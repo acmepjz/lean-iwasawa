@@ -26,8 +26,7 @@ assertion that a ring is an integral domain \docs{IsDomain}
 \item
 assertion that a ring is PID: \docs{IsDomain} + \docs{IsPrincipalIdealRing}
 \item
-Noetherian ring \docs{IsNoetherianRing},
-Noetherian module \docs{IsNoetherian}
+Noetherian ring \docs{IsNoetherianRing}
 \begin{itemize}
 \item
 finitely many minimal prime ideals
@@ -37,8 +36,12 @@ finitely many minimal prime over-ideals
 \docs{Ideal.finite_minimalPrimes_of_isNoetherianRing}
 \end{itemize}
 \item
-Artin ring \docs{IsArtinianRing},
-Artin module \docs{IsArtinian}
+Artin ring \docs{IsArtinianRing}
+\begin{itemize}
+\item
+it is also Noetherian \docs{instIsNoetherianRingOfIsArtinianRing}
+(instance, shouldn't need to call directly)
+\end{itemize}
 \item
 Characteristic of a ring \docs{ringChar}, exponential characteristic \docs{ringExpChar}
 \begin{itemize}
@@ -104,10 +107,23 @@ $M^*=\Hom_\BZ(M,\BQ/\BZ)$ \docs{CharacterModule}
 \item
 Associated primes of a module $\Ass(M)$ \docs{associatedPrimes}
 \item
+Noetherian module \docs{IsNoetherian}
+\item
+Artin module \docs{IsArtinian}
+\item
 assertion that a module is of finite length \docs{IsFiniteLength}
 \begin{itemize}
 \item
+in the statement of theorems use \docs{IsNoetherian} + \docs{IsArtinian} instead
+\item
 length of a module $\ell_A(M)$ \textbf{UNDEFINED !!!}
+\end{itemize}
+\item
+composition series \docs{CompositionSeries}
+\begin{itemize}
+\item
+usage:
+\verb|∃ (s : CompositionSeries (Submodule R M)), RelSeries.head s = ⊥ ∧ RelSeries.last s = ⊤|
 \end{itemize}
 \end{itemize}
 
@@ -117,8 +133,21 @@ length of a module $\ell_A(M)$ \textbf{UNDEFINED !!!}
 
 \begin{prop}
 \label{noeth ring filtration}
-...
+Let $A$ be a Noetherian ring and $M$ be a finitely generated $A$-module.
+Then there exists a chain of submodules of $M$
+\[0 = M_0 \subset M_1 \subset \cdots \subset M_n = M\]
+such that for each $1\leq i\leq n$, $M_i/M_{i-1} \cong A/\fp_i$ for some prime ideal $\fp_i\in\Spec(A)$.
 \end{prop}
+
+\begin{proof}
+When $M=0$ we take $n=0$ and there is nothing to prove.
+When $M\neq 0$ we have $\Ass(M)\neq\varnothing$
+and we can take $\fp_1$ be any element in $\Ass(M)$
+and we obtain $M_1:=A/\fp_1\hookrightarrow M$.
+If $M_1\neq M$, do the same for $M/M_1$ to get $M_2/M_1\cong A/\fp_2\hookrightarrow M/M_1$.
+Since $M$ is a Noetherian $A$-module,
+the chain $M_1\subset M_2\subset\cdots$ must stop after a finite number of steps.
+\end{proof}
 
 \subsection{Characteristic ideal}
 
@@ -388,7 +417,60 @@ Then $A$ itself is a PID.
 \end{lem}
 
 \begin{proof}
-...
+Hint: for a maximal ideal
+$\fp$ of $A$, $A_\fp$ is a PID, hence by Krull's intersection theorem,
+$\bigcap_{n\geq 0}\fp^nA_\fp=0$,
+and in particular, $\fp\supsetneqq\fp^2$. By Chinese remainder theorem,
+for each $\fp$ we can choose $\pi_\fp\in A$ such that
+$\pi_\fp\in\fp\setminus\fp^2$ and $\pi_\fp\equiv 1\pmod{\fq}$
+for all maximal ideals $\fq\neq\fp$.
+Prove that $\pi_\fp$ is a generator of $\fp A_\fp$ as an ideal of $A_\fp$.
+Similar to Homework 3.3 (TODO),
+prove that if $\fa$ is an ideal of $A$, then
+$\fa=\bigcap_\fp\fa A_\fp\subset\Frac(A)$ where $\fp$ runs over all maximal ideals
+of $A$.
+Now if $\fa\neq 0$, then for each maximal ideal $\fp$ of $A$,
+there exists $f_\fp\in A_\fp\setminus\{0\}$ such that $\fa A_\fp=f_\fp A_\fp$,
+and we may choose $f_\fp$ such that $f_\fp\in A\setminus\{0\}$.
+Let $e_\fp\geq 0$
+be the integer such that $f_\fp\in\fp^{e_\fp}\setminus\fp^{e_\fp+1}$.
+Let $f=\prod_\fp\pi_\fp^{e_\fp}$ where $\fp$ runs over all maximal ideals
+of $A$.
+Prove that $fA_\fp=f_\fp A_\fp$ for all maximal ideals $\fp$ of $A$,
+which enables us to deduce that $(f)=\bigcap_\fp fA_\fp=\bigcap_\fp\fa A_\fp
+=\fa$.
+
+Missing details in the hint:
+\begin{itemize}
+\item
+Firstly for any $n\geq 1$, we have $\fp^nA_\fp\cap A=\fp^n$: the ``$\supset$''
+is clear, and for ``$\subset$'', say $a\in A$ such that
+$a=\frac{r}{s}\in\fp^nA_\fp\subset\Frac(A)$ for some $r\in\fp^n$ and $s\in A\setminus\fp$,
+then we have $sa=r\equiv 0\pmod{\fp^n}$;
+on the other hand, the prime ideals of the ring $A/\fp^n$ are one-to-one correspondence to the prime ideals $\fq$ of $A$ satisfying $\fp^n\subset\fq$,
+which implies that $\fp=\sqrt{\fp^n}\subset\sqrt\fq=\fq$, since $\fp$ is a maximal ideal,
+we must have $\fq=\fp$, namely $A/\fp^n$ is a local ring with maximal ideal
+$\fp/\fp^n$, therefore $s$ is invertible in $A/\fp^n$ and which implies
+$a\equiv 0\pmod{\fp^n}$.
+
+Since $A_\fp$ is PID, $\fp A_\fp$ is principal, say $\fp A_\fp=gA_\fp$
+for some $g\in\fp A_\fp$.
+Then $\pi_\fp=gh$ for some $h\in A_\fp$.
+We must have $h\notin\fp A_\fp$, otherwise $\pi_p\in\fp^2 A_\fp\cap A=\fp^2$, contradiction. Therefore $h\in A_\fp^\times$, which means that $\pi_\fp$ is also a generator of $\fp A_\fp$.
+
+\item
+The proof of $\fa=\bigcap_\fp\fa A_\fp$ is exactly the same as
+Homework 3.3 (TODO), which is omitted.
+
+\item
+Since $\pi_\fp$ is a generator of $\fp A_\fp$
+and $\pi_\fq\in A_\fp^\times$ for all $\fq\neq\fp$,
+we have $fA_\fp=\fp^{e_\fp}A_\fp$.
+On the other hand, $f_\fp\in\fp^{e_\fp}\setminus\fp^{e_\fp+1}$ implies that
+$f_\fp=\pi_\fp^{e_\fp}g_\fp$ for some $g_\fp\in A_\fp$
+and we must have $g_\fp\notin\fp A_\fp$, otherwise $f_\fp\in\fp^{e_\fp+1}A_\fp\cap A=\fp^{e_\fp+1}$, contradiction. Therefore $g_\fp\in A_\fp^\times$,
+hence $fA_\fp=\fp^{e_\fp}A_\fp=f_\fp A_\fp$.
+\end{itemize}
 \end{proof}
 
 \begin{prop}
@@ -398,7 +480,14 @@ A Noetherian regular domain satisfies \eqref{e:ht-1-localization-is-PID}.
 \end{prop}
 
 \begin{proof}
-...
+If $A$ is a Noetherian regular domain, then for each height one prime $\fp$ of $A$,
+$A_\fp$ is a PID.
+For any finitely many height one primes $\fp_1,\cdots,\fp_r$ of $A$,
+let $S:=A\setminus\bigcup_{i=1}^r\fp_i$,
+then $S^{-1}A$ is a semilocal integral domain, whose
+maximal ideals are $S^{-1}\fp_1,\cdots,S^{-1}\fp_r$,
+and we have $(S^{-1}A)_{S^{-1}\fp_i}=A_{\fp_i}$,
+therefore by (i) we know that $S^{-1}A$ is a PID.
 \end{proof}
 
 \begin{remark}

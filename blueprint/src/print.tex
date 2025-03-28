@@ -1,3 +1,4 @@
+% !TeX TS-program = xelatex
 % This file makes a printable version of the blueprint
 % It should include all the \usepackage needed for the pdf version.
 % The template version assume you want to use a modern TeX compiler
@@ -12,9 +13,10 @@
 
 \documentclass[a4paper]{amsart}
 
+\usepackage{fontspec}
 \usepackage{fullpage}
 \usepackage{tikz}
-\usepackage{xypic}
+\usepackage{xy}
 \usepackage{newunicodechar}
 
 %\usepackage{geometry}
@@ -25,6 +27,16 @@
 \usepackage[unicode,colorlinks=true,linkcolor=blue,urlcolor=magenta, citecolor=blue]{hyperref}
 
 %\usepackage[warnings-off={mathtools-colon,mathtools-overbracket}]{unicode-math}
+
+% JuliaMono has all the symbols needed for Lean code
+\setmonofont[Scale=MatchLowercase]{JuliaMono}[
+  Extension=.ttf,
+  UprightFont=*-Regular,
+  BoldFont=*-Bold,
+  ItalicFont=*-RegularItalic,
+  BoldItalicFont=*-BoldItalic,
+  RawFeature={-calt},
+]
 
 \input{macros/common}
 \input{macros/print}

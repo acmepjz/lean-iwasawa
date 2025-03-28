@@ -242,6 +242,8 @@ hence $\chaR_A(M)=\chaR_A(M')\chaR_A(M'')$ holds.
 
 \begin{definition}
 \label{def:pseudo null}
+\lean{Module.IsPseudoNull, LinearMap.IsPseudoIsomorphism, Module.IsPseudoIsomorphic}
+\leanok
 Let $A$ be a Noetherian ring.
 
 {\rm(i)}
@@ -475,7 +477,7 @@ hence $fA_\fp=\fp^{e_\fp}A_\fp=f_\fp A_\fp$.
 
 \begin{prop}
 \label{regular domain is good}
-\uses{semilocal PID}
+\uses{semilocal PID, def:ht-1-localization-is-PID}
 A Noetherian regular domain satisfies \eqref{e:ht-1-localization-is-PID}.
 \end{prop}
 

@@ -1,1 +1,1 @@
-# Iwasawalib
+# Formalization of Iwasawa Theory in LꓱꓯN (tentative)

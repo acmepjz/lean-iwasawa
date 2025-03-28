@@ -2,4 +2,10 @@ lean_decls
 print/
 web/
 src/web.paux
-
+*.aux
+*.log
+*.out
+*.pdf
+*.synctex
+*.synctex.gz
+*.toc

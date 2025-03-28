@@ -5,3 +5,403 @@
 % If you want to split the blueprint content into several files then
 % the current file can be a simple sequence of \input. Otherwise It
 % can start with a \section or \chapter for instance.
+
+\tableofcontents
+
+\section*{Known results in mathlib}
+
+\subsection{Property of rings}
+
+\begin{itemize}
+\item
+Commutative ring with unit \docs{CommRing}
+\item
+Field \docs{Field}
+\begin{itemize}
+\item
+assertion that a ring is a field \docs{IsField}
+\end{itemize}
+\item
+assertion that a ring is an integral domain \docs{IsDomain}
+\item
+assertion that a ring is PID: \docs{IsDomain} + \docs{IsPrincipalIdealRing}
+\item
+Noetherian ring \docs{IsNoetherianRing},
+Noetherian module \docs{IsNoetherian}
+\begin{itemize}
+\item
+finitely many minimal prime ideals
+\docs{minimalPrimes.finite_of_isNoetherianRing}
+\item
+finitely many minimal prime over-ideals
+\docs{Ideal.finite_minimalPrimes_of_isNoetherianRing}
+\end{itemize}
+\item
+Artin ring \docs{IsArtinianRing},
+Artin module \docs{IsArtinian}
+\item
+Characteristic of a ring \docs{ringChar}, exponential characteristic \docs{ringExpChar}
+\begin{itemize}
+\item
+assertion that a ring is of specific characteristic
+\docs{CharZero}, \docs{CharP}, \docs{ExpChar}
+\end{itemize}
+\item
+Krull dimension of a ring \docs{ringKrullDim}
+\begin{itemize}
+\item
+assertion that a ring is of Krull dimension $\leq n$
+\docs{Ring.KrullDimLE}
+\end{itemize}
+\end{itemize}
+
+\subsection{Property of ideals}
+
+\begin{itemize}
+\item
+Ideal of a ring \docs{Ideal}
+\begin{itemize}
+\item
+assertion that an ideal is principal \docs{Submodule.IsPrincipal}
+\item
+assertion that an ideal is a prime ideal \docs{Ideal.IsPrime}
+\begin{itemize}
+\item
+\docs{Ideal.Quotient.isDomain_iff_prime}
+\end{itemize}
+\item
+assertion that an ideal is a maximal ideal \docs{Ideal.IsMaximal}
+\begin{itemize}
+\item
+\docs{Ideal.Quotient.maximal_ideal_iff_isField_quotient}
+\item
+\docs{Ideal.Quotient.field} (instance, shouldn't need to call directly)
+\end{itemize}
+\end{itemize}
+\item
+Height of an ideal \docs{Ideal.height},
+height of a prime ideal \docs{Ideal.primeHeight}
+\begin{itemize}
+\item
+assertion that an ideal is the whole ring or of finite height \docs{Ideal.FiniteHeight}
+\end{itemize}
+\item
+the \texttt{Type} of prime ideals of a ring $\Spec(R)$ \docs{PrimeSpectrum}
+\item
+set of minimal primes \docs{minimalPrimes},
+set of minimal prime over-ideals \docs{Ideal.minimalPrimes}
+\end{itemize}
+
+\subsection{Property of modules}
+
+\begin{itemize}
+\item
+Support of a module $\Supp(M)$ \docs{Module.support}
+\item
+Annihilator of a module $\Ann(M)$ \docs{Module.annihilator}
+\item
+$M^*=\Hom_\BZ(M,\BQ/\BZ)$ \docs{CharacterModule}
+\item
+Associated primes of a module $\Ass(M)$ \docs{associatedPrimes}
+\item
+assertion that a module is of finite length \docs{IsFiniteLength}
+\begin{itemize}
+\item
+length of a module $\ell_A(M)$ \textbf{UNDEFINED !!!}
+\end{itemize}
+\end{itemize}
+
+\section{Structure of Iwasawa module}
+
+\subsection{Preliminaries on Noetherian rings}
+
+\begin{prop}
+\label{noeth ring filtration}
+...
+\end{prop}
+
+\subsection{Characteristic ideal}
+
+\begin{prop}
+\label{char ideal}
+\uses{noeth ring filtration}
+Let $A$ be a Noetherian ring, $M$ be a
+finitely generated torsion $A$-module.
+Then for any height one prime $\fp$ of $A$,
+$M_\fp$ is an $A_\fp$-module of finite length. Moreover, there are only finitely
+many height one primes $\fp$ of $A$ such that $M_\fp\neq 0$.
+\end{prop}
+
+\begin{proof}
+By Proposition \ref{noeth ring filtration},
+we may let $0=M_0\subset M_1\subset\cdots\subset M_n=M$ be a filtration of $M$
+such that for each $1\leq i\leq n$,
+$M_i/M_{i-1}\cong A/\fp_i$ for some prime ideal $\fp_i$ of $A$.
+Note that if $\fp,\fq$ are prime ideals of $A$,
+then $(A/\fp)_\fq\neq 0$ if and only if $\fp\subset\fq$.
+Therefore by $M$ is torsion $A$-module, we obtain that $\height(\fp_i)\geq 1$
+for all $1\leq i\leq n$,
+and if $\fp$ is a height one prime, then $M_\fp\neq 0$
+if and only if $\fp_i\subset\fp$ for some $i$,
+by height considerations this means that $\fp_i=\fp$ for some $i$,
+hence such $\fp$ are only finitely many.
+
+To prove $\ell_{A_\fp}(M_\fp)<\infty$,
+we only need to show that if $\fp,\fq$ are prime ideals of $A$
+such that $\height(\fp)\geq 1$ and $\height(\fq)=1$,
+then $(A/\fp)_\fq$ is an $A_\fq$-module of finite length.
+In fact, by height considerations we know that $(A/\fp)_\fq\neq 0$
+if and only if $\fp=\fq$, in this case $(A/\fq)_\fq=A_\fq/\fq A_\fq
+=k(\fq)$ is the residue field of $\fq$, which is
+an $A_\fq$-module of length one.
+
+(\emph{Another proof without using Proposition \ref{noeth ring filtration}.}
+Note that $M_\fp=0$ for all minimal prime ideals of $A$,
+therefore if $\fp$ is of height one such that $M_\fp\neq 0$,
+then $\fp$ is a minimal element in $\Supp(M)$, hence $\fp\in\Ass(M)$
+which is a finite set.
+So there are only finitely
+many height one primes $\fp$ of $A$ such that $M_\fp\neq 0$.
+
+Suppose $\fp$ is a height one prime such that $M_\fp\neq 0$.
+To prove that $M_\fp$ is an $A_\fp$-module of finite length,
+we only need to prove that the ring $A_\fp/\Ann_{A_\fp}(M_\fp)$
+is Artinian. Note that $\Ann_{A_\fp}(M_\fp)=\Ann_A(M)_\fp$,
+hence $A_\fp/\Ann_{A_\fp}(M_\fp)=(A/\Ann_A(M))_\fp$
+whose prime ideals are one-to-one correspondence to prime ideals
+of $A$ between $\Ann_A(M)$ and $\fp$,
+i.e.~prime ideals in $\Supp(M)$ which is contained in $\fp$.
+Such ideal can only be $\fp$ itself,
+since $M$ is torsion, every prime ideal in $\Supp(M)$ has height $\geq 1$.
+Hence $A_\fp/\Ann_{A_\fp}(M_\fp)$
+is Artinian.)
+\end{proof}
+
+In particular, this allows us to define the \emph{characteristic ideal} of $M$.
+
+\begin{definition}
+\label{def:char ideal}
+\uses{char ideal}
+Let $A$ be a Noetherian ring, $M$ be a
+finitely generated torsion $A$-module.
+The \emph{characteristic ideal} of $M$,
+denoted by $\chaR_A(M)$, or simply $\chaR(M)$ if there is no risk of confusion, is defined to be
+$$
+\chaR_A(M):=\prod_{\substack{\fp\in\Spec(A)\\
+\height(\fp)=1}}\fp^{\ell_{A_\fp}(M_\fp)}.
+$$
+\end{definition}
+
+\begin{prop}
+\label{char ideal additive}
+\uses{def:char ideal}
+Let $A$ be a Noetherian ring.
+Let $0\to M'\to M\to M''\to 0$ be a short exact sequence of finitely generated $A$-modules. Then $M$ is $A$-torsion if and only if $M'$ and $M''$ are $A$-torsion.
+If $M$ is $A$-torsion, then $\chaR_A(M)=\chaR_A(M')\chaR_A(M'')$.
+\end{prop}
+
+\begin{proof}
+Since localization is exact, for any prime ideal $\fp$ of $A$,
+the $0\to M_\fp'\to M_\fp\to M_\fp''\to 0$ is exact.
+Let $\fp$ runs over all minimal prime ideals of $A$,
+we obtain that $M$ is $A$-torsion if and only if $M'$ and $M''$ are $A$-torsion.
+Also, we have $\ell_{A_\fp}(M_\fp)=\ell_{A_\fp}(M_\fp')+\ell_{A_\fp}(M_\fp'')$,
+hence $\chaR_A(M)=\chaR_A(M')\chaR_A(M'')$ holds.
+\end{proof}
+
+\subsection{Pseudo-null module}
+
+\begin{definition}
+\label{def:pseudo null}
+Let $A$ be a Noetherian ring.
+
+{\rm(i)}
+A finitely generated $A$-module $M$ is called a \emph{pseudo-null} $A$-module,
+if $M_\fp=0$ for all prime ideals $\fp$ of $A$ of height $\leq 1$.
+
+{\rm(ii)}
+An $A$-linear homomorphism $f:M\to N$ between finitely generated $A$-modules
+is called a \emph{pseudo-isomorphism} (\emph{pis} for short),
+if its kernel and cokernel are pseudo-null $A$-modules.
+
+{\rm(iii)}
+Two finitely generated $A$-modules $M,N$ are called
+\emph{pseudo-isomorphic} (\emph{pis} for short),
+denoted by $M\sim_\pis N$ or simply $M\sim N$,
+if there exists a pseudo-isomorphism from $M$ to $N$.
+\end{definition}
+
+\begin{remark}
+We warn the reader that $M\sim N$ not necessarily implies $N\sim M$.
+\end{remark}
+
+\begin{prop}
+\label{pseudo null criterion}
+\uses{def:pseudo null}
+Let $A$ be a Noetherian ring, $M$ be a finitely generated $A$-module.
+If $A$ is of Krull dimension $\leq 1$, then $M$ is pseudo-null
+if and only if $M=0$.
+If $A$ is of Krull dimension $2$, then $M$ is pseudo-null
+if and only if the cardinality of $M$ is finite (???).
+\end{prop}
+
+\subsection{Structure theorem}
+
+\begin{definition}
+\label{def:ht-1-localization-is-PID}
+Let $A$ be a Noetherian ring.
+We say that the height one localization of $A$ is PID (?), if
+\begin{equation}
+\label{e:ht-1-localization-is-PID}
+\begin{array}{l}
+\text{For any finitely many height one primes $\fp_1,\cdots,\fp_r$ of $A$,}\\
+\text{let $S:=A\setminus\bigcup_{i=1}^r\fp_i$, then $S^{-1}A$ is a PID.}
+\end{array}
+\end{equation}
+\end{definition}
+
+\begin{lem}
+\label{pis-iff}
+\uses{char ideal}
+Let $A$ be a Noetherian ring and let
+$M,N$ be finitely generated torsion $A$-modules.
+Let $\Sigma=\{\fq_1,\cdots,\fq_r\}
+=\{\fq\in\Supp(M)\cup\Supp(N)\mid\height(\fq)=1\}$
+(by Proposition \ref{char ideal} this is a finite set).
+Let $S:=A\setminus\bigcup_{i=1}^r\fq_i$ which is a multiplicative subset of $A$.
+Let $f:M\to N$ be an $A$-module homomorphism.
+Then $f$ is a pseudo-isomorphism if and only if $S^{-1}f:S^{-1}M\to S^{-1}N$
+is an isomorphism.
+\end{lem}
+
+\begin{proof}
+Since the height one support of $\ker(f)$ and $\coker(f)$
+are contained in $\Sigma$,
+and since $S^{-1}\ker(f)=\ker(S^{-1}f)$,
+$S^{-1}\coker(f)=\coker(S^{-1}f)$ (localization is exact),
+we only need to prove that if $M$ is a finitely generated torsion $A$-module
+whose height one support is contained in $\Sigma$,
+then $S^{-1}M=0$ if and only if $M$ is pseudo-null (equivalently, $M_\fq=0$
+for all $\fq\in\Sigma$):
+``$\Rightarrow$'': Clear.
+``$\Leftarrow$'': For all $\fq\in\Sigma$, $M_\fq=0$ means that $\Ann(M)\not\subset\fq$,
+since $\fq$ are prime ideals, we have $\Ann(M)\not\subset\bigcup_{\fq\in\Sigma}\fq$,
+so $S^{-1}M=0$.
+\end{proof}
+
+\begin{prop}[Structure theorem of finitely generated torsion $A$-modules]
+\label{structure thm}
+\uses{def:ht-1-localization-is-PID,char ideal}
+Let $A$ be a Noetherian ring satisfying \eqref{e:ht-1-localization-is-PID}
+and let $M$ be a finitely generated torsion $A$-module.
+Then there exist height one primes $\fp_1,\cdots,\fp_s$ of $A$
+and positive integers $k_1,\cdots,k_s$, such that there exists a pseudo-isomorphism
+$M\to\bigoplus_{i=1}^s A/\fp_i^{k_i}$.
+Moreover, the sequence $(\fp_i^{k_i})_{i=1}^s$ is unique up to ordering.
+\end{prop}
+
+\begin{proof}
+Let
+$\Sigma=\{\fq_1,\cdots,\fq_r\}=\{\fq\in\Supp(M)\mid\height(\fq)=1\}$
+(by Proposition \ref{char ideal} this is a finite set),
+and let $S=A\setminus\bigcup_{i=1}^r\fq_i$.
+Then $S^{-1}M$ is a finitely generated $S^{-1}A$-module,
+and is torsion (for example, since $\Hom_{S^{-1}A}(S^{-1}M,S^{-1}A)
+=S^{-1}\Hom_A(M,A)=0$).
+
+Note that the prime ideals $\fP$ of $S^{-1}A$ are one-to-one correspondence
+to prime ideals $\fp$ of $A$ satisfying $\fp\cap S=\varnothing$
+(i.e.~$\fp\subset\bigcup_{i=1}^r\fq_i$, i.e~$\fp\subset\fq_i$ for some $i$),
+by $\fP=S^{-1}\fp$ and $\fp=\fP\cap A$.
+In particular, $S^{-1}A$ is of dimension $\leq 1$.
+
+By structure theorem of finitely generated torsion modules over a PID,
+there exist primes $\fp_1,\cdots,\fp_s$ of $A$
+satisfying $\fp_i\cap S=\varnothing$,
+and positive integers $k_1,\cdots,k_s$, such that
+there exists an isomorphism
+$g:S^{-1}M\xrightarrow\sim\bigoplus_{i=1}^sS^{-1}(A/\fp_i^{k_i})$
+of $S^{-1}A$-modules.
+Since $S^{-1}M$ is torsion, the $\fp_i$'s must be of height one.
+Since $\Hom_{S^{-1}A}(S^{-1}M,\bigoplus_{i=1}^sS^{-1}(A/\fp_i^{k_i}))
+=S^{-1}\Hom_A(M,\bigoplus_{i=1}^sA/\fp_i^{k_i})$,
+by multiplying an element of $S$ to $g$ if necessary
+(this doesn't change the fact that $g$ is an isomorphism), we may find
+an $A$-linear map $f:M\to\bigoplus_{i=1}^sA/\fp_i^{k_i}$
+such that $g=S^{-1}f$.
+Now by (i) we know that $f$ is a pseudo-isomorphism.
+
+Conversely, if $(\fp_i^{k_i})_{i=1}^s$ is such that there exists a
+pseudo-isomorphism
+$M\to\bigoplus_{i=1}^s A/\fp_i^{k_i}$,
+then enlarging $S$ if necessary, by Lemma \ref{pis-iff},
+its localization
+$S^{-1}M\to\bigoplus_{i=1}^sS^{-1}(A/\fp_i^{k_i})$
+is an isomorphism of $S^{-1}A$-module, hence by
+structure theorem of finitely generated torsion modules over a PID,
+the $(\fp_i^{k_i})_{i=1}^s$ is unique up to ordering.
+\end{proof}
+
+\begin{prop}
+\label{pis symm}
+\uses{def:ht-1-localization-is-PID,pis-iff}
+Let $A$ be a Noetherian ring satisfying \eqref{e:ht-1-localization-is-PID}.
+Let $M,N$ be finitely generated torsion $A$-modules.
+Then the followings are equivalent:
+\begin{itemize}
+\item[(a)]
+There exists a pseudo-isomorphism $M\to N$.
+\item[(b)]
+For any height one prime $\fp$ of $A$, we have $M_\fp\cong N_\fp$.
+\end{itemize}
+In particular, if there exists a pseudo-isomorphism $M\to N$,
+then there also exists a pseudo-isomorphism $N\to M$.
+\end{prop}
+
+\begin{proof}
+(a)$\Rightarrow$(b): Clear.
+
+(b)$\Rightarrow$(a): Let $\Sigma=\{\fq_1,\cdots,\fq_r\}
+=\{\fq\in\Supp(M)\cup\Supp(N)\mid\height(\fq)=1\}$
+(by Proposition \ref{char ideal} this is a finite set),
+and let $S=A\setminus\bigcup_{i=1}^r\fq_i$.
+Since $M_\fp\cong N_\fp$ for all height one primes $\fp$ of $A$,
+the $S^{-1}M$ and $S^{-1}N$, being finitely generated torsion modules over
+a PID $S^{-1}A$, are isomorphic. Say $g:S^{-1}M\xrightarrow\sim S^{-1}N$
+is an isomorphism of $S^{-1}A$-modules.
+Since $\Hom_{S^{-1}A}(S^{-1}M,S^{-1}N)=S^{-1}\Hom_A(M,N)$,
+by multiplying an element of $S$ to $g$ if necessary
+(this doesn't change the fact that $g$ is an isomorphism), we may find
+an $A$-linear map $f:M\to N$
+such that $g=S^{-1}f$.
+Now by Lemma \ref{pis-iff} we know that $f$ is a pseudo-isomorphism.
+\end{proof}
+
+\subsection{Noetherian regular domain}
+
+\begin{lem}
+\label{semilocal PID}
+Let $A$ be a semilocal (i.e.~only finitely many maximal ideals)
+integral domain which is not a field,
+such that for every maximal ideal $\fp$ of $A$, $A_\fp$ is a PID.
+Then $A$ itself is a PID.
+\end{lem}
+
+\begin{proof}
+...
+\end{proof}
+
+\begin{prop}
+\label{regular domain is good}
+\uses{semilocal PID}
+A Noetherian regular domain satisfies \eqref{e:ht-1-localization-is-PID}.
+\end{prop}
+
+\begin{proof}
+...
+\end{proof}
+
+\begin{remark}
+In fact, a Noetherian integrally closed domain satisfies
+\eqref{e:ht-1-localization-is-PID}.
+\end{remark}

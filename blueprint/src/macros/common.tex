@@ -9,10 +9,264 @@
 % (this is what the [theorem] arguments mean) and never resets it.
 % If you want for instance to number them within chapters then you can add
 % [chapter] at the end of the next line.
-\newtheorem{theorem}{Theorem}
-\newtheorem{proposition}[theorem]{Proposition}
-\newtheorem{lemma}[theorem]{Lemma}
-\newtheorem{corollary}[theorem]{Corollary}
 
+\let\Re\undefined
+\let\Im\undefined
+
+\DeclareMathOperator{\Re}{Re}
+\DeclareMathOperator{\Im}{Im}
+\DeclareMathOperator{\Fil}{Fil}
+\DeclareMathOperator{\Tw}{Tw}
+\DeclareMathOperator{\Leop}{Leop}
+\DeclareMathOperator{\Tr}{Tr}
+\DeclareMathOperator{\Rec}{Rec}
+\DeclareMathOperator{\Tam}{Tam}
+\DeclareMathOperator{\Exp}{Exp}
+\DeclareMathOperator{\Log}{Log}
+\DeclareMathOperator{\col}{Col}
+\DeclareMathOperator{\Tay}{Tay}
+\DeclareMathOperator{\res}{res}
+\DeclareMathOperator{\coker}{coker}
+\DeclareMathOperator{\chaR}{char}
+\DeclareMathOperator{\disc}{disc}
+\DeclareMathOperator{\Ext}{Ext}
+\DeclareMathOperator{\Tor}{Tor}
+\DeclareMathOperator{\rank}{rank}
+\DeclareMathOperator{\ev}{ev}
+\DeclareMathOperator{\coR}{cor}
+\DeclareMathOperator{\diV}{div}
+\DeclareMathOperator{\Kom}{Kom}
+\DeclareMathOperator{\Map}{Map}
+\DeclareMathOperator{\Cone}{Cone}
+\DeclareMathOperator{\nrd}{nrd}
+\DeclareMathOperator{\trd}{trd}
+\DeclareMathOperator{\level}{level}
+
+\newcommand{\glob}{{\mathrm{glob}}}
+\newcommand{\arith}{{\mathrm{arith}}}
+\newcommand{\temp}{{\mathrm{temp}}}
+\newcommand{\Iw}{{\mathrm{Iw}}}
+\newcommand{\LP}{{\mathrm{LP}}}
+\newcommand{\LC}{{\mathrm{LC}}}
+\newcommand{\LA}{{\mathrm{LA}}}
+\newcommand{\Haar}{{\mathrm{Haar}}}
+\newcommand{\ps}{{\mathrm{ps}}}
+\newcommand{\rel}{{\mathrm{rel}}}
+\newcommand{\str}{{\mathrm{str}}}
+\newcommand{\rrel}{{\text{\rm-rel}}}
+\newcommand{\sstr}{{\text{\rm-str}}}
+\newcommand{\tors}{{\mathrm{tors}}}
+\newcommand{\ttors}{{\text{\rm-tors}}}
+\newcommand{\pis}{{\mathrm{pis}}}
+\newcommand{\Top}{{\mathbf{Top}}}
+\newcommand{\hTop}{{\mathbf{hTop}}}
+\newcommand{\Ab}{{\mathbf{Ab}}}
+\newcommand{\aalg}{{\text{\rm-alg}}}
+\newcommand{\ET}{{\mathrm{ET}}}
+\newcommand{\ac}{{\mathrm{ac}}}
+\newcommand{\ess}{{\mathrm{ess}}}
+\newcommand{\primeto}{{\mathrm{prime}\text{-}\mathrm{to}\text{-}}}
+\newcommand{\geom}{{\mathrm{geom}}}
+
+\newcommand{\BA}{{\mathbb {A}}} \newcommand{\BB}{{\mathbb {B}}}
+\newcommand{\BC}{{\mathbb {C}}} \newcommand{\BD}{{\mathbb {D}}}
+\newcommand{\BE}{{\mathbb {E}}} \newcommand{\BF}{{\mathbb {F}}}
+\newcommand{\BG}{{\mathbb {G}}} \newcommand{\BH}{{\mathbb {H}}}
+\newcommand{\BI}{{\mathbb {I}}} \newcommand{\BJ}{{\mathbb {J}}}
+\newcommand{\BK}{{\mathbb {K}}} \newcommand{\BL}{{\mathbb {L}}}
+\newcommand{\BM}{{\mathbb {M}}} \newcommand{\BN}{{\mathbb {N}}}
+\newcommand{\BO}{{\mathbb {O}}} \newcommand{\BP}{{\mathbb {P}}}
+\newcommand{\BQ}{{\mathbb {Q}}} \newcommand{\BR}{{\mathbb {R}}}
+\newcommand{\BS}{{\mathbb {S}}} \newcommand{\BT}{{\mathbb {T}}}
+\newcommand{\BU}{{\mathbb {U}}} \newcommand{\BV}{{\mathbb {V}}}
+\newcommand{\BW}{{\mathbb {W}}} \newcommand{\BX}{{\mathbb {X}}}
+\newcommand{\BY}{{\mathbb {Y}}} \newcommand{\BZ}{{\mathbb {Z}}}
+
+\newcommand{\bD}{{\mathbf{D}}}
+\newcommand{\bT}{{\mathbf{T}}}
+\newcommand{\bV}{{\mathbf{V}}}
+\newcommand{\bW}{{\mathbf{W}}}
+
+\newcommand{\CA}{{\mathcal {A}}} \newcommand{\CB}{{\mathcal {B}}}
+\newcommand{\CC}{{\mathcal {C}}} \newcommand{\CD}{{\mathcal {D}}}
+\newcommand{\CE}{{\mathcal {E}}} \newcommand{\CF}{{\mathcal {F}}}
+\newcommand{\CG}{{\mathcal {G}}} \newcommand{\CH}{{\mathcal {H}}}
+\newcommand{\CI}{{\mathcal {I}}} \newcommand{\CJ}{{\mathcal {J}}}
+\newcommand{\CK}{{\mathcal {K}}} \newcommand{\CL}{{\mathcal {L}}}
+\newcommand{\CM}{{\mathcal {M}}} \newcommand{\CN}{{\mathcal {N}}}
+\newcommand{\CO}{{\mathcal {O}}} \newcommand{\CP}{{\mathcal {P}}}
+\newcommand{\CQ}{{\mathcal {Q}}} \newcommand{\CR}{{\mathcal {R}}}
+\newcommand{\CS}{{\mathcal {S}}} \newcommand{\CT}{{\mathcal {T}}}
+\newcommand{\CU}{{\mathcal {U}}} \newcommand{\CV}{{\mathcal {V}}}
+\newcommand{\CW}{{\mathcal {W}}} \newcommand{\CX}{{\mathcal {X}}}
+\newcommand{\CY}{{\mathcal {Y}}} \newcommand{\CZ}{{\mathcal {Z}}}
+
+\newcommand{\RA}{{\mathrm {A}}} \newcommand{\RB}{{\mathrm {B}}}
+\newcommand{\RC}{{\mathrm {C}}} \newcommand{\RD}{{\mathrm {D}}}
+\newcommand{\RE}{{\mathrm {E}}} \newcommand{\RF}{{\mathrm {F}}}
+\newcommand{\RG}{{\mathrm {G}}} \newcommand{\RH}{{\mathrm {H}}}
+\newcommand{\RI}{{\mathrm {I}}} \newcommand{\RJ}{{\mathrm {J}}}
+\newcommand{\RK}{{\mathrm {K}}} \newcommand{\RL}{{\mathrm {L}}}
+\newcommand{\RM}{{\mathrm {M}}} \newcommand{\RN}{{\mathrm {N}}}
+\newcommand{\RO}{{\mathrm {O}}} \newcommand{\RP}{{\mathrm {P}}}
+\newcommand{\RQ}{{\mathrm {Q}}} \newcommand{\RR}{{\mathrm {R}}}
+\newcommand{\RS}{{\mathrm {S}}} \newcommand{\RT}{{\mathrm {T}}}
+\newcommand{\RU}{{\mathrm {U}}} \newcommand{\RV}{{\mathrm {V}}}
+\newcommand{\RW}{{\mathrm {W}}} \newcommand{\RX}{{\mathrm {X}}}
+\newcommand{\RY}{{\mathrm {Y}}} \newcommand{\RZ}{{\mathrm {Z}}}
+
+\newcommand{\fa}{{\mathfrak{a}}} \newcommand{\fb}{{\mathfrak{b}}}
+\newcommand{\fc}{{\mathfrak{c}}} \newcommand{\fd}{{\mathfrak{d}}}
+\newcommand{\fe}{{\mathfrak{e}}} \newcommand{\ff}{{\mathfrak{f}}}
+\newcommand{\fg}{{\mathfrak{g}}} \newcommand{\fh}{{\mathfrak{h}}}
+\newcommand{\fii}{{\mathfrak{i}}} \newcommand{\fj}{{\mathfrak{j}}}
+\newcommand{\fk}{{\mathfrak{k}}} \newcommand{\fl}{{\mathfrak{l}}}
+\newcommand{\fm}{{\mathfrak{m}}} \newcommand{\fn}{{\mathfrak{n}}}
+\newcommand{\fo}{{\mathfrak{o}}} \newcommand{\fp}{{\mathfrak{p}}}
+\newcommand{\fq}{{\mathfrak{q}}} \newcommand{\fr}{{\mathfrak{r}}}
+\newcommand{\fs}{{\mathfrak{s}}} \newcommand{\ft}{{\mathfrak{t}}}
+\newcommand{\fu}{{\mathfrak{u}}} \newcommand{\fv}{{\mathfrak{v}}}
+\newcommand{\fw}{{\mathfrak{w}}} \newcommand{\fx}{{\mathfrak{x}}}
+\newcommand{\fy}{{\mathfrak{y}}} \newcommand{\fz}{{\mathfrak{z}}}
+\newcommand{\fA}{{\mathfrak{A}}} \newcommand{\fB}{{\mathfrak{B}}}
+\newcommand{\fC}{{\mathfrak{C}}} \newcommand{\fD}{{\mathfrak{D}}}
+\newcommand{\fE}{{\mathfrak{E}}} \newcommand{\fF}{{\mathfrak{F}}}
+\newcommand{\fG}{{\mathfrak{G}}} \newcommand{\fH}{{\mathfrak{H}}}
+\newcommand{\fI}{{\mathfrak{I}}} \newcommand{\fJ}{{\mathfrak{J}}}
+\newcommand{\fK}{{\mathfrak{K}}} \newcommand{\fL}{{\mathfrak{L}}}
+\newcommand{\fM}{{\mathfrak{M}}} \newcommand{\fN}{{\mathfrak{N}}}
+\newcommand{\fO}{{\mathfrak{O}}} \newcommand{\fP}{{\mathfrak{P}}}
+\newcommand{\fQ}{{\mathfrak{Q}}} \newcommand{\fR}{{\mathfrak{R}}}
+\newcommand{\fS}{{\mathfrak{S}}} \newcommand{\fT}{{\mathfrak{T}}}
+\newcommand{\fU}{{\mathfrak{U}}} \newcommand{\fV}{{\mathfrak{V}}}
+\newcommand{\fW}{{\mathfrak{W}}} \newcommand{\fX}{{\mathfrak{X}}}
+\newcommand{\fY}{{\mathfrak{Y}}} \newcommand{\fZ}{{\mathfrak{Z}}}
+
+
+
+
+
+
+\newcommand{\ab}{{\mathrm{ab}}}\newcommand{\Ad}{{\mathrm{Ad}}}
+\newcommand{\ad}{{\mathrm{ad}}}\newcommand{\al}{{\mathrm{al}}}
+\newcommand{\alg}{{\mathrm{alg}}} \newcommand{\an}{{\mathrm{an}}}\newcommand{\Ann}{{\mathrm{Ann}}}
+\newcommand{\Aut}{{\mathrm{Aut}}}\newcommand{\Ar}{{\mathrm{Ar}}}
+\newcommand{\Asai}{{\mathrm{Asai}}}\DeclareMathOperator{\Ass}{Ass}
+\newcommand{\Alt}{{\mathrm{Alt}}}\newcommand{\Alb}{{\mathrm{Alb}}}
+\newcommand{\Art}{{\mathrm{Art}}} \newcommand{\bij}{{\mathrm{bij}}}
+\newcommand{\Br}{{\mathrm{Br}}}\newcommand{\BBC}{{\mathrm{BC}}}
+\newcommand{\Char}{{\mathrm{Char}}}\newcommand{\cf}{{\mathrm{cf}}}
+\newcommand{\Ch}{{\mathrm{Ch}}}\newcommand{\cod}{{\mathrm{cod}}}
+\newcommand{\cond}{\mathrm{cond^r}}\newcommand{\Cond}{{\mathrm{Cond}}}
+\newcommand{\cont}{{\mathrm{cont}}}\newcommand{\cris}{{\mathrm{cris}}}
+\DeclareMathOperator{\corank}{corank}\newcommand{\Disc}{{\mathrm{Disc}}}
+\newcommand{\Cor}{{\mathrm{Cor}}}\DeclareMathOperator{\cl}{cl}
+\newcommand{\Cl}{{\mathrm{Cl}}}\newcommand{\can}{{\mathrm{can}}}
+\newcommand{\codim}{{\mathrm{codim}}}\newcommand{\Coker}{{\mathrm{Coker}}}
+\newcommand{\cyc}{{\mathrm{cyc}}}
+\newcommand{\dR}{{\mathrm{dR}}}\newcommand{\depth}{{\mathrm{depth}}}
+\newcommand{\Deg}{{\mathrm{Deg}}}
+\newcommand{\Def}{{\mathrm{Def}}}\newcommand{\der}{{\mathrm{der}}}
+\DeclareMathOperator{\diag}{diag} \newcommand{\Ob}{{\mathrm{Ob}}}
+\newcommand{\Div}{{\mathrm{Div}}}
+\newcommand{\End}{{\mathrm{End}}} \newcommand{\Eis}{{\mathrm{Eis}}}
+\newcommand{\Ell}{{\mathrm{Ell}}}\newcommand{\Error}{{\mathrm{Errr}}}
+\newcommand{\Frac}{{\mathrm{Frac}}}\newcommand{\Fr}{{\mathrm{Fr}}}
+\newcommand{\Frob}{{\mathrm{Frob}}} \newcommand{\fin}{{\mathrm{fin}}}
+\newcommand{\forget}{{\mathrm{forget}}}  \newcommand{\GOl}{{\mathrm{GO}}}
+\newcommand{\Grossen}{{\mathrm{Grossen}}}
+\newcommand{\Gal}{{\mathrm{Gal}}} \newcommand{\GL}{{\mathrm{GL}}}
+\newcommand{\Groth}{{\mathrm{Groth}}}\newcommand{\GSp}{{\mathrm{GSp}}}
+\newcommand{\Hg}{{\mathrm{Hg}}}\DeclareMathOperator{\Hom}{Hom}
+\newcommand{\height}{{\mathrm{ht}}}\newcommand{\Hol}{{\mathrm{Hol}}}
+\newcommand{\id}{{\mathrm{id}}}
+\newcommand{\Ind}{{\mathrm{Ind}}}  \newcommand{\Loc}{{\mathrm{Loc}}} \newcommand{\Inf}{{\mathrm{Inf}}}
+\newcommand{\GO}{{\mathrm{GO}}} \newcommand{\Mod}{{\mathrm{Mod}}}
+\newcommand{\Irr}{{\mathrm{Irr}}}
+\newcommand{\inv}{{\mathrm{inv}}}\newcommand{\Isom}{{\mathrm{Isom}}}
+\newcommand{\JL}{{\mathrm{JL}}}
+\newcommand{\Jac}{{\mathrm{Jac}}}\newcommand{\Ker}{{\mathrm{Ker}}}
+\newcommand{\KS}{{\mathrm{KS}}}\newcommand{\length}{{\mathrm{length}}}
+\newcommand{\Lie}{{\mathrm{Lie}}}\newcommand{\LT}{{\mathrm{LT}}}
+\newcommand{\loc}{{\mathrm{loc}}}\newcommand{\Mass}{{\mathrm{Mass}}}
+\newcommand{\Mat}{{\mathrm{Mat}}}
+\DeclareMathOperator{\mult}{mult}\newcommand{\Meas}{{\mathrm{Meas}}}
+\newcommand{\Mor}{{\mathrm{Mor}}}\newcommand{\Mp}{{\mathrm{Mp}}}
+\newcommand{\nat}{{\mathrm{nat}}}
+\newcommand{\new}{{\mathrm{new}}} \newcommand{\NS}{{\mathrm{NS}}}
+\newcommand{\NT}{{\mathrm{NT}}} \newcommand{\old}{{\mathrm{old}}}
+\newcommand{\op}{{\mathrm{op}}}
+\DeclareMathOperator{\ord}{ord}
+\newcommand{\PGL}{{\mathrm{PGL}}} \newcommand{\Pic}{\mathrm{Pic}}
+\newcommand{\pr}{{\mathrm{pr}}} \newcommand{\Rad}{{\mathrm{Rad}}}
+\DeclareMathOperator{\Prob}{Prob}
+\newcommand{\Proj}{{\mathrm{Proj}}}\newcommand{\PSL}{{\mathrm{PSL}}}
+\newcommand{\Rep}{{\mathrm{Rep}}}\newcommand{\rec}{{\mathrm{rec}}}
+\newcommand{\ram}{{\mathrm{ram}}}\newcommand{\Rings}{{\mathrm{Rings}}}
+\newcommand{\red}{{\mathrm{red}}}\newcommand{\Rat}{{\mathrm{Rat}}}
+\newcommand{\reg}{{\mathrm{reg}}}\newcommand{\Res}{{\mathrm{Res}}}
+\newcommand{\Rows}{{\mathrm{Rows}}}
+\newcommand{\RRM}{{\mathrm{RM}}}\newcommand{\RRO}{{\mathrm{RO}}}\newcommand{\RCO}{{\mathrm{CO}}}
+\newcommand{\Sel}{{\mathrm{Sel}}} \newcommand{\Sch}{{\mathrm{Sch}}}
+\newcommand{\sep}{{\mathrm{sep}}}\newcommand{\sh}{{\mathrm{sh}}}
+\newcommand{\st}{{\mathrm{st}}}\newcommand{\supp}{{\mathrm{supp}}}
+\newcommand{\Sh}{{\mathbf{Sh}}}\newcommand{\Sets}{{\mathrm{Sets}}}
+\newcommand{\sign}{{\mathrm{sign}}}\renewcommand{\ss}{{\mathrm{ss}}}
+\newcommand{\Sim}{{\mathrm{Sim}}}\newcommand{\SL}{{\mathrm{SL}}}
+\newcommand{\Spec}{{\mathrm{Spec}}} \newcommand{\Spf}{{\mathrm{Spf}}}
+\newcommand{\SO}{{\mathrm{SO}}}\newcommand{\Sp}{{\mathrm{Sp}}}
+\newcommand{\St}{{\mathrm{St}}}\newcommand{\SU}{{\mathrm{SU}}}
+\newcommand{\Sym}{{\mathrm{Sym}}}\newcommand{\sgn}{{\mathrm{sgn}}}
+\newcommand{\Stab}{{\mathrm{Stab}}}\newcommand{\Symb}{{\mathrm{Symb}}}
+\newcommand{\Symm}{{\mathrm{Symm}}}\newcommand{\Tate}{{\mathrm{Tate}}}
+\newcommand{\Tgt}{{\mathrm{Tgt}}}  \newcommand{\Supp}{{\mathrm{Supp}}}
+\newcommand{\tr}{{\mathrm{tr}}}\newcommand{\tor}{{\mathrm{tor}}}
+\newcommand{\RTr}{{\mathrm{Tr}}} \newcommand{\Tra}{{\mathrm{Tra}}}
+\newcommand{\univ}{{\mathrm{univ}}}
+\newcommand{\unr}{{\mathrm{unr}}}\newcommand{\val}{{\mathrm{val}}}
+\newcommand{\Vol}{{\mathrm{Vol}}}\newcommand{\vol}{{\mathrm{vol}}}
+\newcommand{\Vect}{{\mathrm{Vect}}}\newcommand{\Ver}{{\mathrm{Ver}}}
+\newcommand{\WD}{{\mathrm{WD}}}\newcommand{\Pet}{{\mathrm{Pet}}}
+\newcommand{\GSO}{{\mathrm{GSO}}} \newcommand{\Id}{{\mathrm{Id}}}
+
+
+\newcommand{\matrixx}[4]{\begin{pmatrix}
+		#1 & #2 \\ #3 & #4
+\end{pmatrix} }        % 2*2 matrix
+
+\font\cyr=wncyr10
+
+\newcommand{\Sha}{\hbox{\cyr X}}\newcommand{\wt}{\widetilde}
+\newcommand{\wh}{\widehat}
+\newcommand{\pp}{\frac{\partial\bar\partial}{\pi i}}
+\newcommand{\pair}[1]{\left\langle {#1} \right\rangle}
+\newcommand{\wpair}[1]{\left\{{#1}\right\}}
+\newcommand{\intn}[1]{\left( {#1} \right)}
+\newcommand{\norm}[1]{\|{#1}\|} \newcommand{\sfrac}[2]{\left( \frac {#1}{#2}\right)}
+\newcommand{\ds}{\displaystyle}\newcommand{\ov}{\overline}
+\newcommand{\Gros}{Gr\"{o}ssencharak}
+\newcommand{\incl}{\hookrightarrow}
+\newcommand{\sk}{\medskip}\newcommand{\bsk}{\bigskip}
+\newcommand{\lra}{\longrightarrow}\newcommand{\lla}{\longleftarrow}
+\newcommand{\ra}{\rightarrow} \newcommand{\imp}{\Longrightarrow}
+\newcommand{\bs}{\backslash}
+\newcommand{\s}{\sk\noindent}\newcommand{\bigs}{\bsk\noindent}
+\newcommand{\LL}[1]{L^\alg(E^{(#1)}, 1)}
+
+
+\theoremstyle{plain}
+\newtheorem{thm}{Theorem}
+\newtheorem{cor}[thm]{Corollary}
+\newtheorem{lem}[thm]{Lemma}
+\newtheorem{prop}[thm]{Proposition}
+\newtheorem{fact}[thm]{Fact}
+\newtheorem{conj}[thm]{Conjecture}
 \theoremstyle{definition}
-\newtheorem{definition}[theorem]{Definition}
+\newtheorem{definition}[thm]{Definition}
+\newtheorem{exer}[thm]{Exercise}
+\newtheorem{question}[thm]{Question}
+\theoremstyle{remark}
+\newtheorem{remark}[thm]{Remark}
+\newtheorem{example}[thm]{Example}
+\numberwithin{thm}{section}
+\numberwithin{equation}{section}

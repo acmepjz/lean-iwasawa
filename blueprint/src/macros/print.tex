@@ -9,6 +9,15 @@
 % sense only for the web version, such as dependency graph
 % macros.
 
+\NewDocumentCommand\docs{v}{%
+	\href{https://leanprover-community.github.io/mathlib4_docs/find/?pattern=#1\#doc}%
+	{\texttt{#1}}%
+}
+
+\newunicodechar{ꓱ}{{\rotatebox[origin=c]{180}{E}}}
+\newunicodechar{ꓯ}{{\rotatebox[origin=c]{180}{A}}}
+
+\newcommand{\Lean}{{\sf LꓱꓯN}}
 
 % Dummy macros that make sense only for web version.
 \newcommand{\lean}[1]{}

@@ -216,9 +216,11 @@ We warn the reader that $M\sim N$ not necessarily implies $N\sim M$.
 \label{pseudo-null-criterion}
 \uses{pseudo-null}
 Let $A$ be a Noetherian ring, $M$ be a finitely generated $A$-module.
-If $A$ is of Krull dimension $\leq 1$, then $M$ is pseudo-null
+
+{\rm(i)} If $A$ is of Krull dimension $\leq 1$, then $M$ is pseudo-null
 if and only if $M=0$.
-If $A$ is of Krull dimension $2$, then $M$ is pseudo-null
+
+{\rm(ii)} If $A$ is of Krull dimension $2$, then $M$ is pseudo-null
 if and only if the cardinality of $M$ is finite (???).
 \end{prop}
 
@@ -239,7 +241,7 @@ We say that the height one localization of $A$ is PID (?), if
 
 \begin{lem}
 \label{pis-iff}
-\uses{char-ideal-preliminary}
+\uses{char-ideal-preliminary,pseudo-null}
 Let $A$ be a Noetherian ring and let
 $M,N$ be finitely generated torsion $A$-modules.
 Let $\Sigma=\{\fq_1,\cdots,\fq_r\}
@@ -268,7 +270,7 @@ so $S^{-1}M=0$.
 
 \begin{prop}[Structure theorem of finitely generated torsion $A$-modules]
 \label{structure-thm}
-\uses{ht-1-localization-is-PID,char-ideal}
+\uses{ht-1-localization-is-PID,char-ideal,pseudo-null}
 Let $A$ be a Noetherian ring satisfying \eqref{eqn:ht-1-localization-is-PID}
 and let $M$ be a finitely generated torsion $A$-module.
 Then there exist height one primes $\fp_1,\cdots,\fp_s$ of $A$

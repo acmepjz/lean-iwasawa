@@ -18,6 +18,8 @@ in {\Lean}.
 
 \begin{definition}
 \label{Zp-ext-def}
+\lean{IsZpExtension,IsZpExtension.kn}
+\leanok
 Let $K$ be a field, $p$ be a prime.
 
 {\rm(i)} An extension $K_\infty/K$ is called a $\BZ_p$-extension,
@@ -31,6 +33,8 @@ $n\geq 0$, define $K_n:=K_\infty^{\Gamma^{p^n}}$.
 \begin{thm}[Iwasawa's theorem]
 \label{clgp-growth}
 \uses{Zp-ext-def,p:f-g-torsion2,coinvariant-growth,X-inf-coinv-is-X-n}
+\lean{IsZpExtension.multiplicity_classNumber_kn_eq}
+\leanok
 Let $K$ be a number field, $p$ be a prime,
 $K_\infty/K$ be a $\BZ_p$-extension.
 Then there exist integers $\lambda,\mu,\nu$
@@ -1228,6 +1232,24 @@ $M^*=\Hom_\BZ(M,\BQ/\BZ)$ \docs{CharacterModule}
 \item
 Associated primes of a module $\Ass(M)$ \docs{associatedPrimes}
 \item
+Finitely generated module \docs{Module.Finite}
+\item
+Free module \docs{Module.Free}
+\item
+Projective module \docs{Module.Projective}
+\item
+Injective module \docs{Module.Injective}
+\item
+Flat module \docs{Module.Flat}
+\item
+Torsion module \docs{Module.IsTorsion}
+\item
+Torsion submodule \docs{Submodule.torsion}
+\begin{itemize}
+\item
+Torsion-free module \docs{Submodule.torsion}\verb| R M = ⊥|
+\end{itemize}
+\item
 Noetherian module \docs{IsNoetherian}
 \item
 Artin module \docs{IsArtinian}
@@ -1237,11 +1259,10 @@ assertion that a module is of finite length \docs{IsFiniteLength}
 \item
 in the statement of theorems use \docs{IsNoetherian} + \docs{IsArtinian} instead
 \item
-length of a module $\ell_A(M)$ \textbf{UNDEFINED !!!}
-\begin{itemize}
+if and only if exists composition series
+\docs{isFiniteLength_iff_exists_compositionSeries}
 \item
-preliminary: \PR{22127}, \PR{21800}, \PR{21803}
-\end{itemize}
+length of a module $\ell_A(M)$ \docs{Module.length}
 \end{itemize}
 \item
 composition series \docs{CompositionSeries}
@@ -1310,6 +1331,9 @@ $r_1+r_2-1$
 Dirichlet unit theorem
 \docs{NumberField.Units.rank_modTorsion}
 \end{itemize}
+\item
+assertion that a field extension is abelian
+\PR{23669}
 \item
 assertion that a field extension is cyclotomic
 \docs{IsCyclotomicExtension}

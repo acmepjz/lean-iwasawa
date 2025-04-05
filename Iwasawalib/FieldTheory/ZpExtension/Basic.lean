@@ -98,6 +98,12 @@ theorem mem_Γpow_iff (n : ℕ) (σ : H.Γ) : σ ∈ H.Γpow n ↔ ∃ τ, σ = 
     simp [mul_comm _ a, ha]
   · simp [ha, mul_comm (Multiplicative.toAdd _)]
 
+/-- `Γ ^ (p ^ 0) = Γ`. -/
+@[simp]
+theorem Γpow_zero : H.Γpow 0 = ⊤ := by
+  ext
+  simp [H.mem_Γpow_iff]
+
 /-- `Γ ^ (p ^ n)` is a normal subgroup. -/
 instance normal_Γpow (n : ℕ) : (H.Γpow n).Normal := inferInstance
 
@@ -137,6 +143,11 @@ theorem closure_γ_pow_eq (n : ℕ) :
 noncomputable def kn (n : ℕ) : IntermediateField k K :=
   IntermediateField.fixedField (H.Γpow n)
 
+/-- `k₀ = k`. -/
+@[simp]
+theorem kn_zero : H.kn 0 = ⊥ := by
+  simp [kn, InfiniteGalois.fixedField_bot]
+
 /-- `kₙ / k` is Galois. -/
 instance isGalois_kn (n : ℕ) : IsGalois k (H.kn n) :=
   IsGalois.of_fixedField_normal_subgroup (H.Γpow n).toSubgroup
@@ -155,9 +166,77 @@ instance finiteDimensional_kn (n : ℕ) : FiniteDimensional k (H.kn n) := by
   rw [← InfiniteGalois.isOpen_iff_finite, fixingSubgroup_kn]
   exact (H.Γpow n).isOpen
 
+-- TODO: move to suitable file
+theorem _root_.IntermediateField.map_fixingSubgroup
+    {k E : Type*} (K : Type*)
+    [Field k] [Field E] [Field K] [Algebra k E] [Algebra k K] [Algebra E K] [IsScalarTower k E K]
+    [Normal k E] (L : IntermediateField k E) :
+    (L.map (IsScalarTower.toAlgHom k E K)).fixingSubgroup =
+      L.fixingSubgroup.comap (AlgEquiv.restrictNormalHom (F := k) (K₁ := K) E) := by
+  ext f
+  simp only [Subgroup.mem_comap, IntermediateField.mem_fixingSubgroup_iff]
+  constructor
+  · rintro h x hx
+    change f.restrictNormal E x = x
+    apply_fun _ using (algebraMap E K).injective
+    rw [AlgEquiv.restrictNormal_commutes]
+    exact h _ ⟨x, hx, rfl⟩
+  · rintro h _ ⟨x, hx, rfl⟩
+    replace h := congr(algebraMap E K $(show f.restrictNormal E x = x from h x hx))
+    rwa [AlgEquiv.restrictNormal_commutes] at h
+
+-- TODO: move to suitable file
+theorem _root_.IntermediateField.map_fixingSubgroup_index
+    {k E : Type*} (K : Type*)
+    [Field k] [Field E] [Field K] [Algebra k E] [Algebra k K] [Algebra E K] [IsScalarTower k E K]
+    [Normal k E] [Normal k K] (L : IntermediateField k E) :
+    (L.map (IsScalarTower.toAlgHom k E K)).fixingSubgroup.index = L.fixingSubgroup.index := by
+  rw [L.map_fixingSubgroup K, L.fixingSubgroup.index_comap_of_surjective
+    (AlgEquiv.restrictNormalHom_surjective _)]
+
+-- TODO: move to suitable file
+theorem _root_.IntermediateField.finrank_eq_fixingSubgroup_index
+    {k K : Type*} [Field k] [Field K] [Algebra k K] (L : IntermediateField k K) [IsGalois k K] :
+    Module.finrank k L = L.fixingSubgroup.index := by
+  wlog hnfd : FiniteDimensional k L generalizing L
+  · rw [Module.finrank_of_infinite_dimensional hnfd]
+    by_contra! h
+    replace h : L.fixingSubgroup.FiniteIndex := ⟨h.symm⟩
+    obtain ⟨L', hfd, hL'⟩ :=
+      IntermediateField.exists_lt_finrank_of_infinite_dimensional hnfd L.fixingSubgroup.index
+    let i := (IntermediateField.liftAlgEquiv L').toLinearEquiv
+    replace hfd := i.finiteDimensional
+    rw [i.finrank_eq, this _ hfd] at hL'
+    exact (Subgroup.index_antitone <| IntermediateField.fixingSubgroup.antimono <|
+      IntermediateField.lift_le L').not_lt hL'
+  let E := IntermediateField.normalClosure k L K
+  have hle : L ≤ E := by
+    simpa only [IntermediateField.fieldRange_val] using L.val.fieldRange_le_normalClosure
+  let L' := IntermediateField.restrict hle
+  have h := Module.finrank_mul_finrank k ↥L' ↥E
+  classical
+  rw [← IsGalois.card_fixingSubgroup_eq_finrank L', ← IsGalois.card_aut_eq_finrank k E] at h
+  nth_rw 2 [Fintype.card_eq_nat_card] at h
+  rw [← L'.fixingSubgroup.index_mul_card, Nat.card_eq_fintype_card,
+    Nat.mul_left_inj Fintype.card_ne_zero] at h
+  rw [(IntermediateField.restrict_algEquiv hle).toLinearEquiv.finrank_eq, h,
+    ← L'.map_fixingSubgroup_index K]
+  congr 2
+  exact IntermediateField.lift_restrict hle
+
 /-- `kₙ / k` is of degree `p ^ n`. -/
 @[simp]
 theorem finrank_kn (n : ℕ) : Module.finrank k (H.kn n) = p ^ n := by
-  sorry
+  rw [IntermediateField.finrank_eq_fixingSubgroup_index, H.fixingSubgroup_kn, H.index_Γpow]
+
+/-- If `m < n` then `kₘ < kₙ`. -/
+theorem strictMono_kn : StrictMono H.kn := strictMono_nat_of_lt_succ fun n ↦ by
+  refine lt_of_le_of_ne ?_ fun h ↦ ?_
+  · nth_rw 2 [kn]
+    rw [IntermediateField.le_iff_le, fixingSubgroup_kn]
+    exact H.strictAnti_Γpow.antitone (by simp)
+  · replace h := congr(Module.finrank k ($h))
+    rw [finrank_kn, finrank_kn] at h
+    simpa using Nat.pow_right_injective (Fact.out : p.Prime).two_le h
 
 end IsZpExtension

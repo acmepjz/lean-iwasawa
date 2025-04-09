@@ -9,17 +9,17 @@ import Mathlib.NumberTheory.NumberField.Basic
 
 universe u v
 
-variable {p : ℕ} [Fact p.Prime]
-variable {k : Type u} {K : Type v} [Field k] [Field K] [Algebra k K] [IsGalois k K]
+variable {p : ℕ} [Fact p.Prime] {d : ℕ} {K : Type u} {Kinf : Type v}
+variable [Field K] [Field Kinf] [Algebra K Kinf] [IsGalois K Kinf]
 
-namespace IsZpExtension
+namespace IsMvZpExtension
 
-variable (H : IsZpExtension p k K)
+variable (H : IsMvZpExtension p d K Kinf)
 
-instance charZero_kn [CharZero k] (n : ℕ) : CharZero (H.kn n) :=
-  charZero_of_injective_algebraMap (algebraMap k _).injective
+instance charZero_Kn [CharZero K] (n : ℕ) : CharZero (H.Kn n) :=
+  charZero_of_injective_algebraMap (algebraMap K _).injective
 
-instance numberField_kn [NumberField k] (n : ℕ) : NumberField (H.kn n) where
-  to_finiteDimensional := .trans ℚ k _
+instance numberField_Kn [NumberField K] (n : ℕ) : NumberField (H.Kn n) where
+  to_finiteDimensional := .trans ℚ K _
 
-end IsZpExtension
+end IsMvZpExtension

@@ -1,5 +1,4 @@
 import Mathlib.FieldTheory.Galois.Infinite
--- import Mathlib.FieldTheory.Galois.Profinite
 import Mathlib.NumberTheory.Padics.ProperSpace
 import Mathlib.Topology.Algebra.Ring.Compact
 
@@ -94,8 +93,8 @@ theorem Γpow_zero : H.Γpow 0 = ⊤ := by
   ext
   simp [H.mem_Γpow_iff]
 
-/-- `Γ ^ (p ^ n)` is a normal subgroup. -/
-instance normal_Γpow (n : ℕ) : (H.Γpow n).Normal := inferInstance
+/-- Any subgroup in `Γ` is a normal subgroup. -/
+instance normal (G : Subgroup H.Γ) : G.Normal := inferInstance
 
 -- TODO: move to suitable file
 theorem _root_.PadicInt.surjective_toZModPow {p : ℕ} [Fact p.Prime] (n : ℕ) :
@@ -143,9 +142,15 @@ noncomputable def Kn (n : ℕ) : IntermediateField K Kinf :=
 theorem Kn_zero : H.Kn 0 = ⊥ := by
   simp [Kn, InfiniteGalois.fixedField_bot]
 
+include H in
+/-- Any intermediate field of `K∞ / K` is Galois. -/
+theorem isGalois (K' : IntermediateField K Kinf) : IsGalois K K' := by
+  let G : Subgroup H.Γ := K'.fixingSubgroup
+  have : IntermediateField.fixedField G = K' := InfiniteGalois.fixedField_fixingSubgroup _
+  convert ← IsGalois.of_fixedField_normal_subgroup G
+
 /-- `Kₙ / K` is Galois. -/
-instance isGalois_Kn (n : ℕ) : IsGalois K (H.Kn n) :=
-  IsGalois.of_fixedField_normal_subgroup (H.Γpow n).toSubgroup
+instance isGalois_Kn (n : ℕ) : IsGalois K (H.Kn n) := H.isGalois _
 
 /-- The fixing subgroup of `Kₙ` is `Γ ^ (p ^ n)`. -/
 @[simp]
@@ -207,6 +212,73 @@ theorem closure_singleton_eq_Γpow_of_closure_singleton_eq
     {γ : H.Γ} (h : closure (Subgroup.closure {γ} : Set H.Γ) = ⊤) (n : ℕ) :
     closure (Subgroup.closure {γ ^ p ^ n} : Set H.Γ) = H.Γpow n := by
   simpa using H.closure_eq_Γpow_of_closure_eq h n
+
+/-- `Γ ^ (p ^ n)` form a neighborhood basis of `1` in `Γ`. -/
+theorem nhds_one_hasBasis : (nhds (1 : H.Γ)).HasBasis (fun (_ : ℕ) ↦ True) (fun n ↦ H.Γpow n) := by
+  have hp : p.Prime := Fact.out
+  have hp2 := hp.two_le
+  let r : ℝ := 1 / p
+  have hr0 : 0 < r := by positivity
+  have hr1 : r < 1 := by
+    simp_rw [r, one_div]
+    apply inv_lt_one_of_one_lt₀
+    norm_cast
+  have h1 := Metric.nhds_basis_ball_pow (x := (0 : Fin d → ℤ_[p])) hr0 hr1
+  replace h1 : (nhds (0 : Fin d → ℤ_[p])).HasBasis (fun (_ : ℕ) ↦ True)
+      fun n ↦ Metric.ball 0 (r ^ (n - 1 : ℤ)) := by
+    refine ⟨fun s ↦ ?_⟩
+    rw [h1.mem_iff]
+    refine ⟨fun ⟨i, _, h⟩ ↦ ⟨i + 1, trivial, by simpa⟩,
+      fun ⟨i, _, h⟩ ↦ ⟨i, trivial, (Metric.ball_subset_ball ?_).trans h⟩⟩
+    rw [← zpow_natCast]
+    apply zpow_le_zpow_right_of_le_one₀ hr0 hr1.le
+    simp
+  replace h1 : (nhds (0 : Fin d → ℤ_[p])).HasBasis (fun (_ : ℕ) ↦ True)
+      fun n ↦ ((Ideal.pi fun _ ↦ Ideal.span {(p ^ n : ℤ_[p])} : Ideal (Fin d → ℤ_[p]))) := by
+    convert h1 with n
+    rw [ball_pi _ (zpow_pos hr0 _)]
+    ext
+    simp_rw [SetLike.mem_coe, Ideal.mem_pi, Pi.zero_apply, Set.mem_pi, Set.mem_univ, forall_const]
+    congr! 1
+    simp_rw [← PadicInt.norm_le_pow_iff_mem_span_pow, PadicInt.norm_le_pow_iff_norm_lt_pow_add_one,
+      Metric.mem_ball, dist_zero_right, r, one_div, inv_zpow, ← zpow_neg]
+    congr! 2
+    ring
+  change (nhds (1 : Multiplicative (Fin d → ℤ_[p]))).HasBasis (fun (_ : ℕ) ↦ True)
+    fun n ↦ ((Ideal.pi fun _ ↦ Ideal.span {(p ^ n : ℤ_[p])} : Ideal (Fin d → ℤ_[p])))
+      |>.toAddSubgroup.toSubgroup at h1
+  replace h1 := h1.comap H.continuousMulEquiv
+  have h2 : _ = Filter.comap H.continuousMulEquiv (nhds (H.continuousMulEquiv 1)) :=
+    H.continuousMulEquiv.nhds_eq_comap 1
+  rw [map_one] at h2
+  rwa [← h2] at h1
+
+/-- If `G` is an open subgroup of `Γ`, then it contains `Γ ^ (p ^ n)` for some `n`. -/
+theorem Γpow_le_of_isOpen (G : Subgroup H.Γ) (h : IsOpen (G : Set H.Γ)) :
+    ∃ n, H.Γpow n ≤ G := by
+  obtain ⟨n, -, h⟩ := H.nhds_one_hasBasis.mem_iff.1 <| h.mem_nhds_iff.2 (one_mem _)
+  exact ⟨n, h⟩
+
+/-- If `K'` is a finite extension of `K` contained in `K∞`,
+then it's contained in `Kₙ` for some `n`. -/
+theorem le_Kn_of_finite (K' : IntermediateField K Kinf) [FiniteDimensional K K'] :
+    ∃ n, K' ≤ H.Kn n := by
+  obtain ⟨n, _⟩ := H.Γpow_le_of_isOpen _ K'.fixingSubgroup_isOpen
+  exact ⟨n, by rwa [Kn, IntermediateField.le_iff_le]⟩
+
+include H in
+/-- If `K'` is a finite extension of `K` contained in `K∞`,
+then `[K' : K] = p ^ n` for some `n`. -/
+theorem finrank_eq_pow_of_finite (K' : IntermediateField K Kinf) [FiniteDimensional K K'] :
+    ∃ n, Module.finrank K K' = p ^ n := by
+  obtain ⟨m, h⟩ := H.le_Kn_of_finite K'
+  have h1 : Module.finrank K K' ∣ p ^ (m * d) := by
+    let L := IntermediateField.extendScalars h
+    have := Module.finrank_mul_finrank K K' L
+    rw [show Module.finrank K L = _ from H.finrank_Kn m] at this
+    exact dvd_of_mul_right_eq _ this
+  obtain ⟨n, -, h2⟩ := (Nat.dvd_prime_pow Fact.out).1 h1
+  exact ⟨n, h2⟩
 
 end IsMvZpExtension
 
@@ -276,5 +348,57 @@ theorem index_Γpow (n : ℕ) : (H.Γpow n).index = p ^ n := by
 /-- `Kₙ / K` is of degree `p ^ n`. -/
 theorem finrank_Kn (n : ℕ) : Module.finrank K (H.Kn n) = p ^ n := by
   simp
+
+/-- If `G` is an open subgroup of `Γ`, then it is equal to `Γ ^ (p ^ n)` for some `n`. -/
+theorem eq_Γpow_of_isOpen (G : Subgroup H.Γ) (h : IsOpen (G : Set H.Γ)) :
+    ∃ n, G = H.Γpow n := by
+  sorry
+
+/-- If `G` is a closed subgroup of `Γ`, then it is equal to `0` or `Γ ^ (p ^ n)` for some `n`. -/
+theorem eq_bot_or_Γpow_of_isClosed (G : Subgroup H.Γ) (h : IsClosed (G : Set H.Γ)) :
+    G = ⊥ ∨ ∃ n, G = H.Γpow n := by
+  sorry
+
+/-- If `K'` is a finite extension of `K` contained in `K∞`,
+then it's equal to `Kₙ` for some `n`. -/
+theorem eq_Kn_of_finite (K' : IntermediateField K Kinf) [FiniteDimensional K K'] :
+    ∃ n, K' = H.Kn n := by
+  obtain ⟨n, h⟩ := H.eq_Γpow_of_isOpen _ K'.fixingSubgroup_isOpen
+  replace h := congr(IntermediateField.fixedField $h)
+  exact ⟨n, by rwa [InfiniteGalois.fixedField_fixingSubgroup] at h⟩
+
+/-- If `K'` is an extension of `K` contained in `K∞`,
+then it's equal to `K∞` or `Kₙ` for some `n`. -/
+theorem eq_top_or_Kn (K' : IntermediateField K Kinf) :
+    K' = ⊤ ∨ ∃ n, K' = H.Kn n := by
+  obtain h | ⟨n, h⟩ := H.eq_bot_or_Γpow_of_isClosed _ (InfiniteGalois.fixingSubgroup_isClosed K')
+  · refine .inl (eq_top_iff.2 ?_)
+    rw [← InfiniteGalois.fixedField_fixingSubgroup K', IntermediateField.le_iff_le]
+    simp [h]
+  · replace h := congr(IntermediateField.fixedField $h)
+    exact .inr ⟨n, by rwa [InfiniteGalois.fixedField_fixingSubgroup] at h⟩
+
+include H in
+/-- If `K'` is an infinite extension of `K` contained in `K∞`,
+then it's equal to `K∞`. -/
+theorem eq_top_of_infinite (K' : IntermediateField K Kinf)
+    (h : ¬FiniteDimensional K K') : K' = ⊤ := by
+  obtain h | ⟨n, rfl⟩ := H.eq_top_or_Kn K'
+  · exact h
+  · exact False.elim (h inferInstance)
+
+/-- If `K'` is an extension of `K` of degree `p ^ n` contained in `K∞`,
+then it's equal to `Kₙ`. -/
+theorem eq_Kn_of_finrank_eq (K' : IntermediateField K Kinf)
+    {n : ℕ} (h : Module.finrank K K' = p ^ n) : K' = H.Kn n := by
+  have : FiniteDimensional K K' := .of_finrank_pos <| by
+    have := (Fact.out : p.Prime).pos
+    rw [h]
+    positivity
+  obtain ⟨m, hm⟩ := H.eq_Kn_of_finite K'
+  convert hm
+  replace hm := congr(Module.finrank K $hm)
+  rw [h, H.finrank_Kn] at hm
+  exact Nat.pow_right_injective (Fact.out : p.Prime).two_le hm
 
 end IsZpExtension

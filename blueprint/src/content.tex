@@ -39,7 +39,7 @@ Let $K$ be a number field, $p$ be a prime,
 $K_\infty/K$ be a $\BZ_p$-extension.
 Then there exist integers $\lambda,\mu,\nu$
 such that for all sufficiently large $n$,
-$\ord_p(\#\Cl(K_n))=\lambda n+\mu p^n+\nu$.
+$\ord_p(\#\Cl(K_n))=\mu p^n+\lambda n+\nu$.
 \end{thm}
 
 \begin{proof}
@@ -287,9 +287,22 @@ Let $A$ be a Noetherian ring, $M$ be a finitely generated $A$-module.
 {\rm(i)} If $A$ is of Krull dimension $\leq 1$, then $M$ is pseudo-null
 if and only if $M=0$.
 
-{\rm(ii)} If $A$ is of Krull dimension $2$, then $M$ is pseudo-null
-if and only if the cardinality of $M$ is finite (???).
+{\rm(ii)} If $A$ is of Krull dimension $2$,
+is a local ring with finite residue field, then $M$ is pseudo-null
+if and only if the cardinality of $M$ is finite.
 \end{prop}
+
+\begin{proof}
+(i) Clear.
+
+(ii) Let $\fm$ be the maximal ideal of $A$.
+If $M$ is finite, then there exists $r\in\BN$
+such that $\fm^rM=0$, hence $\supp(M)\subset\{\fm\}$.
+On the other hand, if $\supp(M)\subset\{\fm\}$,
+then there exists $r\in\BN$
+such that $\fm^rM=0$, hence $\fm^r\subset\Ann_A(M)$, therefore
+$M$ is a finitely generated $A/\fm^r$-module, which must be finite.
+\end{proof}
 
 \begin{prop}
 \label{pseudo-null-char-ideal}

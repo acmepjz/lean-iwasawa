@@ -65,9 +65,7 @@ theorem isPseudoNull_of_surjective (f : M →ₗ[A] N) (h : Function.Surjective 
   ⟨fun _ hp ↦ IsPseudoNull.two_le_primeHeight _ (support_subset_of_surjective f h hp)⟩
 
 variable {A M N P} in
-/-- Pseudo-null modules are preserved by short exact sequences.
-This is weaker than `isPseudoNull_of_exact`. -/
-theorem isPseudoNull_of_exact' (f : M →ₗ[A] N) (g : N →ₗ[A] P)
+private theorem isPseudoNull_of_exact' (f : M →ₗ[A] N) (g : N →ₗ[A] P)
     (h : Function.Exact f g) (hf : Function.Injective f) (hg : Function.Surjective g)
     [IsPseudoNull A M] [IsPseudoNull A P] : IsPseudoNull A N := by
   refine ⟨fun _ hp ↦ ?_⟩

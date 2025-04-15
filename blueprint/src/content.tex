@@ -52,6 +52,8 @@ and Proposition \ref{X-inf-coinv-is-X-n}.
 
 \begin{prop}
 \label{noeth-ring-filtration}
+\lean{IsNoetherianRing.exists_relSeries_isQuotientEquivQuotientPrime}
+\leanok
 Let $A$ be a Noetherian ring and $M$ be a finitely generated $A$-module.
 Then there exists a chain of submodules of $M$
 \[0 = M_0 \subset M_1 \subset \cdots \subset M_n = M\]
@@ -59,6 +61,7 @@ such that for each $1\leq i\leq n$, $M_i/M_{i-1} \cong A/\fp_i$ for some prime i
 \end{prop}
 
 \begin{proof}
+\leanok
 When $M=0$ we take $n=0$ and there is nothing to prove.
 When $M\neq 0$ we have $\Ass(M)\neq\varnothing$
 and we can take $\fp_1$ be any element in $\Ass(M)$
@@ -224,6 +227,8 @@ In particular, this allows us to define the \emph{characteristic ideal} of $M$.
 \begin{definition}
 \label{char-ideal}
 \uses{char-ideal-preliminary}
+\lean{Module.charIdeal}
+\leanok
 Let $A$ be a Noetherian ring, $M$ be a
 finitely generated torsion $A$-module.
 The \emph{characteristic ideal} of $M$,

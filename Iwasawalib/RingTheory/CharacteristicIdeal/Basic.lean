@@ -12,6 +12,8 @@ import Mathlib.RingTheory.Support
 
 universe u v
 
+/-! ### Results should be PR into mathlib -/
+
 section IsNoetherianRing
 
 variable {A : Type u} [CommRing A] [IsNoetherianRing A]
@@ -134,6 +136,7 @@ variable (A M)
 /-- If `A` is a Noetherian ring and `M` is a finitely generated `A`-module, then there exists
 a chain of submodules `0 = M₀ ≤ M₁ ≤ M₂ ≤ ... ≤ Mₙ = M` of `M`, such that for each `0 ≤ i < n`,
 `Mᵢ₊1 / Mᵢ` is isomorphic to `A / pᵢ` for some prime ideal `pᵢ` of `A`. -/
+@[stacks 00L0]
 theorem IsNoetherianRing.exists_relSeries_isQuotientEquivQuotientPrime :
     ∃ s : RelSeries (Submodule.IsQuotientEquivQuotientPrime (A := A) (M := M)),
       s.head = ⊥ ∧ s.last = ⊤ := by
@@ -197,10 +200,53 @@ theorem IsNoetherianRing.induction_on_isQuotientEquivQuotientPrime
       (Submodule.injective_subtype _) (Submodule.mkQ_surjective _)
       (LinearMap.exact_subtype_mkQ (LinearMap.range (Submodule.inclusion hle))) ih (quotient _ p f)
 
--- theorem associatedPrimes.subset_union_of_exact
+/-- If `0 → M → M' → M''` is an exact sequence, then the set of associated primes of `M'` is
+contained in the union of those of `M` and `M''`. -/
+@[stacks 02M3 "second part"]
+theorem associatedPrimes.subset_union_of_exact
+    {R : Type*} [CommRing R] {M : Type*} [AddCommGroup M] [Module R M]
+    {M' : Type*} [AddCommGroup M'] [Module R M'] {M'' : Type*} [AddCommGroup M''] [Module R M'']
+    (f : M →ₗ[R] M') (g : M' →ₗ[R] M'') (hf : Function.Injective f) (hfg : Function.Exact f g) :
+    associatedPrimes R M' ⊆ associatedPrimes R M ∪ associatedPrimes R M'' := by
+  rintro p ⟨_, x, hx⟩
+  by_cases h : ∃ a ∈ p.primeCompl, ∃ y : M, f y = a • x
+  · obtain ⟨a, ha, y, h⟩ := h
+    refine Or.inl ⟨‹_›, y, le_antisymm (fun b hb ↦ ?_) (fun b hb ↦ ?_)⟩
+    · rw [hx] at hb
+      rw [LinearMap.mem_ker, LinearMap.toSpanSingleton_apply] at hb ⊢
+      apply_fun _ using hf
+      rw [map_smul, map_zero, h, smul_comm, hb, smul_zero]
+    · rw [LinearMap.mem_ker, LinearMap.toSpanSingleton_apply] at hb
+      apply_fun f at hb
+      rw [map_smul, map_zero, h, ← mul_smul, ← LinearMap.toSpanSingleton_apply,
+        ← LinearMap.mem_ker, ← hx] at hb
+      contrapose! hb
+      exact p.primeCompl.mul_mem hb ha
+  · push_neg at h
+    refine Or.inr ⟨‹_›, g x, le_antisymm (fun b hb ↦ ?_) (fun b hb ↦ ?_)⟩
+    · rw [hx] at hb
+      rw [LinearMap.mem_ker, LinearMap.toSpanSingleton_apply] at hb ⊢
+      rw [← map_smul, hb, map_zero]
+    · rw [LinearMap.mem_ker, LinearMap.toSpanSingleton_apply, ← map_smul, ← LinearMap.mem_ker,
+        hfg.linearMap_ker_eq] at hb
+      obtain ⟨y, hy⟩ := hb
+      by_contra! H
+      exact h b H y hy
+
+/-- The set of associated primes of the product of two modules is equal to
+the union of those of the two modules. -/
+@[stacks 02M3 "third part"]
+theorem associatedPrimes.prod
+    (R : Type*) [CommRing R] (M : Type*) [AddCommGroup M] [Module R M]
+    (M' : Type*) [AddCommGroup M'] [Module R M'] :
+    associatedPrimes R (M × M') = associatedPrimes R M ∪ associatedPrimes R M' :=
+  (subset_union_of_exact (.inl R M M') (.snd R M M') LinearMap.inl_injective .inl_snd).antisymm
+    (Set.union_subset_iff.2 ⟨subset_of_injective (.inl R M M') LinearMap.inl_injective,
+      subset_of_injective (.inr R M M') LinearMap.inr_injective⟩)
 
 /-- There are only finitely many associated primes of a finitely generated module
 over a Noetherian ring. -/
+@[stacks 00LC]
 theorem associatedPrimes.finite : (associatedPrimes A M).Finite := by
   induction ‹Module.Finite A M› using
     IsNoetherianRing.induction_on_isQuotientEquivQuotientPrime A with
@@ -208,7 +254,8 @@ theorem associatedPrimes.finite : (associatedPrimes A M).Finite := by
   | quotient N p f =>
     have := associatedPrimes.eq_singleton_of_isPrimary p.2.isPrimary
     simp [LinearEquiv.AssociatedPrimes.eq f, this]
-  | exact N₁ N₂ N₃ f h hf hg hfg h₁ h₃ => sorry
+  | exact N₁ N₂ N₃ f g hf _ hfg h₁ h₃ =>
+    exact (h₁.union h₃).subset (associatedPrimes.subset_union_of_exact f g hf hfg)
 
 end IsNoetherianRing
 
@@ -232,6 +279,8 @@ theorem Module.IsTorsion.one_le_primeHeight_of_mem_support
   contrapose! H
   rw [ENat.lt_one_iff_eq_zero, Ideal.primeHeight_eq_zero_iff] at H
   exact Ideal.disjoint_nonZeroDivisors_of_mem_minimalPrimes H
+
+/-! ### Actual contents of the file -/
 
 /-- The characteristic ideal of a module. It is mathematically correct if
 the module is finitely generated torsion over a Noetherian ring. -/

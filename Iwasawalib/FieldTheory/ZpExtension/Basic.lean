@@ -17,6 +17,13 @@ import Mathlib.Topology.Algebra.Ring.Compact
 
 -/
 
+/-! ### Results should be PR into mathlib -/
+
+theorem PadicInt.surjective_toZModPow {p : ℕ} [Fact p.Prime] (n : ℕ) :
+    Function.Surjective (PadicInt.toZModPow (p := p) n) := fun x ↦ ⟨x.val, by simp⟩
+
+/-! ### Actual contents of the file -/
+
 universe u v
 
 variable (p : ℕ) [Fact p.Prime] (d : ℕ) (K : Type u) (Kinf : Type v)
@@ -95,10 +102,6 @@ theorem Γpow_zero : H.Γpow 0 = ⊤ := by
 
 /-- Any subgroup in `Γ` is a normal subgroup. -/
 instance normal (G : Subgroup H.Γ) : G.Normal := inferInstance
-
--- TODO: move to suitable file
-theorem _root_.PadicInt.surjective_toZModPow {p : ℕ} [Fact p.Prime] (n : ℕ) :
-    Function.Surjective (PadicInt.toZModPow (p := p) n) := fun x ↦ ⟨x.val, by simp⟩
 
 /-- `Γ ^ (p ^ n)` is of index `p ^ (n * d)`. -/
 @[simp]

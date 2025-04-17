@@ -170,6 +170,9 @@ $T^nZ=Z$ for any $n\geq 0$. Therefore $Z$ must be zero.
 \begin{prop}
 \label{char-ideal-preliminary}
 \uses{noeth-ring-filtration}
+\lean{Module.IsTorsion.finite_height_one_support,
+Module.IsTorsion.isFiniteLength_localizedModule_of_height_le_one}
+\leanok
 Let $A$ be a Noetherian ring, $M$ be a
 finitely generated torsion $A$-module.
 Then for any height one prime $\fp$ of $A$,
@@ -178,6 +181,7 @@ many height one primes $\fp$ of $A$ such that $M_\fp\neq 0$.
 \end{prop}
 
 \begin{proof}
+\leanok
 By Proposition \ref{noeth-ring-filtration},
 we may let $0=M_0\subset M_1\subset\cdots\subset M_n=M$ be a filtration of $M$
 such that for each $1\leq i\leq n$,
@@ -242,6 +246,7 @@ $$
 \begin{prop}
 \label{char-ideal-additive}
 \uses{char-ideal}
+\lean{Module.IsTorsion.injective,Module.IsTorsion.surjective,Module.IsTorsion.exact}
 Let $A$ be a Noetherian ring.
 Let $0\to M'\to M\to M''\to 0$ be a short exact sequence of finitely generated $A$-modules. Then $M$ is $A$-torsion if and only if $M'$ and $M''$ are $A$-torsion.
 If $M$ is $A$-torsion, then $\chaR_A(M)=\chaR_A(M')\chaR_A(M'')$.

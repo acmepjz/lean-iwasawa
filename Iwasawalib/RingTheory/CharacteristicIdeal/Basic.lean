@@ -1,3 +1,4 @@
+import Mathlib.Algebra.Module.LocalizedModule.Exact
 import Mathlib.Algebra.Module.Torsion
 import Mathlib.RingTheory.Ideal.AssociatedPrime
 import Mathlib.RingTheory.Ideal.Height
@@ -280,11 +281,207 @@ theorem Module.IsTorsion.one_le_primeHeight_of_mem_support
   rw [ENat.lt_one_iff_eq_zero, Ideal.primeHeight_eq_zero_iff] at H
   exact Ideal.disjoint_nonZeroDivisors_of_mem_minimalPrimes H
 
+theorem Module.isTorsion_iff_subsingleton_localizedModule_nonZeroDivisors
+    {A : Type u} [CommRing A] {M : Type v} [AddCommGroup M] [Module A M] :
+    Module.IsTorsion A M ↔ Subsingleton (LocalizedModule (nonZeroDivisors A) M) := by
+  simp only [IsTorsion, Subtype.exists, Submonoid.mk_smul, exists_prop,
+    LocalizedModule.subsingleton_iff]
+
+alias ⟨Module.IsTorsion.subsingleton_localizedModule_nonZeroDivisors, _⟩ :=
+  Module.isTorsion_iff_subsingleton_localizedModule_nonZeroDivisors
+
+theorem Module.IsTorsion.injective
+    {A : Type*} [CommRing A] {M : Type*} [AddCommGroup M] [Module A M]
+    {M' : Type*} [AddCommGroup M'] [Module A M'] (H : Module.IsTorsion A M')
+    {f : M →ₗ[A] M'} (hf : Function.Injective f) : Module.IsTorsion A M := fun x ↦ by
+  obtain ⟨a, ha⟩ := @H (f x)
+  exact ⟨a, hf (by rwa [map_zero, LinearMap.map_smul_of_tower])⟩
+
+theorem Module.IsTorsion.surjective
+    {A : Type*} [CommRing A] {M : Type*} [AddCommGroup M] [Module A M]
+    {M' : Type*} [AddCommGroup M'] [Module A M'] (H : Module.IsTorsion A M)
+    {f : M →ₗ[A] M'} (hf : Function.Surjective f) : Module.IsTorsion A M' := fun x ↦ by
+  obtain ⟨y, rfl⟩ := hf x
+  obtain ⟨a, ha⟩ := @H y
+  exact ⟨a, by rw [← LinearMap.map_smul_of_tower, ha, map_zero]⟩
+
+theorem LinearEquiv.isTorsion
+    {A : Type*} [CommRing A] {M : Type*} [AddCommGroup M] [Module A M]
+    {M' : Type*} [AddCommGroup M'] [Module A M']
+    (f : M ≃ₗ[A] M') : Module.IsTorsion A M ↔ Module.IsTorsion A M' :=
+  ⟨fun H ↦ H.surjective f.surjective, fun H ↦ H.injective f.injective⟩
+
+theorem Function.Exact.subsingleton
+    {M N P : Type*} {f : M → N} {g : N → P} [Zero P]
+    (H : Function.Exact f g) [Subsingleton M] [Subsingleton P] : Subsingleton N where
+  allEq x y := by
+    simp_rw [Function.Exact, Subsingleton.elim _ (0 : P), Set.mem_range, true_iff] at H
+    obtain ⟨a, ha⟩ := H x
+    obtain ⟨b, hb⟩ := H y
+    rw [← ha, ← hb, Subsingleton.elim a b]
+
+theorem Module.IsTorsion.exact
+    {A : Type*} [CommRing A] {M : Type*} [AddCommGroup M] [Module A M]
+    {M' : Type*} [AddCommGroup M'] [Module A M'] {M'' : Type*} [AddCommGroup M''] [Module A M'']
+    (h1 : Module.IsTorsion A M) (h2 : Module.IsTorsion A M'')
+    (f : M →ₗ[A] M') (g : M' →ₗ[A] M'') (hfg : Function.Exact f g) : Module.IsTorsion A M' := by
+  rw [Module.isTorsion_iff_subsingleton_localizedModule_nonZeroDivisors] at h1 h2 ⊢
+  exact (LocalizedModule.map_exact (nonZeroDivisors A) f g hfg).subsingleton
+
 /-! ### Actual contents of the file -/
 
-/-- The characteristic ideal of a module. It is mathematically correct if
-the module is finitely generated torsion over a Noetherian ring. -/
+@[simp]
+theorem Module.support_self (A : Type u) [CommRing A] : Module.support A A = Set.univ := by
+  nontriviality A
+  ext p
+  simp_rw [Set.mem_univ, iff_true, mem_support_iff]
+  by_contra! h
+  rw [not_nontrivial_iff_subsingleton, LocalizedModule.subsingleton_iff] at h
+  specialize h 1
+  simp_rw [smul_eq_mul, mul_one, exists_eq_right] at h
+  change 0 ∉ p.1 at h
+  exact h (zero_mem p.1)
+
+theorem Ring.support_quotient {A : Type u} [CommRing A] (I : Ideal A) :
+    Module.support A (A ⧸ I) = PrimeSpectrum.zeroLocus I := by
+  have : I = I • ⊤ := by simp
+  have := Module.support_quotient (M := A) I
+  rw [Module.support_self, Set.univ_inter] at this
+  convert this
+
+/-- There are only finitely many height one primes contained in the support of a
+finitely generated torsion module over a Noetherian ring. -/
+theorem Module.IsTorsion.finite_height_one_support
+    {A : Type u} [CommRing A] [IsNoetherianRing A]
+    {M : Type v} [AddCommGroup M] [Module A M] [Module.Finite A M]
+    (H : Module.IsTorsion A M) :
+    (Module.support A M ∩ {p : PrimeSpectrum A | p.1.primeHeight = 1}).Finite := by
+  induction ‹Module.Finite A M› using
+    IsNoetherianRing.induction_on_isQuotientEquivQuotientPrime A with
+  | subsingleton N => simp [Module.support_eq_empty]
+  | quotient N p f =>
+    rw [f.isTorsion] at H
+    have hp : 1 ≤ p.1.primeHeight := H.one_le_primeHeight_of_mem_support p <| by
+      simp [Ring.support_quotient]
+    rw [f.support_eq, Ring.support_quotient]
+    refine (Set.finite_singleton p).subset fun q ⟨h1, h2⟩ ↦ ?_
+    simp only [PrimeSpectrum.mem_zeroLocus, SetLike.coe_subset_coe,
+      PrimeSpectrum.asIdeal_le_asIdeal] at h1
+    rw [Set.mem_setOf_eq] at h2
+    rw [Set.mem_singleton_iff]
+    ext1
+    have : q.1.FiniteHeight := ⟨.inr (by simp [q.1.height_eq_primeHeight, h2])⟩
+    have := p.1.height_eq_primeHeight ▸ (h2 ▸ hp).antisymm (Ideal.primeHeight_mono h1)
+    have := mem_minimalPrimes_of_primeHeight_eq_height h1 this
+    simpa [Ideal.minimalPrimes_eq_subsingleton_self] using this
+  | exact N₁ N₂ N₃ f g hf hg hfg h₁ h₃ =>
+    specialize h₁ (H.injective hf)
+    specialize h₃ (H.surjective hg)
+    rw [Module.support_of_exact hfg hf hg, Set.union_inter_distrib_right]
+    exact h₁.union h₃
+
+open scoped Classical in
+theorem Module.length_localizedModule_primeCompl_quotient_prime_eq_of_primeHeight_eq_one
+    {A : Type u} [CommRing A] {p q : PrimeSpectrum A}
+    (hp : p.1.primeHeight = 1) (hq : 1 ≤ q.1.primeHeight) :
+    Module.length (Localization p.1.primeCompl) (LocalizedModule p.1.primeCompl (A ⧸ q.1)) =
+      if p = q then 1 else 0 := by
+  have : p.1.FiniteHeight := ⟨.inr (by simp [p.1.height_eq_primeHeight, hp])⟩
+  by_cases hpq : p ≠ q
+  · rw [if_neg hpq, Module.length_eq_zero_iff]
+    rw [← Module.not_mem_support_iff, Ring.support_quotient,
+      PrimeSpectrum.mem_zeroLocus, SetLike.coe_subset_coe, PrimeSpectrum.asIdeal_le_asIdeal]
+    intro h
+    simpa [hp] using lt_of_le_of_lt hq (Ideal.primeHeight_strict_mono (h.lt_of_ne hpq.symm))
+  rw [ne_eq, not_not] at hpq
+  rw [if_pos hpq, Module.length_eq_one_iff, ← hpq, ← LinearMap.isSimpleModule_iff_of_bijective _
+    (localizedQuotientEquiv p.1.primeCompl p.1).bijective, isSimpleModule_iff_quot_maximal]
+  let f := LocalizedModule.equivTensorProduct p.1.primeCompl A ≪≫ₗ
+    TensorProduct.AlgebraTensorModule.rid _ _ _
+  refine ⟨_, IsLocalRing.maximalIdeal.isMaximal (Localization p.1.primeCompl),
+    ⟨Submodule.Quotient.equiv _ _ f ?_⟩⟩
+  change Submodule.map f.toLinearMap _ = _
+  rw [LinearEquiv.map_eq_comap]
+  ext x
+  induction x with | H x =>
+  nth_rw 2 [Localization.mk_eq_mk']
+  rw [IsLocalization.AtPrime.mk'_mem_maximal_iff _ p.1, Submodule.mem_comap, LinearEquiv.coe_coe]
+  simp only [LinearEquiv.trans_symm, LinearEquiv.trans_apply,
+    TensorProduct.AlgebraTensorModule.rid_symm_apply,
+    LocalizedModule.equivTensorProduct_symm_apply_tmul, f, Submodule.mem_localized']
+  simp_rw [← IsLocalizedModule.mk_eq_mk', LocalizedModule.smul'_mk, LocalizedModule.mk_eq]
+  refine ⟨fun ⟨a, ha, ⟨b, hb⟩, u, hu⟩ ↦ ?_, fun h ↦ ⟨x.1, h, x.2, 1, ?_⟩⟩
+  · change u.1 * (x.2.1 * a) = u.1 * (b * (x.1 * 1)) at hu
+    rw [← mul_assoc, mul_one, ← mul_assoc] at hu
+    replace ha := p.1.mul_mem_left (u.1 * x.2.1) ha
+    rw [hu] at ha
+    exact (p.2.mem_or_mem ha).resolve_left (p.1.primeCompl.mul_mem u.2 hb)
+  · simp
+
+theorem Module.isFiniteLength_localizedModule_primeCompl_quotient_prime_of_primeHeight_eq_one
+    {A : Type u} [CommRing A] {p q : PrimeSpectrum A}
+    (hp : p.1.primeHeight = 1) (hq : 1 ≤ q.1.primeHeight) :
+    IsFiniteLength (Localization p.1.primeCompl) (LocalizedModule p.1.primeCompl (A ⧸ q.1)) := by
+  rw [← Module.length_ne_top_iff,
+    Module.length_localizedModule_primeCompl_quotient_prime_eq_of_primeHeight_eq_one hp hq]
+  split_ifs <;> simp
+
+/-- Let `M` be a finitely generated torsion module over a Noetherian ring `A`. For any prime ideal
+`p` of `A` of height `≤ 1`, the `Mₚ` is of finite length over `Aₚ`. -/
+theorem Module.IsTorsion.isFiniteLength_localizedModule_of_height_le_one
+    {A : Type u} [CommRing A] [IsNoetherianRing A]
+    {M : Type v} [AddCommGroup M] [Module A M] [Module.Finite A M]
+    (H : Module.IsTorsion A M)
+    (p : PrimeSpectrum A) (hp : p.1.primeHeight ≤ 1) :
+    IsFiniteLength (Localization p.1.primeCompl) (LocalizedModule p.1.primeCompl M) := by
+  by_cases hmem : p ∉ Module.support A M
+  · rw [Module.not_mem_support_iff] at hmem
+    exact IsFiniteLength.of_subsingleton
+  rw [not_not] at hmem
+  replace hp := hp.antisymm (H.one_le_primeHeight_of_mem_support p hmem)
+  clear hmem
+  induction ‹Module.Finite A M› using
+    IsNoetherianRing.induction_on_isQuotientEquivQuotientPrime A with
+  | subsingleton N => exact IsFiniteLength.of_subsingleton
+  | quotient N q f =>
+    rw [f.isTorsion] at H
+    have hq : 1 ≤ q.1.primeHeight := H.one_le_primeHeight_of_mem_support q <| by
+      simp [Ring.support_quotient]
+    refine (LinearEquiv.ofBijective (LocalizedModule.map p.1.primeCompl f.toLinearMap)
+      ⟨LocalizedModule.map_injective _ _ f.injective,
+        LocalizedModule.map_surjective _ _ f.surjective⟩).symm.isFiniteLength ?_
+    exact Module.isFiniteLength_localizedModule_primeCompl_quotient_prime_of_primeHeight_eq_one
+      hp hq
+  | exact N₁ N₂ N₃ f g hf hg hfg h₁ h₃ =>
+    specialize h₁ (H.injective hf)
+    specialize h₃ (H.surjective hg)
+    rw [← Module.length_ne_top_iff, ← lt_top_iff_ne_top] at h₁ h₃ ⊢
+    rw [Module.length_eq_add_of_exact (LocalizedModule.map p.1.primeCompl f)
+      (LocalizedModule.map p.1.primeCompl g) (LocalizedModule.map_injective _ f hf)
+      (LocalizedModule.map_surjective _ g hg) (LocalizedModule.map_exact _ f g hfg)]
+    exact ENat.add_lt_top.2 ⟨h₁, h₃⟩
+
+/-- The characteristic ideal `char(M)` of a module `M` over a ring `A`. It is
+mathematically correct if the module is finitely generated torsion over a Noetherian ring. -/
 noncomputable def Module.charIdeal
     (A : Type u) [CommRing A] (M : Type v) [AddCommGroup M] [Module A M] : Ideal A :=
   ∏ᶠ (p : PrimeSpectrum A) (_ : p.1.primeHeight = 1),
     p.1 ^ (Module.length (Localization p.1.primeCompl) (LocalizedModule p.1.primeCompl M)).toNat
+
+theorem Module.charIdeal_eq_finset_prod
+    (A : Type u) [CommRing A] (M : Type v) [AddCommGroup M] [Module A M]
+    (s : Finset (PrimeSpectrum A)) (hh : ∀ p ∈ s, p.1.primeHeight = 1)
+    (hs : Module.support A M ∩ {p : PrimeSpectrum A | p.1.primeHeight = 1} ⊆ s) :
+    Module.charIdeal A M = ∏ p ∈ s, p.1 ^ (Module.length (Localization p.1.primeCompl)
+      (LocalizedModule p.1.primeCompl M)).toNat := by
+  sorry
+
+/-- If `0 → M → N → P → 0` is a short exact sequence of fintely generated torsion modules
+over a Noetherian ring, then `char(N) = char(M) * char(P)`. -/
+theorem Module.IsTorsion.charIdeal_eq_of_exact
+    {A M N P : Type*} [CommRing A] [IsNoetherianRing A] [AddCommGroup M] [Module A M]
+    [AddCommGroup N] [Module A N] [AddCommGroup P] [Module A P]
+    [Module.Finite A N] (H : Module.IsTorsion A N) (f : M →ₗ[A] N) (g : N →ₗ[A] P)
+    (hf : Function.Injective f) (hg : Function.Surjective g) (hfg : Function.Exact f g) :
+    Module.charIdeal A N = Module.charIdeal A M * Module.charIdeal A P := by
+  sorry

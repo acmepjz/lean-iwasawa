@@ -1,5 +1,6 @@
 import Iwasawalib.Algebra.Exact.Basic
 import Iwasawalib.Algebra.Exact.KerCokerComp
+import Mathlib.Algebra.Module.LocalizedModule.Exact
 import Mathlib.Algebra.Module.Torsion
 import Mathlib.RingTheory.Ideal.Height
 import Mathlib.RingTheory.Ideal.Quotient.Index
@@ -29,6 +30,21 @@ Equivalently, if `M` localized at `p` equals zero for all prime ideals `p` of he
 @[mk_iff]
 class IsPseudoNull : Prop where
   two_le_primeHeight : ∀ p ∈ support A M, 2 ≤ p.1.primeHeight
+
+theorem isPseudoNull_iff_primeHeight_le_one_imp_subsingleton :
+    IsPseudoNull A M ↔ ∀ p : PrimeSpectrum A, p.1.primeHeight ≤ 1 →
+      Subsingleton (LocalizedModule p.1.primeCompl M) := by
+  rw [isPseudoNull_iff]
+  congr! 1 with p
+  nth_rw 2 [← not_imp_not]
+  rw [not_subsingleton_iff_nontrivial, ← Module.mem_support_iff, not_le,
+    ← ENat.add_one_le_iff (by simp)]
+  rfl
+
+theorem IsPseudoNull.subsingleton_of_primeHeight_le_one [IsPseudoNull A M]
+    {p : PrimeSpectrum A} (hp : p.1.primeHeight ≤ 1) :
+    Subsingleton (LocalizedModule p.1.primeCompl M) :=
+  (isPseudoNull_iff_primeHeight_le_one_imp_subsingleton A M).1 ‹_› p hp
 
 variable {A M N} in
 theorem _root_.LinearEquiv.isPseudoNull_iff (f : M ≃ₗ[A] N) :
@@ -195,6 +211,48 @@ pseudo-isomorphism if its kernel and cokernel are pseudo-null. -/
 structure IsPseudoIsomorphism : Prop where
   isPseudoNull_ker : Module.IsPseudoNull A (ker f)
   isPseudoNull_coker : Module.IsPseudoNull A (N ⧸ range f)
+
+theorem isPseudoIsomorphism_iff_primeHeight_le_one_imp_bijective :
+    f.IsPseudoIsomorphism ↔ ∀ p : PrimeSpectrum A, p.1.primeHeight ≤ 1 →
+      Function.Bijective (LocalizedModule.map p.1.primeCompl f) := by
+  simp_rw [isPseudoIsomorphism_iff, Module.isPseudoNull_iff_primeHeight_le_one_imp_subsingleton,
+    ← forall_and, Function.Bijective]
+  congr! 3 with p hp
+  · have H : Function.Exact (LocalizedModule.map p.1.primeCompl (ker f).subtype)
+        (LocalizedModule.map p.1.primeCompl f) :=
+      LocalizedModule.map_exact p.1.primeCompl _ _ (f.exact_subtype_ker_map)
+    rw [← (LocalizedModule.map p.1.primeCompl f).exact_zero_iff_injective
+      (LocalizedModule p.asIdeal.primeCompl ↥(ker f))]
+    refine ⟨fun h ↦ ?_, fun h ↦ ?_⟩
+    · convert H
+      exact Subsingleton.elim _ _
+    · refine ⟨fun x y ↦ LocalizedModule.map_injective p.1.primeCompl _ (ker f).injective_subtype ?_⟩
+      rw [LinearMap.exact_iff] at H h
+      rw [H] at h
+      have hx := LinearMap.mem_range_self
+        ((LocalizedModule.map p.asIdeal.primeCompl) (ker f).subtype)
+      simp only [h, range_zero, Submodule.mem_bot] at hx
+      simp only [hx]
+  · have H : Function.Exact (LocalizedModule.map p.1.primeCompl f)
+        (LocalizedModule.map p.1.primeCompl (range f).mkQ) :=
+      LocalizedModule.map_exact p.1.primeCompl _ _ (f.exact_map_mkQ_range)
+    rw [← (LocalizedModule.map p.1.primeCompl f).exact_zero_iff_surjective
+      (LocalizedModule p.asIdeal.primeCompl (N ⧸ range f))]
+    refine ⟨fun h ↦ ?_, fun h ↦ ?_⟩
+    · convert H
+    · refine ⟨fun x y ↦ ?_⟩
+      have hs := LocalizedModule.map_surjective p.1.primeCompl _ (range f).mkQ_surjective
+      obtain ⟨x, rfl⟩ := hs x
+      obtain ⟨y, rfl⟩ := hs y
+      rw [LinearMap.exact_iff] at H h
+      rw [← h, LinearMap.ker_zero, LinearMap.ker_eq_top] at H
+      simp [H]
+
+variable {f} in
+theorem IsPseudoIsomorphism.bijective_of_primeHeight_le_one (H : f.IsPseudoIsomorphism)
+    {p : PrimeSpectrum A} (hp : p.1.primeHeight ≤ 1) :
+    Function.Bijective (LocalizedModule.map p.1.primeCompl f) :=
+  f.isPseudoIsomorphism_iff_primeHeight_le_one_imp_bijective.1 H p hp
 
 theorem isPseudoIsomorphism_iff_of_injective (h : Function.Injective f) :
     f.IsPseudoIsomorphism ↔ Module.IsPseudoNull A (N ⧸ range f) := by

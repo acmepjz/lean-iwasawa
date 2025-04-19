@@ -22,8 +22,7 @@ theorem LinearMap.IsPseudoIsomorphism.charIdeal_eq (H : f.IsPseudoIsomorphism) :
     Module.charIdeal A M = Module.charIdeal A N := by
   simp_rw [Module.charIdeal]
   congr! 4 with p hp
-  let f' := LocalizedModule.map p.1.primeCompl f
-  sorry
+  rw [(LinearEquiv.ofBijective _ (H.bijective_of_primeHeight_le_one hp.le)).length_eq]
 
 theorem Module.IsPseudoIsomorphic.charIdeal_eq (H : M ∼ₚᵢₛ[A] N) :
     Module.charIdeal A M = Module.charIdeal A N := by

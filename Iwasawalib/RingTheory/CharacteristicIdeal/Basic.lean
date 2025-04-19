@@ -96,7 +96,6 @@ namespace Submodule
 variable {R M M₁ : Type*} [Semiring R] [AddCommMonoid M] [AddCommMonoid M₁]
   [Module R M] [Module R M₁] (q : Submodule R M₁) (f : M →ₗ[R] M₁)
 
--- TODO:
 def comapRestrict : ↥(q.comap f) →ₗ[R] ↥q :=
   f.restrict fun x hx ↦ by simpa only [mem_comap] using hx
 
@@ -336,24 +335,9 @@ theorem Module.IsTorsion.prod
 
 /-! ### Actual contents of the file -/
 
-@[simp]
-theorem Module.support_self (A : Type u) [CommRing A] : Module.support A A = Set.univ := by
-  nontriviality A
-  ext p
-  simp_rw [Set.mem_univ, iff_true, mem_support_iff]
-  by_contra! h
-  rw [not_nontrivial_iff_subsingleton, LocalizedModule.subsingleton_iff] at h
-  specialize h 1
-  simp_rw [smul_eq_mul, mul_one, exists_eq_right] at h
-  change 0 ∉ p.1 at h
-  exact h (zero_mem p.1)
-
 theorem Ring.support_quotient {A : Type u} [CommRing A] (I : Ideal A) :
     Module.support A (A ⧸ I) = PrimeSpectrum.zeroLocus I := by
-  have : I = I • ⊤ := by simp
-  have := Module.support_quotient (M := A) I
-  rw [Module.support_self, Set.univ_inter] at this
-  convert this
+  simp [Module.support_of_algebra, show algebraMap A (A ⧸ I) = Ideal.Quotient.mk I from rfl]
 
 /-- There are only finitely many height one primes contained in the support of a
 finitely generated torsion module over a Noetherian ring. -/

@@ -1,6 +1,9 @@
 import Iwasawalib.Algebra.Exact.Basic
 import Iwasawalib.Algebra.Exact.KerCokerComp
+import Mathlib.Algebra.Module.Torsion
 import Mathlib.RingTheory.Ideal.Height
+import Mathlib.RingTheory.Ideal.Quotient.Index
+import Mathlib.RingTheory.LocalRing.Quotient
 import Mathlib.RingTheory.Support
 
 /-!
@@ -39,8 +42,8 @@ theorem _root_.LinearEquiv.isPseudoNull (f : M ≃ₗ[A] N) [IsPseudoNull A M] :
 instance isPseudoNull_of_subsingleton [Subsingleton M] : IsPseudoNull A M := by
   simp [isPseudoNull_iff, support_eq_empty]
 
-/-- A module of a ring with Krull dimension `≤ 1` is pseudo-null if and only it is zero. -/
-theorem isPseudoNull_iff_of_krullDimLE_one [Ring.KrullDimLE 1 A] :
+/-- A module over a ring with Krull dimension `≤ 1` is pseudo-null if and only it is zero. -/
+theorem isPseudoNull_iff_subsingleton_of_krullDimLE_one [Ring.KrullDimLE 1 A] :
     IsPseudoNull A M ↔ Subsingleton M := by
   refine ⟨fun H ↦ ?_, fun _ ↦ inferInstance⟩
   rw [← support_eq_empty_iff (R := A)]
@@ -51,6 +54,100 @@ theorem isPseudoNull_iff_of_krullDimLE_one [Ring.KrullDimLE 1 A] :
     (show ringKrullDim A ≤ 1 from Order.KrullDimLE.krullDim_le)
   rw [WithBot.coe_le_one] at h2
   simpa only [Nat.not_ofNat_le_one] using (H.two_le_primeHeight p hp).trans h2
+
+theorem _root_.IsNoetherianRing.exists_nilradical_pow_eq_bot [IsNoetherianRing A] :
+    ∃ n, (nilradical A) ^ n = ⊥ := by
+  obtain ⟨s, hs⟩ := (isNoetherianRing_iff_ideal_fg A).1 ‹_› (nilradical A)
+  rw [← hs]
+  classical
+  refine Finset.induction_on' (motive := fun t : Finset A ↦ ∃ n, Ideal.span (t : Set A) ^ n = ⊥)
+    s ⟨1, by simp⟩ ?_
+  rintro a t ha ht - ⟨m, hm⟩
+  obtain ⟨n, hn⟩ : ∃ n, Ideal.span {a} ^ n = ⊥ := by
+    simp_rw [Ideal.span_singleton_pow, Ideal.span_singleton_eq_bot]
+    suffices a ∈ nilradical A from mem_nilradical.1 this
+    rw [← hs]
+    exact Ideal.span_mono (by simp [ha]) (Ideal.mem_span_singleton_self a)
+  use n + m
+  rw [Finset.coe_insert, Ideal.span_insert, eq_bot_iff]
+  exact Ideal.sup_pow_add_le_pow_sup_pow.trans (by simp [hm, hn])
+
+theorem _root_.IsNoetherianRing.exists_pow_le_of_zeroLocus_eq_singleton [IsNoetherianRing A]
+    {I : Ideal A} {p : PrimeSpectrum A} (h : PrimeSpectrum.zeroLocus I = {p}) :
+    ∃ n, p.1 ^ n ≤ I := by
+  have hrange := PrimeSpectrum.range_comap_of_surjective _ (Ideal.Quotient.mk I)
+    Ideal.Quotient.mk_surjective
+  rw [Ideal.mk_ker, h] at hrange
+  obtain ⟨q, hq⟩ := hrange ▸ Set.mem_singleton p
+  have hnil : nilradical (A ⧸ I) = q.1 := by
+    rw [PrimeSpectrum.nilradical_eq_iInf]
+    refine le_antisymm (iInf_le _ _) (le_iInf fun r ↦ ?_)
+    have := Set.mem_singleton_iff.1 (hrange ▸ Set.mem_range_self r)
+    rw [← this] at hq
+    rw [PrimeSpectrum.comap_injective_of_surjective (Ideal.Quotient.mk I)
+      Ideal.Quotient.mk_surjective hq]
+  obtain ⟨n, hn⟩ := IsNoetherianRing.exists_nilradical_pow_eq_bot (A ⧸ I)
+  use n
+  rw [hnil] at hn
+  apply_fun Ideal.comap (Ideal.Quotient.mk I) at hn
+  rw [← hq, PrimeSpectrum.comap_asIdeal]
+  refine (Ideal.le_comap_pow _ _).trans ?_
+  rw [hn, ← RingHom.ker_eq_comap_bot, Ideal.mk_ker]
+
+theorem support_subset_maximalIdeal_iff_exists_pow_le_annihilator
+    [IsNoetherianRing A] [IsLocalRing A] [Module.Finite A M] :
+    Module.support A M ⊆ {⟨IsLocalRing.maximalIdeal A, inferInstance⟩} ↔
+      ∃ n, (IsLocalRing.maximalIdeal A) ^ n ≤ Module.annihilator A M := by
+  refine ⟨fun h ↦ ?_, fun ⟨n, hn⟩ p hp ↦ ?_⟩
+  · by_cases hM : Subsingleton M
+    · simp [Module.annihilator_eq_top_iff.2 inferInstance]
+    rw [← support_eq_empty_iff (R := A), ← Ne, ← Set.nonempty_iff_ne_empty] at hM
+    rw [hM.subset_singleton_iff, support_eq_zeroLocus] at h
+    exact IsNoetherianRing.exists_pow_le_of_zeroLocus_eq_singleton _ h
+  have := Ideal.IsMaximal.eq_of_le inferInstance (Ideal.IsPrime.ne_top inferInstance) <|
+    Ideal.IsPrime.le_of_pow_le <| hn.trans (mem_support_iff_of_finite.1 hp)
+  simp [this]
+
+theorem isPseudoNull_iff_support_subset_maximalIdeal_of_ringKrullDim_eq_two
+    (hd : ringKrullDim A = 2) [IsLocalRing A] :
+    IsPseudoNull A M ↔ Module.support A M ⊆ {⟨IsLocalRing.maximalIdeal A, inferInstance⟩} := by
+  rw [isPseudoNull_iff, Set.subset_singleton_iff]
+  congr! 2 with p _
+  refine ⟨fun h ↦ ?_, fun h ↦ ?_⟩
+  · have : FiniteRingKrullDim A := finiteRingKrullDim_iff_ne_bot_and_top.2
+      (by rw [hd]; exact ⟨nofun, nofun⟩)
+    have := (Ideal.primeHeight_le_ringKrullDim (I := p.1)).antisymm
+      (by simpa [hd] using WithBot.coe_le_coe.2 h)
+    ext1
+    rwa [Ideal.primeHeight_eq_ringKrullDim_iff] at this
+  · simp [h, Option.some.inj (hd ▸ IsLocalRing.maximalIdeal_primeHeight_eq_ringKrullDim)]
+
+/-- Let `A` be a Noetherian local ring of Krull dimension 2 with finite residue field,
+`M` be a finitely generated `A`-module. Then `M` is pseudo-null if and only if the cardinality
+of `M` is finite. -/
+theorem isPseudoNull_iff_finite_of_ringKrullDim_eq_two (hd : ringKrullDim A = 2)
+    [IsNoetherianRing A] [IsLocalRing A] [Finite (IsLocalRing.ResidueField A)]
+    [Module.Finite A M] : IsPseudoNull A M ↔ Finite M := by
+  rw [isPseudoNull_iff_support_subset_maximalIdeal_of_ringKrullDim_eq_two _ _ hd,
+    support_subset_maximalIdeal_iff_exists_pow_le_annihilator]
+  refine ⟨?_, fun _ ↦ ?_⟩
+  · let _ := Module.quotientAnnihilator (R := A) (M := M)
+    have := Module.Finite.of_restrictScalars_finite A (A ⧸ annihilator A M) M
+    rw [← IsLocalRing.finite_quotient_iff]
+    intro _
+    exact Module.finite_of_finite (A ⧸ annihilator A M)
+  obtain ⟨n, h⟩ := IsArtinian.monotone_stabilizes {
+    toFun := fun n ↦ ((IsLocalRing.maximalIdeal A) ^ n • ⊤ : Submodule A M)
+    monotone' := fun m n h ↦ Submodule.smul_mono_left (Ideal.pow_le_pow_right h) }
+  replace h := h (n + 1) (by simp)
+  dsimp at h
+  rw [pow_succ', mul_smul] at h
+  have hbot := Submodule.eq_bot_of_le_smul_of_le_jacobson_bot
+    (IsLocalRing.maximalIdeal A) ((IsLocalRing.maximalIdeal A) ^ n • ⊤ : Submodule A M)
+    (IsNoetherian.noetherian _) (by apply Eq.le; convert h)
+    (by rw [IsLocalRing.jacobson_eq_maximalIdeal ⊥ (by simp)])
+  refine ⟨n, fun x hx ↦ Module.mem_annihilator.2 fun m ↦ ?_⟩
+  simpa [hbot] using Submodule.smul_mem_smul hx (Submodule.mem_top : m ∈ _)
 
 variable {A M N} in
 /-- Pseudo-null modules are preserved by taking submodules. -/

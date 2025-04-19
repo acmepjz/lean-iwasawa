@@ -295,6 +295,9 @@ We warn the reader that $M\sim N$ not necessarily implies $N\sim M$.
 \begin{prop}
 \label{pseudo-null-criterion}
 \uses{pseudo-null}
+\lean{Module.isPseudoNull_iff_subsingleton_of_krullDimLE_one,
+Module.isPseudoNull_iff_finite_of_ringKrullDim_eq_two}
+\leanok
 Let $A$ be a Noetherian ring, $M$ be a finitely generated $A$-module.
 
 {\rm(i)} If $A$ is of Krull dimension $\leq 1$, then $M$ is pseudo-null
@@ -306,6 +309,7 @@ if and only if the cardinality of $M$ is finite.
 \end{prop}
 
 \begin{proof}
+\leanok
 (i) Clear.
 
 (ii) Let $\fm$ be the maximal ideal of $A$.
@@ -320,6 +324,10 @@ $M$ is a finitely generated $A/\fm^r$-module, which must be finite.
 \begin{prop}
 \label{pseudo-null-char-ideal}
 \uses{pseudo-null,char-ideal-additive}
+\lean{Module.charIdeal_eq_one_of_isPseudoNull,
+LinearMap.IsPseudoIsomorphism.charIdeal_eq,
+Module.IsPseudoIsomorphic.charIdeal_eq}
+\leanok
 Let $A$ be a Noetherian ring, $M$, $N$ be finitely generated torsion $A$-modules.
 
 {\rm(i)} If $M$ is pseudo-null, then $\chaR_A(M)=0$.

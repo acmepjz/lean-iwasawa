@@ -50,6 +50,8 @@ and Proposition \ref{X-inf-coinv-is-X-n}.
 
 \section{Preliminaries in commutative algebra}
 
+\subsection{Random}
+
 \begin{prop}
 \label{noeth-ring-filtration}
 \lean{IsNoetherianRing.exists_relSeries_isQuotientEquivQuotientPrime}
@@ -161,6 +163,54 @@ is also $Z$, so $TZ=Z$. Since $T$ is topologically nilpotent in $\Lambda$,
 for any open subgroup $U$ of $Z$, there exists $N\geq 0$ such that
 for any $n\geq N$, $T^nZ\subset U$. But by $TZ=Z$ we know that
 $T^nZ=Z$ for any $n\geq 0$. Therefore $Z$ must be zero.
+\end{proof}
+
+\subsection{Noetherian integrally closed domain}
+
+\begin{prop}
+\label{noeth-local-domain-is-icd-iff}
+\leanok
+For a Noetherian local domain $A$ of dimension one, the following are equivalent.
+\begin{itemize}
+\item
+$A$ is integrally closed.
+\item
+The maximal ideal of $A$ is principal.
+\item
+$A$ is a discrete valuation ring.
+\item
+$A$ is a regular local ring.
+\end{itemize}
+(\docs{IsDiscreteValuationRing.TFAE},
+\docs{tfae_of_isNoetherianRing_of_isLocalRing_of_isDomain}.)
+\end{prop}
+
+\begin{definition}
+\label{krull-domain-defn}
+\lean{IsKrullDomain}
+\leanok
+An integral domain $A$ is called a \emph{Krull domain}
+if it satisfies the following properties:
+\begin{itemize}
+\item
+$A_\fp$ is a discrete valuation ring for all height one primes $\fp$ of $A$,
+\item
+$A=\bigcap_{\fp\in\Spec(A),\height(\fp)=1}A_\fp$ inside $\Frac(A)$,
+\item
+any nonzero element of $A$ is contained in only a finitely many height one primes of $A$.
+\end{itemize}
+\end{definition}
+
+\begin{prop}
+\label{noeth-ring-is-krull-domain-iff}
+\lean{isKrullDomain_iff_isIntegrallyClosed}
+\leanok
+\uses{noeth-local-domain-is-icd-iff,krull-domain-defn}
+A Noetherian ring is a Krull domain if and only if it is an integrally closed domain.
+\end{prop}
+
+\begin{proof}
+...
 \end{proof}
 
 \section{Structure of module up to pseudo-isomorphism}
@@ -344,6 +394,8 @@ Clear from definition and Proposition \ref{char-ideal-additive}.
 
 \begin{definition}
 \label{ht-1-localization-is-PID}
+\lean{HeightOneLocalizationIsPID}
+\leanok
 Let $A$ be a Noetherian ring.
 We say that the height one localization of $A$ is PID (?), if
 \begin{equation}
@@ -358,6 +410,8 @@ We say that the height one localization of $A$ is PID (?), if
 \begin{lem}
 \label{pis-iff}
 \uses{char-ideal-preliminary,pseudo-null}
+\lean{LinearMap.isPseudoIsomorphism_iff_bijective_map}
+\leanok
 Let $A$ be a Noetherian ring and let
 $M,N$ be finitely generated torsion $A$-modules.
 Let $\Sigma=\{\fq_1,\cdots,\fq_r\}
@@ -387,6 +441,8 @@ so $S^{-1}M=0$.
 \begin{prop}[Structure theorem of finitely generated torsion $A$-modules]
 \label{structure-thm}
 \uses{ht-1-localization-is-PID,char-ideal,pseudo-null}
+\lean{Module.IsTorsion.isPseudoIsomorphic_pi}
+\leanok
 Let $A$ be a Noetherian ring satisfying \eqref{eqn:ht-1-localization-is-PID}
 and let $M$ be a finitely generated torsion $A$-module.
 Then there exist height one primes $\fp_1,\cdots,\fp_s$ of $A$
@@ -440,6 +496,10 @@ the $(\fp_i^{k_i})_{i=1}^s$ is unique up to ordering.
 \begin{prop}
 \label{pis-symm}
 \uses{ht-1-localization-is-PID,pis-iff}
+\lean{Module.IsTorsion.isPseudoIsomorphic_iff_nonempty_linearEquiv_localizedModule,
+Module.IsPseudoIsomorphic.symm,
+Module.isPseudoIsomorphic_comm}
+\leanok
 Let $A$ be a Noetherian ring satisfying \eqref{eqn:ht-1-localization-is-PID}.
 Let $M,N$ be finitely generated torsion $A$-modules.
 Then the followings are equivalent:
@@ -476,6 +536,8 @@ Now by Lemma \ref{pis-iff} we know that $f$ is a pseudo-isomorphism.
 
 \begin{lem}
 \label{semilocal-PID}
+\lean{isPrincipalIdealRing_of_isPrincipalIdealRing_localization}
+\leanok
 Let $A$ be a semilocal (i.e.~only finitely many maximal ideals)
 integral domain which is not a field,
 such that for every maximal ideal $\fp$ of $A$, $A_\fp$ is a PID.
@@ -491,7 +553,7 @@ for each $\fp$ we can choose $\pi_\fp\in A$ such that
 $\pi_\fp\in\fp\setminus\fp^2$ and $\pi_\fp\equiv 1\pmod{\fq}$
 for all maximal ideals $\fq\neq\fp$.
 Prove that $\pi_\fp$ is a generator of $\fp A_\fp$ as an ideal of $A_\fp$.
-Similar to Homework 3.3 (TODO),
+Similar to Homework 3.3,
 prove that if $\fa$ is an ideal of $A$, then
 $\fa=\bigcap_\fp\fa A_\fp\subset\Frac(A)$ where $\fp$ runs over all maximal ideals
 of $A$.
@@ -526,7 +588,7 @@ We must have $h\notin\fp A_\fp$, otherwise $\pi_p\in\fp^2 A_\fp\cap A=\fp^2$, co
 
 \item
 The proof of $\fa=\bigcap_\fp\fa A_\fp$ is exactly the same as
-Homework 3.3 (TODO), which is omitted.
+Homework 3.3, which is omitted.
 
 \item
 Since $\pi_\fp$ is a generator of $\fp A_\fp$
@@ -537,16 +599,53 @@ $f_\fp=\pi_\fp^{e_\fp}g_\fp$ for some $g_\fp\in A_\fp$
 and we must have $g_\fp\notin\fp A_\fp$, otherwise $f_\fp\in\fp^{e_\fp+1}A_\fp\cap A=\fp^{e_\fp+1}$, contradiction. Therefore $g_\fp\in A_\fp^\times$,
 hence $fA_\fp=\fp^{e_\fp}A_\fp=f_\fp A_\fp$.
 \end{itemize}
+
+\textbf{Homework 3.3.}
+Let $A$ be an integral domain, $\Frac(A)$ be its fraction field.
+Then for every maximal ideal $\fp$ of $A$,
+the localization $A_\fp$ can be viewed as a subring of $\Frac(A)$.
+Prove that $A=\bigcap_\fp A_\fp\subset\Frac(A)$
+where $\fp$ runs over all maximal ideals of $A$.
+
+\emph{Proof.}
+Clearly ``$\subset$'' holds.
+Conversely, suppose there exists $x\in\bigcap_\fp A_\fp\subset\Frac(A)$
+but $x\notin A$,
+consider $\fa=(A:x):=\{b\in A\mid bx\in A\}$,
+then it is a proper ideal of $A$,
+hence there exists a maximal ideal $\fm$ of $A$ containing $\fa$.
+Write $x=\frac as\in A_\fm\subset\Frac(A)$
+for some $a\in A$ and $s\in A\setminus\fm$,
+then $sx=a\in A$, hence $s\in\fa\subset\fm$, a contradiction.
+Therefore ``$\supset$'' also holds.
+
+(\emph{Another proof.}
+If $x\in\bigcap_\fp A_\fp\subset\Frac(A)$,
+then for each maximal ideal $\fp$ of $A$,
+we may write $x=\frac{r_\fp}{s_\fp}\in\Frac(A)$ for some $r_\fp\in A$
+and $s_\fp\in A\setminus\fp$. Let $\fa$ be the ideal of $A$ generated by all the $s_\fp$'s.
+Then $\fa$ is not contained in any maximal ideal $\fp$ of $\fa$,
+hence we must have $\fa=(1)$, say $1=\sum_{i=1}^ns_it_i$
+for a finite subset $\{\fp_1,\cdots,\fp_n\}$ of maximal ideals of $A$
+and some $t_i\in A$, here for the simplicity of notation, denote
+$s_i:=s_{\fp_i}$ and $r_i:=r_{\fp_i}$.
+Therefore $x=\sum_{i=1}^nxs_it_i=\sum_{i=1}^nr_it_i\in A$.)
 \end{proof}
 
 \begin{prop}
 \label{regular-domain-is-good}
-\uses{semilocal-PID,ht-1-localization-is-PID}
-A Noetherian regular domain satisfies \eqref{eqn:ht-1-localization-is-PID}.
+\lean{IsKrullDomain.heightOneLocalizationIsPID}
+\leanok
+\uses{semilocal-PID,ht-1-localization-is-PID,noeth-ring-is-krull-domain-iff}
+A Noetherian regular domain
+(more generally, a Noetherian integrally closed domain)
+satisfies \eqref{eqn:ht-1-localization-is-PID}.
 \end{prop}
 
 \begin{proof}
-If $A$ is a Noetherian regular domain, then for each height one prime $\fp$ of $A$,
+If $A$ is a Noetherian regular domain
+(more generally, a Noetherian integrally closed domain),
+then for each height one prime $\fp$ of $A$,
 $A_\fp$ is a PID.
 For any finitely many height one primes $\fp_1,\cdots,\fp_r$ of $A$,
 let $S:=A\setminus\bigcup_{i=1}^r\fp_i$,
@@ -555,11 +654,6 @@ maximal ideals are $S^{-1}\fp_1,\cdots,S^{-1}\fp_r$,
 and we have $(S^{-1}A)_{S^{-1}\fp_i}=A_{\fp_i}$,
 therefore by (i) we know that $S^{-1}A$ is a PID.
 \end{proof}
-
-\begin{remark}
-In fact, a Noetherian integrally closed domain satisfies
-\eqref{eqn:ht-1-localization-is-PID}.
-\end{remark}
 
 \section{Structure of Iwasawa module}
 
@@ -1130,8 +1224,7 @@ totally ramified. So similarly, we get $X_\infty/(\gamma^{p^n}-1)X_\infty\xright
 X_n$.
 \end{proof}
 
-\subsubsection{A group theory result}
-
+We state a group theory result.
 Suppose $\CG$ is any group, $\CX$ is a normal abelian subgroup of $\CG$.
 Then $\CG/\CX$ acts on $\CX$ as follows:
 if $\sigma\in{\CG/\CX}$, lift $\sigma$ to an element $\widetilde\sigma$ in $\CG$.

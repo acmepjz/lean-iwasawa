@@ -1,3 +1,8 @@
+/-
+Copyright (c) 2025 Jz Pan. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Jz Pan
+-/
 import Mathlib.FieldTheory.Galois.Infinite
 import Mathlib.NumberTheory.Padics.ProperSpace
 import Mathlib.Topology.Algebra.Ring.Compact

@@ -181,9 +181,14 @@ $A$ is a discrete valuation ring.
 \item
 $A$ is a regular local ring.
 \end{itemize}
-(\docs{IsDiscreteValuationRing.TFAE},
+(Mathlib: \docs{IsDiscreteValuationRing.TFAE} and
 \docs{tfae_of_isNoetherianRing_of_isLocalRing_of_isDomain}.)
 \end{prop}
+
+\begin{proof}
+\leanok
+Omitted.
+\end{proof}
 
 \begin{definition}
 \label{krull-domain-defn}
@@ -799,9 +804,12 @@ This is WIP in \PR{21944}.
 
 \begin{definition}
 \label{distinguished-polynomial}
+\leanok
 If $(A,\fm,k)$ is a local ring, then a polynomial $f(X)=\sum_{i=0}^na_iX^i\in A[X]$
 is called a \emph{distinguished polynomial}
 if $a_n=1$ and $a_i\in\fm$ for all $0\leq i\leq n-1$.
+
+(Mathlib: \docs{Polynomial.IsDistinguishedAt})
 \end{definition}
 
 \begin{prop}
@@ -811,7 +819,7 @@ Let $A$ be a ring, and let $f(X)=\sum_{n=0}^\infty a_nX^n\in A[[X]]$
 be a formal power series.
 Then $f(X)\in A[[X]]^\times$ if and only if $a_0\in A^\times$.
 
-(This is already in mathlib: \docs{PowerSeries.isUnit_iff_constantCoeff})
+(Mathlib: \docs{PowerSeries.isUnit_iff_constantCoeff})
 \end{prop}
 
 \begin{proof}
@@ -832,6 +840,9 @@ $f(X)$.
 \begin{prop}[Weierstrass division]
 \label{weierstrass-division}
 \uses{power-series-invertible-iff}
+\lean{PowerSeries.exists_isWeierstrassDivision,
+PowerSeries.IsWeierstrassDivision.elim}
+\leanok
 Let $(A,\fm,k)$ be a complete local ring,
 $g(X)=\sum_{i=0}^\infty a_iX^i\in A[[X]]\setminus\fm[[X]]$ be a formal power series
 such that not all of its coefficients are in $\fm$.
@@ -887,6 +898,9 @@ therefore $q(X)\in\fm^{k+1}[[X]]$.
 \begin{prop}[Weierstrass preparation theorem]
 \label{weierstrass-preparation}
 \uses{weierstrass-division,distinguished-polynomial}
+\lean{PowerSeries.exists_isWeierstrassFactorization,
+PowerSeries.IsWeierstrassFactorization.elim}
+\leanok
 Let $(A,\fm,k)$ be a complete local ring.
 Let $g(X)\in A[[X]]\setminus\fm[[X]]$ be a formal power series
 such that not all of its coefficients are in $\fm$.

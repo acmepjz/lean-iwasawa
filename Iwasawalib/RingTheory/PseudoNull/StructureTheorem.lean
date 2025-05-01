@@ -70,13 +70,47 @@ class HeightOneLocalizationIsPID (A : Type*) [CommRing A] : Prop where
     IsDomain (Localization (⨅ p ∈ s, p.1.primeCompl)) ∧
     IsPrincipalIdealRing (Localization (⨅ p ∈ s, p.1.primeCompl))
 
+theorem isPrincipalIdealRing_of_isPrincipalIdealRing_localization'
+    (A : Type*) [CommRing A] [IsDomain A] [Finite (MaximalSpectrum A)] (hnf : ¬IsField A)
+    (hpid : ∀ p : MaximalSpectrum A, IsPrincipalIdealRing (Localization p.1.primeCompl)) :
+    ∀ p : MaximalSpectrum A , ∀ n : ℕ,
+    (Localization.mapToFractionRing '' ((IsLocalRing.maximalIdeal (Localization p.1.primeCompl)) ^ n))
+    ∩ (FractionalIdeal.coeIdeal (⊤ : Ideal A)) = Set (p.1 ^ n) := by
+    sorry
+
 /-- If a semilocal integral domain which is not a field satisfies that it localized at all
 maximal ideals is a PID, then itself is a PID. -/
 theorem isPrincipalIdealRing_of_isPrincipalIdealRing_localization
     (A : Type*) [CommRing A] [IsDomain A] [Finite (MaximalSpectrum A)] (hnf : ¬IsField A)
     (hpid : ∀ p : MaximalSpectrum A, IsPrincipalIdealRing (Localization p.1.primeCompl)) :
     IsPrincipalIdealRing A := by
+  have : ∀ p : MaximalSpectrum A,
+      ⨅ i, (IsLocalRing.maximalIdeal (Localization p.1.primeCompl)) ^ i = ⊥ := by
+    intro p
+    apply Ideal.iInf_pow_eq_bot_of_isDomain
+    exact Ideal.IsPrime.ne_top'
+  have h1 : ∀ p : MaximalSpectrum A, p.1 ≠ p.1 ^ 2 := by sorry
+
+    sorry
+
   sorry
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 instance (priority := 100) IsKrullDomain.heightOneLocalizationIsPID
     (A : Type*) [CommRing A] [IsDomain A] [IsKrullDomain A] : HeightOneLocalizationIsPID A := by

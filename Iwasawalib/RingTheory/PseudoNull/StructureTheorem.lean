@@ -70,13 +70,30 @@ class HeightOneLocalizationIsPID (A : Type*) [CommRing A] : Prop where
     IsDomain (Localization (⨅ p ∈ s, p.1.primeCompl)) ∧
     IsPrincipalIdealRing (Localization (⨅ p ∈ s, p.1.primeCompl))
 
-theorem isPrincipalIdealRing_of_isPrincipalIdealRing_localization'
-    (A : Type*) [CommRing A] [IsDomain A] [Finite (MaximalSpectrum A)] (hnf : ¬IsField A)
-    (hpid : ∀ p : MaximalSpectrum A, IsPrincipalIdealRing (Localization p.1.primeCompl)) :
-    ∀ p : MaximalSpectrum A , ∀ n : ℕ,
-    (Localization.mapToFractionRing '' ((IsLocalRing.maximalIdeal (Localization p.1.primeCompl)) ^ n))
-    ∩ (FractionalIdeal.coeIdeal (⊤ : Ideal A)) = Set (p.1 ^ n) := by
+/-- The image of the n-th power of the maximal ideal of the localization at `p` in the fraction field,
+intersected with `A`, equals the image of the n-th power of `p` in the fraction field. -/
+theorem map_pow_maximal_ideal_eq_map_localization_pow_inf_map_top
+    (A : Type*) [CommRing A] [IsDomain A] :
+    ∀ p : MaximalSpectrum A , ∀ n : ℕ, n ≥ 1 →
+    ((IsLocalRing.maximalIdeal (Localization p.1.primeCompl)) ^ n).map
+    (algebraMap (Localization p.1.primeCompl) (FractionRing A))
+    ⊓ (⊤ : Ideal A).map (algebraMap A (FractionRing A))
+    = (p.1 ^ n).map (algebraMap A (FractionRing A)) := by
     sorry
+
+/-- The image of the n-th power of the maximal ideal of the localization at `p` in the fraction field,
+intersected with `A`, equals the image of the n-th power of `p` in the fraction field. -/
+theorem map_pow_maximal_ideal_eq_map_localization_pow_inf_map_top'
+    (A : Type*) [CommRing A] [IsDomain A] :
+    ∀ p : MaximalSpectrum A , ∀ n : ℕ, n ≥ 1 →
+    ((IsLocalRing.maximalIdeal (Localization p.1.primeCompl)) ^ n).map
+    (Localization.mapToFractionRing (FractionRing A) p.1.primeCompl (Localization p.1.primeCompl)
+    (Ideal.primeCompl_le_nonZeroDivisors p.1) )
+    ⊓ (⊤ : Ideal A).map (algebraMap A (FractionRing A))
+    = (p.1 ^ n).map (algebraMap A (FractionRing A)) := by
+    sorry
+
+
 
 /-- If a semilocal integral domain which is not a field satisfies that it localized at all
 maximal ideals is a PID, then itself is a PID. -/
@@ -90,8 +107,6 @@ theorem isPrincipalIdealRing_of_isPrincipalIdealRing_localization
     apply Ideal.iInf_pow_eq_bot_of_isDomain
     exact Ideal.IsPrime.ne_top'
   have h1 : ∀ p : MaximalSpectrum A, p.1 ≠ p.1 ^ 2 := by sorry
-
-    sorry
 
   sorry
 

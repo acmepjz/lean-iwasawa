@@ -93,23 +93,6 @@ theorem map_pow_maximal_ideal_eq_map_localization_pow_inf_map_top'
     = (p.1 ^ n).map (algebraMap A (FractionRing A)) := by
     sorry
 
-
-
-/-- If a semilocal integral domain which is not a field satisfies that it localized at all
-maximal ideals is a PID, then itself is a PID. -/
-theorem isPrincipalIdealRing_of_isPrincipalIdealRing_localization
-    (A : Type*) [CommRing A] [IsDomain A] [Finite (MaximalSpectrum A)] (hnf : ¬IsField A)
-    (hpid : ∀ p : MaximalSpectrum A, IsPrincipalIdealRing (Localization p.1.primeCompl)) :
-    IsPrincipalIdealRing A := by
-  have : ∀ p : MaximalSpectrum A,
-      ⨅ i, (IsLocalRing.maximalIdeal (Localization p.1.primeCompl)) ^ i = ⊥ := by
-    intro p
-    apply Ideal.iInf_pow_eq_bot_of_isDomain
-    exact Ideal.IsPrime.ne_top'
-  have h1 : ∀ p : MaximalSpectrum A, p.1 ≠ p.1 ^ 2 := by sorry
-
-  sorry
-
 namespace Module
 
 variable {R : Type*} [CommSemiring R] [Finite (MaximalSpectrum R)]
@@ -134,16 +117,38 @@ include f in
 theorem finite_of_isLocalized_maximal' (H : ∀ (P : Ideal R) [P.IsMaximal], Module.Finite R (Mₚ P)) :
     Module.Finite R M := by sorry
 
-theorem isPrincipalIdealRing_of_DedekindDomain_isPrincipalIdealRing_localization
-    (A : Type*) [CommRing A] [IsNoetherianRing A] [IsDedekindDomain A]
-    (hpid : ∀ p : MaximalSpectrum A, IsPrincipalIdealRing (Localization p.1.primeCompl)) :
+end Module
+
+theorem isDedekindDomain_of_isDedekindDomain_localization
+    (A : Type*) [CommRing A] [IsDomain A] [IsNoetherianRing A] (hnf : ¬IsField A)
+    (hddk : ∀ p : MaximalSpectrum A, IsDedekindDomain (Localization p.1.primeCompl)) :
+    IsDedekindDomain A := by
+  sorry
+
+theorem IsDedekindDomain.isDedekindDomain_localization_at_maximal
+    (A : Type*) [CommRing A] [IsDedekindDomain A] (hnf : ¬IsField A) :
+    ∀ p : MaximalSpectrum A, IsDedekindDomain (Localization p.1.primeCompl) ∧
+    IsNoetherianRing A := by
+  sorry
+
+theorem isPrincipalIdealRing_of_DedekindDomain_semilocal
+    (A : Type*) [CommRing A] [IsDedekindDomain A] [Finite (MaximalSpectrum A)] :
     IsPrincipalIdealRing A := by
   sorry
 
-end Module
-
-
-
+/-- If a semilocal integral domain which is not a field satisfies that it localized at all
+maximal ideals is a PID, then itself is a PID. -/
+theorem isPrincipalIdealRing_of_isPrincipalIdealRing_localization
+    (A : Type*) [CommRing A] [IsDomain A] [Finite (MaximalSpectrum A)] (hnf : ¬IsField A)
+    (hpid : ∀ p : MaximalSpectrum A, IsPrincipalIdealRing (Localization p.1.primeCompl)) :
+    IsPrincipalIdealRing A := by
+  have : ∀ p : MaximalSpectrum A,
+      ⨅ i, (IsLocalRing.maximalIdeal (Localization p.1.primeCompl)) ^ i = ⊥ := by
+    intro p
+    apply Ideal.iInf_pow_eq_bot_of_isDomain
+    exact Ideal.IsPrime.ne_top'
+  have h1 : ∀ p : MaximalSpectrum A, p.1 ≠ p.1 ^ 2 := by sorry
+  sorry
 
 instance (priority := 100) IsKrullDomain.heightOneLocalizationIsPID
     (A : Type*) [CommRing A] [IsDomain A] [IsKrullDomain A] : HeightOneLocalizationIsPID A := by

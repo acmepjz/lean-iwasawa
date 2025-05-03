@@ -134,15 +134,13 @@ include f in
 theorem finite_of_isLocalized_maximal' (H : ∀ (P : Ideal R) [P.IsMaximal], Module.Finite R (Mₚ P)) :
     Module.Finite R M := by sorry
 
+theorem isPrincipalIdealRing_of_DedekindDomain_isPrincipalIdealRing_localization
+    (A : Type*) [CommRing A] [IsNoetherianRing A] [IsDedekindDomain A]
+    (hpid : ∀ p : MaximalSpectrum A, IsPrincipalIdealRing (Localization p.1.primeCompl)) :
+    IsPrincipalIdealRing A := by
+  sorry
+
 end Module
-
-
-
-
-
-
-
-
 
 
 

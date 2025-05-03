@@ -209,17 +209,166 @@ any nonzero element of $A$ is contained in only a finitely many height one prime
 
 % check this IsDedekindDomain.HeightOneSpectrum.iInf_localization_eq_bot
 
+\begin{lem}
+\label{integrally-closed-is-local-prop}
+Let $A$ be a domain, $S$ be a subset of $\Spec(A)$
+such that $A_\fp$ is integrally closed for all $\fp\in\Spec(A)$
+and $\bigcap_{\fp\in S}A_\fp=A$ inside $\Frac(A)$.
+Then $A$ itself is integrally closed.
+
+(Generalization of \docs{IsIntegrallyClosed.of_localization_maximal}.)
+\end{lem}
+
+\begin{proof}
+???
+\end{proof}
+
 \begin{prop}
 \label{noeth-ring-is-krull-domain-iff}
 \lean{isKrullDomain_iff_isIntegrallyClosed}
 \leanok
-\uses{noeth-local-domain-is-icd-iff,krull-domain-defn}
+\uses{noeth-local-domain-is-icd-iff,krull-domain-defn,integrally-closed-is-local-prop}
 A Noetherian ring is a Krull domain if and only if it is an integrally closed domain.
 \end{prop}
 
 \begin{proof}
+``$\Rightarrow$'': Lemma \ref{integrally-closed-is-local-prop}.
+
+``$\Leftarrow$'': ...
+\end{proof}
+
+\subsection{Semilocal PID}
+
+\begin{lem}
+\label{semilocal-fg-mod}
+Let $A$ be a semilocal ring, $M$ be an $A$-module such that
+for any maximal ideal $\fm$ of $A$, $M_\fm$ is a finitely generated $A_\fm$-module.
+Then $M$ is a finitely generated $A$-module.
+\end{lem}
+
+\begin{proof}
 ...
 \end{proof}
+
+\begin{lem}
+\label{semilocal-PID}
+\lean{isPrincipalIdealRing_of_isPrincipalIdealRing_localization}
+\uses{semilocal-fg-mod}
+\leanok
+Let $A$ be a semilocal (i.e.~only finitely many maximal ideals)
+integral domain which is not a field,
+such that for every maximal ideal $\fp$ of $A$, $A_\fp$ is a PID.
+Then $A$ itself is a PID.
+\end{lem}
+
+\begin{proof}
+It's known that a semilocal Dedeking domain is a PID
+(\docs{IsPrincipalIdealRing.of_finite_primes}).
+So we only need to show $A$ is a Dedekind domain.
+
+Let $I$ be any ideal of $A$. Apply Lemma \ref{semilocal-fg-mod} to $I$ we know that
+$I$ is finitely generated. Hence $A$ is a Noetherian ring.
+
+Let $\fp\neq 0$ be a prime ideal of $A$.
+Choose a maximal ideal $\fm$ containing $\fp$.
+Then $0\neq\fp A_\fm\subset\fm A_\fm$. Since $\Spec(A_\fm)=\{0,\fm A_\fm\}$,
+we know that $\fp A_fm=\fm A_\fm$, hence $\fp=\fm$ is maximal.
+
+It's known that if the localizations of a domain at all maximal ideals
+are integrally closed, then the domain itself is integrally closed
+(\docs{IsIntegrallyClosed.of_localization_maximal}).
+Hence our $A$ is integrally closed. This completes the proof.
+\end{proof}
+
+\iffalse
+\begin{proof}
+Hint: for a maximal ideal
+$\fp$ of $A$, $A_\fp$ is a PID, hence by Krull's intersection theorem,
+$\bigcap_{n\geq 0}\fp^nA_\fp=0$,
+and in particular, $\fp\supsetneqq\fp^2$. By Chinese remainder theorem,
+for each $\fp$ we can choose $\pi_\fp\in A$ such that
+$\pi_\fp\in\fp\setminus\fp^2$ and $\pi_\fp\equiv 1\pmod{\fq}$
+for all maximal ideals $\fq\neq\fp$.
+Prove that $\pi_\fp$ is a generator of $\fp A_\fp$ as an ideal of $A_\fp$.
+Similar to Homework 3.3,
+prove that if $\fa$ is an ideal of $A$, then
+$\fa=\bigcap_\fp\fa A_\fp\subset\Frac(A)$ where $\fp$ runs over all maximal ideals
+of $A$.
+Now if $\fa\neq 0$, then for each maximal ideal $\fp$ of $A$,
+there exists $f_\fp\in A_\fp\setminus\{0\}$ such that $\fa A_\fp=f_\fp A_\fp$,
+and we may choose $f_\fp$ such that $f_\fp\in A\setminus\{0\}$.
+Let $e_\fp\geq 0$
+be the integer such that $f_\fp\in\fp^{e_\fp}\setminus\fp^{e_\fp+1}$.
+Let $f=\prod_\fp\pi_\fp^{e_\fp}$ where $\fp$ runs over all maximal ideals
+of $A$.
+Prove that $fA_\fp=f_\fp A_\fp$ for all maximal ideals $\fp$ of $A$,
+which enables us to deduce that $(f)=\bigcap_\fp fA_\fp=\bigcap_\fp\fa A_\fp
+=\fa$.
+
+Missing details in the hint:
+\begin{itemize}
+\item
+Firstly for any $n\geq 1$, we have $\fp^nA_\fp\cap A=\fp^n$: the ``$\supset$''
+is clear, and for ``$\subset$'', say $a\in A$ such that
+$a=\frac{r}{s}\in\fp^nA_\fp\subset\Frac(A)$ for some $r\in\fp^n$ and $s\in A\setminus\fp$,
+then we have $sa=r\equiv 0\pmod{\fp^n}$;
+on the other hand, the prime ideals of the ring $A/\fp^n$ are one-to-one correspondence to the prime ideals $\fq$ of $A$ satisfying $\fp^n\subset\fq$,
+which implies that $\fp=\sqrt{\fp^n}\subset\sqrt\fq=\fq$, since $\fp$ is a maximal ideal,
+we must have $\fq=\fp$, namely $A/\fp^n$ is a local ring with maximal ideal
+$\fp/\fp^n$, therefore $s$ is invertible in $A/\fp^n$ and which implies
+$a\equiv 0\pmod{\fp^n}$.
+
+Since $A_\fp$ is PID, $\fp A_\fp$ is principal, say $\fp A_\fp=gA_\fp$
+for some $g\in\fp A_\fp$.
+Then $\pi_\fp=gh$ for some $h\in A_\fp$.
+We must have $h\notin\fp A_\fp$, otherwise $\pi_p\in\fp^2 A_\fp\cap A=\fp^2$, contradiction. Therefore $h\in A_\fp^\times$, which means that $\pi_\fp$ is also a generator of $\fp A_\fp$.
+
+\item
+The proof of $\fa=\bigcap_\fp\fa A_\fp$ is exactly the same as
+Homework 3.3, which is omitted.
+
+\item
+Since $\pi_\fp$ is a generator of $\fp A_\fp$
+and $\pi_\fq\in A_\fp^\times$ for all $\fq\neq\fp$,
+we have $fA_\fp=\fp^{e_\fp}A_\fp$.
+On the other hand, $f_\fp\in\fp^{e_\fp}\setminus\fp^{e_\fp+1}$ implies that
+$f_\fp=\pi_\fp^{e_\fp}g_\fp$ for some $g_\fp\in A_\fp$
+and we must have $g_\fp\notin\fp A_\fp$, otherwise $f_\fp\in\fp^{e_\fp+1}A_\fp\cap A=\fp^{e_\fp+1}$, contradiction. Therefore $g_\fp\in A_\fp^\times$,
+hence $fA_\fp=\fp^{e_\fp}A_\fp=f_\fp A_\fp$.
+\end{itemize}
+
+\textbf{Homework 3.3.}
+Let $A$ be an integral domain, $\Frac(A)$ be its fraction field.
+Then for every maximal ideal $\fp$ of $A$,
+the localization $A_\fp$ can be viewed as a subring of $\Frac(A)$.
+Prove that $A=\bigcap_\fp A_\fp\subset\Frac(A)$
+where $\fp$ runs over all maximal ideals of $A$.
+
+\emph{Proof.}
+Clearly ``$\subset$'' holds.
+Conversely, suppose there exists $x\in\bigcap_\fp A_\fp\subset\Frac(A)$
+but $x\notin A$,
+consider $\fa=(A:x):=\{b\in A\mid bx\in A\}$,
+then it is a proper ideal of $A$,
+hence there exists a maximal ideal $\fm$ of $A$ containing $\fa$.
+Write $x=\frac as\in A_\fm\subset\Frac(A)$
+for some $a\in A$ and $s\in A\setminus\fm$,
+then $sx=a\in A$, hence $s\in\fa\subset\fm$, a contradiction.
+Therefore ``$\supset$'' also holds.
+
+(\emph{Another proof.}
+If $x\in\bigcap_\fp A_\fp\subset\Frac(A)$,
+then for each maximal ideal $\fp$ of $A$,
+we may write $x=\frac{r_\fp}{s_\fp}\in\Frac(A)$ for some $r_\fp\in A$
+and $s_\fp\in A\setminus\fp$. Let $\fa$ be the ideal of $A$ generated by all the $s_\fp$'s.
+Then $\fa$ is not contained in any maximal ideal $\fp$ of $\fa$,
+hence we must have $\fa=(1)$, say $1=\sum_{i=1}^ns_it_i$
+for a finite subset $\{\fp_1,\cdots,\fp_n\}$ of maximal ideals of $A$
+and some $t_i\in A$, here for the simplicity of notation, denote
+$s_i:=s_{\fp_i}$ and $r_i:=r_{\fp_i}$.
+Therefore $x=\sum_{i=1}^nxs_it_i=\sum_{i=1}^nr_it_i\in A$.)
+\end{proof}
+\fi
 
 \section{Structure of module up to pseudo-isomorphism}
 
@@ -541,104 +690,6 @@ Now by Lemma \ref{pis-iff} we know that $f$ is a pseudo-isomorphism.
 \end{proof}
 
 \subsection{Noetherian regular domain}
-
-\begin{lem}
-\label{semilocal-PID}
-\lean{isPrincipalIdealRing_of_isPrincipalIdealRing_localization}
-\leanok
-Let $A$ be a semilocal (i.e.~only finitely many maximal ideals)
-integral domain which is not a field,
-such that for every maximal ideal $\fp$ of $A$, $A_\fp$ is a PID.
-Then $A$ itself is a PID.
-\end{lem}
-
-\begin{proof}
-Hint: for a maximal ideal
-$\fp$ of $A$, $A_\fp$ is a PID, hence by Krull's intersection theorem,
-$\bigcap_{n\geq 0}\fp^nA_\fp=0$,
-and in particular, $\fp\supsetneqq\fp^2$. By Chinese remainder theorem,
-for each $\fp$ we can choose $\pi_\fp\in A$ such that
-$\pi_\fp\in\fp\setminus\fp^2$ and $\pi_\fp\equiv 1\pmod{\fq}$
-for all maximal ideals $\fq\neq\fp$.
-Prove that $\pi_\fp$ is a generator of $\fp A_\fp$ as an ideal of $A_\fp$.
-Similar to Homework 3.3,
-prove that if $\fa$ is an ideal of $A$, then
-$\fa=\bigcap_\fp\fa A_\fp\subset\Frac(A)$ where $\fp$ runs over all maximal ideals
-of $A$.
-Now if $\fa\neq 0$, then for each maximal ideal $\fp$ of $A$,
-there exists $f_\fp\in A_\fp\setminus\{0\}$ such that $\fa A_\fp=f_\fp A_\fp$,
-and we may choose $f_\fp$ such that $f_\fp\in A\setminus\{0\}$.
-Let $e_\fp\geq 0$
-be the integer such that $f_\fp\in\fp^{e_\fp}\setminus\fp^{e_\fp+1}$.
-Let $f=\prod_\fp\pi_\fp^{e_\fp}$ where $\fp$ runs over all maximal ideals
-of $A$.
-Prove that $fA_\fp=f_\fp A_\fp$ for all maximal ideals $\fp$ of $A$,
-which enables us to deduce that $(f)=\bigcap_\fp fA_\fp=\bigcap_\fp\fa A_\fp
-=\fa$.
-
-Missing details in the hint:
-\begin{itemize}
-\item
-Firstly for any $n\geq 1$, we have $\fp^nA_\fp\cap A=\fp^n$: the ``$\supset$''
-is clear, and for ``$\subset$'', say $a\in A$ such that
-$a=\frac{r}{s}\in\fp^nA_\fp\subset\Frac(A)$ for some $r\in\fp^n$ and $s\in A\setminus\fp$,
-then we have $sa=r\equiv 0\pmod{\fp^n}$;
-on the other hand, the prime ideals of the ring $A/\fp^n$ are one-to-one correspondence to the prime ideals $\fq$ of $A$ satisfying $\fp^n\subset\fq$,
-which implies that $\fp=\sqrt{\fp^n}\subset\sqrt\fq=\fq$, since $\fp$ is a maximal ideal,
-we must have $\fq=\fp$, namely $A/\fp^n$ is a local ring with maximal ideal
-$\fp/\fp^n$, therefore $s$ is invertible in $A/\fp^n$ and which implies
-$a\equiv 0\pmod{\fp^n}$.
-
-Since $A_\fp$ is PID, $\fp A_\fp$ is principal, say $\fp A_\fp=gA_\fp$
-for some $g\in\fp A_\fp$.
-Then $\pi_\fp=gh$ for some $h\in A_\fp$.
-We must have $h\notin\fp A_\fp$, otherwise $\pi_p\in\fp^2 A_\fp\cap A=\fp^2$, contradiction. Therefore $h\in A_\fp^\times$, which means that $\pi_\fp$ is also a generator of $\fp A_\fp$.
-
-\item
-The proof of $\fa=\bigcap_\fp\fa A_\fp$ is exactly the same as
-Homework 3.3, which is omitted.
-
-\item
-Since $\pi_\fp$ is a generator of $\fp A_\fp$
-and $\pi_\fq\in A_\fp^\times$ for all $\fq\neq\fp$,
-we have $fA_\fp=\fp^{e_\fp}A_\fp$.
-On the other hand, $f_\fp\in\fp^{e_\fp}\setminus\fp^{e_\fp+1}$ implies that
-$f_\fp=\pi_\fp^{e_\fp}g_\fp$ for some $g_\fp\in A_\fp$
-and we must have $g_\fp\notin\fp A_\fp$, otherwise $f_\fp\in\fp^{e_\fp+1}A_\fp\cap A=\fp^{e_\fp+1}$, contradiction. Therefore $g_\fp\in A_\fp^\times$,
-hence $fA_\fp=\fp^{e_\fp}A_\fp=f_\fp A_\fp$.
-\end{itemize}
-
-\textbf{Homework 3.3.}
-Let $A$ be an integral domain, $\Frac(A)$ be its fraction field.
-Then for every maximal ideal $\fp$ of $A$,
-the localization $A_\fp$ can be viewed as a subring of $\Frac(A)$.
-Prove that $A=\bigcap_\fp A_\fp\subset\Frac(A)$
-where $\fp$ runs over all maximal ideals of $A$.
-
-\emph{Proof.}
-Clearly ``$\subset$'' holds.
-Conversely, suppose there exists $x\in\bigcap_\fp A_\fp\subset\Frac(A)$
-but $x\notin A$,
-consider $\fa=(A:x):=\{b\in A\mid bx\in A\}$,
-then it is a proper ideal of $A$,
-hence there exists a maximal ideal $\fm$ of $A$ containing $\fa$.
-Write $x=\frac as\in A_\fm\subset\Frac(A)$
-for some $a\in A$ and $s\in A\setminus\fm$,
-then $sx=a\in A$, hence $s\in\fa\subset\fm$, a contradiction.
-Therefore ``$\supset$'' also holds.
-
-(\emph{Another proof.}
-If $x\in\bigcap_\fp A_\fp\subset\Frac(A)$,
-then for each maximal ideal $\fp$ of $A$,
-we may write $x=\frac{r_\fp}{s_\fp}\in\Frac(A)$ for some $r_\fp\in A$
-and $s_\fp\in A\setminus\fp$. Let $\fa$ be the ideal of $A$ generated by all the $s_\fp$'s.
-Then $\fa$ is not contained in any maximal ideal $\fp$ of $\fa$,
-hence we must have $\fa=(1)$, say $1=\sum_{i=1}^ns_it_i$
-for a finite subset $\{\fp_1,\cdots,\fp_n\}$ of maximal ideals of $A$
-and some $t_i\in A$, here for the simplicity of notation, denote
-$s_i:=s_{\fp_i}$ and $r_i:=r_{\fp_i}$.
-Therefore $x=\sum_{i=1}^nxs_it_i=\sum_{i=1}^nr_it_i\in A$.)
-\end{proof}
 
 \begin{prop}
 \label{regular-domain-is-good}

@@ -121,7 +121,7 @@ variable (Mₚ : ∀ _ : MaximalSpectrum R, Type*)
   (f : ∀ P : MaximalSpectrum R, M →ₗ[R] Mₚ P)
   [∀ P : MaximalSpectrum R, IsLocalizedModule P.1.primeCompl (f P)]
 
-theorem fg_of_isLocalized_maximal (H : ∀ P : MaximalSpectrum R, Module.Finite R (Mₚ P)) :
+theorem finite_of_isLocalized_maximal (H : ∀ P : MaximalSpectrum R, Module.Finite R (Mₚ P)) :
     Module.Finite R M := by sorry
 
 variable (Mₚ : ∀ (P : Ideal R) [P.IsMaximal], Type*)
@@ -131,12 +131,10 @@ variable (Mₚ : ∀ (P : Ideal R) [P.IsMaximal], Type*)
   [∀ (P : Ideal R) [P.IsMaximal], IsLocalizedModule P.primeCompl (f P)]
 
 include f in
-theorem fg_of_isLocalized_maximal' (H : ∀ (P : Ideal R) [P.IsMaximal], Module.Finite R (Mₚ P)) :
+theorem finite_of_isLocalized_maximal' (H : ∀ (P : Ideal R) [P.IsMaximal], Module.Finite R (Mₚ P)) :
     Module.Finite R M := by sorry
 
 end Module
-
-
 
 
 

@@ -132,6 +132,7 @@ theorem IsDedekindDomain.isDedekindDomain_localization_at_maximal
     IsNoetherianRing A := by
   sorry
 
+/-- If a DedekindDomain is semi-local, then itself is a PID. -/
 theorem isPrincipalIdealRing_of_DedekindDomain_semilocal
     (A : Type*) [CommRing A] [IsDedekindDomain A] [Finite (MaximalSpectrum A)] :
     IsPrincipalIdealRing A := by

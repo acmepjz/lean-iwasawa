@@ -104,6 +104,7 @@ variable (Mₚ : ∀ _ : MaximalSpectrum R, Type*)
   (f : ∀ P : MaximalSpectrum R, M →ₗ[R] Mₚ P)
   [∀ P : MaximalSpectrum R, IsLocalizedModule P.1.primeCompl (f P)]
 
+include f in
 theorem finite_of_isLocalized_maximal (H : ∀ P : MaximalSpectrum R, Module.Finite R (Mₚ P)) :
     Module.Finite R M := by sorry
 
@@ -142,13 +143,11 @@ theorem isPrincipalIdealRing_of_isPrincipalIdealRing_localization
     (A : Type*) [CommRing A] [IsDomain A] [Finite (MaximalSpectrum A)] (hnf : ¬IsField A)
     (hpid : ∀ p : MaximalSpectrum A, IsPrincipalIdealRing (Localization p.1.primeCompl)) :
     IsPrincipalIdealRing A := by
-  have : ∀ p : MaximalSpectrum A,
-      ⨅ i, (IsLocalRing.maximalIdeal (Localization p.1.primeCompl)) ^ i = ⊥ := by
-    intro p
-    apply Ideal.iInf_pow_eq_bot_of_isDomain
-    exact Ideal.IsPrime.ne_top'
-  have h1 : ∀ p : MaximalSpectrum A, p.1 ≠ p.1 ^ 2 := by sorry
-  sorry
+  have h1 : IsNoetherianRing A := by
+    sorry
+  have h2 : IsDedekindDomain A := by
+    sorry
+  apply isPrincipalIdealRing_of_DedekindDomain_semilocal A
 
 instance (priority := 100) IsKrullDomain.heightOneLocalizationIsPID
     (A : Type*) [CommRing A] [IsDomain A] [IsKrullDomain A] : HeightOneLocalizationIsPID A := by

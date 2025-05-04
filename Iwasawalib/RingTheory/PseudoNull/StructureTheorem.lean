@@ -70,29 +70,6 @@ class HeightOneLocalizationIsPID (A : Type*) [CommRing A] : Prop where
     IsDomain (Localization (⨅ p ∈ s, p.1.primeCompl)) ∧
     IsPrincipalIdealRing (Localization (⨅ p ∈ s, p.1.primeCompl))
 
-/-- The image of the n-th power of the maximal ideal of the localization at `p` in the fraction field,
-intersected with `A`, equals the image of the n-th power of `p` in the fraction field. -/
-theorem map_pow_maximal_ideal_eq_map_localization_pow_inf_map_top
-    (A : Type*) [CommRing A] [IsDomain A] :
-    ∀ p : MaximalSpectrum A , ∀ n : ℕ, n ≥ 1 →
-    ((IsLocalRing.maximalIdeal (Localization p.1.primeCompl)) ^ n).map
-    (algebraMap (Localization p.1.primeCompl) (FractionRing A))
-    ⊓ (⊤ : Ideal A).map (algebraMap A (FractionRing A))
-    = (p.1 ^ n).map (algebraMap A (FractionRing A)) := by
-    sorry
-
-/-- The image of the n-th power of the maximal ideal of the localization at `p` in the fraction field,
-intersected with `A`, equals the image of the n-th power of `p` in the fraction field. -/
-theorem map_pow_maximal_ideal_eq_map_localization_pow_inf_map_top'
-    (A : Type*) [CommRing A] [IsDomain A] :
-    ∀ p : MaximalSpectrum A , ∀ n : ℕ, n ≥ 1 →
-    ((IsLocalRing.maximalIdeal (Localization p.1.primeCompl)) ^ n).map
-    (Localization.mapToFractionRing (FractionRing A) p.1.primeCompl (Localization p.1.primeCompl)
-    (Ideal.primeCompl_le_nonZeroDivisors p.1) )
-    ⊓ (⊤ : Ideal A).map (algebraMap A (FractionRing A))
-    = (p.1 ^ n).map (algebraMap A (FractionRing A)) := by
-    sorry
-
 namespace Module
 
 variable {R : Type*} [CommSemiring R] [Finite (MaximalSpectrum R)]

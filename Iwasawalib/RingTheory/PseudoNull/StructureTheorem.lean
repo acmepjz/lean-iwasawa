@@ -15,6 +15,70 @@ import Iwasawalib.RingTheory.PseudoNull.CharacteristicIdeal
 
 universe u
 
+theorem PrimeSpectrum.localization_comap_range_eq_of_isDomain_of_primeHeight_eq_one
+    {R : Type*} (S : Type*) [CommRing R] [CommRing S] [IsDomain R] [Algebra R S]
+    (s : Set (PrimeSpectrum R)) (hs : s ⊆ {p : PrimeSpectrum R | p.1.primeHeight = 1})
+    (hn : s.Nonempty) (hfin : s.Finite) [IsLocalization (⨅ p ∈ s, p.1.primeCompl) S] :
+    Set.range (PrimeSpectrum.comap (algebraMap R S)) = s ∪ {⟨⊥, Ideal.bot_prime⟩} := by
+  set M := ⨅ p ∈ s, p.1.primeCompl
+  rw [PrimeSpectrum.localization_comap_range S M]
+  ext p
+  simp_rw [Set.mem_setOf_eq, Set.union_singleton, Set.mem_insert_iff, M, Submonoid.coe_iInf,
+    ← le_compl_iff_disjoint_left, Set.compl_iInter, Set.le_eq_subset]
+  change _ ⊆ ⋃ p ∈ s, (p.1ᶜᶜ : Set R) ↔ _
+  simp_rw [compl_compl]
+  rw [← hfin.coe_toFinset, Ideal.subset_union_prime hn.some hn.some fun p _ _ _ ↦ p.2]
+  simp_rw [Set.Finite.mem_toFinset, Set.Finite.coe_toFinset]
+  refine ⟨fun ⟨q, hq, hle⟩ ↦ ?_, fun h ↦ ?_⟩
+  · have : q.1.FiniteHeight := q.1.finiteHeight_iff.2 <| Or.inr <| by
+      rw [Ideal.height_eq_primeHeight, hs hq]; nofun
+    have hle' := hs hq ▸ Ideal.primeHeight_mono hle
+    rcases eq_or_ne p.1.primeHeight 1 with hh | hh
+    · have hmem := mem_minimalPrimes_of_primeHeight_eq_height hle
+        (by rw [Ideal.height_eq_primeHeight, hs hq, hh])
+      rw [Ideal.minimalPrimes_eq_subsingleton_self, Set.mem_singleton_iff,
+        ← PrimeSpectrum.ext_iff] at hmem
+      right; rwa [← hmem]
+    replace hh := ENat.lt_one_iff_eq_zero.1 (hle'.lt_of_ne hh)
+    have := Ideal.bot_prime (α := R)
+    rw [Ideal.primeHeight_eq_zero_iff, minimalPrimes, Ideal.minimalPrimes_eq_subsingleton_self,
+      Set.mem_singleton_iff] at hh
+    left; ext1; exact hh
+  · rcases h with h | h
+    · rw [PrimeSpectrum.ext_iff] at h
+      exact ⟨hn.some, hn.some_mem, by simp [h]⟩
+    · exact ⟨p, h, le_rfl⟩
+
+theorem RingEquiv.isPrincipalIdealRing {α β : Type*} [Semiring α] [Semiring β]
+    [IsPrincipalIdealRing β] (e : α ≃+* β) : IsPrincipalIdealRing α where
+  principal S := by
+    obtain ⟨b, hb⟩ := IsPrincipalIdealRing.principal (S.map e.toRingHom)
+    use e.symm.toRingHom b
+    apply_fun Ideal.map e.symm.toRingHom at hb
+    simp_rw [Ideal.map_map, RingEquiv.toRingHom_eq_coe, RingEquiv.symm_comp, Ideal.map_id] at hb
+    simp_rw [hb, Ideal.submodule_span_eq, RingEquiv.toRingHom_eq_coe, RingHom.coe_coe]
+    change Ideal.map e.symm _ = _
+    rw [Ideal.map_symm]
+    ext x
+    simp_rw [Ideal.mem_comap, Ideal.mem_span_singleton']
+    refine ⟨fun ⟨a, ha⟩ ↦ ⟨e.symm a, ?_⟩, fun ⟨a, ha⟩ ↦ ⟨e a, ?_⟩⟩
+    · simpa using congr(e.symm $(ha))
+    · simpa using congr(e $(ha))
+
+-- theorem MaximalSpectrum.localization_comap_range_eq_of_primeHeight_eq_one
+--     {R : Type*} (S : Type*) [CommRing R] [CommRing S] [Algebra R S]
+--     (s : Set (PrimeSpectrum R)) (hs : s ⊆ {p : PrimeSpectrum R | p.1.primeHeight = 1})
+--     (hfin : s.Finite) [IsLocalization (⨅ p ∈ s, p.1.primeCompl) S] :
+--     Set.range (PrimeSpectrum.comap (algebraMap R S) ∘ toPrimeSpectrum) = s := by
+--   rcases s.eq_empty_or_nonempty with rfl | hn
+--   · simp_all only [Set.empty_subset, Set.finite_empty, Set.mem_empty_iff_false, not_false_eq_true,
+--       iInf_neg, iInf_top, Set.range_eq_empty_iff]
+--     have := IsLocalization.subsingleton (R := R) (S := S) (M := ⊤) (Submonoid.mem_top 0)
+--     exact toPrimeSpectrum.isEmpty
+--   set M := ⨅ p ∈ s, p.1.primeCompl
+--   have h1 := PrimeSpectrum.localization_comap_range S M
+--   sorry
+
 /-!
 
 ## Krull domain
@@ -65,7 +129,7 @@ instance (priority := 100) UniqueFactorizationMonoid.isKrullDomain
 let `S = A \ ⋃ i, pᵢ`, then `S⁻¹A` is a PID. -/
 class HeightOneLocalizationIsPID (A : Type*) [CommRing A] : Prop where
   isPrincipalIdealRing_localization (s : Set (PrimeSpectrum A)) :
-    s ⊆ {p : PrimeSpectrum A | p.1.primeHeight = 1} → s.Finite →
+    s ⊆ {p : PrimeSpectrum A | p.1.primeHeight = 1} → s.Nonempty → s.Finite →
     IsDomain (Localization (⨅ p ∈ s, p.1.primeCompl)) ∧
     IsPrincipalIdealRing (Localization (⨅ p ∈ s, p.1.primeCompl))
 
@@ -85,14 +149,57 @@ end Module
 /-- If a semilocal integral domain which is not a field satisfies that it localized at all
 maximal ideals is a PID, then itself is a PID. -/
 theorem isPrincipalIdealRing_of_isPrincipalIdealRing_localization
-    (A : Type*) [CommRing A] [IsDomain A] [Finite (MaximalSpectrum A)] (hnf : ¬IsField A)
+    (A : Type*) [CommRing A] [IsDomain A] [Finite (MaximalSpectrum A)]
     (hpid : ∀ p : MaximalSpectrum A, IsPrincipalIdealRing (Localization p.1.primeCompl)) :
     IsPrincipalIdealRing A := by
   sorry
 
 instance (priority := 100) IsKrullDomain.heightOneLocalizationIsPID
     (A : Type*) [CommRing A] [IsDomain A] [IsKrullDomain A] : HeightOneLocalizationIsPID A := by
-  sorry
+  refine ⟨fun s hs hn hfin ↦ ?_⟩
+  set S := ⨅ p ∈ s, p.1.primeCompl
+  have hS : S ≤ nonZeroDivisors A :=
+    iInf_le_of_le hn.some <| iInf_le_of_le hn.some_mem hn.some.1.primeCompl_le_nonZeroDivisors
+  have : IsDomain (Localization S) := IsLocalization.isDomain_of_le_nonZeroDivisors A hS
+  have := Ideal.bot_prime (α := A)
+  refine ⟨‹_›, ?_⟩
+  have hrange := PrimeSpectrum.localization_comap_range_eq_of_isDomain_of_primeHeight_eq_one
+    (Localization S) s hs hn hfin
+  have : Finite (MaximalSpectrum (Localization S)) := by
+    refine @Finite.of_injective _ _ ?_ _ MaximalSpectrum.toPrimeSpectrum_injective
+    refine @Finite.of_injective_finite_range _ _ _
+      (PrimeSpectrum.localization_comap_injective (Localization S) S) (Set.Finite.to_subtype ?_)
+    simp [hrange, hfin]
+  refine isPrincipalIdealRing_of_isPrincipalIdealRing_localization _ fun p ↦ ?_
+  have hp := Set.mem_range_self (f := PrimeSpectrum.comap (algebraMap A (Localization S)))
+    p.toPrimeSpectrum
+  rw [hrange, Set.union_singleton, Set.mem_insert_iff] at hp
+  rcases hp with hp | hp
+  · have : p.1.primeCompl = nonZeroDivisors (Localization S) := by
+      have hp' : PrimeSpectrum.comap (algebraMap A (Localization S)) ⟨⊥, Ideal.bot_prime⟩ =
+          ⟨⊥, Ideal.bot_prime⟩ := by
+        ext1
+        exact Ideal.comap_bot_of_injective (algebraMap A (Localization S))
+          (IsLocalization.injective _ hS)
+      have := congr($(PrimeSpectrum.localization_comap_injective (Localization S) S (hp' ▸ hp)).1)
+      change p.1 = ⊥ at this
+      ext
+      simp_rw [mem_nonZeroDivisors_iff_ne_zero, this]
+      change _ ∈ ((⊥ : Ideal (Localization S)) : Set (Localization S))ᶜ ↔ _
+      simp
+    rw [this]
+    infer_instance
+  · replace hp := IsKrullDomain.isDiscreteValuationRing_localization _ (hs hp)
+    have : IsLocalization
+        (PrimeSpectrum.comap (algebraMap A (Localization S)) p.toPrimeSpectrum).1.primeCompl
+        (Localization p.1.primeCompl) :=
+      IsLocalization.isLocalization_isLocalization_atPrime_isLocalization S
+        (Localization p.1.primeCompl) p.1
+    exact IsLocalization.algEquiv
+      (PrimeSpectrum.comap (algebraMap A (Localization S)) p.toPrimeSpectrum).1.primeCompl
+      (Localization (PrimeSpectrum.comap (algebraMap A (Localization S))
+        p.toPrimeSpectrum).1.primeCompl)
+      (Localization p.1.primeCompl) |>.symm.toRingEquiv.isPrincipalIdealRing
 
 /-!
 

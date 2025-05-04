@@ -218,11 +218,14 @@ such that $A_\fp$ is integrally closed for all $\fp\in S$
 and $\bigcap_{\fp\in S}A_\fp=A$ inside $\Frac(A)$.
 Then $A$ itself is integrally closed.
 
-(Generalization of \docs{IsIntegrallyClosed.of_localization_maximal}.)
+(Generalization of \docs{IsIntegrallyClosed.of_localization_maximal}. \PR{24588})
 \end{lem}
 
-% https://github.com/leanprover-community/mathlib4/commit/856ccb964c7bbab7297618d47398aa42e8bff959
-% isIntegrallyClosed_of_isLocalization
+\noindent\verb|#check |\docs{isIntegrallyClosed_of_isLocalization}
+
+\noindent\verb|#check |\docs{PrimeSpectrum.localization_comap_injective}
+
+\noindent\verb|#check |\docs{PrimeSpectrum.localization_comap_range}
 
 \begin{proof}
 Suppose $x\in\Frac(A)$ is integral over $A$. Then it's also integral over $A_\fp$
@@ -286,8 +289,10 @@ $I$ is finitely generated. Hence $A$ is a Noetherian ring.
 
 Let $\fp\neq 0$ be a prime ideal of $A$.
 Choose a maximal ideal $\fm$ containing $\fp$.
-Then $0\neq\fp A_\fm\subset\fm A_\fm$. Since $\Spec(A_\fm)=\{0,\fm A_\fm\}$,
-we know that $\fp A_fm=\fm A_\fm$, hence $\fp=\fm$ is maximal.
+Then $0\neq\fp A_\fm\subset\fm A_\fm$. Since $A_\fm$ is a PID
+(hence DVR), we have
+$\Spec(A_\fm)=\{0,\fm A_\fm\}$,
+so know that $\fp A_\fm=\fm A_\fm$, hence $\fp=\fm$ is maximal.
 
 It's known that if the localizations of a domain at all maximal ideals
 are integrally closed, then the domain itself is integrally closed
@@ -717,6 +722,7 @@ satisfies \eqref{eqn:ht-1-localization-is-PID}.
 \end{prop}
 
 \begin{proof}
+\leanok
 If $A$ is a Noetherian regular domain
 (more generally, a Noetherian integrally closed domain),
 then for each height one prime $\fp$ of $A$,

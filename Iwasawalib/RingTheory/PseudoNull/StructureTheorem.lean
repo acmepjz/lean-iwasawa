@@ -14,6 +14,7 @@ import Iwasawalib.RingTheory.PseudoNull.CharacteristicIdeal
 -/
 
 universe u
+set_option diagnostics true
 
 /-!
 
@@ -39,12 +40,107 @@ class IsKrullDomain (A : Type*) [CommRing A] [IsDomain A] : Prop where
 
 instance (priority := 100) IsKrullDomain.isIntegrallyClosed
     (A : Type*) [CommRing A] [IsDomain A] [IsKrullDomain A] : IsIntegrallyClosed A := by
-  sorry
+  have notField : ∀ (p : PrimeSpectrum A), p.1.primeHeight = 1 → ¬IsField (Localization p.1.primeCompl) := by
+    intros p hp
+    have : IsDiscreteValuationRing (Localization p.1.primeCompl) := IsKrullDomain.isDiscreteValuationRing_localization _ hp
+    apply IsDiscreteValuationRing.not_isField
+  have pisDVR : ∀ (p : PrimeSpectrum A), p.1.primeHeight = 1 → IsDiscreteValuationRing (Localization p.1.primeCompl) := by
+    intros p hp
+    exact IsKrullDomain.isDiscreteValuationRing_localization _ hp
+  have pisIntegrallyclosed : ∀ (p : PrimeSpectrum A), p.1.primeHeight = 1 → IsIntegrallyClosed (Localization p.1.primeCompl) := by
+    intros p hp
+    have : IsDiscreteValuationRing (Localization p.1.primeCompl) := IsKrullDomain.isDiscreteValuationRing_localization _ hp
+    have : IsIntegrallyClosed (Localization p.asIdeal.primeCompl) ∧ ∃! (P : Ideal (Localization p.asIdeal.primeCompl)), P ≠ ⊥ ∧ P.IsPrime := by
+      apply ((IsDiscreteValuationRing.TFAE _ (notField p hp)).out 0 3).mp
+      exact pisDVR p hp
+    exact this.1
+  unfold IsIntegrallyClosed IsIntegrallyClosedIn
+  apply  IsIntegralClosure.mk
+  · exact FaithfulSMul.algebraMap_injective A (FractionRing A)
+  · intro x
+    constructor
+    · intro h
+      rw [IsIntegral] at h
+      obtain ⟨l, hl_monic, hl_eval⟩ := h
+      --have :∀ p : PrimeSpectrum A, p.1.primeHeight = 1 → ∀ x ∈ A, x ∈ (Localization p.1.primeCompl) := by
+      --have : ∀ p ∈ {p : PrimeSpectrum A | p.1.primeHeight = 1}, l ∈ Polynomial (Localization p.1.primeCompl) := by sorry
+      --apply (IsIntegralClosure.mk _ _).isIntegral _ this
+      sorry
+    · intro h
+      rw [IsIntegral] at ⊢
+      obtain ⟨p, hp_monic, hp_eval⟩ := h
+      exact RingHom.isIntegralElem_map (algebraMap A (FractionRing A))
+
+#check Ideal.minimalPrimes
+#check Localization.AtPrime.map_eq_maximalIdeal
+#check IsAssociatedPrime
+#check primesOver_finite
+--#check Ring.KrullDimLE.existsUnique_isPrime
+
 
 instance (priority := 100) IsIntegrallyClosed.isKrullDomain_of_isNoetherianRing
     (A : Type*) [CommRing A] [IsDomain A] [IsNoetherianRing A] [IsIntegrallyClosed A] :
     IsKrullDomain A := by
-  sorry
+  apply IsKrullDomain.mk
+  · intro p hp
+    have IsLocalRingAp : IsLocalRing (Localization p.1.primeCompl) := Localization.AtPrime.isLocalRing p.asIdeal
+    have IsIntegralClosedAp : IsIntegrallyClosed (Localization p.1.primeCompl) := by
+      apply isIntegrallyClosed_of_isLocalization (Localization p.asIdeal.primeCompl) p.1.primeCompl
+      exact Ideal.primeCompl_le_nonZeroDivisors p.asIdeal
+    have IsNoetherianRingAp : IsNoetherianRing (Localization p.1.primeCompl) := by
+      apply  IsLocalization.isNoetherianRing p.asIdeal.primeCompl
+      infer_instance
+    have notField: ¬IsField (Localization p.1.primeCompl) := by
+      refine Ring.not_isField_iff_exists_prime.mpr ?_
+      set P := Ideal.map (algebraMap A (Localization p.1.primeCompl)) p.1
+      use P
+      constructor
+      · sorry
+      · sorry
+    have UniquePrime : ∃! P : Ideal (Localization p.1.primeCompl), P ≠ ⊥ ∧ P.IsPrime := by
+      have UniqueMax : ∃! I : Ideal (Localization p.1.primeCompl), I.IsMaximal := by
+        exact IsLocalRing.maximal_ideal_unique (Localization p.asIdeal.primeCompl)
+      --one way is to show that each prime ideal in Ap is in the form of qAp where q is a prime ideal in A contained in p. And then use "Localization.AtPrime.map_eq_maximalIdeal" to show that it's maximal then unique.
+      --another way is to show that Ap is KrullDim 0, then prime is unique
+      have PrimeIsMaximal : ∀ P : Ideal (Localization p.1.primeCompl), P ≠ ⊥ ∧ P.IsPrime → P.IsMaximal := by
+        intro P hP
+        sorry
+      unfold ExistsUnique
+      set P := Ideal.map (algebraMap A (Localization p.1.primeCompl)) p.1
+      use P
+      constructor
+      · sorry
+      · intro y hy
+        have yMaximal : y.IsMaximal := by exact PrimeIsMaximal y hy
+        have hP : P ≠ ⊥ ∧ P.IsPrime := by
+          sorry
+        have PMaximal : P.IsMaximal := by exact PrimeIsMaximal P hP
+        exact ExistsUnique.unique UniqueMax yMaximal PMaximal
+    have TFAE3 : IsIntegrallyClosed (Localization p.1.primeCompl) ∧ ∃! P : Ideal (Localization p.1.primeCompl), P ≠ ⊥ ∧ P.IsPrime := by
+      exact ⟨IsIntegralClosedAp, UniquePrime⟩
+    have IsDVRAp : IsDiscreteValuationRing (Localization p.1.primeCompl) := by
+      apply ((IsDiscreteValuationRing.TFAE _ notField).out 0 3).mpr
+      exact TFAE3
+    exact IsDVRAp
+  · ext a
+    constructor
+    · intro ha
+      sorry
+    · intro ha
+      have : ∀ p ∈ {p : PrimeSpectrum A  | p.asIdeal.primeHeight = 1}, a ∈ (Localization.mapToFractionRing (FractionRing A) p.1.primeCompl (Localization p.1.primeCompl) p.1.primeCompl_le_nonZeroDivisors).range := by
+        intro p hp
+        simp only [AlgHom.mem_range, Localization.mapToFractionRing_apply]
+        sorry
+      simp only [Set.mem_setOf_eq]
+      apply Algebra.mem_sInf.mpr
+      sorry
+  · intro a ha
+    --have : IsDedekindDomain A := by sorry
+    have : (Ideal.span {a}).IsPrime  := sorry
+    have : ∀ p ∈ {p : PrimeSpectrum A | p.asIdeal.primeHeight = 1 ∧ a ∈ p.asIdeal}, IsAssociatedPrime (Ideal.map (algebraMap A (Localization p.1.primeCompl)) p.1) (Localization p.1.primeCompl) := by sorry
+    -- show that associated prime ideals of A are finite
+    sorry
+--#check primesOver_finite
 
 /-- A Noetherian ring is a Krull domain if and only if it is an integrally closed domain. -/
 theorem isKrullDomain_iff_isIntegrallyClosed

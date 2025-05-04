@@ -114,6 +114,8 @@ then $\fp^N\subset\fp'$, hence $\fp\subset\fp'$, so $\fp=\fp'$).
 \uses{krull-principal-ideal-thm}
 Let $A$ be a Noetherian domain. Then $A$ is a UFD if and only if every prime ideal of height $1$ is principal
 (recall that a prime ideal $\fp$ is of height $1$ if $\fp \neq 0$ and there is no prime ideal lies in between $0$ and $\fp$).
+
+(We only need ``$\Rightarrow$'' in our project.)
 \end{thm}
 
 \begin{proof}
@@ -212,7 +214,7 @@ any nonzero element of $A$ is contained in only a finitely many height one prime
 \begin{lem}
 \label{integrally-closed-is-local-prop}
 Let $A$ be a domain, $S$ be a subset of $\Spec(A)$
-such that $A_\fp$ is integrally closed for all $\fp\in\Spec(A)$
+such that $A_\fp$ is integrally closed for all $\fp\in S$
 and $\bigcap_{\fp\in S}A_\fp=A$ inside $\Frac(A)$.
 Then $A$ itself is integrally closed.
 
@@ -220,7 +222,9 @@ Then $A$ itself is integrally closed.
 \end{lem}
 
 \begin{proof}
-???
+Suppose $x\in\Frac(A)$ is integral over $A$. Then it's also integral over $A_\fp$
+for all $\fp\in\Spec(A)$. Hence $x\in A_\fp$ for all $\fp\in S$.
+So $x\in\bigcap_{\fp\in S}A_\fp=A$.
 \end{proof}
 
 \begin{prop}

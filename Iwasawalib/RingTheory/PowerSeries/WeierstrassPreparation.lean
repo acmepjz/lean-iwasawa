@@ -14,11 +14,46 @@ import Mathlib.RingTheory.PowerSeries.Trunc
 
 # Weierstrass preparation theorem for power series over a complete local ring
 
-In this file we assume that a ring is adic complete with respect to some ideal.
+In this file we define Weierstrass division, Weierstrass factorization, and prove
+Weierstrass preparation theorem.
+
+We assume that a ring is adic complete with respect to some ideal.
 If such ideal is a maximal ideal, then by `isLocalRing_of_isAdicComplete_maximal`,
 such ring has only on maximal ideal, and hence such ring is a complete local ring.
 
-Consider using results in <https://github.com/leanprover-community/mathlib4/pull/21944> instead.
+## Main definitions
+
+- `PowerSeries.IsWeierstrassDivisionAt f g q r I`: a `Prop` which asserts that a power series
+  `q` and a polynomial `r` of degree `< n` satisfy `f = g * q + r`, where `n` is the order of the
+  image of `g` in `(A / I)⟦X⟧` (defined to be zero if such image is zero, in which case
+  it's mathematically not considered).
+
+- `PowerSeries.IsWeierstrassDivision`: version of `PowerSeries.IsWeierstrassDivisionAt`
+  for local rings with respect to its maximal ideal.
+
+- `PowerSeries.IsWeierstrassFactorizationAt g f h I`: a `Prop` which asserts that `f` is a
+  distingushed polynomial at `I`, `h` is a formal power series over `A` which a unit, such that
+  the formal power series `g` satisfies `g = f * h`.
+
+- `PowerSeries.IsWeierstrassFactorization`: version of `PowerSeries.IsWeierstrassFactorizationAt`
+  for local rings with respect to its maximal ideal.
+
+## Main results
+
+- `PowerSeries.exists_isWeierstrassDivision`: **Weierstrass division**: let `f`, `g` be power
+  series over a complete local ring, such that the image of `g` in the residue field is not zero.
+  Let `n` be the order of the image of `g` in the residue field. Then there exists a power series
+  `q` and a polynomial `r` of degree `< n`, such that `f = g * q + r`.
+
+- `PowerSeries.IsWeierstrassDivision.elim`: The `q` and `r` in the Weierstrass division is unique.
+
+- `PowerSeries.exists_isWeierstrassFactorization`: **Weierstrass preparation theorem**: let `g` be
+  a power series over a complete local ring, such that the image of `g` in the residue field is
+  not zero. Then there exists a distinguished polynomial `f` and a power series `h`
+  which is a unit, such that `g = f * h`.
+
+- `PowerSeries.IsWeierstrassFactorization.elim`: The `f` and `h` in Werierstrass preparation
+  theorem is unique.
 
 -/
 
@@ -66,6 +101,14 @@ theorem Polynomial.IsDistinguishedAt.natDegree_eq_of_associated_powerSeries
   change _ * (RingHom.toMonoidHom _) _ = _ at hu'
   rw [← Units.coe_map] at hu'
   exact PowerSeries.eq_of_X_pow_mul_eq_X_pow _ _ _ (Units.isUnit _) hu'
+
+theorem IsLocalRing.one_not_mem_maximalIdeal {R : Type*} [CommSemiring R] [IsLocalRing R] :
+    1 ∉ IsLocalRing.maximalIdeal R := one_not_mem_nonunits
+
+theorem IsLocalRing.maximalIdeal_lt_top {R : Type*} [CommSemiring R] [IsLocalRing R] :
+    IsLocalRing.maximalIdeal R < ⊤ := by
+  simp_rw [lt_top_iff_ne_top, Ideal.ne_top_iff_one]
+  exact one_not_mem_maximalIdeal
 
 namespace PowerSeries
 
@@ -129,13 +172,15 @@ variable {A : Type*} [CommRing A]
 
 -/
 
-/-- A `Prop` which asserts that a power series `q` and a polynomial `r` of degree `< n` satisfy
-`f = g * q + r`, where `n` is the order of the image of `g` in `(A / I)⟦X⟧` (defined to be
-zero if such image is zero, in which case it's mathematically not considered). -/
+/-- `PowerSeries.IsWeierstrassDivisionAt f g q r I` is a `Prop` which asserts that a power series
+`q` and a polynomial `r` of degree `< n` satisfy `f = g * q + r`, where `n` is the order of the
+image of `g` in `(A / I)⟦X⟧` (defined to be zero if such image is zero, in which case
+it's mathematically not considered). -/
 def IsWeierstrassDivisionAt (f g q : A⟦X⟧) (r : A[X]) (I : Ideal A) : Prop :=
   r.degree < (g.map (Ideal.Quotient.mk I)).order.toNat ∧ f = g * q + r
 
-/-- Version of `IsWeierstrassDivisionAt` for local rings with respect to its maximal ideal. -/
+/-- Version of `PowerSeries.IsWeierstrassDivisionAt` for local rings with respect to
+its maximal ideal. -/
 abbrev IsWeierstrassDivision [IsLocalRing A] (f g q : A⟦X⟧) (r : A[X]) : Prop :=
   f.IsWeierstrassDivisionAt g q r (IsLocalRing.maximalIdeal A)
 
@@ -227,11 +272,8 @@ theorem order_eq (hI : I ≠ ⊤) : (S.g.map (Ideal.Quotient.mk I)).order = S.n 
   · nth_rw 1 [← zero_add S.n]
     rw [coeff_X_pow_mul, coeff_zero_eq_constantCoeff]
     contrapose! hI
-    ext x
-    simp only [Submodule.mem_top, iff_true]
-    suffices 1 ∈ I by simpa using I.mul_mem_left x this
     rw [Ideal.Quotient.eq_zero_iff_mem] at hI
-    simpa using I.mul_mem_left (isUnit_constantCoeff _ S.isUnit_g₁).unit.inv hI
+    exact Ideal.eq_top_of_isUnit_mem _ hI (isUnit_iff_constantCoeff.1 S.isUnit_g₁)
   · rw [Ideal.Quotient.eq_zero_iff_mem]
     refine coeff_mul_mem_ideal_of_coeff_left_mem_ideal _ _ i (fun j hj ↦ ?_) i le_rfl
     simp_rw [coeff_X_pow, if_neg (lt_of_le_of_lt hj hi).ne, zero_mem]
@@ -518,35 +560,62 @@ theorem weierstrassMod_zero_left [IsLocalRing A] [IsAdicComplete (IsLocalRing.ma
 
 -/
 
-variable [IsLocalRing A]
-
-/-- A `Prop` which asserts that `f` is a distingushed polynomial,
-`h` is a power series which is a unit, such that `g = f * h`. -/
+/-- If `f` is a polynomial over `A`, `g` and `h` are power series over `A`,
+then `PowerSeries.IsWeierstrassFactorizationAt g f h I` is a `Prop` which asserts that `f` is
+distingushed at `I`, `h` is a unit, such that `g = f * h`. -/
 @[mk_iff]
-structure IsWeierstrassFactorization (g : A⟦X⟧) (f : A[X]) (h : A⟦X⟧) : Prop where
-  isDistinguishedAt : f.IsDistinguishedAt (IsLocalRing.maximalIdeal A)
+structure IsWeierstrassFactorizationAt (g : A⟦X⟧) (f : A[X]) (h : A⟦X⟧) (I : Ideal A) : Prop where
+  isDistinguishedAt : f.IsDistinguishedAt I
   isUnit : IsUnit h
   eq_mul : g = f * h
+
+/-- Version of `PowerSeries.IsWeierstrassFactorizationAt` for local rings with respect to
+its maximal ideal. -/
+abbrev IsWeierstrassFactorization (g : A⟦X⟧) (f : A[X]) (h : A⟦X⟧) [IsLocalRing A] : Prop :=
+  g.IsWeierstrassFactorizationAt f h (IsLocalRing.maximalIdeal A)
+
+namespace IsWeierstrassFactorizationAt
+
+variable {g : A⟦X⟧} {f : A[X]} {h : A⟦X⟧} {I : Ideal A} (H : g.IsWeierstrassFactorizationAt f h I)
+include H
+
+theorem map_ne_zero_of_ne_top (hI : I ≠ ⊤) : g.map (Ideal.Quotient.mk I) ≠ 0 := by
+  rcases subsingleton_or_nontrivial (A ⧸ I) with h | _
+  · apply (Submodule.Quotient.subsingleton_iff _).1 at h
+    exact False.elim <| hI <| by ext; simp [h]
+  rw [congr(map (Ideal.Quotient.mk I) $(H.eq_mul)), map_mul, ← Polynomial.polynomial_map_coe, ne_eq,
+    (H.isUnit.map _).mul_left_eq_zero]
+  exact_mod_cast f.map_monic_ne_zero (f := Ideal.Quotient.mk I) H.isDistinguishedAt.monic
+
+theorem degree_eq_order_map_of_ne_top (hI : I ≠ ⊤) :
+    f.degree = (g.map (Ideal.Quotient.mk I)).order := by
+  refine H.isDistinguishedAt.degree_eq_order_map g h ?_ H.eq_mul
+  contrapose! hI
+  exact Ideal.eq_top_of_isUnit_mem _ hI (isUnit_iff_constantCoeff.1 H.isUnit)
+
+theorem natDegree_eq_toNat_order_map_of_ne_top (hI : I ≠ ⊤) :
+    f.natDegree = (g.map (Ideal.Quotient.mk I)).order.toNat := by
+  rw [Polynomial.natDegree, H.degree_eq_order_map_of_ne_top hI]
+  rfl
+
+end IsWeierstrassFactorizationAt
+
+variable [IsLocalRing A]
 
 namespace IsWeierstrassFactorization
 
 variable {g : A⟦X⟧} {f : A[X]} {h : A⟦X⟧} (H : g.IsWeierstrassFactorization f h)
 include H
 
-theorem map_ne_zero : g.map (IsLocalRing.residue A) ≠ 0 := by
-  rw [congr(map (IsLocalRing.residue A) $(H.eq_mul)), map_mul, mul_ne_zero_iff,
-    ← Polynomial.polynomial_map_coe, ne_eq, Polynomial.coe_eq_zero_iff]
-  exact ⟨f.map_monic_ne_zero H.isDistinguishedAt.monic, (H.isUnit.map _).ne_zero⟩
+theorem map_ne_zero : g.map (IsLocalRing.residue A) ≠ 0 :=
+  H.map_ne_zero_of_ne_top IsLocalRing.maximalIdeal_lt_top.ne
 
-theorem degree_eq_order_map : f.degree = (g.map (IsLocalRing.residue A)).order := by
-  refine H.isDistinguishedAt.degree_eq_order_map g h ?_ H.eq_mul
-  rw [IsLocalRing.not_mem_maximalIdeal, ← isUnit_iff_constantCoeff]
-  exact H.isUnit
+theorem degree_eq_order_map : f.degree = (g.map (IsLocalRing.residue A)).order :=
+  H.degree_eq_order_map_of_ne_top IsLocalRing.maximalIdeal_lt_top.ne
 
 theorem natDegree_eq_toNat_order_map :
-    f.natDegree = (g.map (IsLocalRing.residue A)).order.toNat := by
-  rw [Polynomial.natDegree, H.degree_eq_order_map]
-  rfl
+    f.natDegree = (g.map (IsLocalRing.residue A)).order.toNat :=
+  H.natDegree_eq_toNat_order_map_of_ne_top IsLocalRing.maximalIdeal_lt_top.ne
 
 end IsWeierstrassFactorization
 

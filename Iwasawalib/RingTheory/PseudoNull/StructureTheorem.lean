@@ -32,8 +32,7 @@ class IsKrullDomain (A : Type*) [CommRing A] [IsDomain A] : Prop where
   isDiscreteValuationRing_localization (p : PrimeSpectrum A) :
     p.1.primeHeight = 1 → IsDiscreteValuationRing (Localization p.1.primeCompl)
   biInf_eq_bot (A) : ⨅ p ∈ {p : PrimeSpectrum A | p.1.primeHeight = 1},
-    (Localization.mapToFractionRing (FractionRing A) p.1.primeCompl (Localization p.1.primeCompl)
-      p.1.primeCompl_le_nonZeroDivisors).range = ⊥
+    Localization.subalgebra (FractionRing A) p.1.primeCompl p.1.primeCompl_le_nonZeroDivisors = ⊥
   finite (a : A) :
     a ≠ 0 → {p : PrimeSpectrum A | p.1.primeHeight = 1 ∧ a ∈ p.1}.Finite
 

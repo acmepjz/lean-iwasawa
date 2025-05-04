@@ -75,9 +75,9 @@ namespace Module
 variable {R : Type*} [CommSemiring R] [Finite (MaximalSpectrum R)]
 variable (M : Type*) [AddCommMonoid M] [Module R M]
 
-theorem finite_of_localized_MaximalSpec
+theorem finite_of_finite_localizedModule
     (H : ∀ P : MaximalSpectrum R,
-    Module.Finite (Localization P.1.primeCompl) (LocalizedModule P.1.primeCompl M)) :
+      Module.Finite (Localization P.1.primeCompl) (LocalizedModule P.1.primeCompl M)) :
     Module.Finite R M := by
   sorry
 
@@ -88,7 +88,8 @@ maximal ideals is a PID, then itself is a PID. -/
 theorem isPrincipalIdealRing_of_isPrincipalIdealRing_localization
     (A : Type*) [CommRing A] [IsDomain A] [Finite (MaximalSpectrum A)] (hnf : ¬IsField A)
     (hpid : ∀ p : MaximalSpectrum A, IsPrincipalIdealRing (Localization p.1.primeCompl)) :
-    IsPrincipalIdealRing A := by sorry
+    IsPrincipalIdealRing A := by
+  sorry
 
 instance (priority := 100) IsKrullDomain.heightOneLocalizationIsPID
     (A : Type*) [CommRing A] [IsDomain A] [IsKrullDomain A] : HeightOneLocalizationIsPID A := by

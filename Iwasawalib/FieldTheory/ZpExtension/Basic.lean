@@ -282,6 +282,7 @@ theorem finrank_eq_pow_of_finite (K' : IntermediateField K Kinf) [FiniteDimensio
   obtain ⟨m, h⟩ := H.le_Kn_of_finite K'
   have h1 : Module.finrank K K' ∣ p ^ (m * d) := by
     let L := IntermediateField.extendScalars h
+    have := Module.Free.of_divisionRing K' L
     have := Module.finrank_mul_finrank K K' L
     rw [show Module.finrank K L = _ from H.finrank_Kn m] at this
     exact dvd_of_mul_right_eq _ this

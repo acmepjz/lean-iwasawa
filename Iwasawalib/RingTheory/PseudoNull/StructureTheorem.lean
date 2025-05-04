@@ -98,57 +98,20 @@ namespace Module
 variable {R : Type*} [CommSemiring R] [Finite (MaximalSpectrum R)]
 variable (M : Type*) [AddCommMonoid M] [Module R M]
 
-variable (Mₚ : ∀ _ : MaximalSpectrum R, Type*)
-  [∀ P : MaximalSpectrum R, AddCommMonoid (Mₚ P)]
-  [∀ P : MaximalSpectrum R, Module R (Mₚ P)]
-  (f : ∀ P : MaximalSpectrum R, M →ₗ[R] Mₚ P)
-  [∀ P : MaximalSpectrum R, IsLocalizedModule P.1.primeCompl (f P)]
-
-include f in
-theorem finite_of_isLocalized_maximal (H : ∀ P : MaximalSpectrum R, Module.Finite R (Mₚ P)) :
-    Module.Finite R M := by sorry
-
-variable (Mₚ : ∀ (P : Ideal R) [P.IsMaximal], Type*)
-  [∀ (P : Ideal R) [P.IsMaximal], AddCommMonoid (Mₚ P)]
-  [∀ (P : Ideal R) [P.IsMaximal], Module R (Mₚ P)]
-  (f : ∀ (P : Ideal R) [P.IsMaximal], M →ₗ[R] Mₚ P)
-  [∀ (P : Ideal R) [P.IsMaximal], IsLocalizedModule P.primeCompl (f P)]
-
-include f in
-theorem finite_of_isLocalized_maximal' (H : ∀ (P : Ideal R) [P.IsMaximal], Module.Finite R (Mₚ P)) :
-    Module.Finite R M := by sorry
+theorem finite_of_localized_MaximalSpec
+    (H : ∀ P : MaximalSpectrum R,
+    Module.Finite (Localization P.1.primeCompl) (LocalizedModule P.1.primeCompl M)) :
+    Module.Finite R M := by
+  sorry
 
 end Module
-
-theorem isDedekindDomain_of_isDedekindDomain_localization
-    (A : Type*) [CommRing A] [IsDomain A] [IsNoetherianRing A] (hnf : ¬IsField A)
-    (hddk : ∀ p : MaximalSpectrum A, IsDedekindDomain (Localization p.1.primeCompl)) :
-    IsDedekindDomain A := by
-  sorry
-
-theorem IsDedekindDomain.isDedekindDomain_localization_at_maximal
-    (A : Type*) [CommRing A] [IsDedekindDomain A] (hnf : ¬IsField A) :
-    ∀ p : MaximalSpectrum A, IsDedekindDomain (Localization p.1.primeCompl) ∧
-    IsNoetherianRing A := by
-  sorry
-
-/-- If a DedekindDomain is semi-local, then itself is a PID. -/
-theorem isPrincipalIdealRing_of_DedekindDomain_semilocal
-    (A : Type*) [CommRing A] [IsDedekindDomain A] [Finite (MaximalSpectrum A)] :
-    IsPrincipalIdealRing A := by
-  sorry
 
 /-- If a semilocal integral domain which is not a field satisfies that it localized at all
 maximal ideals is a PID, then itself is a PID. -/
 theorem isPrincipalIdealRing_of_isPrincipalIdealRing_localization
     (A : Type*) [CommRing A] [IsDomain A] [Finite (MaximalSpectrum A)] (hnf : ¬IsField A)
     (hpid : ∀ p : MaximalSpectrum A, IsPrincipalIdealRing (Localization p.1.primeCompl)) :
-    IsPrincipalIdealRing A := by
-  have h1 : IsNoetherianRing A := by
-    sorry
-  have h2 : IsDedekindDomain A := by
-    sorry
-  apply isPrincipalIdealRing_of_DedekindDomain_semilocal A
+    IsPrincipalIdealRing A := by sorry
 
 instance (priority := 100) IsKrullDomain.heightOneLocalizationIsPID
     (A : Type*) [CommRing A] [IsDomain A] [IsKrullDomain A] : HeightOneLocalizationIsPID A := by

@@ -69,6 +69,19 @@ class HeightOneLocalizationIsPID (A : Type*) [CommRing A] : Prop where
     IsDomain (Localization (⨅ p ∈ s, p.1.primeCompl)) ∧
     IsPrincipalIdealRing (Localization (⨅ p ∈ s, p.1.primeCompl))
 
+namespace Module
+
+variable {R : Type*} [CommSemiring R] [Finite (MaximalSpectrum R)]
+variable (M : Type*) [AddCommMonoid M] [Module R M]
+
+theorem finite_of_finite_localizedModule
+    (H : ∀ P : MaximalSpectrum R,
+      Module.Finite (Localization P.1.primeCompl) (LocalizedModule P.1.primeCompl M)) :
+    Module.Finite R M := by
+  sorry
+
+end Module
+
 /-- If a semilocal integral domain which is not a field satisfies that it localized at all
 maximal ideals is a PID, then itself is a PID. -/
 theorem isPrincipalIdealRing_of_isPrincipalIdealRing_localization

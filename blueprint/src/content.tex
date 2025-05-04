@@ -221,6 +221,9 @@ Then $A$ itself is integrally closed.
 (Generalization of \docs{IsIntegrallyClosed.of_localization_maximal}.)
 \end{lem}
 
+% https://github.com/leanprover-community/mathlib4/commit/856ccb964c7bbab7297618d47398aa42e8bff959
+% isIntegrallyClosed_of_isLocalization
+
 \begin{proof}
 Suppose $x\in\Frac(A)$ is integral over $A$. Then it's also integral over $A_\fp$
 for all $\fp\in\Spec(A)$. Hence $x\in A_\fp$ for all $\fp\in S$.
@@ -238,13 +241,21 @@ A Noetherian ring is a Krull domain if and only if it is an integrally closed do
 \begin{proof}
 ``$\Rightarrow$'': Lemma \ref{integrally-closed-is-local-prop}.
 
-``$\Leftarrow$'': ...
+``$\Leftarrow$'': Let $\fp$ be a height one prime of $A$.
+Then $A_\fp$ is integrally closed (\docs{isIntegrallyClosed_of_isLocalization}).
+We have $\Spec(A_\fp)=\{0,\fp A_\fp\}$ hence
+$A_\fp$ is also a Noetherian local domain of dimension one.
+Now by Proposition \ref{noeth-local-domain-is-icd-iff}, $A_\fp$ is a DVR.
+
+??? ???
 \end{proof}
 
 \subsection{Semilocal PID}
 
 \begin{lem}
 \label{semilocal-fg-mod}
+\lean{Module.finite_of_finite_localizedModule}
+\leanok
 Let $A$ be a semilocal ring, $M$ be an $A$-module such that
 for any maximal ideal $\fm$ of $A$, $M_\fm$ is a finitely generated $A_\fm$-module.
 Then $M$ is a finitely generated $A$-module.

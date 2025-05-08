@@ -810,7 +810,7 @@ Therefore it is an isomorphism of $\BZ_p$-algebras.
 
 \begin{prop}
 \label{Iwasawa-alg-isom}
-\uses{Iwasawa-alg-isom-finite-level}
+\uses{Iwasawa-alg-isom-finite-level,isom-given-by-weierstrass-division}
 There is an isomorphism of topological rings
 $\BZ_p[[T]]\xrightarrow\sim\Lambda$
 sending $1+T$ to $\gamma$,
@@ -839,12 +839,13 @@ in particular $\varphi_n(T)$ is a distinguished polynomial of degree $p^n$.
 
 It's clear that $\BZ_p[T]_{\deg\leq p^n-1}\xrightarrow\sim\BZ_p[T]/(\varphi_n(T))$
 is an isomorphism of $\BZ_p$-modules,
-and the Weierstrass division implies that
+and the Weierstrass division (Proposition \ref{weierstrass-division}) implies that
 $\BZ_p[T]_{\deg\leq p^n-1}\xrightarrow\sim\BZ_p[[T]]/(\varphi_n(T))$
 is also an isomorphism of $\BZ_p$-modules,
 therefore the natural ring homomorphism $\BZ_p[T]\hookrightarrow\BZ_p[[T]]$
 induces an isomorphism of $\BZ_p$-algebras
-$\BZ_p[T]/(\varphi_n(T))\xrightarrow\sim\BZ_p[[T]]/(\varphi_n(T))$.
+$\BZ_p[T]/(\varphi_n(T))\xrightarrow\sim\BZ_p[[T]]/(\varphi_n(T))$
+(Corollary \ref{isom-given-by-weierstrass-division}).
 
 Since each $\BZ_p[[T]]/(\varphi_n(T))$ is a free $\BZ_p$-module of finite rank
 endowed with the $p$-adic topology, we have
@@ -969,6 +970,25 @@ since $a_i\in\fm$ for all $i\leq n-1$, we obtain $r(X)\in\fm^{k+1}[X]_{\deg\leq 
 Multiply $g_1(X)^{-1}$ to both side,
 we obtain $(\sum_{i=0}^{n-1}a_iX^i)q(X)g_1(X)^{-1}+X^nq(X)=r(X)g_1(X)^{-1}$,
 therefore $q(X)\in\fm^{k+1}[[X]]$.
+\end{proof}
+
+\begin{cor}
+\label{isom-given-by-weierstrass-division}
+\uses{weierstrass-division}
+Let $(A,\fm,k)$ be a complete local ring,
+$g(X)=\sum_{i=0}^n a_iX^i\in A[X]$ be a polynomial
+such that $a_n\in A\setminus\fm$ and $a_i\in\fm$ for all $i<n$.
+Then the natural map $A[X]/(g)\to A[[X]]/(g)$
+is an isomorphism.
+\end{cor}
+
+\begin{proof}
+Let $f\in A[[X]]$.
+Then by Proposition \ref{weierstrass-division},
+we may find a unique formal power series
+$q(X)\in A[[X]]$ and a unique polynomial $r(X)\in A[X]$ of degree $\leq n-1$
+such that $f=gq+r$.
+Then $r$ is the unique inverse of $f$ under the natural map $A[X]/(g)\to A[[X]]/(g)$.
 \end{proof}
 
 \begin{prop}[Weierstrass preparation theorem]
@@ -1568,3 +1588,22 @@ if $\mu_{p^\infty}\subset L$
 then $\chi_\cyc:\Aut(L)\to\BZ_p^\times$
 \PR{21934}
 \end{itemize}
+
+\begin{thebibliography}{XXXX}
+\bibitem[Nek06]{Mek06}
+J. Nekov\'{a}\v{r}.
+\emph{Selmer complexes}.
+Ast\'erisque No. 310 (2006), viii+559 pp.
+\bibitem[NSW08]{NSW08}
+J. Neukirch, A. Schmidt, K. Wingberg.
+\emph{Cohomology of number fields}.
+Second edition.
+Grundlehren Math. Wiss., 323.
+Springer-Verlag, Berlin, 2008. xvi+825 pp.
+\bibitem[Was97]{Was97}
+L. C. Washington.
+\emph{Introduction to cyclotomic fields}.
+Second edition.
+Grad. Texts in Math., 83.
+Springer-Verlag, New York, 1997. xiv+487 pp.
+\end{thebibliography}

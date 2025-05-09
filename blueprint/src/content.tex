@@ -975,6 +975,8 @@ therefore $q(X)\in\fm^{k+1}[[X]]$.
 \begin{cor}
 \label{isom-given-by-weierstrass-division}
 \uses{weierstrass-division}
+\lean{Polynomial.IsDistinguishedAt.algEquivQuotient}
+\leanok
 Let $(A,\fm,k)$ be a complete local ring,
 $g(X)=\sum_{i=0}^n a_iX^i\in A[X]$ be a polynomial
 such that $a_n\in A\setminus\fm$ and $a_i\in\fm$ for all $i<n$.
@@ -983,6 +985,7 @@ is an isomorphism.
 \end{cor}
 
 \begin{proof}
+\leanok
 Let $f\in A[[X]]$.
 Then by Proposition \ref{weierstrass-division},
 we may find a unique formal power series

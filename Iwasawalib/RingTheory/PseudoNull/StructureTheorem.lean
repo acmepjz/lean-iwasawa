@@ -133,16 +133,127 @@ class HeightOneLocalizationIsPID (A : Type*) [CommRing A] : Prop where
     IsDomain (Localization (⨅ p ∈ s, p.1.primeCompl)) ∧
     IsPrincipalIdealRing (Localization (⨅ p ∈ s, p.1.primeCompl))
 
+section Missinglemmas
+
+namespace Submodule
+
+variable {R : Type*} {M : Type*}
+
+variable [Semiring R] [AddCommMonoid M] [Module R M]
+variable {p : Submodule R M}
+variable {r : R} {x : M}
+variable (p)
+
+lemma smul_mem_iff_of_isUnit (hr : IsUnit r) :
+    r • x ∈ p ↔ x ∈ p :=
+  let _ : Invertible r := hr.invertible
+  smul_mem_iff'' p
+
+end Submodule
+
+namespace IsLocalization
+
+section smul
+
+variable {R : Type*} [CommSemiring R] {S : Submonoid R}
+variable {R' : Type*} [CommSemiring R'] [Algebra R R'] [IsLocalization S R']
+variable {M': Type*} [AddCommMonoid M'] [Module R' M'] [Module R M'] [IsScalarTower R R' M']
+
+/-- If `x` in a `R' = S⁻¹ R`-module `M'`, then for a submodule `N'` of `M'`,
+`s • x ∈ N'` if and only if `x ∈ N'` for some `s` in S. -/
+lemma smul_mem_iff {N' : Submodule R' M'} {x : M'} {s : S} :
+    s • x ∈ N' ↔ x ∈ N' := by
+  refine ⟨fun h ↦ ?_, fun h ↦ Submodule.smul_of_tower_mem N' s h⟩
+  rwa [← Submodule.smul_mem_iff_of_isUnit (r := algebraMap R R' s) N' (map_units R' s),
+    algebraMap_smul]
+
+end smul
+
+end IsLocalization
+
+section numerator
+
+variable {R : Type*} [CommSemiring R] (S : Submonoid R)
+variable {M M' : Type*} [AddCommMonoid M] [AddCommMonoid M']
+variable {R' : Type*} [CommSemiring R'] [Algebra R R'] [Module R' M'] [IsLocalization S R']
+variable [Module R M] [Module R M'] [IsScalarTower R R' M']
+variable (f : M →ₗ[R] M') [IsLocalizedModule S f]
+
+noncomputable def getNumerator (x : M') : M :=
+  (Classical.choose (IsLocalizedModule.surj S f x)).1
+
+/-- If the image of `getNumerator x` under `f`
+is in a submodule `N'` of `M'`, then `x` itself lies in `N'`. -/
+lemma mem_of_getNumerator_image_mem {N' : Submodule R' M'} {x : M'}
+    (hx : f (getNumerator S f x) ∈ N') : x ∈ N' := by
+  let Num := (getNumerator S f x)
+  let Den := (Classical.choose (IsLocalizedModule.surj S f x)).2
+  have h : Den • x = f Num := (Classical.choose_spec (IsLocalizedModule.surj S f x))
+  rwa [← IsLocalization.smul_mem_iff (s := Den), h]
+
+noncomputable def finsetNumerator [DecidableEq M] (s : Finset M') : Finset M :=
+  Finset.image (getNumerator S f) s
+
+end numerator
+
+end Missinglemmas
+
 namespace Module
 
 variable {R : Type*} [CommSemiring R] [Finite (MaximalSpectrum R)]
 variable (M : Type*) [AddCommMonoid M] [Module R M]
 
-theorem finite_of_finite_localizedModule
-    (H : ∀ P : MaximalSpectrum R,
-      Module.Finite (Localization P.1.primeCompl) (LocalizedModule P.1.primeCompl M)) :
+variable {R M : Type*} [CommSemiring R] [AddCommMonoid M] [Module R M]
+  [Finite (MaximalSpectrum R)]
+
+variable
+  (Rₚ : ∀ (P : Ideal R) [P.IsMaximal], Type*)
+  [∀ (P : Ideal R) [P.IsMaximal], CommSemiring (Rₚ P)]
+  [∀ (P : Ideal R) [P.IsMaximal], Algebra R (Rₚ P)]
+  [∀ (P : Ideal R) [P.IsMaximal], IsLocalization.AtPrime (Rₚ P) P]
+  (Mₚ : ∀ (P : Ideal R) [P.IsMaximal], Type*)
+  [∀ (P : Ideal R) [P.IsMaximal], AddCommMonoid (Mₚ P)]
+  [∀ (P : Ideal R) [P.IsMaximal], Module R (Mₚ P)]
+  [∀ (P : Ideal R) [P.IsMaximal], Module (Rₚ P) (Mₚ P)]
+  [∀ (P : Ideal R) [P.IsMaximal], IsScalarTower R (Rₚ P) (Mₚ P)]
+  (f : ∀ (P : Ideal R) [P.IsMaximal], M →ₗ[R] Mₚ P)
+  [∀ (P : Ideal R) [P.IsMaximal], IsLocalizedModule P.primeCompl (f P)]
+
+include f in
+theorem finite_of_finite_isLocalized_maximal
+    (H : ∀ (P : Ideal R) [P.IsMaximal], Module.Finite (Rₚ P) (Mₚ P)) :
     Module.Finite R M := by
-  sorry
+  classical
+  let _ : Fintype ({ P : Ideal R | P.IsMaximal }) := by
+    rw [← MaximalSpectrum.range_asIdeal]
+    exact Fintype.ofFinite (Set.range MaximalSpectrum.asIdeal)
+  constructor
+  let _ {P : { P : Ideal R | P.IsMaximal }} : P.1.IsMaximal := P.2
+  choose s₁ s₂ using (fun P : { P : Ideal R | P.IsMaximal } ↦ (H P.1).1)
+  let sf := fun P : { P : Ideal R | P.IsMaximal } ↦
+    finsetNumerator P.1.primeCompl (f P.1) (s₁ P)
+  use Finset.biUnion (Finset.univ) sf
+  let N : Submodule R M := Submodule.span R (Finset.univ.biUnion sf)
+  apply Submodule.eq_top_of_localization_maximal Rₚ Mₚ f
+  intro P hP
+  rw [← top_le_iff, ← s₂ ⟨P, hP⟩]
+  simp only [Submodule.localized'_span, N]
+  apply Submodule.span_le.2
+  intro x hx
+  lift x to s₁ ⟨P, hP⟩ using hx
+  rw [SetLike.mem_coe]
+  let Num := (getNumerator P.primeCompl (f P) x)
+  apply mem_of_getNumerator_image_mem P.primeCompl (f P)
+  refine Submodule.mem_span.mpr fun p a => a ?_
+  simp only [Finset.coe_biUnion, Finset.coe_univ, Set.mem_univ, Set.iUnion_true, Set.mem_image,
+    Set.mem_iUnion, Finset.mem_coe, finsetNumerator, Finset.mem_image, getNumerator, sf]
+  exact ⟨Num, ⟨⟨P, hP⟩, ⟨x, ⟨x.2, rfl⟩⟩⟩, rfl⟩
+
+theorem finite_of_finite_localized_maximal
+    (H : ∀ (P : Ideal R) [P.IsMaximal],
+      Module.Finite (Localization P.primeCompl) (LocalizedModule P.primeCompl M)) :
+    Module.Finite R M :=
+  finite_of_finite_isLocalized_maximal _ _ (fun _ _ ↦ LocalizedModule.mkLinearMap _ _) H
 
 end Module
 

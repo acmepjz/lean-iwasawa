@@ -1,7 +1,7 @@
 /-
 Copyright (c) 2025 Jz Pan. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Jz Pan
+Authors: Jz Pan, Yiming Fu
 -/
 import Mathlib.Algebra.Module.PID
 import Mathlib.RingTheory.DedekindDomain.PID
@@ -135,41 +135,7 @@ class HeightOneLocalizationIsPID (A : Type*) [CommRing A] : Prop where
 
 section Missinglemmas
 
-namespace Submodule
-
-variable {R : Type*} {M : Type*}
-
-variable [Semiring R] [AddCommMonoid M] [Module R M]
-variable {p : Submodule R M}
-variable {r : R} {x : M}
-variable (p)
-
-lemma smul_mem_iff_of_isUnit (hr : IsUnit r) :
-    r • x ∈ p ↔ x ∈ p :=
-  let _ : Invertible r := hr.invertible
-  smul_mem_iff'' p
-
-end Submodule
-
-namespace IsLocalization
-
-section smul
-
-variable {R : Type*} [CommSemiring R] {S : Submonoid R}
-variable {R' : Type*} [CommSemiring R'] [Algebra R R'] [IsLocalization S R']
-variable {M': Type*} [AddCommMonoid M'] [Module R' M'] [Module R M'] [IsScalarTower R R' M']
-
-/-- If `x` in a `R' = S⁻¹ R`-module `M'`, then for a submodule `N'` of `M'`,
-`s • x ∈ N'` if and only if `x ∈ N'` for some `s` in S. -/
-lemma smul_mem_iff {N' : Submodule R' M'} {x : M'} {s : S} :
-    s • x ∈ N' ↔ x ∈ N' := by
-  refine ⟨fun h ↦ ?_, fun h ↦ Submodule.smul_of_tower_mem N' s h⟩
-  rwa [← Submodule.smul_mem_iff_of_isUnit (r := algebraMap R R' s) N' (map_units R' s),
-    algebraMap_smul]
-
-end smul
-
-end IsLocalization
+namespace IsLocalizedModule
 
 section numerator
 
@@ -196,9 +162,13 @@ noncomputable def finsetNumerator [DecidableEq M] (s : Finset M') : Finset M :=
 
 end numerator
 
+end IsLocalizedModule
+
 end Missinglemmas
 
 namespace Module
+
+open IsLocalizedModule
 
 variable {R : Type*} [CommSemiring R] [Finite (MaximalSpectrum R)]
 variable (M : Type*) [AddCommMonoid M] [Module R M]

@@ -258,7 +258,7 @@ theorem finite_of_finite_localized_maximal'
     Module.Finite R M := by
   apply finite_of_finite_localized_maximal
   convert H
-  exact ⟨fun h p ↦ h p.1, fun H p hp ↦ H ⟨p, hp⟩⟩
+  exact ⟨fun h p ↦ h p.1, fun H P hP ↦ H ⟨P, hP⟩⟩
 
 end Module
 

@@ -243,7 +243,7 @@ theorem finite_of_finite_isLocalized_maximal
   apply mem_of_getNumerator_image_mem P.primeCompl (f P)
   refine Submodule.mem_span.mpr fun p a => a ?_
   simp only [Finset.coe_biUnion, Finset.coe_univ, Set.mem_univ, Set.iUnion_true, Set.mem_image,
-    Set.mem_iUnion, Finset.mem_coe, finsetNumerator, Finset.mem_image, getNumerator, sf]
+    Set.mem_iUnion, Finset.mem_coe, finsetNumerator, Finset.mem_image, sf]
   exact ⟨Num, ⟨⟨P, hP⟩, ⟨x, ⟨x.2, rfl⟩⟩⟩, rfl⟩
 
 theorem finite_of_finite_localized_maximal

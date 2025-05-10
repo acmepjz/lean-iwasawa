@@ -1,7 +1,7 @@
 /-
 Copyright (c) 2025 Jz Pan. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Jz Pan
+Authors: Jz Pan, Yiming Fu
 -/
 import Mathlib.Algebra.Module.PID
 import Mathlib.RingTheory.DedekindDomain.PID
@@ -133,16 +133,102 @@ class HeightOneLocalizationIsPID (A : Type*) [CommRing A] : Prop where
     IsDomain (Localization (⨅ p ∈ s, p.1.primeCompl)) ∧
     IsPrincipalIdealRing (Localization (⨅ p ∈ s, p.1.primeCompl))
 
+section Missinglemmas
+
+namespace IsLocalizedModule
+
+section numerator
+
+variable {R : Type*} [CommSemiring R] (S : Submonoid R)
+variable {M M' : Type*} [AddCommMonoid M] [AddCommMonoid M']
+variable {R' : Type*} [CommSemiring R'] [Algebra R R'] [Module R' M'] [IsLocalization S R']
+variable [Module R M] [Module R M'] [IsScalarTower R R' M']
+variable (f : M →ₗ[R] M') [IsLocalizedModule S f]
+
+noncomputable def getNumerator (x : M') : M :=
+  (Classical.choose (IsLocalizedModule.surj S f x)).1
+
+/-- If the image of `getNumerator x` under `f`
+is in a submodule `N'` of `M'`, then `x` itself lies in `N'`. -/
+lemma mem_of_getNumerator_image_mem {N' : Submodule R' M'} {x : M'}
+    (hx : f (getNumerator S f x) ∈ N') : x ∈ N' := by
+  let Num := (getNumerator S f x)
+  let Den := (Classical.choose (IsLocalizedModule.surj S f x)).2
+  have h : Den • x = f Num := (Classical.choose_spec (IsLocalizedModule.surj S f x))
+  rwa [← IsLocalization.smul_mem_iff (s := Den), h]
+
+noncomputable def finsetNumerator [DecidableEq M] (s : Finset M') : Finset M :=
+  Finset.image (getNumerator S f) s
+
+end numerator
+
+end IsLocalizedModule
+
+end Missinglemmas
+
 namespace Module
+
+open IsLocalizedModule
 
 variable {R : Type*} [CommSemiring R] [Finite (MaximalSpectrum R)]
 variable (M : Type*) [AddCommMonoid M] [Module R M]
 
-theorem finite_of_finite_localizedModule
-    (H : ∀ P : MaximalSpectrum R,
-      Module.Finite (Localization P.1.primeCompl) (LocalizedModule P.1.primeCompl M)) :
+variable
+  (Rₚ : ∀ (P : Ideal R) [P.IsMaximal], Type*)
+  [∀ (P : Ideal R) [P.IsMaximal], CommSemiring (Rₚ P)]
+  [∀ (P : Ideal R) [P.IsMaximal], Algebra R (Rₚ P)]
+  [∀ (P : Ideal R) [P.IsMaximal], IsLocalization.AtPrime (Rₚ P) P]
+  (Mₚ : ∀ (P : Ideal R) [P.IsMaximal], Type*)
+  [∀ (P : Ideal R) [P.IsMaximal], AddCommMonoid (Mₚ P)]
+  [∀ (P : Ideal R) [P.IsMaximal], Module R (Mₚ P)]
+  [∀ (P : Ideal R) [P.IsMaximal], Module (Rₚ P) (Mₚ P)]
+  [∀ (P : Ideal R) [P.IsMaximal], IsScalarTower R (Rₚ P) (Mₚ P)]
+  (f : ∀ (P : Ideal R) [P.IsMaximal], M →ₗ[R] Mₚ P)
+  [∀ (P : Ideal R) [P.IsMaximal], IsLocalizedModule P.primeCompl (f P)]
+
+include f in
+theorem finite_of_finite_isLocalized_maximal
+    (H : ∀ (P : Ideal R) [P.IsMaximal], Module.Finite (Rₚ P) (Mₚ P)) :
     Module.Finite R M := by
-  sorry
+  classical
+  let _ : Fintype ({ P : Ideal R | P.IsMaximal }) := by
+    rw [← MaximalSpectrum.range_asIdeal]
+    exact Fintype.ofFinite (Set.range MaximalSpectrum.asIdeal)
+  constructor
+  let _ {P : { P : Ideal R | P.IsMaximal }} : P.1.IsMaximal := P.2
+  choose s₁ s₂ using (fun P : { P : Ideal R | P.IsMaximal } ↦ (H P.1).1)
+  let sf := fun P : { P : Ideal R | P.IsMaximal } ↦
+    finsetNumerator P.1.primeCompl (f P.1) (s₁ P)
+  use Finset.biUnion (Finset.univ) sf
+  let N : Submodule R M := Submodule.span R (Finset.univ.biUnion sf)
+  apply Submodule.eq_top_of_localization_maximal Rₚ Mₚ f
+  intro P hP
+  rw [← top_le_iff, ← s₂ ⟨P, hP⟩]
+  simp only [Submodule.localized'_span, N]
+  apply Submodule.span_le.2
+  intro x hx
+  lift x to s₁ ⟨P, hP⟩ using hx
+  rw [SetLike.mem_coe]
+  let Num := (getNumerator P.primeCompl (f P) x)
+  apply mem_of_getNumerator_image_mem P.primeCompl (f P)
+  refine Submodule.mem_span.mpr fun p a => a ?_
+  simp only [Finset.coe_biUnion, Finset.coe_univ, Set.mem_univ, Set.iUnion_true, Set.mem_image,
+    Set.mem_iUnion, Finset.mem_coe, finsetNumerator, Finset.mem_image, sf]
+  exact ⟨Num, ⟨⟨P, hP⟩, ⟨x, ⟨x.2, rfl⟩⟩⟩, rfl⟩
+
+theorem finite_of_finite_localized_maximal
+    (H : ∀ (P : Ideal R) [P.IsMaximal],
+      Module.Finite (Localization P.primeCompl) (LocalizedModule P.primeCompl M)) :
+    Module.Finite R M :=
+  finite_of_finite_isLocalized_maximal M _ _ (fun _ _ ↦ LocalizedModule.mkLinearMap _ _) H
+
+theorem finite_of_finite_localized_maximal'
+    (H : ∀ p : MaximalSpectrum R,
+      Module.Finite (Localization p.1.primeCompl) (LocalizedModule p.1.primeCompl M)) :
+    Module.Finite R M := by
+  apply finite_of_finite_localized_maximal
+  convert H
+  exact ⟨fun h p ↦ h p.1, fun H P hP ↦ H ⟨P, hP⟩⟩
 
 end Module
 

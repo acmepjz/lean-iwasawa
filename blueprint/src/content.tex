@@ -279,17 +279,17 @@ It's clear that $N_{\fm_{i}} \subseteq  M_{\fm_{i}}$, so we only need to show th
 In other words, need to prove that $M_{\fm_{i}} \subseteq 
 \operatorname{span}_{A_{\fm_i}} f_i (\bigcup_{i}\{y_{i,1} \cdots, y_{i,n_i}\})$ 
 where $f_i : M \to M_{\fm_i}$ is the localization map.
-It is enough to show the set of generators of $M_{\fm_{i}}$ is contained left hand side.
+It is enough to show the set of generators of $M_{\fm_{i}}$ is contained in right hand side.
 
 Take any $x$ in the set of generators of $M_{\fm_{i}}$.
 It remains to show that the image of a numerator of $x$ under $f_i$ 
-is in the generators of left hand side by 
+is in the generators of right hand side by 
 \docs{Submodule.mem_of_numerator_image_mem} and \docs{Submodule.mem_span}.
 i.e. $f_i(y) \in f_i (\bigcup_{i}\{y_{i,1} \cdots, y_{i,n_i}\})$
 for some numerator $y$ of $x$.
 
-we take $y$ as some $y_{i,k}$ as above.
-By definition of $y_{i,k}$, we have $y_{i,k}$ in left hand side.
+We take $y$ as some $y_{i,k}$ as above.
+By definition of $y_{i,k}$, we have $f_i(y_{i,k})$ in right hand side.
 
 \end{proof}
 

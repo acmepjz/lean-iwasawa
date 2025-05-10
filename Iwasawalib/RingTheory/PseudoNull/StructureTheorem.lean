@@ -255,6 +255,14 @@ theorem finite_of_finite_localized_maximal
     Module.Finite R M :=
   finite_of_finite_isLocalized_maximal _ _ (fun _ _ ↦ LocalizedModule.mkLinearMap _ _) H
 
+theorem finite_of_finite_localized_maximal'
+    (H : ∀ p : MaximalSpectrum R,
+      Module.Finite (Localization p.1.primeCompl) (LocalizedModule p.1.primeCompl M)) :
+    Module.Finite R M := by
+  apply finite_of_finite_localized_maximal
+  convert H
+  exact ⟨fun h p ↦ h p.1, fun H p hp ↦ H ⟨p, hp⟩⟩
+
 end Module
 
 /-- If a semilocal integral domain which is not a field satisfies that it localized at all

@@ -203,9 +203,6 @@ namespace Module
 variable {R : Type*} [CommSemiring R] [Finite (MaximalSpectrum R)]
 variable (M : Type*) [AddCommMonoid M] [Module R M]
 
-variable {R M : Type*} [CommSemiring R] [AddCommMonoid M] [Module R M]
-  [Finite (MaximalSpectrum R)]
-
 variable
   (Rₚ : ∀ (P : Ideal R) [P.IsMaximal], Type*)
   [∀ (P : Ideal R) [P.IsMaximal], CommSemiring (Rₚ P)]
@@ -253,7 +250,7 @@ theorem finite_of_finite_localized_maximal
     (H : ∀ (P : Ideal R) [P.IsMaximal],
       Module.Finite (Localization P.primeCompl) (LocalizedModule P.primeCompl M)) :
     Module.Finite R M :=
-  finite_of_finite_isLocalized_maximal _ _ (fun _ _ ↦ LocalizedModule.mkLinearMap _ _) H
+  finite_of_finite_isLocalized_maximal M _ _ (fun _ _ ↦ LocalizedModule.mkLinearMap _ _) H
 
 theorem finite_of_finite_localized_maximal'
     (H : ∀ p : MaximalSpectrum R,

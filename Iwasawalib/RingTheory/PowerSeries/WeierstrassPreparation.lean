@@ -211,41 +211,18 @@ theorem IsWeierstrassDivisor.of_map_ne_zero [IsLocalRing A]
   contrapose! h
   rwa [coeff_map, IsLocalRing.residue_eq_zero_iff]
 
-theorem _root_.Polynomial.IsWeaklyEisensteinAt.isWeierstrassDivisorAt {g : A[X]} {I : Ideal A}
-    (H : g.IsWeaklyEisensteinAt I) (hI : I ≠ ⊤) (h : IsUnit g.leadingCoeff) :
-    IsWeierstrassDivisorAt g I := by
-  have h1 : (g : A⟦X⟧).map (Ideal.Quotient.mk I) =
-      (Ideal.Quotient.mk I g.leadingCoeff) • X ^ g.natDegree := by
-    ext i
-    simp only [coeff_map, Polynomial.coeff_coe, map_smul, coeff_X_pow, smul_eq_mul, mul_ite,
-      mul_one, mul_zero]
-    rcases lt_trichotomy i g.natDegree with hi | rfl | hi
-    · simpa only [if_neg hi.ne, ← RingHom.mem_ker, Ideal.mk_ker] using H.mem hi
-    · simp
-    · simp only [Polynomial.coeff_eq_zero_of_natDegree_lt hi, map_zero, if_neg hi.ne']
-  have h2 : ((g : A⟦X⟧).map (Ideal.Quotient.mk I)).order = g.natDegree := by
-    rw [h1]
-    refine (order_le _ ?_).antisymm (nat_le_order _ _ fun i hi ↦ ?_)
-    · have := Ideal.Quotient.nontrivial hI
-      simp [(h.map (Ideal.Quotient.mk I)).ne_zero]
-    · simp [coeff_X_pow, if_neg hi.ne]
-  simpa [IsWeierstrassDivisorAt, ENat.toNat_coe g.natDegree ▸ congr($(h2).toNat)]
-
 theorem _root_.Polynomial.IsDistinguishedAt.isWeierstrassDivisorAt {g : A[X]} {I : Ideal A}
-    (H : g.IsDistinguishedAt I) (hI : I ≠ ⊤) : IsWeierstrassDivisorAt g I :=
-  H.toIsWeaklyEisensteinAt.isWeierstrassDivisorAt hI (by simp [H.monic])
+    (H : g.IsDistinguishedAt I) (hI : I ≠ ⊤) : IsWeierstrassDivisorAt g I := by
+  have : g.natDegree = _ := congr(ENat.toNat
+    $(H.degree_eq_order_map g 1 (by rwa [constantCoeff_one, ← Ideal.ne_top_iff_one]) (by simp)))
+  simp [IsWeierstrassDivisorAt, ← this, H.monic.leadingCoeff]
 
-theorem _root_.Polynomial.IsWeaklyEisensteinAt.isWeierstrassDivisorAt' {g : A[X]} {I : Ideal A}
-    (H : g.IsWeaklyEisensteinAt I) [IsHausdorff I A] (h : IsUnit g.leadingCoeff) :
-    IsWeierstrassDivisorAt g I := by
+theorem _root_.Polynomial.IsDistinguishedAt.isWeierstrassDivisorAt' {g : A[X]} {I : Ideal A}
+    (H : g.IsDistinguishedAt I) [IsHausdorff I A] : IsWeierstrassDivisorAt g I := by
   rcases eq_or_ne I ⊤ with rfl | hI
   · have := ‹IsHausdorff ⊤ A›.subsingleton
     exact isUnit_of_subsingleton _
-  exact H.isWeierstrassDivisorAt hI h
-
-theorem _root_.Polynomial.IsDistinguishedAt.isWeierstrassDivisorAt' {g : A[X]} {I : Ideal A}
-    (H : g.IsDistinguishedAt I) [IsHausdorff I A] : IsWeierstrassDivisorAt g I :=
-  H.toIsWeaklyEisensteinAt.isWeierstrassDivisorAt' (by simp [H.monic])
+  exact H.isWeierstrassDivisorAt hI
 
 private theorem coeff_trunc_order_mem (i : ℕ) :
     (g.trunc (g.map (Ideal.Quotient.mk I)).order.toNat).coeff i ∈ I := by
@@ -513,11 +490,11 @@ noncomputable def _root_.Polynomial.IsDistinguishedAt.algEquivQuotient :
       rw [Eq.comm, Ideal.Quotient.mk_eq_mk_iff_sub_mem, Ideal.mem_span_singleton']
       exact ⟨f /ₘ g, by rw [Polynomial.modByMonic_eq_sub_mul_div _ H.monic]; ring⟩
     have h1 : g.degree = ((g : A⟦X⟧).map (Ideal.Quotient.mk I)).order.toNat := by
-      convert H.degree_eq_order_map g 1 ?_ (by simp)
-      · apply ENat.coe_toNat
-        rw [← lt_top_iff_ne_top, order_finite_iff_ne_zero, ← Polynomial.polynomial_map_coe]
-        exact_mod_cast Polynomial.map_monic_ne_zero H.monic
-      rwa [constantCoeff_one, ← Ideal.ne_top_iff_one]
+      convert H.degree_eq_order_map g 1 (by rwa [constantCoeff_one, ← Ideal.ne_top_iff_one])
+        (by simp)
+      apply ENat.coe_toNat
+      rw [← lt_top_iff_ne_top, order_finite_iff_ne_zero, ← Polynomial.polynomial_map_coe]
+      exact_mod_cast Polynomial.map_monic_ne_zero H.monic
     dsimp
     rw [Ideal.Quotient.mk_eq_mk_iff_sub_mem, Ideal.mem_span_singleton']
     exact ⟨0, by simp [H.isWeierstrassDivisorAt'.mod_coe_eq_self (hfdeg.trans_eq h1)]⟩

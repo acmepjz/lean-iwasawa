@@ -3,6 +3,7 @@
 import Iwasawalib.Algebra.CompleteGroupAlgebra.Basic
 import Iwasawalib.Algebra.Exact.Basic
 import Iwasawalib.Algebra.Exact.KerCokerComp
+import Iwasawalib.Algebra.InverseLimit.Basic
 import Iwasawalib.FieldTheory.ZpExtension.Basic
 import Iwasawalib.NumberTheory.ZpExtension.Basic
 import Iwasawalib.NumberTheory.ZpExtension.ClassGroup

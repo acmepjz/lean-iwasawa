@@ -857,10 +857,13 @@ From which we can obtain the isomorphism of topological rings
 $\Lambda\xrightarrow\sim\BZ_p[[T]]$ given by $\gamma\mapsto 1+T$.
 
 For simplicity of notation, denote $\varphi_n(T):=(1+T)^{p^n}-1$.
-It's easy to see that for each $n\geq 1$ and for all $1\leq i\leq p^n-1$,
-we have $\binom{p^n}{i}\in p^n\BZ$,
-hence $\varphi_n(T)\in T^{p^n}+p^n\BZ[T]_{\deg\leq p^n-1}$,
+Clearly, for each $n\geq 0$ and for all $1\leq i\leq p^n-1$,
+we have $\binom{p^n}{i}\in p\BZ$,
+hence $\varphi_n(T)\in T^{p^n}+p\BZ[T]_{\deg\leq p^n-1}\subset(p,T)$,
 in particular $\varphi_n(T)$ is a distinguished polynomial of degree $p^n$.
+Moreover, $\varphi_{n+1}(T)=\varphi_n(T)\cdot\sum_{i=0}^{p-1}(1+T)^{p^ni}$
+with $\sum_{i=0}^{p-1}(1+T)^{p^ni}\in(p,T)$,
+hence $\varphi_n(T)\in(p,T)^{n+1}$ for all $n\geq 0$.
 
 It's clear that $\BZ_p[T]_{\deg\leq p^n-1}\xrightarrow\sim\BZ_p[T]/(\varphi_n(T))$
 is an isomorphism of $\BZ_p$-modules,

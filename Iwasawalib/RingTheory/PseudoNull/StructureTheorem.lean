@@ -289,7 +289,7 @@ lemma dimensionLEOne_of_dimensionLEOne_localization_maximal' (A : Type*) [CommRi
 
 end Ring
 
-/-- If a semilocal integral domain which is not a field satisfies that it localized at all
+/-- If a semilocal integral domain satisfies that it localized at all
 maximal ideals is a PID, then itself is a PID. -/
 theorem isPrincipalIdealRing_of_isPrincipalIdealRing_localization
     (A : Type*) [CommRing A] [IsDomain A] [Finite (MaximalSpectrum A)]

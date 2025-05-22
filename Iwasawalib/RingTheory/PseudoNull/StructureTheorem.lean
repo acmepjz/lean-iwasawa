@@ -272,9 +272,8 @@ lemma dimensionLEOne_of_dimensionLEOne_localization_maximal (A : Type*) [CommRin
       exact hq
     · have huq : ∃! P : Ideal (Localization.AtPrime q), P ≠ ⊥ ∧ P.IsPrime := by
         obtain ⟨P, hP⟩ := Ring.not_isField_iff_exists_prime.1 hqf
-        refine ⟨P, ⟨hP, ?_⟩⟩
+        refine ⟨P, ⟨hP, fun Q hQ ↦ ?_⟩⟩
         have hpm := Ideal.IsPrime.isMaximal hP.2 hP.1
-        intro Q hQ
         have hqm := Ideal.IsPrime.isMaximal hQ.2 hQ.1
         exact (IsLocalRing.maximal_ideal_unique _).unique hqm hpm
       rw [show p = q from Subtype.val_inj.mpr <| f.injective <|

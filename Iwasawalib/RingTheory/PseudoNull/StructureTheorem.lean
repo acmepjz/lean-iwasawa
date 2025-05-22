@@ -247,7 +247,7 @@ end Submodule
 namespace Ring
 
 -- TODO: Generalize this to `ringKrullDim` for `CommSemiring A`.
-/- If a commutative domain `A` satisfies that its localization at all maximal ideals is `Ring.DimensionLEOne`,
+/-- If a commutative domain `A` satisfies that its localization at all maximal ideals is `Ring.DimensionLEOne`,
 then `A` itself is `Ring.DimensionLEOne`. -/
 lemma dimensionLEOne_of_dimensionLEOne_localization_maximal (A : Type*) [CommRing A] [IsDomain A]
     (h : ∀ (P : Ideal A) [P.IsMaximal], Ring.DimensionLEOne (Localization P.primeCompl)) :

@@ -314,10 +314,10 @@ theorem isPrincipalIdealRing_of_isPrincipalIdealRing_localization
   have hp_sub : {P : Ideal A | P.IsPrime} ⊆ {P : Ideal A | P.IsMaximal} ∪ {⊥}:= by
     simp only [Set.mem_setOf_eq, Set.union_singleton, Set.mem_insert_iff]
     intro P hP
-    obtain rfl | hI := eq_or_ne P ⊥
+    obtain rfl | hbot := eq_or_ne P ⊥
     · simp
-    · simp only [Set.mem_insert_iff, hI, Set.mem_setOf_eq, false_or]
-      exact Ring.DimensionLEOne.maximalOfPrime hI hP
+    · simp only [Set.mem_insert_iff, hbot, Set.mem_setOf_eq, false_or]
+      exact Ring.DimensionLEOne.maximalOfPrime hbot hP
   have hp_finite : {P : Ideal A | P.IsPrime}.Finite := by
     refine Set.Finite.subset (Set.Finite.union ?_ (Set.finite_singleton ⊥)) hp_sub
     rw [← MaximalSpectrum.range_asIdeal]

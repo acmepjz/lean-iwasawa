@@ -246,7 +246,10 @@ end Submodule
 
 namespace Ring
 
-lemma dimensionLEOne_of_localization_maximal (A : Type*) [CommRing A] [IsDomain A]
+-- TODO: Generalize this to `ringKrullDim` for `CommSemiring A`.
+/- If a commutative domain `A` satisfies that its localization at all maximal ideals is `Ring.DimensionLEOne`,
+then `A` itself is `Ring.DimensionLEOne`. -/
+lemma dimensionLEOne_of_dimensionLEOne_localization_maximal (A : Type*) [CommRing A] [IsDomain A]
     (h : ∀ (P : Ideal A) [P.IsMaximal], Ring.DimensionLEOne (Localization P.primeCompl)) :
     Ring.DimensionLEOne A where
   maximalOfPrime := by
@@ -278,10 +281,10 @@ lemma dimensionLEOne_of_localization_maximal (A : Type*) [CommRing A] [IsDomain 
         Subtype.val_inj.mp (huq.unique ⟨hp1, P.2⟩ ⟨hq1, Q.2⟩)]
       exact hq
 
-lemma dimensionLEOne_of_localization_maximal' (A : Type*) [CommRing A] [IsDomain A]
+lemma dimensionLEOne_of_dimensionLEOne_localization_maximal' (A : Type*) [CommRing A] [IsDomain A]
     (h : ∀ p : MaximalSpectrum A, Ring.DimensionLEOne (Localization p.1.primeCompl)) :
     Ring.DimensionLEOne A := by
-  apply dimensionLEOne_of_localization_maximal A
+  apply dimensionLEOne_of_dimensionLEOne_localization_maximal A
   convert h
   exact ⟨fun h p ↦ h p.1, fun H P hP ↦ H ⟨P, hP⟩⟩
 
@@ -305,7 +308,7 @@ theorem isPrincipalIdealRing_of_isPrincipalIdealRing_localization
     show IsIntegrallyClosed (Localization p.1.primeCompl)
     infer_instance
   have : Ring.DimensionLEOne A := by
-    apply Ring.dimensionLEOne_of_localization_maximal' A
+    apply Ring.dimensionLEOne_of_dimensionLEOne_localization_maximal' A
     infer_instance
   have : IsDedekindDomain A := {maximalOfPrime := Ring.DimensionLEOne.maximalOfPrime}
   have hp_sub : {P : Ideal A | P.IsPrime} ⊆ {P : Ideal A | P.IsMaximal} ∪ {⊥}:= by

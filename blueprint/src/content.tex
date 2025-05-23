@@ -305,6 +305,7 @@ Then $A$ itself is a PID.
 \end{lem}
 
 \begin{proof}
+\leanok
 It's known that a semilocal Dedeking domain is a PID
 (\docs{IsPrincipalIdealRing.of_finite_primes}).
 So we only need to show $A$ is a Dedekind domain.
@@ -598,16 +599,14 @@ Clear from definition and Proposition \ref{char-ideal-additive}.
 \label{ht-1-localization-is-PID}
 \lean{HeightOneLocalizationIsPID}
 \leanok
-Let $A$ be a Noetherian ring.
-We say that the height one localization of $A$ is PID (?), if
-\begin{equation}
-\label{eqn:ht-1-localization-is-PID}
-\begin{array}{l}
-\text{For any finitely many height one primes $\fp_1,\cdots,\fp_r$ of $A$,}\\
-\text{let $S:=A\setminus\bigcup_{i=1}^r\fp_i$, then $S^{-1}A$ is a PID.}
-\end{array}
-\end{equation}
+A Noetherian ring $A$ is called
+``height one localizations are PID'', if
+for any finitely many height one primes $\fp_1,\cdots,\fp_r$ of $A$,
+let $S:=A\setminus\bigcup_{i=1}^r\fp_i$, then $S^{-1}A$ is a PID.
 \end{definition}
+
+If $A$ is a Noetherian integral domain, then by Lemma \ref{pis-iff} we
+only need to check $r=1$ case.
 
 \begin{lem}
 \label{pis-iff}
@@ -645,8 +644,9 @@ so $S^{-1}M=0$.
 \uses{ht-1-localization-is-PID,char-ideal,pseudo-null}
 \lean{Module.IsTorsion.isPseudoIsomorphic_pi}
 \leanok
-Let $A$ be a Noetherian ring satisfying \eqref{eqn:ht-1-localization-is-PID}
-and let $M$ be a finitely generated torsion $A$-module.
+Let $A$ be a Noetherian ring whose height one localizations are PID
+(Definition \ref{ht-1-localization-is-PID}).
+Let $M$ be a finitely generated torsion $A$-module.
 Then there exist height one primes $\fp_1,\cdots,\fp_s$ of $A$
 and positive integers $k_1,\cdots,k_s$, such that there exists a pseudo-isomorphism
 $M\to\bigoplus_{i=1}^s A/\fp_i^{k_i}$.
@@ -702,7 +702,8 @@ the $(\fp_i^{k_i})_{i=1}^s$ is unique up to ordering.
 Module.IsPseudoIsomorphic.symm,
 Module.isPseudoIsomorphic_comm}
 \leanok
-Let $A$ be a Noetherian ring satisfying \eqref{eqn:ht-1-localization-is-PID}.
+Let $A$ be a Noetherian ring whose height one localizations are PID
+(Definition \ref{ht-1-localization-is-PID}).
 Let $M,N$ be finitely generated torsion $A$-modules.
 Then the followings are equivalent:
 \begin{itemize}
@@ -741,9 +742,10 @@ Now by Lemma \ref{pis-iff} we know that $f$ is a pseudo-isomorphism.
 \lean{IsKrullDomain.heightOneLocalizationIsPID}
 \leanok
 \uses{semilocal-PID,ht-1-localization-is-PID,noeth-ring-is-krull-domain-iff}
-A Noetherian regular domain
-(more generally, a Noetherian integrally closed domain)
-satisfies \eqref{eqn:ht-1-localization-is-PID}.
+Let $A$ be a Noetherian regular domain
+(more generally, a Noetherian integrally closed domain).
+Then height one localizations of $A$ are PID
+(Definition \ref{ht-1-localization-is-PID}).
 \end{prop}
 
 \begin{proof}
@@ -757,7 +759,7 @@ let $S:=A\setminus\bigcup_{i=1}^r\fp_i$,
 then $S^{-1}A$ is a semilocal integral domain, whose
 maximal ideals are $S^{-1}\fp_1,\cdots,S^{-1}\fp_r$,
 and we have $(S^{-1}A)_{S^{-1}\fp_i}=A_{\fp_i}$,
-therefore by (i) we know that $S^{-1}A$ is a PID.
+therefore by Lemma \ref{semilocal-PID} we know that $S^{-1}A$ is a PID.
 \end{proof}
 
 \section{Structure of Iwasawa module}

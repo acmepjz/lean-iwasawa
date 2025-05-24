@@ -3,10 +3,9 @@ Copyright (c) 2025 Jz Pan. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jz Pan
 -/
-import Mathlib.RingTheory.AdicCompletion.LocalRing
-import Mathlib.RingTheory.Ideal.BigOperators
 import Mathlib.RingTheory.LocalRing.ResidueField.Basic
 import Mathlib.RingTheory.Polynomial.Eisenstein.Distinguished
+import Mathlib.RingTheory.PowerSeries.CoeffMulMem
 import Mathlib.RingTheory.PowerSeries.Inverse
 import Mathlib.RingTheory.PowerSeries.Trunc
 
@@ -19,11 +18,12 @@ Weierstrass preparation theorem.
 
 We assume that a ring is adic complete with respect to some ideal.
 If such ideal is a maximal ideal, then by `isLocalRing_of_isAdicComplete_maximal`,
-such ring has only on maximal ideal, and hence such ring is a complete local ring.
+such ring has only one maximal ideal, and hence it is a complete local ring.
 
 ## Main definitions
 
-- `PowerSeries.IsWeierstrassDivisionAt f g q r I`: a `Prop` which asserts that a power series
+- `PowerSeries.IsWeierstrassDivisionAt f g q r I`: let `f` and `g` be power series over `A`, `I` be
+  an ideal of `A`, this is a `Prop` which asserts that a power series
   `q` and a polynomial `r` of degree `< n` satisfy `f = g * q + r`, where `n` is the order of the
   image of `g` in `(A / I)⟦X⟧` (defined to be zero if such image is zero, in which case
   it's mathematically not considered).
@@ -31,19 +31,20 @@ such ring has only on maximal ideal, and hence such ring is a complete local rin
 - `PowerSeries.IsWeierstrassDivision`: version of `PowerSeries.IsWeierstrassDivisionAt`
   for local rings with respect to its maximal ideal.
 
-- `PowerSeries.IsWeierstrassDivisorAt g I`:  a `Prop` which asserts that the `n`-th coefficient
+- `PowerSeries.IsWeierstrassDivisorAt g I`: let `g` be a power series over `A`, `I` be an ideal of
+  `A`, this is a `Prop` which asserts that the `n`-th coefficient
   of `g` is a unit, where `n` is the order of the image of `g` in `(A / I)⟦X⟧`
   (defined to be zero if such image is zero, in which case it's mathematically not considered).
 
-  This property guarantees that if the ring is `I`-adic complete, then `g` can be used as a divisor
+  This property guarantees that if the `A` is `I`-adic complete, then `g` can be used as a divisor
   in Weierstrass division (`PowerSeries.IsWeierstrassDivisorAt.isWeierstrassDivisionAt_div_mod`).
 
 - `PowerSeries.IsWeierstrassDivisor`: version of `PowerSeries.IsWeierstrassDivisorAt` for
   local rings with respect to its maximal ideal.
 
-- `PowerSeries.IsWeierstrassFactorizationAt g f h I`: a `Prop` which asserts that `f` is a
-  distingushed polynomial at `I`, `h` is a formal power series over `A` which a unit, such that
-  the formal power series `g` satisfies `g = f * h`.
+- `PowerSeries.IsWeierstrassFactorizationAt g f h I`: for a power series `g` over `A` and
+  an ideal `I` of `A`, this is a `Prop` which asserts that `f` is a distinguished polynomial at `I`,
+  `h` is a formal power series over `A` that is a unit and such that `g = f * h`.
 
 - `PowerSeries.IsWeierstrassFactorization`: version of `PowerSeries.IsWeierstrassFactorizationAt`
   for local rings with respect to its maximal ideal.
@@ -56,19 +57,29 @@ such ring has only on maximal ideal, and hence such ring is a complete local rin
   Let `n` be the order of the image of `g` in the residue field. Then there exists a power series
   `q` and a polynomial `r` of degree `< n`, such that `f = g * q + r`.
 
-- `PowerSeries.IsWeierstrassDivision.elim`: The `q` and `r` in the Weierstrass division is unique.
+- `PowerSeries.IsWeierstrassDivision.elim`,
+  `PowerSeries.IsWeierstrassDivision.unique`: `q` and `r` in the Weierstrass division are unique.
 
 - `PowerSeries.exists_isWeierstrassFactorization`: **Weierstrass preparation theorem**
   ([washington_cyclotomic], Theorem 7.3): let `g` be a power series
-  over a complete local ring, such that the image of `g` in the residue field is
+  over a complete local ring, such that its image in the residue field is
   not zero. Then there exists a distinguished polynomial `f` and a power series `h`
   which is a unit, such that `g = f * h`.
 
-- `PowerSeries.IsWeierstrassFactorization.elim`: The `f` and `h` in Werierstrass preparation
-  theorem is unique.
+- `PowerSeries.IsWeierstrassFactorization.elim`,
+  `PowerSeries.IsWeierstrassFactorization.unique`: `f` and `h` in Weierstrass preparation
+  theorem are unique.
 
 - `Polynomial.IsDistinguishedAt.algEquivQuotient`: a distinguished polynomial `g` induces a
   natural isomorphism `A[X] / (g) ≃ A⟦X⟧ / (g)`.
+
+- `PowerSeries.IsWeierstrassFactorizationAt.algEquivQuotient`: a Weierstrass factorization
+  `g = f * h` induces a natural isomorphism `A[X] / (f) ≃ A⟦X⟧ / (g)`.
+
+- `PowerSeries.algEquivQuotientWeierstrassDistinguished`:
+  if `g` is a power series over a complete local ring,
+  such that its image in the residue field is not zero, then there is a natural isomorphism
+  `A[X] / (f) ≃ A⟦X⟧ / (g)` where `f` is `PowerSeries.weierstrassDistinguished g`.
 
 ## References
 
@@ -76,69 +87,9 @@ such ring has only on maximal ideal, and hence such ring is a complete local rin
 
 -/
 
-open scoped Polynomial PowerSeries
-
-/-!
-
-## Results should be added to mathlib
-
--/
-
-theorem ENat.lift_eq_toNat_of_lt_top {x : ℕ∞} (hx : x < ⊤) : x.lift hx = x.toNat := by
-  rcases x with ⟨⟩ | x
-  · contradiction
-  · rfl
+open scoped Polynomial
 
 namespace PowerSeries
-
-section
-
-variable {A : Type*} [Semiring A] {I J : Ideal A} {f g : A⟦X⟧} (n : ℕ)
-
-theorem eq_shift_mul_X_pow_add_trunc (n : ℕ) (f : A⟦X⟧) :
-    f = (mk fun i ↦ coeff A (i + n) f) * X ^ n + (f.trunc n : A⟦X⟧) := by
-  ext j
-  rw [map_add, Polynomial.coeff_coe, coeff_mul_X_pow', coeff_trunc]
-  simp_rw [← not_le]
-  split_ifs with h <;> simp [h]
-
-theorem eq_X_pow_mul_shift_add_trunc (n : ℕ) (f : A⟦X⟧) :
-    f = X ^ n * (mk fun i ↦ coeff A (i + n) f) + (f.trunc n : A⟦X⟧) := by
-  rw [← (commute_X_pow _ n).eq, ← eq_shift_mul_X_pow_add_trunc]
-
-theorem coeff_mul_mem_ideal_mul_ideal_of_coeff_mem_ideal (hf : ∀ i ≤ n, coeff A i f ∈ I)
-    (hg : ∀ i ≤ n, coeff A i g ∈ J) : ∀ i ≤ n, coeff A i (f * g) ∈ I * J := fun i hi ↦ by
-  rw [coeff_mul]
-  exact Ideal.sum_mem _ fun p hp ↦ Ideal.mul_mem_mul
-    (hf _ ((Finset.antidiagonal.fst_le hp).trans hi))
-    (hg _ ((Finset.antidiagonal.snd_le hp).trans hi))
-
-theorem coeff_mul_mem_ideal_mul_ideal_of_coeff_mem_ideal' (hf : ∀ i, coeff A i f ∈ I)
-    (hg : ∀ i, coeff A i g ∈ J) : ∀ i, coeff A i (f * g) ∈ I * J :=
-  fun i ↦ coeff_mul_mem_ideal_mul_ideal_of_coeff_mem_ideal i
-    (fun i _ ↦ hf i) (fun i _ ↦ hg i) i le_rfl
-
-theorem coeff_mul_mem_ideal_of_coeff_right_mem_ideal
-    (hg : ∀ i ≤ n, coeff A i g ∈ I) : ∀ i ≤ n, coeff A i (f * g) ∈ I := by
-  simpa using coeff_mul_mem_ideal_mul_ideal_of_coeff_mem_ideal (I := ⊤) (f := f) n (by simp) hg
-
-theorem coeff_mul_mem_ideal_of_coeff_right_mem_ideal'
-    (hg : ∀ i, coeff A i g ∈ I) : ∀ i, coeff A i (f * g) ∈ I := by
-  simpa using coeff_mul_mem_ideal_mul_ideal_of_coeff_mem_ideal' (I := ⊤) (f := f) (by simp) hg
-
-variable [I.IsTwoSided]
-
-theorem coeff_mul_mem_ideal_of_coeff_left_mem_ideal
-    (hf : ∀ i ≤ n, coeff A i f ∈ I) : ∀ i ≤ n, coeff A i (f * g) ∈ I := by
-  simpa only [Ideal.IsTwoSided.mul_one] using
-    coeff_mul_mem_ideal_mul_ideal_of_coeff_mem_ideal (J := 1) (g := g) n hf (by simp)
-
-theorem coeff_mul_mem_ideal_of_coeff_left_mem_ideal'
-    (hf : ∀ i, coeff A i f ∈ I) : ∀ i, coeff A i (f * g) ∈ I := by
-  simpa only [Ideal.IsTwoSided.mul_one] using
-    coeff_mul_mem_ideal_mul_ideal_of_coeff_mem_ideal' (J := 1) (g := g) hf (by simp)
-
-end
 
 variable {A : Type*} [CommRing A]
 
@@ -152,12 +103,15 @@ section IsWeierstrassDivisionAt
 
 variable (f g q : A⟦X⟧) (r : A[X]) (I : Ideal A)
 
-/-- `PowerSeries.IsWeierstrassDivisionAt f g q r I` is a `Prop` which asserts that a power series
+/-- Let `f`, `g` be power series over `A`, `I` be an ideal of `A`,
+`PowerSeries.IsWeierstrassDivisionAt f g q r I` is a `Prop` which asserts that a power series
 `q` and a polynomial `r` of degree `< n` satisfy `f = g * q + r`, where `n` is the order of the
 image of `g` in `(A / I)⟦X⟧` (defined to be zero if such image is zero, in which case
 it's mathematically not considered). -/
-def IsWeierstrassDivisionAt : Prop :=
-  r.degree < (g.map (Ideal.Quotient.mk I)).order.toNat ∧ f = g * q + r
+@[mk_iff]
+structure IsWeierstrassDivisionAt : Prop where
+  degree_lt : r.degree < (g.map (Ideal.Quotient.mk I)).order.toNat
+  eq_mul_add : f = g * q + r
 
 /-- Version of `PowerSeries.IsWeierstrassDivisionAt` for local rings with respect to
 its maximal ideal. -/
@@ -172,14 +126,29 @@ theorem isWeierstrassDivisionAt_zero : IsWeierstrassDivisionAt 0 g 0 0 I := by
 
 variable {f g q r I}
 
-theorem IsWeierstrassDivisionAt.coeff_f_sub_r_mem (H : f.IsWeierstrassDivisionAt g q r I) :
-    ∀ i < (g.map (Ideal.Quotient.mk I)).order.toNat, coeff A i (f - r) ∈ I := fun i hi ↦ by
+namespace IsWeierstrassDivisionAt
+
+theorem coeff_f_sub_r_mem (H : f.IsWeierstrassDivisionAt g q r I)
+    {i : ℕ} (hi : i < (g.map (Ideal.Quotient.mk I)).order.toNat) : coeff A i (f - r) ∈ I := by
   replace H := H.2
   rw [← sub_eq_iff_eq_add] at H
   rw [H]
   refine coeff_mul_mem_ideal_of_coeff_left_mem_ideal i (fun j hj ↦ ?_) i le_rfl
   have := coeff_of_lt_order_toNat _ (lt_of_le_of_lt hj hi)
   rwa [coeff_map, ← RingHom.mem_ker, Ideal.mk_ker] at this
+
+theorem add {f' q' r'} (H : f.IsWeierstrassDivisionAt g q r I)
+    (H' : f'.IsWeierstrassDivisionAt g q' r' I) :
+    (f + f').IsWeierstrassDivisionAt g (q + q') (r + r') I :=
+  ⟨(Polynomial.degree_add_le _ _).trans_lt (sup_lt_iff.2 ⟨H.degree_lt, H'.degree_lt⟩), by
+    rw [H.eq_mul_add, H'.eq_mul_add, Polynomial.coe_add]; ring⟩
+
+theorem smul (H : f.IsWeierstrassDivisionAt g q r I) (a : A) :
+    (a • f).IsWeierstrassDivisionAt g (a • q) (a • r) I :=
+  ⟨(Polynomial.degree_smul_le a _).trans_lt H.degree_lt, by
+    simp [H.eq_mul_add, Algebra.smul_def, mul_add, mul_left_comm]⟩
+
+end IsWeierstrassDivisionAt
 
 end IsWeierstrassDivisionAt
 
@@ -202,6 +171,7 @@ its maximal ideal. -/
 abbrev IsWeierstrassDivisor [IsLocalRing A] : Prop :=
   g.IsWeierstrassDivisorAt (IsLocalRing.maximalIdeal A)
 
+variable {g} in
 /-- If `g` is a power series over a local ring such that
 its image in the residue field is not zero, then `g` can be used as a Weierstrass divisor. -/
 theorem IsWeierstrassDivisor.of_map_ne_zero [IsLocalRing A]
@@ -213,8 +183,8 @@ theorem IsWeierstrassDivisor.of_map_ne_zero [IsLocalRing A]
 
 theorem _root_.Polynomial.IsDistinguishedAt.isWeierstrassDivisorAt {g : A[X]} {I : Ideal A}
     (H : g.IsDistinguishedAt I) (hI : I ≠ ⊤) : IsWeierstrassDivisorAt g I := by
-  have : g.natDegree = _ := congr(ENat.toNat
-    $(H.degree_eq_order_map g 1 (by rwa [constantCoeff_one, ← Ideal.ne_top_iff_one]) (by simp)))
+  have : g.natDegree = _ := congr(ENat.toNat $(H.coe_natDegree_eq_order_map g 1
+    (by rwa [constantCoeff_one, ← Ideal.ne_top_iff_one]) (by simp)))
   simp [IsWeierstrassDivisorAt, ← this, H.monic.leadingCoeff]
 
 theorem _root_.Polynomial.IsDistinguishedAt.isWeierstrassDivisorAt' {g : A[X]} {I : Ideal A}
@@ -228,7 +198,7 @@ private theorem coeff_trunc_order_mem (i : ℕ) :
     (g.trunc (g.map (Ideal.Quotient.mk I)).order.toNat).coeff i ∈ I := by
   rw [coeff_trunc]
   split_ifs with h
-  · simpa only [coeff_map, ← RingHom.mem_ker, Ideal.mk_ker] using coeff_of_lt_order_toNat _ h
+  · simpa [← RingHom.mem_ker] using coeff_of_lt_order_toNat _ h
   · exact zero_mem _
 
 namespace IsWeierstrassDivisorAt
@@ -236,22 +206,22 @@ namespace IsWeierstrassDivisorAt
 variable {g I} (H : g.IsWeierstrassDivisorAt I)
 include H
 
-theorem isUnit_shift : IsUnit <| PowerSeries.mk fun i ↦
+theorem isUnit_shift : IsUnit <| mk fun i ↦
     coeff A (i + (g.map (Ideal.Quotient.mk I)).order.toNat) g := by
-  simpa only [isUnit_iff_constantCoeff, constantCoeff_mk, zero_add]
+  simpa [isUnit_iff_constantCoeff]
 
 /-- The inductively constructed sequence `qₖ` in the proof of Weierstrass division. -/
 noncomputable def seq (H : g.IsWeierstrassDivisorAt I) (f : A⟦X⟧) : ℕ → A⟦X⟧
   | 0 => 0
   | k + 1 =>
-    H.seq f k + (PowerSeries.mk fun i ↦ coeff A (i + (g.map (Ideal.Quotient.mk I)).order.toNat)
+    H.seq f k + (mk fun i ↦ coeff A (i + (g.map (Ideal.Quotient.mk I)).order.toNat)
       (f - g * H.seq f k)) * H.isUnit_shift.unit⁻¹
 
 variable {f : A⟦X⟧}
 
-theorem coeff_seq_mem (k : ℕ) : ∀ i ≥ (g.map (Ideal.Quotient.mk I)).order.toNat,
+theorem coeff_seq_mem (k : ℕ) {i : ℕ} (hi : i ≥ (g.map (Ideal.Quotient.mk I)).order.toNat) :
     coeff A i (f - g * H.seq f k) ∈ I ^ k := by
-  induction k with
+  induction k generalizing hi i with
   | zero => simp
   | succ k hq =>
     rw [seq]
@@ -270,21 +240,20 @@ theorem coeff_seq_mem (k : ℕ) : ∀ i ≥ (g.map (Ideal.Quotient.mk I)).order.
       nth_rw 1 [g.eq_X_pow_mul_shift_add_trunc n]
       rw [add_mul, mul_assoc, IsUnit.mul_val_inv, hs]
       ring
-    intro i hi
     rw [key, map_sub, Polynomial.coeff_coe, coeff_trunc, if_neg hi.not_lt, zero_sub, neg_mem_iff,
       pow_succ']
     refine coeff_mul_mem_ideal_of_coeff_left_mem_ideal' (fun i ↦ ?_) i
     refine coeff_mul_mem_ideal_mul_ideal_of_coeff_mem_ideal'
       (by simp [n, g.coeff_trunc_order_mem]) (fun i ↦ ?_) i
     rw [coeff_mk]
-    exact hq (i + n) (by simp)
+    exact hq (by simp)
 
-theorem coeff_seq_succ_sub_seq_mem (k : ℕ) :
-    ∀ i, coeff A i (H.seq f (k + 1) - H.seq f k) ∈ I ^ k := by
-  simp_rw [seq, add_sub_cancel_left]
-  refine coeff_mul_mem_ideal_of_coeff_left_mem_ideal' fun i ↦ ?_
+theorem coeff_seq_succ_sub_seq_mem (k i : ℕ) :
+    coeff A i (H.seq f (k + 1) - H.seq f k) ∈ I ^ k := by
+  rw [seq, add_sub_cancel_left]
+  refine coeff_mul_mem_ideal_of_coeff_left_mem_ideal' (fun i ↦ ?_) i
   rw [coeff_mk]
-  exact H.coeff_seq_mem k (i + _) (by simp)
+  exact H.coeff_seq_mem k (by simp)
 
 @[simp]
 theorem seq_zero : H.seq f 0 = 0 := rfl
@@ -301,10 +270,10 @@ noncomputable def divCoeff [IsPrecomplete I A] (i : ℕ) :=
   Classical.indefiniteDescription _ <| IsPrecomplete.prec' (I := I)
     (fun k ↦ coeff A i (H.seq f k)) fun {m} {n} hn ↦ by
       induction n, hn using Nat.le_induction with
-      | base => rfl
+      | base => rw [SModEq.def]
       | succ n hn ih =>
         refine ih.trans (SModEq.symm ?_)
-        simp_rw [SModEq.sub_mem, smul_eq_mul, Ideal.mul_top, ← map_sub]
+        rw [SModEq.sub_mem, smul_eq_mul, Ideal.mul_top, ← map_sub]
         exact Ideal.pow_le_pow_right hn (H.coeff_seq_succ_sub_seq_mem n i)
 
 /-- The limit `q` of the
@@ -313,13 +282,12 @@ noncomputable def div [IsPrecomplete I A] : A⟦X⟧ := PowerSeries.mk fun i ↦
 
 variable {f}
 
-theorem coeff_div [IsPrecomplete I A] : ∀ i, coeff A i (H.div f) = (H.divCoeff f i).1 := by
+theorem coeff_div [IsPrecomplete I A] (i : ℕ) : coeff A i (H.div f) = (H.divCoeff f i).1 := by
   simp [div]
 
-theorem coeff_div_sub_seq_mem [IsPrecomplete I A] (k : ℕ) :
-    ∀ i, coeff A i (H.div f - (H.seq f k)) ∈ I ^ k := fun i ↦ by
-  rw [map_sub, coeff_div]
-  simpa only [SModEq.sub_mem, smul_eq_mul, Ideal.mul_top] using ((H.divCoeff f i).2 k).symm
+theorem coeff_div_sub_seq_mem [IsPrecomplete I A] (k i : ℕ) :
+    coeff A i (H.div f - (H.seq f k)) ∈ I ^ k := by
+  simpa [coeff_div, SModEq.sub_mem] using ((H.divCoeff f i).2 k).symm
 
 variable (f)
 
@@ -334,17 +302,18 @@ theorem isWeierstrassDivisionAt_div_mod [IsAdicComplete I A] :
   · have := ‹IsAdicComplete ⊤ A›.toIsHausdorff.subsingleton
     rw [Subsingleton.elim f 0, Subsingleton.elim (H.div 0) 0, Subsingleton.elim (H.mod 0) 0]
     exact g.isWeierstrassDivisionAt_zero _
-  refine ⟨degree_trunc_lt _ _, ?_⟩
-  rw [mod, add_comm, ← sub_eq_iff_eq_add]
-  ext i
-  rw [Polynomial.coeff_coe, coeff_trunc]
-  split_ifs with hi
-  · rfl
-  refine IsHausdorff.haus' (I := I) _ fun k ↦ ?_
-  rw [SModEq.zero, smul_eq_mul, Ideal.mul_top, show f - g * H.div f =
-    f - g * (H.seq f k) - g * (H.div f - (H.seq f k)) by ring, map_sub]
-  exact Ideal.sub_mem _ (H.coeff_seq_mem k _ (not_lt.1 hi)) <|
-    coeff_mul_mem_ideal_of_coeff_right_mem_ideal' (H.coeff_div_sub_seq_mem k) i
+  constructor
+  · exact degree_trunc_lt _ _
+  · rw [mod, add_comm, ← sub_eq_iff_eq_add]
+    ext i
+    rw [Polynomial.coeff_coe, coeff_trunc]
+    split_ifs with hi
+    · rfl
+    refine IsHausdorff.haus' (I := I) _ fun k ↦ ?_
+    rw [SModEq.zero, smul_eq_mul, Ideal.mul_top, show f - g * H.div f =
+      f - g * (H.seq f k) - g * (H.div f - (H.seq f k)) by ring, map_sub]
+    exact Ideal.sub_mem _ (H.coeff_seq_mem k (not_lt.1 hi)) <|
+      coeff_mul_mem_ideal_of_coeff_right_mem_ideal' (H.coeff_div_sub_seq_mem k) i
 
 /-- If `g * q = r` for some power series `q` and some polynomial `r` whose degree is `< n`,
 then `q` and `r` are all zero. This implies the uniqueness of Weierstrass division. -/
@@ -402,28 +371,43 @@ theorem eq_of_mul_add_eq_mul_add [IsHausdorff I A] {q q' : A⟦X⟧} {r r' : A[X
   exact ⟨h.1, h.2.symm⟩
 
 @[simp]
+theorem div_add [IsAdicComplete I A] {f f' : A⟦X⟧} : H.div (f + f') = H.div f + H.div f' := by
+  have H1 := (H.isWeierstrassDivisionAt_div_mod f).add (H.isWeierstrassDivisionAt_div_mod f')
+  have H2 := H.isWeierstrassDivisionAt_div_mod (f + f')
+  exact (H.eq_of_mul_add_eq_mul_add H2.degree_lt H1.degree_lt
+    (H2.eq_mul_add.symm.trans H1.eq_mul_add)).1
+
+@[simp]
+theorem div_smul [IsAdicComplete I A] {a : A} {f : A⟦X⟧} : H.div (a • f) = a • H.div f := by
+  have H1 := (H.isWeierstrassDivisionAt_div_mod f).smul a
+  have H2 := H.isWeierstrassDivisionAt_div_mod (a • f)
+  exact (H.eq_of_mul_add_eq_mul_add H2.degree_lt H1.degree_lt
+    (H2.eq_mul_add.symm.trans H1.eq_mul_add)).1
+
+@[simp]
+theorem div_zero [IsAdicComplete I A] : H.div 0 = 0 := by
+  simpa using H.div_smul (a := 0) (f := 0)
+
+@[simp]
 theorem mod_add [IsAdicComplete I A] {f f' : A⟦X⟧} : H.mod (f + f') = H.mod f + H.mod f' := by
-  obtain ⟨hf1, hf2⟩ := H.isWeierstrassDivisionAt_div_mod f
-  obtain ⟨hf'1, hf'2⟩ := H.isWeierstrassDivisionAt_div_mod f'
-  obtain ⟨hf''1, hf''2⟩ := H.isWeierstrassDivisionAt_div_mod (f + f')
-  nth_rw 1 [hf2, hf'2] at hf''2
-  rw [← add_assoc, add_right_comm _ _ (g * _), ← mul_add, add_assoc, ← Polynomial.coe_add] at hf''2
-  exact (H.eq_of_mul_add_eq_mul_add (lt_of_le_of_lt (Polynomial.degree_add_le _ _)
-    (sup_lt_iff.2 ⟨hf1, hf'1⟩)) hf''1 hf''2).2.symm
+  have H1 := (H.isWeierstrassDivisionAt_div_mod f).add (H.isWeierstrassDivisionAt_div_mod f')
+  have H2 := H.isWeierstrassDivisionAt_div_mod (f + f')
+  exact (H.eq_of_mul_add_eq_mul_add H2.degree_lt H1.degree_lt
+    (H2.eq_mul_add.symm.trans H1.eq_mul_add)).2
 
 @[simp]
 theorem mod_smul [IsAdicComplete I A] {a : A} {f : A⟦X⟧} : H.mod (a • f) = a • H.mod f := by
-  obtain ⟨hf1, hf2⟩ := H.isWeierstrassDivisionAt_div_mod f
-  obtain ⟨hf'1, hf'2⟩ := H.isWeierstrassDivisionAt_div_mod (a • f)
-  nth_rw 1 [hf2] at hf'2
-  rw [smul_add, ← mul_smul_comm] at hf'2
-  exact (H.eq_of_mul_add_eq_mul_add ((Polynomial.degree_smul_le _ _).trans_lt hf1) hf'1 hf'2).2.symm
+  have H1 := (H.isWeierstrassDivisionAt_div_mod f).smul a
+  have H2 := H.isWeierstrassDivisionAt_div_mod (a • f)
+  exact (H.eq_of_mul_add_eq_mul_add H2.degree_lt H1.degree_lt
+    (H2.eq_mul_add.symm.trans H1.eq_mul_add)).2
 
 @[simp]
 theorem mod_zero [IsAdicComplete I A] : H.mod 0 = 0 := by
   simpa using H.mod_smul (a := 0) (f := 0)
 
-/-- The remainder is invariant under multiples of `g`. -/
+/-- The remainder map `PowerSeries.IsWeierstrassDivisorAt.mod` induces a linear map
+`A⟦X⟧ / (g) → A[X]`. -/
 noncomputable def mod' [IsAdicComplete I A] : A⟦X⟧ ⧸ Ideal.span {g} →ₗ[A] A[X] where
   toFun := Quotient.lift (fun f ↦ H.mod f) fun f f' hf ↦ by
     simp_rw [HasEquiv.Equiv, Submodule.quotientRel_def, Ideal.mem_span_singleton'] at hf
@@ -443,6 +427,11 @@ noncomputable def mod' [IsAdicComplete I A] : A⟦X⟧ ⧸ Ideal.span {g} →ₗ
 @[simp]
 theorem mod'_mk_eq_mod [IsAdicComplete I A] {f : A⟦X⟧} :
     H.mod' (Ideal.Quotient.mk _ f) = H.mod f := rfl
+
+theorem div_coe_eq_zero [IsAdicComplete I A] {r : A[X]}
+    (hr : r.degree < (g.map (Ideal.Quotient.mk I)).order.toNat) : H.div r = 0 := by
+  obtain ⟨h1, h2⟩ := H.isWeierstrassDivisionAt_div_mod r
+  exact (H.eq_of_mul_add_eq_mul_add (q := H.div r) (q' := 0) h1 hr (by simpa using h2.symm)).1
 
 theorem mod_coe_eq_self [IsAdicComplete I A] {r : A[X]}
     (hr : r.degree < (g.map (Ideal.Quotient.mk I)).order.toNat) : H.mod r = r := by
@@ -490,55 +479,49 @@ noncomputable def _root_.Polynomial.IsDistinguishedAt.algEquivQuotient :
       rw [Eq.comm, Ideal.Quotient.mk_eq_mk_iff_sub_mem, Ideal.mem_span_singleton']
       exact ⟨f /ₘ g, by rw [Polynomial.modByMonic_eq_sub_mul_div _ H.monic]; ring⟩
     have h1 : g.degree = ((g : A⟦X⟧).map (Ideal.Quotient.mk I)).order.toNat := by
-      convert H.degree_eq_order_map g 1 (by rwa [constantCoeff_one, ← Ideal.ne_top_iff_one])
-        (by simp)
-      apply ENat.coe_toNat
-      rw [← lt_top_iff_ne_top, order_finite_iff_ne_zero, ← Polynomial.polynomial_map_coe]
-      exact_mod_cast Polynomial.map_monic_ne_zero H.monic
+      convert H.degree_eq_coe_lift_order_map g 1
+        (by rwa [constantCoeff_one, ← Ideal.ne_top_iff_one]) (by simp)
+      exact (ENat.lift_eq_toNat_of_lt_top _).symm
     dsimp
     rw [Ideal.Quotient.mk_eq_mk_iff_sub_mem, Ideal.mem_span_singleton']
     exact ⟨0, by simp [H.isWeierstrassDivisorAt'.mod_coe_eq_self (hfdeg.trans_eq h1)]⟩
   right_inv f := H.isWeierstrassDivisorAt'.mk_mod'_eq_self
 
-theorem _root_.Polynomial.IsDistinguishedAt.algEquivQuotient_mk (f : A[X]) :
-    H.algEquivQuotient (Ideal.Quotient.mk _ f) = Ideal.Quotient.mk _ (f : A⟦X⟧) := rfl
-
-theorem _root_.Polynomial.IsDistinguishedAt.algEquivQuotient_symm_mk (f : A⟦X⟧) :
-    H.algEquivQuotient.symm (Ideal.Quotient.mk _ f) =
-      Ideal.Quotient.mk _ (H.isWeierstrassDivisorAt'.mod f) := rfl
-
 end Equiv
 
 end IsWeierstrassDivisorAt
 
+section IsLocalRing
+
+variable [IsLocalRing A] (a : A) (f f' g : A⟦X⟧)
+
+variable {g} in
 /-- **Weierstrass division** ([washington_cyclotomic], Proposition 7.2): let `f`, `g` be
 power series over a complete local ring, such that
 the image of `g` in the residue field is not zero. Let `n` be the order of the image of `g` in the
 residue field. Then there exists a power series `q` and a polynomial `r` of degree `< n`, such that
 `f = g * q + r`. -/
-theorem exists_isWeierstrassDivision [IsLocalRing A] [IsAdicComplete (IsLocalRing.maximalIdeal A) A]
-    (f g : A⟦X⟧) (hg : g.map (IsLocalRing.residue A) ≠ 0) : ∃ q r, f.IsWeierstrassDivision g q r :=
-  ⟨_, _, (IsWeierstrassDivisor.of_map_ne_zero g hg).isWeierstrassDivisionAt_div_mod f⟩
+theorem exists_isWeierstrassDivision [IsAdicComplete (IsLocalRing.maximalIdeal A) A]
+    (hg : g.map (IsLocalRing.residue A) ≠ 0) : ∃ q r, f.IsWeierstrassDivision g q r :=
+  ⟨_, _, (IsWeierstrassDivisor.of_map_ne_zero hg).isWeierstrassDivisionAt_div_mod f⟩
 
 -- Unfortunately there is no Unicode subscript `w`.
 
-/-- The `q` in Werierstrass division, denoted by `f /ʷ g`. Note that when the image of `g` in the
-residue field is zero, this is defined to be zero. -/
-noncomputable def weierstrassDiv [IsLocalRing A] [IsAdicComplete (IsLocalRing.maximalIdeal A) A]
-    (f g : A⟦X⟧) : A⟦X⟧ :=
+/-- The quotient `q` in Weierstrass division, denoted by `f /ʷ g`. Note that when the image of
+`g` in the residue field is zero, this is defined to be zero. -/
+noncomputable def weierstrassDiv [IsPrecomplete (IsLocalRing.maximalIdeal A) A] : A⟦X⟧ :=
   open scoped Classical in
   if hg : g.map (IsLocalRing.residue A) ≠ 0 then
-    (f.exists_isWeierstrassDivision g hg).choose
+    (IsWeierstrassDivisor.of_map_ne_zero hg).div f
   else
     0
 
-/-- The `r` in Werierstrass division, denoted by `f %ʷ g`. Note that when the image of `g` in the
-residue field is zero, this is defined to be zero. -/
-noncomputable def weierstrassMod [IsLocalRing A] [IsAdicComplete (IsLocalRing.maximalIdeal A) A]
-    (f g : A⟦X⟧) : A[X] :=
+/-- The remainder `r` in Weierstrass division, denoted by `f %ʷ g`. Note that when the image of
+`g` in the residue field is zero, this is defined to be zero. -/
+noncomputable def weierstrassMod [IsPrecomplete (IsLocalRing.maximalIdeal A) A] : A[X] :=
   open scoped Classical in
   if hg : g.map (IsLocalRing.residue A) ≠ 0 then
-    (f.exists_isWeierstrassDivision g hg).choose_spec.choose
+    (IsWeierstrassDivisor.of_map_ne_zero hg).mod f
   else
     0
 
@@ -549,83 +532,111 @@ infixl:70 " /ʷ " => weierstrassDiv
 infixl:70 " %ʷ " => weierstrassMod
 
 @[simp]
-theorem weierstrassDiv_zero_right [IsLocalRing A] [IsAdicComplete (IsLocalRing.maximalIdeal A) A]
-    (f : A⟦X⟧) : f /ʷ 0 = 0 := by
+theorem weierstrassDiv_zero_right [IsPrecomplete (IsLocalRing.maximalIdeal A) A] : f /ʷ 0 = 0 := by
   rw [weierstrassDiv, dif_neg (by simp)]
 
+alias weierstrassDiv_zero := weierstrassDiv_zero_right
+
 @[simp]
-theorem weierstrassMod_zero_right [IsLocalRing A] [IsAdicComplete (IsLocalRing.maximalIdeal A) A]
-    (f : A⟦X⟧) : f %ʷ 0 = 0 := by
+theorem weierstrassMod_zero_right [IsPrecomplete (IsLocalRing.maximalIdeal A) A] : f %ʷ 0 = 0 := by
   rw [weierstrassMod, dif_neg (by simp)]
 
-theorem degree_weierstrassMod_lt [IsLocalRing A] [IsAdicComplete (IsLocalRing.maximalIdeal A) A]
-    (f g : A⟦X⟧) : (f %ʷ g).degree < (g.map (IsLocalRing.residue A)).order.toNat := by
+alias weierstrassMod_zero := weierstrassMod_zero_right
+
+theorem degree_weierstrassMod_lt [IsPrecomplete (IsLocalRing.maximalIdeal A) A] :
+    (f %ʷ g).degree < (g.map (IsLocalRing.residue A)).order.toNat := by
   rw [weierstrassMod]
   split_ifs with hg
-  · exact (f.exists_isWeierstrassDivision g hg).choose_spec.choose_spec.1
+  · exact degree_trunc_lt _ _
   · nontriviality A
     rw [Polynomial.degree_zero]
     exact WithBot.bot_lt_coe _
 
+section
+
+variable {g} (hg : g.map (IsLocalRing.residue A) ≠ 0)
+include hg
+
 theorem isWeierstrassDivision_weierstrassDiv_weierstrassMod
-    [IsLocalRing A] [IsAdicComplete (IsLocalRing.maximalIdeal A) A] (f g : A⟦X⟧)
-    (hg : g.map (IsLocalRing.residue A) ≠ 0) : f.IsWeierstrassDivision g (f /ʷ g) (f %ʷ g) := by
+    [IsAdicComplete (IsLocalRing.maximalIdeal A) A] :
+    f.IsWeierstrassDivision g (f /ʷ g) (f %ʷ g) := by
   simp_rw [weierstrassDiv, weierstrassMod, dif_pos hg]
-  exact (f.exists_isWeierstrassDivision g hg).choose_spec.choose_spec
+  exact (IsWeierstrassDivisor.of_map_ne_zero hg).isWeierstrassDivisionAt_div_mod f
 
 theorem eq_mul_weierstrassDiv_add_weierstrassMod
-    [IsLocalRing A] [IsAdicComplete (IsLocalRing.maximalIdeal A) A] (f g : A⟦X⟧)
-    (hg : g.map (IsLocalRing.residue A) ≠ 0) : f = g * (f /ʷ g) + (f %ʷ g) := by
+    [IsAdicComplete (IsLocalRing.maximalIdeal A) A] :
+    f = g * (f /ʷ g) + (f %ʷ g) := by
   simp_rw [weierstrassDiv, weierstrassMod, dif_pos hg]
-  exact (f.exists_isWeierstrassDivision g hg).choose_spec.choose_spec.2
+  exact ((IsWeierstrassDivisor.of_map_ne_zero hg).isWeierstrassDivisionAt_div_mod f).2
 
-/-- The `q` and `r` in the Weierstrass division for `0` is equal to `0`. -/
-theorem eq_zero_of_weierstrass_division [IsLocalRing A] [IsHausdorff (IsLocalRing.maximalIdeal A) A]
-    (g : A⟦X⟧) (hg : g.map (IsLocalRing.residue A) ≠ 0) {q : A⟦X⟧} {r : A[X]}
-    (hr : r.degree < (g.map (IsLocalRing.residue A)).order.toNat)
-    (heq : g * q = r) : q = 0 ∧ r = 0 :=
-  (IsWeierstrassDivisor.of_map_ne_zero g hg).eq_zero_of_mul_eq hr heq
+variable {f} in
+/-- The quotient `q` and the remainder `r` in the Weierstrass division are unique.
 
-/-- The `q` and `r` in the Weierstrass division is unique. -/
-theorem eq_of_weierstrass_division [IsLocalRing A] [IsHausdorff (IsLocalRing.maximalIdeal A) A]
-    (g : A⟦X⟧) (hg : g.map (IsLocalRing.residue A) ≠ 0) {q q' : A⟦X⟧} {r r' : A[X]}
-    (hr : r.degree < (g.map (IsLocalRing.residue A)).order.toNat)
-    (hr' : r'.degree < (g.map (IsLocalRing.residue A)).order.toNat)
-    (heq : g * q + r = g * q' + r') : q = q' ∧ r = r' :=
-  (IsWeierstrassDivisor.of_map_ne_zero g hg).eq_of_mul_add_eq_mul_add hr hr' heq
-
-/-- The `q` and `r` in the Weierstrass division is unique. -/
-theorem IsWeierstrassDivision.elim [IsLocalRing A] [IsHausdorff (IsLocalRing.maximalIdeal A) A]
-    {f g : A⟦X⟧} (hg : g.map (IsLocalRing.residue A) ≠ 0) {q q' : A⟦X⟧} {r r' : A[X]}
+This result is stated using two `PowerSeries.IsWeierstrassDivision` assertions, and only requires
+the ring being Hausdorff with respect to the maximal ideal. If you want `q` and `r` equal to
+`f /ʷ g` and `f %ʷ g`, use `PowerSeries.IsWeierstrassDivision.unique`
+instead, which requires the ring being complete with respect to the maximal ideal. -/
+theorem IsWeierstrassDivision.elim [IsHausdorff (IsLocalRing.maximalIdeal A) A]
+    {q q' : A⟦X⟧} {r r' : A[X]}
     (H : f.IsWeierstrassDivision g q r) (H2 : f.IsWeierstrassDivision g q' r') : q = q' ∧ r = r' :=
-  g.eq_of_weierstrass_division hg H.1 H2.1 (H.2.symm.trans H2.2)
+  (IsWeierstrassDivisor.of_map_ne_zero hg).eq_of_mul_add_eq_mul_add H.1 H2.1 (H.2.symm.trans H2.2)
 
-/-- The `q` and `r` in the Weierstrass division for `0` is equal to `0`. -/
-theorem IsWeierstrassDivision.eq_zero [IsLocalRing A] [IsHausdorff (IsLocalRing.maximalIdeal A) A]
-    {g : A⟦X⟧} (hg : g.map (IsLocalRing.residue A) ≠ 0) {q : A⟦X⟧} {r : A[X]}
+/-- If `q` and `r` are quotient and remainder in the Weierstrass division `0 / g`, then they are
+equal to `0`. -/
+theorem IsWeierstrassDivision.eq_zero [IsHausdorff (IsLocalRing.maximalIdeal A) A]
+    {q : A⟦X⟧} {r : A[X]}
     (H : IsWeierstrassDivision 0 g q r) : q = 0 ∧ r = 0 :=
   H.elim hg (g.isWeierstrassDivisionAt_zero _)
 
-/-- The `q` and `r` in the Weierstrass division is equal to `f /ʷ g` and `f %ʷ g`. -/
-theorem IsWeierstrassDivision.eq_weierstrassDiv_weierstrassMod
-    [IsLocalRing A] [IsAdicComplete (IsLocalRing.maximalIdeal A) A]
-    {f g : A⟦X⟧} (hg : g.map (IsLocalRing.residue A) ≠ 0) {q : A⟦X⟧} {r : A[X]}
+variable {f} in
+/-- If `q` and `r` are quotient and remainder in the Weierstrass division `f / g`, then they are
+equal to `f /ʷ g` and `f %ʷ g`. -/
+theorem IsWeierstrassDivision.unique [IsAdicComplete (IsLocalRing.maximalIdeal A) A]
+    {q : A⟦X⟧} {r : A[X]}
     (H : f.IsWeierstrassDivision g q r) : q = f /ʷ g ∧ r = f %ʷ g :=
-  H.elim hg (f.isWeierstrassDivision_weierstrassDiv_weierstrassMod g hg)
+  H.elim hg (f.isWeierstrassDivision_weierstrassDiv_weierstrassMod hg)
+
+end
 
 @[simp]
-theorem weierstrassDiv_zero_left [IsLocalRing A] [IsAdicComplete (IsLocalRing.maximalIdeal A) A]
-    (g : A⟦X⟧) : 0 /ʷ g = 0 := by
-  by_cases hg : g.map (IsLocalRing.residue A) ≠ 0
-  · exact ((isWeierstrassDivision_weierstrassDiv_weierstrassMod 0 g hg).eq_zero hg).1
-  rw [weierstrassDiv, dif_neg hg]
+theorem add_weierstrassDiv [IsAdicComplete (IsLocalRing.maximalIdeal A) A] :
+    (f + f') /ʷ g = f /ʷ g + f' /ʷ g := by
+  simp_rw [weierstrassDiv]
+  split_ifs <;> simp
 
 @[simp]
-theorem weierstrassMod_zero_left [IsLocalRing A] [IsAdicComplete (IsLocalRing.maximalIdeal A) A]
-    (g : A⟦X⟧) : 0 %ʷ g = 0 := by
-  by_cases hg : g.map (IsLocalRing.residue A) ≠ 0
-  · exact ((isWeierstrassDivision_weierstrassDiv_weierstrassMod 0 g hg).eq_zero hg).2
-  rw [weierstrassMod, dif_neg hg]
+theorem smul_weierstrassDiv [IsAdicComplete (IsLocalRing.maximalIdeal A) A] :
+    (a • f) /ʷ g = a • (f /ʷ g) := by
+  simp_rw [weierstrassDiv]
+  split_ifs <;> simp
+
+@[simp]
+theorem weierstrassDiv_zero_left [IsAdicComplete (IsLocalRing.maximalIdeal A) A] : 0 /ʷ g = 0 := by
+  simp_rw [weierstrassDiv]
+  split_ifs <;> simp
+
+alias zero_weierstrassDiv := weierstrassDiv_zero_left
+
+@[simp]
+theorem add_weierstrassMod [IsAdicComplete (IsLocalRing.maximalIdeal A) A] :
+    (f + f') %ʷ g = f %ʷ g + f' %ʷ g := by
+  simp_rw [weierstrassMod]
+  split_ifs <;> simp
+
+@[simp]
+theorem smul_weierstrassMod [IsAdicComplete (IsLocalRing.maximalIdeal A) A] :
+    (a • f) %ʷ g = a • (f %ʷ g) := by
+  simp_rw [weierstrassMod]
+  split_ifs <;> simp
+
+@[simp]
+theorem weierstrassMod_zero_left [IsAdicComplete (IsLocalRing.maximalIdeal A) A] : 0 %ʷ g = 0 := by
+  simp_rw [weierstrassMod]
+  split_ifs <;> simp
+
+alias zero_weierstrassMod := weierstrassMod_zero_left
+
+end IsLocalRing
 
 /-!
 
@@ -647,6 +658,29 @@ its maximal ideal. -/
 abbrev IsWeierstrassFactorization (g : A⟦X⟧) (f : A[X]) (h : A⟦X⟧) [IsLocalRing A] : Prop :=
   g.IsWeierstrassFactorizationAt f h (IsLocalRing.maximalIdeal A)
 
+theorem _root_.Polynomial.IsWeaklyEisensteinAt.mul
+    {R : Type*} [CommSemiring R] {𝓟 : Ideal R} {f f' : R[X]}
+    (hf : f.IsWeaklyEisensteinAt 𝓟) (hf' : f'.IsWeaklyEisensteinAt 𝓟) :
+    (f * f').IsWeaklyEisensteinAt 𝓟 := by
+  rw [Polynomial.isWeaklyEisensteinAt_iff] at hf hf' ⊢
+  intro n hn
+  rw [Polynomial.coeff_mul]
+  refine Ideal.sum_mem _ fun x hx ↦ ?_
+  rcases lt_or_le x.1 f.natDegree with hx1 | hx1
+  · exact Ideal.mul_mem_right _ _ (hf hx1)
+  replace hx1 : x.2 < f'.natDegree := by
+    by_contra!
+    rw [Finset.HasAntidiagonal.mem_antidiagonal] at hx
+    replace hn := hn.trans_le Polynomial.natDegree_mul_le
+    linarith
+  exact Ideal.mul_mem_left _ _ (hf' hx1)
+
+theorem _root_.Polynomial.IsDistinguishedAt.mul
+    {R : Type*} [CommRing R] {f f' : R[X]} {I : Ideal R}
+    (hf : f.IsDistinguishedAt I) (hf' : f'.IsDistinguishedAt I) :
+    (f * f').IsDistinguishedAt I :=
+  ⟨hf.toIsWeaklyEisensteinAt.mul hf'.toIsWeaklyEisensteinAt, hf.monic.mul hf'.monic⟩
+
 namespace IsWeierstrassFactorizationAt
 
 variable {g : A⟦X⟧} {f : A[X]} {h : A⟦X⟧} {I : Ideal A} (H : g.IsWeierstrassFactorizationAt f h I)
@@ -658,16 +692,44 @@ theorem map_ne_zero_of_ne_top (hI : I ≠ ⊤) : g.map (Ideal.Quotient.mk I) ≠
     (H.isUnit.map _).mul_left_eq_zero]
   exact_mod_cast f.map_monic_ne_zero (f := Ideal.Quotient.mk I) H.isDistinguishedAt.monic
 
-theorem degree_eq_order_map_of_ne_top (hI : I ≠ ⊤) :
-    f.degree = (g.map (Ideal.Quotient.mk I)).order := by
-  refine H.isDistinguishedAt.degree_eq_order_map g h ?_ H.eq_mul
+theorem degree_eq_coe_lift_order_map_of_ne_top (hI : I ≠ ⊤) :
+    f.degree = (g.map (Ideal.Quotient.mk I)).order.lift
+      (order_finite_iff_ne_zero.2 (H.map_ne_zero_of_ne_top hI)) := by
+  refine H.isDistinguishedAt.degree_eq_coe_lift_order_map g h ?_ H.eq_mul
   contrapose! hI
   exact Ideal.eq_top_of_isUnit_mem _ hI (isUnit_iff_constantCoeff.1 H.isUnit)
 
 theorem natDegree_eq_toNat_order_map_of_ne_top (hI : I ≠ ⊤) :
     f.natDegree = (g.map (Ideal.Quotient.mk I)).order.toNat := by
-  rw [Polynomial.natDegree, H.degree_eq_order_map_of_ne_top hI]
-  rfl
+  rw [Polynomial.natDegree, H.degree_eq_coe_lift_order_map_of_ne_top hI,
+    ENat.lift_eq_toNat_of_lt_top]
+  exact WithBot.unbotD_coe _ _
+
+/-- If `g = f * h` is a Weierstrass factorization, then there is a
+natural isomorphism `A[X] / (f) ≃ A⟦X⟧ / (g)`. -/
+@[simps! apply]
+noncomputable def algEquivQuotient [IsAdicComplete I A] :
+    (A[X] ⧸ Ideal.span {f}) ≃ₐ[A] A⟦X⟧ ⧸ Ideal.span {g} :=
+  H.isDistinguishedAt.algEquivQuotient.trans <| Ideal.quotientEquivAlgOfEq A <|
+    by rw [H.eq_mul, Ideal.span_singleton_mul_right_unit H.isUnit]
+
+@[simp]
+theorem algEquivQuotient_symm_apply [IsAdicComplete I A] (x : A⟦X⟧ ⧸ Ideal.span {g}) :
+    H.algEquivQuotient.symm x = Ideal.Quotient.mk _
+      (H.isDistinguishedAt.isWeierstrassDivisorAt'.mod' <| Ideal.quotientEquivAlgOfEq A
+        (by rw [H.eq_mul, Ideal.span_singleton_mul_right_unit H.isUnit]) x) := by
+  simp [algEquivQuotient]
+
+theorem mul {g' : A⟦X⟧} {f' : A[X]} {h' : A⟦X⟧} (H' : g'.IsWeierstrassFactorizationAt f' h' I) :
+    (g * g').IsWeierstrassFactorizationAt (f * f') (h * h') I :=
+  ⟨H.isDistinguishedAt.mul H'.isDistinguishedAt, H.isUnit.mul H'.isUnit, by
+    rw [H.eq_mul, H'.eq_mul, Polynomial.coe_mul]; ring⟩
+
+theorem smul {a : A} (ha : IsUnit a) : (a • g).IsWeierstrassFactorizationAt f (a • h) I := by
+  refine ⟨H.isDistinguishedAt, ?_, ?_⟩
+  · rw [Algebra.smul_def]
+    exact (ha.map _).mul H.isUnit
+  · simp [H.eq_mul]
 
 end IsWeierstrassFactorizationAt
 
@@ -681,8 +743,9 @@ include H
 theorem map_ne_zero : g.map (IsLocalRing.residue A) ≠ 0 :=
   H.map_ne_zero_of_ne_top (Ideal.IsMaximal.ne_top inferInstance)
 
-theorem degree_eq_order_map : f.degree = (g.map (IsLocalRing.residue A)).order :=
-  H.degree_eq_order_map_of_ne_top (Ideal.IsMaximal.ne_top inferInstance)
+theorem degree_eq_coe_lift_order_map : f.degree = (g.map (IsLocalRing.residue A)).order.lift
+    (order_finite_iff_ne_zero.2 H.map_ne_zero) :=
+  H.degree_eq_coe_lift_order_map_of_ne_top (Ideal.IsMaximal.ne_top inferInstance)
 
 theorem natDegree_eq_toNat_order_map :
     f.natDegree = (g.map (IsLocalRing.residue A)).order.toNat :=
@@ -699,16 +762,16 @@ theorem IsWeierstrassDivision.isUnit_of_map_ne_zero
   replace H2 := congr(coeff _ n (($H2).map (IsLocalRing.residue A)))
   simp_rw [map_pow, map_X, coeff_X_pow_self, map_add, map_mul, coeff_map,
     Polynomial.coeff_coe, Polynomial.coeff_eq_zero_of_degree_lt H1, map_zero, add_zero] at H2
-  rw [coeff_mul, ← Finset.sum_subset (s₁ := {(n, 0)}) (by simp) (fun p hp hnmem ↦ by
-    have hp1 : p.1 < n := (Finset.antidiagonal.fst_le hp).lt_of_ne <| by
+  rw [isUnit_iff_constantCoeff, ← isUnit_map_iff (IsLocalRing.residue A)]
+  rw [coeff_mul, ← Finset.sum_subset (s₁ := {(n, 0)}) (by simp) (fun p hp hnmem ↦ ?_),
+    Finset.sum_singleton, coeff_map, coeff_map, coeff_zero_eq_constantCoeff, mul_comm] at H2
+  · exact isUnit_of_mul_eq_one _ _ H2.symm
+  · rw [coeff_of_lt_order p.1 ?_]
+    · rw [zero_mul]
+    · rw [← ENat.lt_lift_iff (h := order_finite_iff_ne_zero.2 hg), ENat.lift_eq_toNat_of_lt_top]
+      refine (Finset.antidiagonal.fst_le hp).lt_of_ne ?_
       contrapose! hnmem
       rwa [Finset.mem_singleton, Finset.antidiagonal_congr hp (by simp)]
-    rw [coeff_of_lt_order p.1 (by
-      rwa [← ENat.lt_lift_iff (h := order_finite_iff_ne_zero.2 hg),
-        ENat.lift_eq_toNat_of_lt_top]), zero_mul]), Finset.sum_singleton,
-    coeff_map, coeff_map, coeff_zero_eq_constantCoeff, mul_comm, Eq.comm] at H2
-  rw [isUnit_iff_constantCoeff, ← isUnit_map_iff (IsLocalRing.residue A)]
-  exact isUnit_of_mul_eq_one _ _ H2
 
 theorem IsWeierstrassDivision.isWeierstrassFactorization
     {g q : A⟦X⟧} {r : A[X]} (hg : g.map (IsLocalRing.residue A) ≠ 0)
@@ -726,7 +789,7 @@ theorem IsWeierstrassDivision.isWeierstrassFactorization
   refine ⟨⟨⟨fun {i} hi ↦ ?_⟩, .sub_of_left (Polynomial.monic_X_pow _) H1⟩, Units.isUnit _, ?_⟩
   · rw [hfdeg] at hi
     simp_rw [f, Polynomial.coeff_sub, Polynomial.coeff_X_pow, if_neg hi.ne, zero_sub, neg_mem_iff]
-    have := H.coeff_f_sub_r_mem i hi
+    have := H.coeff_f_sub_r_mem hi
     rwa [map_sub, coeff_X_pow, if_neg hi.ne, zero_sub, neg_mem_iff, Polynomial.coeff_coe] at this
   · have := congr($(H.2) * ↑(H.isUnit_of_map_ne_zero hg).unit⁻¹)
     rw [add_mul, mul_assoc, IsUnit.mul_val_inv, mul_one, ← sub_eq_iff_eq_add] at this
@@ -736,59 +799,22 @@ theorem IsWeierstrassFactorization.isWeierstrassDivision
     {g : A⟦X⟧} {f : A[X]} {h : A⟦X⟧} (H : g.IsWeierstrassFactorization f h) :
     (X ^ (g.map (IsLocalRing.residue A)).order.toNat).IsWeierstrassDivision g ↑H.isUnit.unit⁻¹
       (Polynomial.X ^ (g.map (IsLocalRing.residue A)).order.toNat - f) := by
-  set n := (g.map (IsLocalRing.residue A)).order.toNat
+  set n := (g.map (IsLocalRing.residue A)).order.toNat with hn
   constructor
-  · change (Polynomial.X ^ n - f).degree < ↑n
-    refine (Polynomial.degree_sub_lt ?_ (Polynomial.monic_X_pow n).ne_zero ?_).trans_eq (by simp)
-    · simp_rw [H.degree_eq_order_map, Polynomial.degree_X_pow, n,
-        ← ENat.lift_eq_toNat_of_lt_top (order_finite_iff_ne_zero.2 H.map_ne_zero)]
-      exact ENat.coe_lift _ _
+  · refine (Polynomial.degree_sub_lt ?_ (Polynomial.monic_X_pow n).ne_zero ?_).trans_eq (by simpa)
+    · simp_rw [H.degree_eq_coe_lift_order_map, Polynomial.degree_X_pow, n,
+        ENat.lift_eq_toNat_of_lt_top]
     · rw [(Polynomial.monic_X_pow n).leadingCoeff, H.isDistinguishedAt.monic.leadingCoeff]
   · simp_rw [H.eq_mul, mul_assoc, IsUnit.mul_val_inv, mul_one, Polynomial.coe_sub,
       Polynomial.coe_pow, Polynomial.coe_X, add_sub_cancel]
 
-section
+/-- The `f` and `h` in the Weierstrass preparation theorem are unique.
 
-variable [IsAdicComplete (IsLocalRing.maximalIdeal A) A] (g : A⟦X⟧)
-  (hg : g.map (IsLocalRing.residue A) ≠ 0)
-include hg
-
-/-- **Weierstrass preparation theorem** ([washington_cyclotomic], Theorem 7.3):
-let `g` be a power series over a complete local ring,
-such that the image of `g` in the residue field is not zero. Then there exists a distinguished
-polynomial `f` and a power series `h` which is a unit, such that `g = f * h`. -/
-theorem exists_isWeierstrassFactorization : ∃ f h, g.IsWeierstrassFactorization f h := by
-  obtain ⟨q, r, H⟩ :=
-    (X ^ (g.map (IsLocalRing.residue A)).order.toNat).exists_isWeierstrassDivision g hg
-  exact ⟨_, _, H.isWeierstrassFactorization hg⟩
-
-/-- The `f` in Werierstrass preparation theorem. -/
-noncomputable def weierstrassDistinguished : A[X] :=
-  (g.exists_isWeierstrassFactorization hg).choose
-
-/-- The `h` in Werierstrass preparation theorem. -/
-noncomputable def weierstrassUnit : A⟦X⟧ :=
-  (g.exists_isWeierstrassFactorization hg).choose_spec.choose
-
-theorem isWeierstrassFactorization_weierstrassDistinguished_weierstrassUnit :
-    g.IsWeierstrassFactorization (g.weierstrassDistinguished hg) (g.weierstrassUnit hg) :=
-  (g.exists_isWeierstrassFactorization hg).choose_spec.choose_spec
-
-theorem isDistinguishedAt_weierstrassDistinguished :
-    (g.weierstrassDistinguished hg).IsDistinguishedAt (IsLocalRing.maximalIdeal A) :=
-  (g.exists_isWeierstrassFactorization hg).choose_spec.choose_spec.isDistinguishedAt
-
-theorem isUnit_weierstrassUnit :
-    IsUnit (g.weierstrassUnit hg) :=
-  (g.exists_isWeierstrassFactorization hg).choose_spec.choose_spec.isUnit
-
-theorem eq_weierstrassDistinguished_mul_weierstrassUnit :
-    g = g.weierstrassDistinguished hg * g.weierstrassUnit hg :=
-  (g.exists_isWeierstrassFactorization hg).choose_spec.choose_spec.eq_mul
-
-end
-
-/-- The `f` and `h` in Werierstrass preparation theorem is unique. -/
+This result is stated using two `PowerSeries.IsWeierstrassFactorization` assertions, and only
+requires the ring being Hausdorff with respect to the maximal ideal. If you want `f` and `h` equal
+to `PowerSeries.weierstrassDistinguished` and `PowerSeries.weierstrassUnit`,
+use `PowerSeries.IsWeierstrassFactorization.unique` instead, which requires the ring being
+complete with respect to the maximal ideal. -/
 theorem IsWeierstrassFactorization.elim [IsHausdorff (IsLocalRing.maximalIdeal A) A]
     {g : A⟦X⟧} {f f' : A[X]} {h h' : A⟦X⟧} (H : g.IsWeierstrassFactorization f h)
     (H2 : g.IsWeierstrassFactorization f' h') : f = f' ∧ h = h' := by
@@ -796,12 +822,105 @@ theorem IsWeierstrassFactorization.elim [IsHausdorff (IsLocalRing.maximalIdeal A
   rw [← Units.ext_iff, inv_inj, Units.ext_iff] at h1
   exact ⟨by simpa using h2, h1⟩
 
-/-- The `f` and `h` in Werierstrass preparation theorem is unique. -/
-theorem IsWeierstrassFactorization.eq_weierstrassDistinguished_weierstrassUnit
-    [IsAdicComplete (IsLocalRing.maximalIdeal A) A]
-    {g : A⟦X⟧} {f : A[X]} {h : A⟦X⟧} (H : g.IsWeierstrassFactorization f h)
+section IsAdicComplete
+
+variable [IsAdicComplete (IsLocalRing.maximalIdeal A) A] {a : A} {g g' : A⟦X⟧} {f : A[X]} {h : A⟦X⟧}
+
+/-- **Weierstrass preparation theorem** ([washington_cyclotomic], Theorem 7.3):
+let `g` be a power series over a complete local ring,
+such that its image in the residue field is not zero. Then there exists a distinguished
+polynomial `f` and a power series `h` which is a unit, such that `g = f * h`. -/
+theorem exists_isWeierstrassFactorization (hg : g.map (IsLocalRing.residue A) ≠ 0) :
+    ∃ f h, g.IsWeierstrassFactorization f h := by
+  obtain ⟨q, r, H⟩ :=
+    (X ^ (g.map (IsLocalRing.residue A)).order.toNat).exists_isWeierstrassDivision hg
+  exact ⟨_, _, H.isWeierstrassFactorization hg⟩
+
+variable (g) in
+/-- The `f` in the Weierstrass preparation theorem. -/
+noncomputable def weierstrassDistinguished (hg : g.map (IsLocalRing.residue A) ≠ 0) : A[X] :=
+  (g.exists_isWeierstrassFactorization hg).choose
+
+variable (g) in
+/-- The `h` in the Weierstrass preparation theorem. -/
+noncomputable def weierstrassUnit (hg : g.map (IsLocalRing.residue A) ≠ 0) : A⟦X⟧ :=
+  (g.exists_isWeierstrassFactorization hg).choose_spec.choose
+
+theorem isWeierstrassFactorization_weierstrassDistinguished_weierstrassUnit
     (hg : g.map (IsLocalRing.residue A) ≠ 0) :
+    g.IsWeierstrassFactorization (g.weierstrassDistinguished hg) (g.weierstrassUnit hg) :=
+  (g.exists_isWeierstrassFactorization hg).choose_spec.choose_spec
+
+/-- If `g` is a power series over a complete local ring,
+such that its image in the residue field is not zero, then there is a natural isomorphism
+`A[X] / (f) ≃ A⟦X⟧ / (g)` where `f` is `PowerSeries.weierstrassDistinguished g`. -/
+noncomputable abbrev algEquivQuotientWeierstrassDistinguished
+    (hg : g.map (IsLocalRing.residue A) ≠ 0) :=
+  (g.isWeierstrassFactorization_weierstrassDistinguished_weierstrassUnit hg).algEquivQuotient
+
+theorem isDistinguishedAt_weierstrassDistinguished (hg : g.map (IsLocalRing.residue A) ≠ 0) :
+    (g.weierstrassDistinguished hg).IsDistinguishedAt (IsLocalRing.maximalIdeal A) :=
+  (g.exists_isWeierstrassFactorization hg).choose_spec.choose_spec.isDistinguishedAt
+
+theorem isUnit_weierstrassUnit (hg : g.map (IsLocalRing.residue A) ≠ 0) :
+    IsUnit (g.weierstrassUnit hg) :=
+  (g.exists_isWeierstrassFactorization hg).choose_spec.choose_spec.isUnit
+
+theorem eq_weierstrassDistinguished_mul_weierstrassUnit (hg : g.map (IsLocalRing.residue A) ≠ 0) :
+    g = g.weierstrassDistinguished hg * g.weierstrassUnit hg :=
+  (g.exists_isWeierstrassFactorization hg).choose_spec.choose_spec.eq_mul
+
+/-- The `f` and `h` in Weierstrass preparation theorem are equal
+to `PowerSeries.weierstrassDistinguished` and `PowerSeries.weierstrassUnit`. -/
+theorem IsWeierstrassFactorization.unique
+    (H : g.IsWeierstrassFactorization f h) (hg : g.map (IsLocalRing.residue A) ≠ 0) :
     f = g.weierstrassDistinguished hg ∧ h = g.weierstrassUnit hg :=
   H.elim (g.isWeierstrassFactorization_weierstrassDistinguished_weierstrassUnit hg)
+
+@[simp]
+theorem weierstrassDistinguished_mul (hg : (g * g').map (IsLocalRing.residue A) ≠ 0) :
+    (g * g').weierstrassDistinguished hg =
+      g.weierstrassDistinguished (fun h ↦ hg (by simp [h])) *
+        g'.weierstrassDistinguished (fun h ↦ hg (by simp [h])) := by
+  have H := g.isWeierstrassFactorization_weierstrassDistinguished_weierstrassUnit
+    (fun h ↦ hg (by simp [h]))
+  have H' := g'.isWeierstrassFactorization_weierstrassDistinguished_weierstrassUnit
+    (fun h ↦ hg (by simp [h]))
+  have H'' := (g * g').isWeierstrassFactorization_weierstrassDistinguished_weierstrassUnit hg
+  exact (H''.elim (H.mul H')).1
+
+@[simp]
+theorem weierstrassUnit_mul (hg : (g * g').map (IsLocalRing.residue A) ≠ 0) :
+    (g * g').weierstrassUnit hg =
+      g.weierstrassUnit (fun h ↦ hg (by simp [h])) *
+        g'.weierstrassUnit (fun h ↦ hg (by simp [h])) := by
+  have H := g.isWeierstrassFactorization_weierstrassDistinguished_weierstrassUnit
+    (fun h ↦ hg (by simp [h]))
+  have H' := g'.isWeierstrassFactorization_weierstrassDistinguished_weierstrassUnit
+    (fun h ↦ hg (by simp [h]))
+  have H'' := (g * g').isWeierstrassFactorization_weierstrassDistinguished_weierstrassUnit hg
+  exact (H''.elim (H.mul H')).2
+
+@[simp]
+theorem weierstrassDistinguished_smul (hg : (a • g).map (IsLocalRing.residue A) ≠ 0) :
+    (a • g).weierstrassDistinguished hg =
+      g.weierstrassDistinguished (fun h ↦ hg (by simp [Algebra.smul_def, h])) := by
+  have H := g.isWeierstrassFactorization_weierstrassDistinguished_weierstrassUnit
+    (fun h ↦ hg (by simp [Algebra.smul_def, h]))
+  have H' := (a • g).isWeierstrassFactorization_weierstrassDistinguished_weierstrassUnit hg
+  have ha : IsLocalRing.residue A a ≠ 0 := fun h ↦ hg (by simp [Algebra.smul_def, h])
+  exact (H'.elim (H.smul (by simpa using ha))).1
+
+@[simp]
+theorem weierstrassUnit_smul (hg : (a • g).map (IsLocalRing.residue A) ≠ 0) :
+    (a • g).weierstrassUnit hg =
+      a • g.weierstrassUnit (fun h ↦ hg (by simp [Algebra.smul_def, h])) := by
+  have H := g.isWeierstrassFactorization_weierstrassDistinguished_weierstrassUnit
+    (fun h ↦ hg (by simp [Algebra.smul_def, h]))
+  have H' := (a • g).isWeierstrassFactorization_weierstrassDistinguished_weierstrassUnit hg
+  have ha : IsLocalRing.residue A a ≠ 0 := fun h ↦ hg (by simp [Algebra.smul_def, h])
+  exact (H'.elim (H.smul (by simpa using ha))).2
+
+end IsAdicComplete
 
 end PowerSeries

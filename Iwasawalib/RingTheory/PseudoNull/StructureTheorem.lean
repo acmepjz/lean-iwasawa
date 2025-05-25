@@ -1,7 +1,7 @@
 /-
 Copyright (c) 2025 Jz Pan. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Jz Pan, Yiming Fu
+Authors: Jz Pan, Yiming Fu, Shouxin Zhang
 -/
 import Mathlib.Algebra.Module.PID
 import Mathlib.RingTheory.DedekindDomain.PID
@@ -144,19 +144,19 @@ variable {R' : Type*} [CommSemiring R'] [Algebra R R'] [Module R' M'] [IsLocaliz
 variable [Module R M] [Module R M'] [IsScalarTower R R' M']
 variable (f : M →ₗ[R] M') [IsLocalizedModule S f]
 
-noncomputable def getNumerator (x : M') : M :=
+private noncomputable def getNumerator (x : M') : M :=
   (Classical.choose (IsLocalizedModule.surj S f x)).1
 
 /-- If the image of `getNumerator x` under `f`
 is in a submodule `N'` of `M'`, then `x` itself lies in `N'`. -/
-lemma mem_of_getNumerator_image_mem {N' : Submodule R' M'} {x : M'}
+private lemma mem_of_getNumerator_image_mem {N' : Submodule R' M'} {x : M'}
     (hx : f (getNumerator S f x) ∈ N') : x ∈ N' := by
   let Num := (getNumerator S f x)
   let Den := (Classical.choose (IsLocalizedModule.surj S f x)).2
   have h : Den • x = f Num := (Classical.choose_spec (IsLocalizedModule.surj S f x))
   rwa [← IsLocalization.smul_mem_iff (s := Den), h]
 
-noncomputable def finsetNumerator [DecidableEq M] (s : Finset M') : Finset M :=
+private noncomputable def finsetNumerator [DecidableEq M] (s : Finset M') : Finset M :=
   Finset.image (getNumerator S f) s
 
 end numerator
@@ -310,7 +310,7 @@ theorem isPrincipalIdealRing_of_isPrincipalIdealRing_localization
     apply Ring.dimensionLEOne_of_dimensionLEOne_localization_maximal'
     infer_instance
   have : IsDedekindDomain A := {maximalOfPrime := Ring.DimensionLEOne.maximalOfPrime}
-  have hp_sub : {P : Ideal A | P.IsPrime} ⊆ {P : Ideal A | P.IsMaximal} ∪ {⊥}:= by
+  have hp_sub : {P : Ideal A | P.IsPrime} ⊆ {P : Ideal A | P.IsMaximal} ∪ {⊥} := by
     simp only [Set.mem_setOf_eq, Set.union_singleton, Set.mem_insert_iff]
     intro P hP
     obtain rfl | hbot := eq_or_ne P ⊥
@@ -581,7 +581,7 @@ theorem Module.IsTorsion.isPseudoIsomorphic_pi
     {A : Type u} [CommRing A] [IsNoetherianRing A] [HeightOneLocalizationIsPID A]
     {M : Type*} [AddCommGroup M] [Module A M] [Module.Finite A M] (hMT : Module.IsTorsion A M) :
     ∃ (ι : Type u) (_ : Fintype ι) (p : ι → PrimeSpectrum A) (_ : ∀ i, (p i).1.primeHeight = 1)
-      (e : ι → ℕ), M ∼ₚᵢₛ[A] ((i : ι) → A ⧸ (p i).1 ^ (e i)) := by
+      (e : ι → ℕ) (_ : ∀ i, 0 < e i), M ∼ₚᵢₛ[A] ((i : ι) → A ⧸ (p i).1 ^ (e i)) := by
   sorry
 
 /-- Let `A` be a Noetherian ring satisfying `HeightOneLocalizationIsPID`. Then two finitely

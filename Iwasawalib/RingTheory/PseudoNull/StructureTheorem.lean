@@ -376,6 +376,112 @@ instance (priority := 100) IsKrullDomain.heightOneLocalizationIsPID
 
 -/
 
+lemma key {A : Type*} [CommRing A] [IsNoetherianRing A]
+  {M : Type*} [AddCommGroup M] [Module A M] [Module.Finite A M] (hMT : Module.IsTorsion A M)
+  {N : Type*} [AddCommGroup N] [Module A N] [Module.Finite A N] (hNT : Module.IsTorsion A N)
+  (X : Type*) [AddCommGroup X] [Module A X] [Module.Finite A X] :
+  let sigma := (Module.support A M ∪ Module.support A N) ∩
+    {p : PrimeSpectrum A | p.1.primeHeight = 1}
+  let S := ⨅ p ∈ sigma, p.1.primeCompl
+  Subsingleton (LocalizedModule S X) ↔ (∀ p ∈ sigma, Subsingleton (LocalizedModule p.1.primeCompl X)) := by
+  intro sigma S
+  constructor
+  . intro hS p hp
+    simp only [S] at hS
+    rw [LocalizedModule.subsingleton_iff] at hS ⊢
+    intro m
+    specialize hS m
+    obtain ⟨r, ⟨hrmem, hreq⟩⟩ := hS
+    use r, by
+      apply Set.mem_of_subset_of_mem ?_ hrmem
+      simp only [Submonoid.coe_iInf, Set.biInter_subset_of_mem hp]
+  . intro h
+    simp_rw [LocalizedModule.subsingleton_iff] at h ⊢
+    intro k
+    obtain ⟨s_a, hmem, hnotmem⟩ : ∃ s_a ∈ Module.annihilator A X, s_a ∉ ⋃ p ∈ sigma, p.1 := by
+      simp
+      have h_not_subset : ¬((Module.annihilator A X : Set A) ⊆ ⋃ p ∈ sigma, ↑p.asIdeal) := by
+        intro h_sub
+        haveI : Fintype ↑sigma := by
+          refine Set.Finite.fintype ?_
+          unfold sigma
+          rw [Set.union_inter_distrib_right]
+          refine Set.Finite.union ?_ ?_
+          all_goals exact Module.IsTorsion.finite_primeHeight_one_support ‹_›
+        let t : Finset (PrimeSpectrum A) := sigma.toFinset
+        have h_not_le : ∀ p ∈ sigma, ¬(Module.annihilator A X ≤ p.asIdeal) := by
+          intro p hp
+          specialize h p hp
+          rwa [← LocalizedModule.subsingleton_iff, ← Module.not_mem_support_iff, Module.mem_support_iff_of_finite] at h
+        obtain ⟨a, b, ha, hb, hab⟩ : ∃ a b, a ∈ t ∧ b ∈ t ∧ a ≠ b := by
+          suffices Nontrivial t by
+            rw [nontrivial_iff] at this
+            obtain ⟨⟨a, ha⟩, ⟨b, hb⟩, hab⟩ := this
+            use a, b, ha, hb
+            simpa using hab
+          convert_to Nontrivial sigma; simp [t]
+          simp only [Set.nontrivial_coe_sort]
+          obtain ⟨p, hp⟩ : sigma.Nonempty := by
+            rw [@Set.nonempty_iff_ne_empty]
+            intro h
+            simp [h] at h_sub
+            rw [Set.eq_empty_iff_forall_not_mem] at h_sub
+            specialize h_sub 0
+            simp at h_sub
+          rw [← Set.not_subsingleton_iff]
+          intro h
+          rw [Set.subsingleton_iff_singleton hp] at h
+          simp [h] at h_sub h_not_le
+          contradiction
+        rw [show sigma = t by simp [t]] at h_sub h_not_le
+        have hp : ∀ i ∈ t, (i.asIdeal).IsPrime := fun i _ => i.isPrime
+        rw [Ideal.subset_union_prime a b (fun i hi _ _ => hp i hi)] at h_sub
+        obtain ⟨i, hi, hle⟩ := h_sub
+        exact h_not_le i hi hle
+      obtain ⟨s_a, hs_a⟩ := Set.not_subset.mp h_not_subset
+      simp at hs_a
+      exact ⟨s_a, hs_a.1, hs_a.2⟩
+    use s_a, by
+      simp_rw [S, Submonoid.mem_iInf]
+      intro p hp
+      simp at hnotmem
+      simp [Ideal.primeCompl, hnotmem p hp]
+    rw [Module.mem_annihilator] at hmem
+    simp [hmem k]
+
+lemma LinearMap.subsingleton_ker_convert
+  {A : Type*} [CommRing A]
+  {M : Type*} [AddCommGroup M] [Module A M]
+  {N : Type*} [AddCommGroup N] [Module A N]
+  (f : M →ₗ[A] N) (S : Submonoid A):
+  Subsingleton ↥(ker ((LocalizedModule.map S) f)) ↔ Subsingleton (LocalizedModule S (LinearMap.ker f)) := by
+  have h_exact : Function.Exact (LocalizedModule.map S (ker f).subtype) (LocalizedModule.map S f) :=
+    LocalizedModule.map_exact S _ _ (f.exact_subtype_ker_map)
+  rw [LinearMap.exact_iff] at h_exact
+  rw [h_exact]
+  have : LocalizedModule S ↥(ker f) ≃ₗ[Localization S] range (LocalizedModule.map S (ker f).subtype) := by
+    apply LinearEquiv.ofInjective
+    exact LocalizedModule.map_injective S _ (Submodule.subtype_injective _)
+  rw [Equiv.subsingleton_congr this.toEquiv]
+
+lemma LinearMap.subsingleton_coker_convert
+  {A : Type*} [CommRing A]
+  {M : Type*} [AddCommGroup M] [Module A M]
+  {N : Type*} [AddCommGroup N] [Module A N]
+  (f : M →ₗ[A] N) (S : Submonoid A):
+  Subsingleton (LocalizedModule S N ⧸ range ((LocalizedModule.map S) f)) ↔ Subsingleton (LocalizedModule S (N ⧸ LinearMap.range f)) := by
+  have h_exact : Function.Exact (LocalizedModule.map S f)
+      (LocalizedModule.map S (range f).mkQ) :=
+    LocalizedModule.map_exact S _ _ (f.exact_map_mkQ_range)
+  rw [LinearMap.exact_iff] at h_exact
+  have : LocalizedModule S (N ⧸ range f) ≃ₗ[Localization S]
+    (LocalizedModule S N) ⧸ ker (LocalizedModule.map S (range f).mkQ) := by
+    refine (((LocalizedModule.map S) (range f).mkQ).quotKerEquivOfSurjective ?_).symm
+    refine LocalizedModule.map_surjective S (range f).mkQ ?_
+    exact Submodule.mkQ_surjective (range f)
+  rw [h_exact] at this
+  exact Equiv.subsingleton_congr this.symm.toEquiv
+
 /-- Let `A` be a Noetherian ring and let `M`, `N` be finitely generated torsion `A`-modules.
 Let `p₁, ..., pₙ` be all height one primes in `Supp(M) ∪ Supp(N)`, let `S = A \ ⋃ i, pᵢ`.
 Then an `A`-linear map `f : M → N` is a pseudo-isomorphism if and only if
@@ -388,7 +494,84 @@ theorem LinearMap.isPseudoIsomorphism_iff_bijective_map
     f.IsPseudoIsomorphism ↔ Function.Bijective (LocalizedModule.map
       (⨅ p ∈ (Module.support A M ∪ Module.support A N) ∩
         {p : PrimeSpectrum A | p.1.primeHeight = 1}, p.1.primeCompl) f) := by
-  sorry
+  set sigma := (Module.support A M ∪ Module.support A N) ∩
+    {p : PrimeSpectrum A | p.1.primeHeight = 1} with hsigma
+  set S := ⨅ p ∈ sigma, p.1.primeCompl with hS
+  set K := LinearMap.ker f
+  simp_rw [isPseudoIsomorphism_iff, Module.isPseudoNull_iff_primeHeight_le_one_imp_subsingleton, Function.Bijective]
+  rw [← ker_eq_bot, ← Submodule.subsingleton_iff_eq_bot, subsingleton_ker_convert]
+  rw [← range_eq_top, ← Submodule.subsingleton_quotient_iff_eq_top, subsingleton_coker_convert]
+  simp_rw [S, sigma, key hMT hNT, ← hsigma]
+  refine and_congr ?_ ?_
+  . refine forall_congr' fun p => ?_
+    constructor
+    . rintro hp₁ hp
+      apply hp₁
+      rw [Set.mem_inter_iff] at hp
+      simp [show p.asIdeal.primeHeight = 1 by simpa using hp.2]
+    . rintro hp hp₁
+      rw [Decidable.le_iff_eq_or_lt, ENat.lt_one_iff_eq_zero] at hp₁
+      rcases hp₁ with hp₁ | hp₁
+      . by_cases hpmem : p ∈ sigma
+        . exact hp hpmem
+        simp [hp₁, sigma] at hpmem
+        replace hpmem := hpmem.1
+        rw [← Module.not_mem_support_iff]
+        contrapose! hpmem
+        have : Module.support A ↥(ker f) ⊆ Module.support A M :=
+          Module.support_subset_of_injective (Submodule.subtype (ker f)) Subtype.val_injective
+        exact this hpmem
+      . rw [Ideal.primeHeight_eq_zero_iff] at hp₁
+        rw [LocalizedModule.subsingleton_iff]
+        rintro ⟨m, hm⟩
+        simp
+        have hK_is_torsion : Module.IsTorsion A K := by
+          unfold Module.IsTorsion at hMT ⊢
+          rintro ⟨x, hx⟩
+          simpa using @hMT x
+        obtain ⟨⟨s, hsne⟩, hs⟩ := @hK_is_torsion ⟨m, hm⟩
+        simp at hs
+        use s, ?_, hs
+        simp [Ideal.primeCompl]
+        have := Ideal.disjoint_nonZeroDivisors_of_mem_minimalPrimes hp₁
+        rw [Set.disjoint_right] at this
+        apply this
+        simpa
+  . refine forall_congr' fun p => ?_
+    constructor
+    . rintro hp₁ hp
+      apply hp₁
+      rw [Set.mem_inter_iff] at hp
+      simp [show p.asIdeal.primeHeight = 1 by simpa using hp.2]
+    . rintro hp hp₁
+      rw [Decidable.le_iff_eq_or_lt, ENat.lt_one_iff_eq_zero] at hp₁
+      rcases hp₁ with hp₁ | hp₁
+      . by_cases hpmem : p ∈ sigma
+        . exact hp hpmem
+        simp [hp₁, sigma] at hpmem
+        replace hpmem := hpmem.2
+        rw [← Module.not_mem_support_iff]
+        contrapose! hpmem
+        have : Module.support A (N ⧸ range f) ⊆ Module.support A N :=
+          Module.support_subset_of_surjective (range f).mkQ (Submodule.mkQ_surjective (range f))
+        exact this hpmem
+      . rw [Ideal.primeHeight_eq_zero_iff] at hp₁
+        rw [LocalizedModule.subsingleton_iff]
+        intro m
+        have hK_is_torsion : Module.IsTorsion A (N ⧸ range f) := by
+          unfold Module.IsTorsion at hNT ⊢
+          intro x
+          obtain ⟨y, rfl⟩ := Submodule.Quotient.mk_surjective (range f) x
+          obtain ⟨a, ha⟩ := @hNT y
+          use a, by simp [← Submodule.Quotient.mk_smul (range f), ha]
+        obtain ⟨⟨s, hsne⟩, hs⟩ := @hK_is_torsion m
+        simp at hs
+        use s, ?_, hs
+        simp [Ideal.primeCompl]
+        have := Ideal.disjoint_nonZeroDivisors_of_mem_minimalPrimes hp₁
+        rw [Set.disjoint_right] at this
+        apply this
+        simpa
 
 -- #check DirectSum.linearEquivFunOnFintype
 -- #check Module.equiv_directSum_of_isTorsion
@@ -414,6 +597,7 @@ theorem Module.IsTorsion.isPseudoIsomorphic_iff_nonempty_linearEquiv_localizedMo
     M ∼ₚᵢₛ[A] N ↔ ∀ p : PrimeSpectrum A, p.1.primeHeight = 1 →
       Nonempty ((LocalizedModule p.1.primeCompl M) ≃ₗ[Localization p.1.primeCompl]
         (LocalizedModule p.1.primeCompl N)) := by
+
   sorry
 
 /-- Let `A` be a Noetherian ring satisfying `HeightOneLocalizationIsPID`. Then pseudo-isomorphic

@@ -440,7 +440,7 @@ private lemma subsingleton_convert {A : Type*} [CommRing A] [IsNoetherianRing A]
         obtain ⟨i, hi, hle⟩ := h_sub
         exact h_not_le i hi hle
       obtain ⟨s_a, hs_a⟩ := Set.not_subset.mp h_not_subset
-      simp at hs_a
+      simp only [SetLike.mem_coe, Set.mem_iUnion, exists_prop, not_exists, not_and] at hs_a
       exact ⟨s_a, hs_a.1, hs_a.2⟩
     use s_a, by
       simp_rw [S, Submonoid.mem_iInf]

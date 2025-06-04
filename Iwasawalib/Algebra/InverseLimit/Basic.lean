@@ -5,6 +5,7 @@ Authors: Jz Pan
 -/
 import Mathlib.Algebra.Algebra.Pi
 import Mathlib.Algebra.Algebra.Subalgebra.Basic
+import Mathlib.Data.Rel
 
 /-!
 
@@ -21,22 +22,22 @@ One can define the inverse limit `Algebra.InverseLimit` with respect to these ma
 namespace Algebra
 
 variable {R : Type*} [CommSemiring R] {I : Type*}
-variable {A : I → Type*} [∀ i, Semiring (A i)] [∀ i, Algebra R (A i)]
+variable {A : I → Type*} [∀ i : I, Semiring (A i)] [∀ i : I, Algebra R (A i)]
 
 section LE
 
-variable [LE I] (f : ∀ ⦃i j⦄, i ≤ j → A j →ₐ[R] A i)
+variable [LE I] (f : ∀ ⦃i i' : I⦄, i ≤ i' → A i' →ₐ[R] A i)
 
 namespace InverseLimit
 
 /-- The inverse limit of algebras as a subalgebra of products of `A i`. -/
 noncomputable def toSubalgebra : Subalgebra R (∀ i, A i) where
-  carrier := {x | ∀ ⦃i j⦄ h, f h (x j) = x i}
+  carrier := {x | ∀ ⦃i i'⦄ h, f h (x i') = x i}
   add_mem' := by aesop
   mul_mem' := by aesop
   algebraMap_mem' := by aesop
 
-theorem mem_toSubalgebra {x} : x ∈ toSubalgebra f ↔ ∀ ⦃i j⦄ h, f h (x j) = x i := Iff.rfl
+theorem mem_toSubalgebra {x} : x ∈ toSubalgebra f ↔ ∀ ⦃i i'⦄ h, f h (x i') = x i := Iff.rfl
 
 end InverseLimit
 
@@ -47,7 +48,7 @@ namespace InverseLimit
 
 section mk
 
-variable {f} (x : ∀ i, A i) (hx : ∀ ⦃i j⦄ h, f h (x j) = x i)
+variable {f} (x : ∀ i : I, A i) (hx : ∀ ⦃i i'⦄ h, f h (x i') = x i)
 
 /-- Construct an element of the inverse limit of algebras
 from a compatible family of elements. -/
@@ -70,7 +71,7 @@ noncomputable def proj : InverseLimit f →ₐ[R] A i :=
 theorem proj_apply : proj f i x = x.1 i := rfl
 
 @[simp]
-theorem algHom_comp_proj {i j : I} (h : i ≤ j) : (f h).comp (proj f j) = proj f i := by
+theorem algHom_comp_proj {i i' : I} (h : i ≤ i') : (f h).comp (proj f i') = proj f i := by
   ext1 x
   exact x.2 h
 
@@ -79,12 +80,12 @@ end proj
 section lift
 
 variable {B : Type*} [Semiring B] [Algebra R B]
-  (φ : ∀ i, B →ₐ[R] A i) (hφ : ∀ ⦃i j⦄ h, (f h).comp (φ j) = φ i)
+  (φ : ∀ i : I, B →ₐ[R] A i) (hφ : ∀ ⦃i i'⦄ h, (f h).comp (φ i') = φ i)
 
 /-- If a family of algebra maps `B → A i` for `i : I` satisfy compatibility conditions,
 then they lift to a map $B\to\varprojlim_i A_i$. -/
 noncomputable def lift : B →ₐ[R] InverseLimit f where
-  toFun x := ⟨fun i ↦ φ i x, fun i j h ↦ congr($(hφ h) x)⟩
+  toFun x := ⟨fun i ↦ φ i x, fun i i' h ↦ congr($(hφ h) x)⟩
   map_one' := by aesop
   map_mul' := by aesop
   map_zero' := by aesop
@@ -105,6 +106,16 @@ theorem eq_lift_of_proj_comp_eq (g : B →ₐ[R] InverseLimit f)
   simpa using congr($(hg i) x)
 
 end lift
+
+-- section liftRel
+
+-- variable {J : Type*} {B : J → Type*} [∀ j : J, Semiring (B j)] [∀ j : J, Algebra R (B j)]
+-- variable [LE J] (g : ∀ ⦃j j' : J⦄, j ≤ j' → B j' →ₐ[R] B j)
+-- variable (r : Rel J I) (φ : ∀ ⦃j : J⦄ ⦃i : I⦄, r j i → B j →ₐ[R] A i)
+-- variable (hφ : ∀ ⦃j j' i i' i''⦄ (hji : r j i) (hji' : r j' i') (hi : i'' ≤ i) (hi' : i'' ≤ i'),
+--   (f hi).comp ((φ hji).comp (proj g j)) = (f hi').comp ((φ hji').comp (proj g j')))
+
+-- end liftRel
 
 section lift₂'
 

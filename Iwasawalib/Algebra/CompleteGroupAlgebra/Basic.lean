@@ -6,8 +6,7 @@ Authors: Jz Pan
 import Iwasawalib.Algebra.InverseLimit.Basic
 import Mathlib.Algebra.MonoidAlgebra.Basic
 import Mathlib.LinearAlgebra.Finsupp.Pi
-import Mathlib.Topology.Algebra.Group.ClosedSubgroup
-import Mathlib.Topology.Algebra.OpenSubgroup
+import Mathlib.Topology.Algebra.ClopenNhdofOne
 
 /-!
 
@@ -250,42 +249,113 @@ theorem proj_comp_ofMonoidAlgebra (N : OpenNormalSubgroup G) :
     (proj R G N).comp (ofMonoidAlgebra R G) = MonoidAlgebra.mapDomainAlgHom R R
       (QuotientGroup.mk' N.toSubgroup) := rfl
 
+theorem proj_surjective (N : OpenNormalSubgroup G) :
+    Function.Surjective (proj R G N) := by
+  suffices Function.Surjective ((proj R G N).comp (ofMonoidAlgebra R G)) from .of_comp this
+  rw [proj_comp_ofMonoidAlgebra]
+  exact Finsupp.mapDomain_surjective QuotientGroup.mk_surjective
+
 end ofMonoidAlgebra
 
 /-! ## Elements of form `r • [g]` -/
 
 section single
 
+variable (g g' : G) (r r' : R) (n : ℕ) (N : OpenNormalSubgroup G)
+
 /-- The linear map which maps `r` to `r • [g]` in `R⟦ˣG⟧`. -/
-noncomputable def single (g : G) : R →ₗ[R] R⟦ˣG⟧ where
+noncomputable def single : R →ₗ[R] R⟦ˣG⟧ where
   toFun r := ⟨fun _ ↦ .single (QuotientGroup.mk g) r, fun _ _ _ ↦ MonoidAlgebra.mapDomain_single⟩
   map_add' _ _ := by ext : 2; simp
   map_smul' _ _ := by ext : 2; simp
 
 @[simp]
-theorem single_apply_coe (g : G) (r : R) (N : OpenNormalSubgroup G) :
-    (single R G g r).1 N = .single (QuotientGroup.mk g) r := rfl
+theorem single_apply_coe : (single R G g r).1 N = .single (QuotientGroup.mk g) r := rfl
+
+theorem proj_comp_single : (proj R G N : R⟦ˣG⟧ →ₗ[R] R[ˣG ⧸ N.toSubgroup]) ∘ₗ single R G g =
+    MonoidAlgebra.lsingle (QuotientGroup.mk g) := by
+  ext1; simp
 
 theorem one_def : (1 : R⟦ˣG⟧) = single R G 1 1 := by
   ext : 2
   simp [MonoidAlgebra.one_def]
 
 @[simp]
-theorem augmentation_single (g : G) (r : R) : augmentation R G (single R G g r) = r := by
+theorem augmentation_single : augmentation R G (single R G g r) = r := by
   have : Subsingleton (G ⧸ (⊤ : Subgroup G)) := QuotientGroup.subsingleton_quotient_top
   simp [augmentation_apply, Subsingleton.elim _ (1 : G ⧸ (⊤ : Subgroup G))]
 
+theorem augmentation_comp_single : (augmentation R G : R⟦ˣG⟧ →ₗ[R] R) ∘ₗ single R G g = .id := by
+  ext1; simp
+
 @[simp]
-theorem ofMonoidAlgebra_single (g : G) (r : R) :
-    ofMonoidAlgebra R G (.single g r) = single R G g r := by
+theorem ofMonoidAlgebra_single : ofMonoidAlgebra R G (.single g r) = single R G g r := by
   ext : 2
   simp
 
--- theorem proj_surjective (N : OpenNormalSubgroup G) :
---     Function.Surjective (proj R N) := fun f ↦ by
---   have := MonoidAlgebra.sum_single f
---   sorry
+theorem ofMonoidAlgebra_comp_lsingle :
+    (ofMonoidAlgebra R G : R[ˣG] →ₗ[R] R⟦ˣG⟧) ∘ₗ (MonoidAlgebra.lsingle g) = single R G g := by
+  ext1; simp
+
+theorem single_injective : Function.Injective (single R G g) := by
+  suffices Function.Injective (augmentation R G ∘ single R G g) from .of_comp this
+  intro x y h
+  simpa using h
+
+@[simp]
+theorem single_eq_zero : single R G g r = 0 ↔ r = 0 :=
+  ⟨fun h ↦ single_injective R G g (by rw [h, map_zero]), fun h ↦ by rw [h, map_zero]⟩
+
+theorem single_ne_zero : single R G g r ≠ 0 ↔ r ≠ 0 := (single_eq_zero R G g r).ne
+
+@[simp]
+theorem single_mul_single :
+    single R G g r * single R G g' r' = single R G (g * g') (r * r') := by
+  ext : 2
+  simp
+
+@[simp]
+theorem single_pow : single R G g r ^ n = single R G (g ^ n) (r ^ n) := by
+  ext : 2
+  simp
 
 end single
+
+/-! ## The map `g ↦ [g]` -/
+
+section of
+
+variable (N : OpenNormalSubgroup G)
+
+/-- The map which maps `g` to `[g]` in `R⟦ˣG⟧`. -/
+@[simps apply]
+noncomputable def of : G →* R⟦ˣG⟧ where
+  toFun g := single R G g 1
+  map_one' := (one_def R G).symm
+  map_mul' _ _ := by simp
+
+theorem proj_comp_of : (proj R G N : R⟦ˣG⟧ →* R[ˣG ⧸ N.toSubgroup]).comp (of R G) =
+    (MonoidAlgebra.of R _).comp (QuotientGroup.mk' _) := by
+  ext1; simp
+
+#check ProfiniteGrp.exist_openNormalSubgroup_sub_open_nhds_of_one
+
+theorem of_injective [IsTopologicalGroup G] [CompactSpace G] [TotallyDisconnectedSpace G]
+    [Nontrivial R] : Function.Injective (of R G) := by
+  suffices ∀ g, of R G g = 1 → g = 1 by
+    intro x y h
+    rw [← mul_inv_eq_one]
+    apply this
+    rw [map_mul, h, ← map_mul, mul_inv_cancel, map_one]
+  intro x h
+  have key (N : OpenNormalSubgroup G) : x ∈ N := by
+    apply (QuotientGroup.eq_one_iff (N := N.toSubgroup) x).1
+    apply_fun proj R G N at h
+    simp_rw [of_apply, proj_apply, single_apply_coe] at h
+    exact MonoidAlgebra.of_injective h
+  have : T2Space G := inferInstance
+  sorry
+
+end of
 
 end CompleteGroupAlgebra

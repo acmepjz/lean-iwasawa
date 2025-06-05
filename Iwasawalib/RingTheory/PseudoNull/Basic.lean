@@ -5,12 +5,9 @@ Authors: Jz Pan
 -/
 import Iwasawalib.Algebra.Exact.Basic
 import Iwasawalib.Algebra.Exact.KerCokerComp
-import Mathlib.Algebra.Module.LocalizedModule.Exact
-import Mathlib.Algebra.Module.Torsion
-import Mathlib.RingTheory.Ideal.Height
+import Iwasawalib.Algebra.Module.Torsion
 import Mathlib.RingTheory.Ideal.Quotient.Index
 import Mathlib.RingTheory.LocalRing.Quotient
-import Mathlib.RingTheory.Support
 
 /-!
 
@@ -325,6 +322,42 @@ theorem IsPseudoIsomorphism.comp (hg : g.IsPseudoIsomorphism) (hf : f.IsPseudoIs
     Module.isPseudoNull_of_exact _ _ (Module.KerCokerComp.exact_f₄_f₅ f g)⟩
 
 end LinearMap
+
+variable {A M} in
+/-- If `M` is a torsion `A`-module, `a` is an element of `A` such that for all height one primes `p`
+of `A` containing `a`, `Mₚ = 0`, then `M → M, m ↦ a • m` is a pseudo-isomorphism. -/
+theorem Module.IsTorsion.isPseudoIsomorphism_smul (H : Module.IsTorsion A M) (a : A)
+    (h : ∀ p ∈ Module.support A M, a ∈ p.1 → p.1.primeHeight ≠ 1) :
+    (DistribMulAction.toLinearMap A M a).IsPseudoIsomorphism := by
+  rw [LinearMap.isPseudoIsomorphism_iff_primeHeight_le_one_imp_bijective]
+  intro p hp
+  by_cases hmem : p ∈ Module.support A M
+  · have ha : a ∈ p.1.primeCompl := imp_not_comm.1 (h p hmem) <|
+      hp.antisymm (H.one_le_primeHeight_of_mem_support _ hmem)
+    have h1 : LocalizedModule.map p.1.primeCompl (DistribMulAction.toLinearMap A M a) =
+        DistribMulAction.toLinearMap (Localization p.1.primeCompl)
+          (LocalizedModule p.1.primeCompl M) (Localization.mk a (1 : p.1.primeCompl)) := by
+      ext x
+      induction x with
+      | h m s => simp [LocalizedModule.mk_smul_mk]
+    let e : LocalizedModule p.1.primeCompl M ≃ₗ[Localization p.1.primeCompl]
+        LocalizedModule p.1.primeCompl M := LinearEquiv.ofLinear
+      (DistribMulAction.toLinearMap (Localization p.1.primeCompl)
+        (LocalizedModule p.1.primeCompl M) (Localization.mk a (1 : p.1.primeCompl)))
+      (DistribMulAction.toLinearMap (Localization p.1.primeCompl)
+        (LocalizedModule p.1.primeCompl M) (Localization.mk 1 ⟨a, ha⟩))
+      (by
+        ext x
+        induction x with
+        | h m s => simp [← mul_smul, Localization.mk_mul])
+      (by
+        ext x
+        induction x with
+        | h m s => simp [← mul_smul, Localization.mk_mul])
+    rw [h1]
+    exact e.bijective
+  rw [Module.notMem_support_iff] at hmem
+  exact Function.bijective_of_subsingleton _
 
 /-! ## Pseudo-isomorphic modules -/
 

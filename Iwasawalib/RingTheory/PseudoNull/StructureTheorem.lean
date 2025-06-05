@@ -412,7 +412,7 @@ private lemma subsingleton_convert {A : Type*} [CommRing A] [IsNoetherianRing A]
         have h_not_le : ∀ p ∈ sigma, ¬(Module.annihilator A X ≤ p.asIdeal) := by
           intro p hp
           specialize h p hp
-          rwa [← LocalizedModule.subsingleton_iff, ← Module.not_mem_support_iff, Module.mem_support_iff_of_finite] at h
+          rwa [← LocalizedModule.subsingleton_iff, ← Module.notMem_support_iff, Module.mem_support_iff_of_finite] at h
         obtain ⟨a, b, ha, hb, hab⟩ : ∃ a b, a ∈ t ∧ b ∈ t ∧ a ≠ b := by
           suffices Nontrivial t by
             rw [nontrivial_iff] at this
@@ -425,7 +425,7 @@ private lemma subsingleton_convert {A : Type*} [CommRing A] [IsNoetherianRing A]
             rw [@Set.nonempty_iff_ne_empty]
             intro h
             replace h_sub : ∀ (x : A), x ∉ ↑(Module.annihilator A X) := by
-              simpa [h, Set.eq_empty_iff_forall_not_mem] using h_sub
+              simpa [h, Set.eq_empty_iff_forall_notMem] using h_sub
             specialize h_sub 0
             simp at h_sub
           rw [← Set.not_subsingleton_iff]
@@ -517,7 +517,7 @@ theorem LinearMap.isPseudoIsomorphism_iff_bijective_map
         . exact hp hpmem
         replace hpmem : p ∉ Module.support A M ∧ p ∉ Module.support A N := by simpa [hp₁, sigma] using hpmem
         replace hpmem := hpmem.1
-        rw [← Module.not_mem_support_iff]
+        rw [← Module.notMem_support_iff]
         contrapose! hpmem
         have : Module.support A ↥(ker f) ⊆ Module.support A M :=
           Module.support_subset_of_injective (Submodule.subtype (ker f)) Subtype.val_injective
@@ -549,7 +549,7 @@ theorem LinearMap.isPseudoIsomorphism_iff_bijective_map
         . exact hp hpmem
         replace hpmem : p ∉ Module.support A M ∧ p ∉ Module.support A N := by simpa [hp₁, sigma] using hpmem
         replace hpmem := hpmem.2
-        rw [← Module.not_mem_support_iff]
+        rw [← Module.notMem_support_iff]
         contrapose! hpmem
         have : Module.support A (N ⧸ range f) ⊆ Module.support A N :=
           Module.support_subset_of_surjective (range f).mkQ (Submodule.mkQ_surjective (range f))

@@ -26,7 +26,7 @@ theorem Module.IsTorsion.not_disjoint_nonZeroDivisors_of_mem_support
     ∀ p ∈ Module.support A M, ¬Disjoint (p.1 : Set A) (nonZeroDivisors A : Set A) := by
   intro p
   contrapose!
-  rw [Module.not_mem_support_iff, LocalizedModule.subsingleton_iff,
+  rw [Module.notMem_support_iff, LocalizedModule.subsingleton_iff,
     ← Set.subset_compl_iff_disjoint_left]
   intro h x
   obtain ⟨t, ht⟩ := @H x
@@ -140,7 +140,7 @@ theorem Module.length_localizedModule_primeCompl_quotient_prime_eq_of_primeHeigh
   have : p.1.FiniteHeight := ⟨.inr (by simpa only [p.1.height_eq_primeHeight])⟩
   by_cases hpq : p ≠ q
   · rw [if_neg hpq, Module.length_eq_zero_iff]
-    rw [← Module.not_mem_support_iff, Ring.support_quotient,
+    rw [← Module.notMem_support_iff, Ring.support_quotient,
       PrimeSpectrum.mem_zeroLocus, SetLike.coe_subset_coe, PrimeSpectrum.asIdeal_le_asIdeal]
     intro h
     simpa using lt_of_le_of_lt hq (Ideal.primeHeight_strict_mono (h.lt_of_ne hpq.symm))
@@ -184,7 +184,7 @@ theorem Module.IsTorsion.isFiniteLength_localizedModule_of_primeHeight_le_one
     (p : PrimeSpectrum A) (hp : p.1.primeHeight ≤ 1) :
     IsFiniteLength (Localization p.1.primeCompl) (LocalizedModule p.1.primeCompl M) := by
   by_cases hmem : p ∉ Module.support A M
-  · rw [Module.not_mem_support_iff] at hmem
+  · rw [Module.notMem_support_iff] at hmem
     exact IsFiniteLength.of_subsingleton
   rw [not_not] at hmem
   replace hp := hp.antisymm (H.one_le_primeHeight_of_mem_support p hmem)
@@ -345,7 +345,7 @@ theorem Module.charIdeal_quotient_prime_eq_of_one_le_primeHeight
     ext
     split_ifs <;> (simp only [Set.toFinite_toFinset, Set.mem_toFinset, Set.mem_inter_iff,
       Set.mem_singleton_iff, Set.mem_setOf_eq, Finset.mem_singleton, and_iff_left_iff_imp,
-      Finset.not_mem_empty, iff_false, not_and]; intro h; rwa [h])
+      Finset.notMem_empty, iff_false, not_and]; intro h; rwa [h])
   rw [heq, hf']
   split_ifs with hp'
   · simp [Module.length_localizedModule_primeCompl_quotient_prime_eq_of_primeHeight_le

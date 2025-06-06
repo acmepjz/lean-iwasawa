@@ -1,17 +1,20 @@
 <!-- Check if the current page requires MathJax support -->
 {% if page.usemathjax %}
   <!-- MathJax configuration script -->
-  <script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-      TeX: {
+  <script>
+    MathJax = {
+      loader: {
+        load: ['[custom]/xypic.js'],
+        paths: {custom: 'https://cdn.jsdelivr.net/gh/sonoisa/XyJax-v3@3/build/'}
+      },
+      tex: {
+        packages: {'[+]': ['xypic']},
         equationNumbers: {
           autoNumber: "AMS"  <!-- Automatically number equations using AMS style -->
         }
       }
-    });
+    };
   </script>
   <!-- Load MathJax library asynchronously from the CDN -->
-  <script type="text/javascript" async
-    src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
-  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.min.js"></script>
 {% endif %}

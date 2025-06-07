@@ -1,3 +1,5 @@
+% !TeX root = print.tex
+% !TeX TS-program = xelatex
 % In this file you should put the actual content of the blueprint.
 % It will be used both by the web and the print version.
 % It should *not* include the \begin{document}
@@ -805,13 +807,13 @@ We can find $a\in S$ and $g\in\Hom_A(M,T)$ such that
 $af=g$ and such that $T\hookrightarrow M\xrightarrow{g}T$
 is $T\xrightarrow{\times a}T$ which is a pseudo-isomorphism by Proposition \ref{smul-is-pis}.
 Now we have the following commutative diagram of short exact sequences
-\[
-\xymatrix{
-0\ar[r] & T\ar[r]\ar[d]^{\times a} & M\ar[r]^-{\pi}\ar[d]^-{(g,\pi)} &
-M/T\ar[r]\ar@{=}[d] & 0 \\
-0\ar[r] & T\ar[r] & T\oplus M/T\ar[r] & M/T\ar[r] & 0,
-}
-\]
+\begin{center}
+\begin{tikzcd}
+0\arrow{r} & T\arrow{r}\arrow{d}{\times a} &
+M\arrow{r}{\pi}\arrow{d}{(g,\pi)} & M/T\arrow{r}\arrow{d}{\id} & 0 \\
+0\arrow{r} & T\arrow{r} & T\oplus M/T\arrow{r} & M/T\arrow{r} & 0,
+\end{tikzcd}
+\end{center}
 by snake lemma we know that the constructed $M\to T\oplus M/T$
 is a pseudo-isomorphism.
 \end{proof}

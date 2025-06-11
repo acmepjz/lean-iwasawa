@@ -50,22 +50,6 @@ theorem PrimeSpectrum.localization_comap_range_eq_of_isDomain_of_primeHeight_eq_
       exact ⟨hn.some, hn.some_mem, by simp [h]⟩
     · exact ⟨p, h, le_rfl⟩
 
-theorem RingEquiv.isPrincipalIdealRing {α β : Type*} [Semiring α] [Semiring β]
-    [IsPrincipalIdealRing β] (e : α ≃+* β) : IsPrincipalIdealRing α where
-  principal S := by
-    obtain ⟨b, hb⟩ := IsPrincipalIdealRing.principal (S.map e.toRingHom)
-    use e.symm.toRingHom b
-    apply_fun Ideal.map e.symm.toRingHom at hb
-    simp_rw [Ideal.map_map, RingEquiv.toRingHom_eq_coe, RingEquiv.symm_comp, Ideal.map_id] at hb
-    simp_rw [hb, Ideal.submodule_span_eq, RingEquiv.toRingHom_eq_coe, RingHom.coe_coe]
-    change Ideal.map e.symm _ = _
-    rw [Ideal.map_symm]
-    ext x
-    simp_rw [Ideal.mem_comap, Ideal.mem_span_singleton']
-    refine ⟨fun ⟨a, ha⟩ ↦ ⟨e.symm a, ?_⟩, fun ⟨a, ha⟩ ↦ ⟨e a, ?_⟩⟩
-    · simpa using congr(e.symm $(ha))
-    · simpa using congr(e $(ha))
-
 -- theorem MaximalSpectrum.localization_comap_range_eq_of_primeHeight_eq_one
 --     {R : Type*} (S : Type*) [CommRing R] [CommRing S] [Algebra R S]
 --     (s : Set (PrimeSpectrum R)) (hs : s ⊆ {p : PrimeSpectrum R | p.1.primeHeight = 1})
@@ -364,11 +348,12 @@ instance (priority := 100) IsKrullDomain.heightOneLocalizationIsPID
         (Localization p.1.primeCompl) :=
       IsLocalization.isLocalization_isLocalization_atPrime_isLocalization S
         (Localization p.1.primeCompl) p.1
-    exact IsLocalization.algEquiv
+    let e := IsLocalization.algEquiv
       (PrimeSpectrum.comap (algebraMap A (Localization S)) p.toPrimeSpectrum).1.primeCompl
       (Localization (PrimeSpectrum.comap (algebraMap A (Localization S))
         p.toPrimeSpectrum).1.primeCompl)
-      (Localization p.1.primeCompl) |>.symm.toRingEquiv.isPrincipalIdealRing
+      (Localization p.1.primeCompl)
+    exact IsPrincipalIdealRing.of_surjective e e.surjective
 
 /-!
 
@@ -616,3 +601,12 @@ theorem Module.isPseudoIsomorphic_comm
     {N : Type*} [AddCommGroup N] [Module A N] [Module.Finite A N] (hNT : Module.IsTorsion A N) :
     M ∼ₚᵢₛ[A] N ↔ N ∼ₚᵢₛ[A] M :=
   ⟨fun H ↦ H.symm hMT hNT, fun H ↦ H.symm hNT hMT⟩
+
+/-- Let `A` be a Noetherian ring satisfying `HeightOneLocalizationIsPID`, `M` be a finitely
+generated `A`-module, `T` be the torsion submodule of `M`. Then `M` is pseudo-isomorphic to
+`T × M/T`. -/
+theorem Module.isPseudoIsomorphic_torsion_prod_quotient
+    {A : Type*} [CommRing A] [IsNoetherianRing A] [HeightOneLocalizationIsPID A]
+    {M : Type*} [AddCommGroup M] [Module A M] [Module.Finite A M] :
+    M ∼ₚᵢₛ[A] (Submodule.torsion A M × M ⧸ Submodule.torsion A M) := by
+  sorry

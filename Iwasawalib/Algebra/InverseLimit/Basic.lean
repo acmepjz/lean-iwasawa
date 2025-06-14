@@ -5,7 +5,8 @@ Authors: Jz Pan
 -/
 import Mathlib.Algebra.Algebra.Pi
 import Mathlib.Algebra.Algebra.Subalgebra.Basic
-import Mathlib.Data.Rel
+-- import Mathlib.Data.Rel
+import Mathlib.RingTheory.Ideal.Maps
 
 /-!
 
@@ -75,6 +76,11 @@ theorem algHom_comp_proj {i i' : I} (h : i ≤ i') : (f h).comp (proj f i') = pr
   ext1 x
   exact x.2 h
 
+theorem eq_of_proj_comp_eq {B : Type*} [Semiring B] [Algebra R B] {a b : B →ₐ[R] InverseLimit f}
+    (hab : ∀ i, (proj f i).comp a = (proj f i).comp b) : a = b := by
+  ext x i : 3
+  simpa using congr($(hab i) x)
+
 end proj
 
 section lift
@@ -105,6 +111,15 @@ theorem eq_lift_of_proj_comp_eq (g : B →ₐ[R] InverseLimit f)
   ext x i : 3
   simpa using congr($(hg i) x)
 
+theorem ker_lift_eq_iInf : RingHom.ker (lift f φ hφ) = ⨅ i : I, RingHom.ker (φ i) := by
+  ext x
+  simp only [RingHom.mem_ker, Ideal.mem_iInf]
+  refine ⟨fun h i ↦ ?_, fun h ↦ ?_⟩
+  · -- congr() macro does not work in this case
+    rw [← lift_apply_coe (hφ := hφ), h, ZeroMemClass.coe_zero, Pi.zero_apply]
+  · ext i : 2
+    simp [h]
+
 end lift
 
 -- section liftRel
@@ -119,19 +134,23 @@ end lift
 
 section lift₂'
 
-variable {J : Type*} {B : J → Type*} [∀ i, Semiring (B i)] [∀ i, Algebra R (B i)]
-variable [LE J] (g : ∀ ⦃i j⦄, i ≤ j → B j →ₐ[R] B i)
-variable {j' : I → J} (φ : ∀ i, B (j' i) →ₐ[R] A i)
-variable (hφ : ∀ ⦃i j⦄ h, ∃ h', (f h).comp (φ j) = (φ i).comp (g h'))
+variable {J : Type*} {B : J → Type*} [∀ j : J, Semiring (B j)] [∀ j : J, Algebra R (B j)]
+variable [LE J] (g : ∀ ⦃j j' : J⦄, j ≤ j' → B j' →ₐ[R] B j)
+variable {ij : I → J} (φ : ∀ i : I, B (ij i) →ₐ[R] A i)
+variable (hφ : ∀ ⦃i i'⦄ h, ∃ h', (f h).comp (φ i') = (φ i).comp (g h'))
 
-/-- If for each `i : I`, an element `j' i : J` and
-an algebra map `B (j' i) → A i` is given, satisfying compatibility conditions,
+-- variable {ij : I → J} (φ : ∀ (i : I) (j : J), ij i = j → B j →ₐ[R] A i)
+-- variable (hφ : ∀ (i i' : I) (j j' : J) (hij : ij i = j) (hij' : ij i' = j') (hi : i ≤ i'),
+--   ∃ (hj : j ≤ j'), (f hi).comp (φ i' j' hij') = (φ i j hij).comp (g hj))
+
+/-- If a map `ij : I → J`, and for each `i : I`,
+an algebra map `B (ij i) → A i` is given, satisfying compatibility conditions,
 then they lift to a map $\varprojlim_j B_j\to\varprojlim_i A_i$.
 
 This is the primed version since its definition involves a choice of `i ↦ j' i`.
 An unprimed version will be defined later with assumptions on index sets. -/
 noncomputable def lift₂' : InverseLimit g →ₐ[R] InverseLimit f :=
-  lift f (fun i ↦ (φ i).comp (proj _ _)) fun i j h ↦ by
+  lift f (fun i ↦ (φ i).comp (proj _ _)) fun i i' h ↦ by
     obtain ⟨h', hcomp⟩ := hφ h
     rw [← AlgHom.comp_assoc, hcomp, AlgHom.comp_assoc, algHom_comp_proj]
 
@@ -152,14 +171,14 @@ theorem eq_lift₂'_of_proj_comp_eq (h : InverseLimit g →ₐ[R] InverseLimit f
 theorem lift₂'_id :
     lift₂' f f (fun i ↦ AlgHom.id R (A i)) (fun _ _ h ↦ ⟨h, rfl⟩) = AlgHom.id R _ := rfl
 
-variable {K : Type*} {C : K → Type*} [∀ i, Semiring (C i)] [∀ i, Algebra R (C i)]
-variable [LE K] (h : ∀ ⦃i j⦄, i ≤ j → C j →ₐ[R] C i)
-variable {k' : J → K} {ψ : ∀ i, C (k' i) →ₐ[R] B i}
-variable {hψ : ∀ ⦃i j⦄ h', ∃ h'', (g h').comp (ψ j) = (ψ i).comp (h h'')}
+variable {K : Type*} {C : K → Type*} [∀ k, Semiring (C k)] [∀ k, Algebra R (C k)]
+variable [LE K] (h : ∀ ⦃k k'⦄, k ≤ k' → C k' →ₐ[R] C k)
+variable {jk : J → K} {ψ : ∀ j, C (jk j) →ₐ[R] B j}
+variable {hψ : ∀ ⦃j j'⦄ h', ∃ h'', (g h').comp (ψ j') = (ψ j).comp (h h'')}
 
 @[simp]
 theorem lift₂'_comp_lift₂' : (lift₂' f g φ hφ).comp (lift₂' g h ψ hψ) =
-    lift₂' f h (j' := k' ∘ j') (fun i ↦ (φ i).comp (ψ _)) (fun i j h' ↦ by
+    lift₂' f h (ij := jk ∘ ij) (fun i ↦ (φ i).comp (ψ _)) (fun i i' h' ↦ by
       obtain ⟨h1, h2⟩ := hφ h'
       obtain ⟨h3, h4⟩ := hψ h1
       use h3
@@ -170,9 +189,9 @@ end lift₂'
 section congr
 
 variable {B : I → Type*} [∀ i, Semiring (B i)] [∀ i, Algebra R (B i)]
-variable (g : ∀ ⦃i j⦄, i ≤ j → B j →ₐ[R] B i)
+variable (g : ∀ ⦃i i'⦄, i ≤ i' → B i' →ₐ[R] B i)
 variable (φ : ∀ i, B i ≃ₐ[R] A i)
-variable (hφ : ∀ ⦃i j⦄ h, (f h).comp (φ j : B j →ₐ[R] A j) = (φ i : B i →ₐ[R] A i).comp (g h))
+variable (hφ : ∀ ⦃i i'⦄ h, (f h).comp (φ i' : B i' →ₐ[R] A i') = (φ i : B i →ₐ[R] A i).comp (g h))
 
 /-- If `A i` and `B i` defined over the same index set are isomorphic,
 then their inverse limits are also isomorphic. -/
@@ -189,12 +208,11 @@ end congr
 
 section congr₂
 
-variable {J : Type*} {B : J → Type*} [∀ i, Semiring (B i)] [∀ i, Algebra R (B i)]
-variable [Preorder J] (g : ∀ ⦃i j⦄, i ≤ j → B j →ₐ[R] B i)
---  (hgrfl : ∀ i, g (le_refl i) = AlgHom.id R (B i))
-  (hgcomp : ∀ ⦃i j k⦄ (hij : i ≤ j) (hjk : j ≤ k), (g hij).comp (g hjk) = g (hij.trans hjk))
+variable {J : Type*} {B : J → Type*} [∀ j, Semiring (B j)] [∀ j, Algebra R (B j)]
+variable [Preorder J] (g : ∀ ⦃j j'⦄, j ≤ j' → B j' →ₐ[R] B j)
+  (hgcomp : ∀ ⦃j j' j''⦄ (h1 : j ≤ j') (h2 : j' ≤ j''), (g h1).comp (g h2) = g (h1.trans h2))
 variable (e : I ≃o J) (φ : ∀ i, B (e i) ≃ₐ[R] A i)
-variable (hφ : ∀ ⦃i j⦄ h, (f h).comp (φ j : B _ →ₐ[R] A j) =
+variable (hφ : ∀ ⦃i i'⦄ h, (f h).comp (φ i' : B _ →ₐ[R] A i') =
   (φ i : B _ →ₐ[R] A i).comp (g (e.map_rel_iff.2 h)))
 
 /-- If `A i` and `B j` defined over two isomorphic index sets `I` and `J` are isomorphic,
@@ -202,7 +220,7 @@ such that `J` is a `Preorder` (which implies that `I` is also), and such that th
 on `B` are functorial, then their inverse limits are also isomorphic. -/
 noncomputable def congr₂ : InverseLimit g ≃ₐ[R] InverseLimit f :=
   .ofAlgHom (lift₂' f g (fun i ↦ (φ i : B _ →ₐ[R] A _)) fun _ _ h ↦ ⟨e.map_rel_iff.2 h, hφ h⟩)
-    (lift₂' g f (j' := e.symm) (fun j ↦ (g (OrderIso.apply_symm_apply e j).ge).comp
+    (lift₂' g f (ij := e.symm) (fun j ↦ (g (OrderIso.apply_symm_apply e j).ge).comp
       (AlgHomClass.toAlgHom (φ (e.symm j)).symm)) fun i j h ↦ ⟨e.symm.map_rel_iff.2 h, by
         replace hφ := congr((g (OrderIso.apply_symm_apply e i).ge).comp
           (AlgHomClass.toAlgHom (φ (e.symm i)).symm) |>.comp

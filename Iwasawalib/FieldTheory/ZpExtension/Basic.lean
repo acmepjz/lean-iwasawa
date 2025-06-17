@@ -5,6 +5,7 @@ Authors: Jz Pan
 -/
 import Mathlib.FieldTheory.Galois.Infinite
 import Iwasawalib.NumberTheory.Padics.HasBasis
+import Iwasawalib.Topology.Algebra.OpenSubgroup
 
 /-!
 
@@ -53,8 +54,8 @@ noncomputable def continuousMulEquiv : H.Γ ≃ₜ* Multiplicative (Fin d → �
 instance isMulCommutative : IsMulCommutative H.Γ :=
   ⟨⟨fun a b ↦ by apply H.continuousMulEquiv.injective; simp_rw [map_mul, mul_comm]⟩⟩
 
-/-- The open subgroup `Γ ^ (p ^ n)` of `Γ`. -/
-noncomputable def Γpow (n : ℕ) : OpenSubgroup H.Γ where
+/-- The open normal subgroup `Γ ^ (p ^ n)` of `Γ`. -/
+noncomputable def Γpow (n : ℕ) : OpenNormalSubgroup H.Γ where
   toSubgroup := (Ideal.pi fun _ ↦ Ideal.span {(p ^ n : ℤ_[p])} : Ideal (Fin d → ℤ_[p]))
     |>.toAddSubgroup.toSubgroup.comap H.continuousMulEquiv
   isOpen' := by
@@ -173,11 +174,12 @@ theorem closure_eq_Γpow_of_closure_eq
   have h1 := closure_image_closure (s := (Subgroup.closure s : Set H.Γ))
     (show Continuous f from continuous_pow _)
   rw [h, Set.top_eq_univ, Set.image_univ] at h1
-  have : Set.range f = H.Γpow n := by
+  have h2 : Set.range f = H.Γpow n := by
     ext
     simp only [MonoidHom.coe_mk, OneHom.coe_mk, Set.mem_range, SetLike.mem_coe, H.mem_Γpow_iff, f]
     tauto
-  rw [this, (H.Γpow n).isClosed.closure_eq] at h1
+  have h3 := (H.Γpow n).coe_toOpenSubgroup ▸ (H.Γpow n).isClosed.closure_eq
+  rw [h2, h3] at h1
   change closure (Subgroup.closure (f '' s) : Set H.Γ) = _
   rw [← MonoidHom.map_closure]
   exact h1.symm

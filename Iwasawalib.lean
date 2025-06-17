@@ -15,3 +15,4 @@ import Iwasawalib.RingTheory.PowerSeries.WeierstrassPreparation
 import Iwasawalib.RingTheory.PseudoNull.Basic
 import Iwasawalib.RingTheory.PseudoNull.CharacteristicIdeal
 import Iwasawalib.RingTheory.PseudoNull.StructureTheorem
+import Iwasawalib.Topology.Algebra.OpenSubgroup

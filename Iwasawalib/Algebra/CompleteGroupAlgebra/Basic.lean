@@ -6,9 +6,9 @@ Authors: Jz Pan
 import Iwasawalib.Algebra.InverseLimit.Basic
 import Mathlib.Algebra.MonoidAlgebra.Basic
 import Mathlib.LinearAlgebra.Finsupp.Pi
--- import Mathlib.Topology.Algebra.Algebra
 import Mathlib.Topology.Algebra.ClopenNhdofOne
 import Mathlib.Topology.Algebra.ContinuousMonoidHom
+import Iwasawalib.Topology.Algebra.OpenSubgroup
 
 /-!
 
@@ -83,23 +83,6 @@ end MonoidAlgebra
 open scoped MonoidAlgebra
 
 variable (R : Type*) [CommSemiring R] (G : Type*) [Group G] [TopologicalSpace G]
-
-namespace OpenNormalSubgroup
-
-instance instTop : Top (OpenNormalSubgroup G) where
-  top := { (⊤ : OpenSubgroup G) with isNormal' := inferInstanceAs (⊤ : Subgroup G).Normal }
-
-variable {G} {N : Type*} [Group N] [TopologicalSpace N] (f : G →* N) (hf : Continuous f)
-  (H : OpenNormalSubgroup N)
-
-/-- The preimage of an `OpenNormalSubgroup` along a continuous `Monoid` homomorphism is an
-`OpenNormalSubgroup`. -/
-@[simps toOpenSubgroup]
-def comap : OpenNormalSubgroup G where
-  toOpenSubgroup := OpenSubgroup.comap f hf H.toOpenSubgroup
-  isNormal' := Subgroup.normal_comap f
-
-end OpenNormalSubgroup
 
 /-! ## Definition of complete group algebra -/
 

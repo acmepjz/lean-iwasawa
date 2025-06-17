@@ -4,8 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jz Pan
 -/
 import Mathlib.FieldTheory.Galois.Infinite
-import Mathlib.NumberTheory.Padics.ProperSpace
-import Mathlib.Topology.Algebra.Ring.Compact
+import Iwasawalib.NumberTheory.Padics.HasBasis
 
 /-!
 
@@ -22,16 +21,9 @@ import Mathlib.Topology.Algebra.Ring.Compact
 
 -/
 
-/-! ### Results should be PR into mathlib -/
+/-! ### `ℤₚᵈ`-extension -/
 
-theorem PadicInt.surjective_toZModPow {p : ℕ} [Fact p.Prime] (n : ℕ) :
-    Function.Surjective (PadicInt.toZModPow (p := p) n) := fun x ↦ ⟨x.val, by simp⟩
-
-/-! ### Actual contents of the file -/
-
-universe u v
-
-variable (p : ℕ) [Fact p.Prime] (d : ℕ) (K : Type u) (Kinf : Type v)
+variable (p : ℕ) [Fact p.Prime] (d : ℕ) (K Kinf : Type*)
 variable [Field K] [Field Kinf] [Algebra K Kinf]
 
 /-- A Galois extension `K∞ / K` ia called a `ℤₚᵈ`-extension, if its Galois group is
@@ -58,27 +50,15 @@ noncomputable def continuousMulEquiv : H.Γ ≃ₜ* Multiplicative (Fin d → �
   Classical.choice H.nonempty_continuousMulEquiv
 
 /-- The `Γ` is commutative. -/
-instance commGroup : CommGroup H.Γ := {
-  inferInstanceAs (Group H.Γ) with
-  mul_comm a b := by
-    apply H.continuousMulEquiv.injective
-    simp_rw [map_mul, mul_comm]
-}
+instance isMulCommutative : IsMulCommutative H.Γ :=
+  ⟨⟨fun a b ↦ by apply H.continuousMulEquiv.injective; simp_rw [map_mul, mul_comm]⟩⟩
 
 /-- The open subgroup `Γ ^ (p ^ n)` of `Γ`. -/
 noncomputable def Γpow (n : ℕ) : OpenSubgroup H.Γ where
   toSubgroup := (Ideal.pi fun _ ↦ Ideal.span {(p ^ n : ℤ_[p])} : Ideal (Fin d → ℤ_[p]))
     |>.toAddSubgroup.toSubgroup.comap H.continuousMulEquiv
   isOpen' := by
-    have h1 : IsOpen (Ideal.span {(p ^ n : ℤ_[p])} : Set ℤ_[p]) := by
-      rw [IsDiscreteValuationRing.isOpen_iff]
-      simp [show p ≠ 0 from NeZero.out]
-    refine IsOpen.preimage H.continuousMulEquiv.continuous ?_
-    change IsOpen ((Ideal.pi fun _ ↦ Ideal.span {(p ^ n : ℤ_[p])} :
-      Ideal (Fin d → ℤ_[p])) : Set (Fin d → ℤ_[p]))
-    convert isOpen_set_pi Set.finite_univ (fun (_ : Fin d) _ ↦ h1)
-    ext
-    simp [Ideal.mem_pi]
+    exact (PadicInt.isOpen_pi_span_p_pow (Fin d) p n).preimage H.continuousMulEquiv.continuous
 
 /-- An element is in `Γ ^ (p ^ n)` if and only if it is `p ^ n`-th power of some element. -/
 theorem mem_Γpow_iff (n : ℕ) (σ : H.Γ) : σ ∈ H.Γpow n ↔ ∃ τ, σ = τ ^ p ^ n := by
@@ -113,20 +93,8 @@ instance normal (G : Subgroup H.Γ) : G.Normal := inferInstance
 theorem index_Γpow (n : ℕ) : (H.Γpow n).index = p ^ (n * d) := by
   dsimp only [Γpow]
   rw [Subgroup.index_comap_of_surjective _ H.continuousMulEquiv.surjective,
-    AddSubgroup.index_toSubgroup]
-  have h1 : (Ideal.span {(p ^ n : ℤ_[p])}).toAddSubgroup.index = p ^ n := by
-    rw [AddSubgroup.index_eq_card]
-    change Nat.card (ℤ_[p] ⧸ Ideal.span {(p ^ n : ℤ_[p])}) = _
-    have := Nat.card_congr
-      (RingHom.quotientKerEquivOfSurjective (PadicInt.surjective_toZModPow (p := p) n)).toEquiv
-    nth_rw 2 [Nat.card_eq_fintype_card] at this
-    rwa [ZMod.card, PadicInt.ker_toZModPow] at this
-  have h2 : (AddSubgroup.pi (Set.univ : Set (Fin d))
-      fun _ ↦ (Ideal.span {(p ^ n : ℤ_[p])}).toAddSubgroup).index = p ^ (n * d) := by
-    simp [h1, pow_mul]
-  convert h2
-  ext
-  simp [Ideal.mem_pi, AddSubgroup.mem_pi]
+    AddSubgroup.index_toSubgroup, PadicInt.index_pi_span_p_pow (Fin d) p n,
+    Nat.card_eq_fintype_card, Fintype.card_fin]
 
 /-- If `m ≤ n` then `Γ ^ (p ^ n) ≤ Γ ^ (p ^ m)`. -/
 theorem antitone_Γpow : Antitone H.Γpow := antitone_nat_of_succ_le fun n x hx ↦ by
@@ -223,35 +191,7 @@ theorem closure_singleton_eq_Γpow_of_closure_singleton_eq
 
 /-- `Γ ^ (p ^ n)` form a neighborhood basis of `1` in `Γ`. -/
 theorem nhds_one_hasBasis : (nhds (1 : H.Γ)).HasBasis (fun (_ : ℕ) ↦ True) (fun n ↦ H.Γpow n) := by
-  have hp : p.Prime := Fact.out
-  have hp2 := hp.two_le
-  let r : ℝ := 1 / p
-  have hr0 : 0 < r := by positivity
-  have hr1 : r < 1 := by
-    simp_rw [r, one_div]
-    apply inv_lt_one_of_one_lt₀
-    norm_cast
-  have h1 := Metric.nhds_basis_ball_pow (x := (0 : Fin d → ℤ_[p])) hr0 hr1
-  replace h1 : (nhds (0 : Fin d → ℤ_[p])).HasBasis (fun (_ : ℕ) ↦ True)
-      fun n ↦ Metric.ball 0 (r ^ (n - 1 : ℤ)) := by
-    refine ⟨fun s ↦ ?_⟩
-    rw [h1.mem_iff]
-    refine ⟨fun ⟨i, _, h⟩ ↦ ⟨i + 1, trivial, by simpa⟩,
-      fun ⟨i, _, h⟩ ↦ ⟨i, trivial, (Metric.ball_subset_ball ?_).trans h⟩⟩
-    rw [← zpow_natCast]
-    apply zpow_le_zpow_right_of_le_one₀ hr0 hr1.le
-    simp
-  replace h1 : (nhds (0 : Fin d → ℤ_[p])).HasBasis (fun (_ : ℕ) ↦ True)
-      fun n ↦ ((Ideal.pi fun _ ↦ Ideal.span {(p ^ n : ℤ_[p])} : Ideal (Fin d → ℤ_[p]))) := by
-    convert h1 with n
-    rw [ball_pi _ (zpow_pos hr0 _)]
-    ext
-    simp_rw [SetLike.mem_coe, Ideal.mem_pi, Pi.zero_apply, Set.mem_pi, Set.mem_univ, forall_const]
-    congr! 1
-    simp_rw [← PadicInt.norm_le_pow_iff_mem_span_pow, PadicInt.norm_le_pow_iff_norm_lt_pow_add_one,
-      Metric.mem_ball, dist_zero_right, r, one_div, inv_zpow, ← zpow_neg]
-    congr! 2
-    ring
+  have h1 := PadicInt.nhds_zero_hasBasis_pi_span_p_pow (Fin d) p
   change (nhds (1 : Multiplicative (Fin d → ℤ_[p]))).HasBasis (fun (_ : ℕ) ↦ True)
     fun n ↦ ((Ideal.pi fun _ ↦ Ideal.span {(p ^ n : ℤ_[p])} : Ideal (Fin d → ℤ_[p])))
       |>.toAddSubgroup.toSubgroup at h1
@@ -290,6 +230,8 @@ theorem finrank_eq_pow_of_finite (K' : IntermediateField K Kinf) [FiniteDimensio
   exact ⟨n, h2⟩
 
 end IsMvZpExtension
+
+/-! ### `ℤₚ`-extension -/
 
 /-- A Galois extension `K∞ / K` ia called a `ℤₚ`-extension, if its Galois group is
 isomorphic to `ℤₚ` as a topological group. -/
@@ -361,12 +303,51 @@ theorem finrank_Kn (n : ℕ) : Module.finrank K (H.Kn n) = p ^ n := by
 /-- If `G` is an open subgroup of `Γ`, then it is equal to `Γ ^ (p ^ n)` for some `n`. -/
 theorem eq_Γpow_of_isOpen (G : Subgroup H.Γ) (h : IsOpen (G : Set H.Γ)) :
     ∃ n, G = H.Γpow n := by
-  sorry
+  let G' : AddSubgroup ℤ_[p] := (G.comap H.continuousMulEquiv.symm).toAddSubgroup'
+  obtain ⟨n, hn⟩ := PadicInt.exists_eq_span_p_pow_of_isOpen p G'
+    (h.preimage H.continuousMulEquiv.symm.continuous)
+  have hG : G = (Ideal.span {(p ^ n : ℤ_[p])}).toAddSubgroup.toSubgroup.comap
+      H.continuousMulEquiv := by
+    simp_rw [← hn, G', OrderIso.apply_symm_apply, Subgroup.comap_comap]
+    convert G.comap_id.symm
+    ext; simp
+  have hmem (σ : H.Γ) : σ ∈ G ↔ ∃ τ, σ = τ ^ p ^ n := by
+    rw [hG, Subgroup.mem_comap, MonoidHom.coe_coe]
+    change _ ∈ Multiplicative.toAdd ⁻¹' _ ↔ _
+    rw [Set.mem_preimage]
+    change _ ∈ Ideal.span {(p ^ n : ℤ_[p])} ↔ _
+    rw [Ideal.mem_span_singleton']
+    refine ⟨fun ⟨a, ha⟩ ↦ ?_, fun ⟨a, ha⟩ ↦ ⟨Multiplicative.toAdd (H.continuousMulEquiv a), ?_⟩⟩
+    · use H.continuousMulEquiv.symm (Multiplicative.ofAdd a)
+      apply_fun _ using H.continuousMulEquiv.injective
+      apply_fun _ using Multiplicative.toAdd.injective
+      simp [ha, mul_comm (p ^ n : ℤ_[p])]
+    · simp [ha, mul_comm (p ^ n : ℤ_[p])]
+  use n
+  ext
+  simp [hmem, H.mem_Γpow_iff]
 
 /-- If `G` is a closed subgroup of `Γ`, then it is equal to `0` or `Γ ^ (p ^ n)` for some `n`. -/
 theorem eq_bot_or_Γpow_of_isClosed (G : Subgroup H.Γ) (h : IsClosed (G : Set H.Γ)) :
     G = ⊥ ∨ ∃ n, G = H.Γpow n := by
-  sorry
+  refine (eq_or_ne G ⊥).imp (fun hbot ↦ by simp [hbot]) fun hbot ↦ ?_
+  let G' : AddSubgroup ℤ_[p] := (G.comap H.continuousMulEquiv.symm).toAddSubgroup'
+  obtain ⟨I, hI⟩ := PadicInt.exists_eq_ideal_of_addSubgroup_of_isClosed p G'
+    (h.preimage H.continuousMulEquiv.symm.continuous)
+  have hG : G = I.toAddSubgroup.toSubgroup.comap H.continuousMulEquiv := by
+    simp_rw [← hI, G', OrderIso.apply_symm_apply, Subgroup.comap_comap]
+    convert G.comap_id.symm
+    ext; simp
+  rcases eq_or_ne I ⊥ with rfl | hbot'
+  · simp only [Submodule.bot_toAddSubgroup, map_eq_bot_iff, G'] at hI
+    replace hI : (G.map H.continuousMulEquiv : Subgroup (Multiplicative ℤ_[p])) = ⊥ := by
+      convert hI using 1
+      exact G.map_equiv_eq_comap_symm H.continuousMulEquiv.toMulEquiv
+    rw [G.map_eq_bot_iff_of_injective H.continuousMulEquiv.injective] at hI
+    contradiction
+  refine H.eq_Γpow_of_isOpen G ?_
+  rw [hG]
+  exact (IsDiscreteValuationRing.isOpen_iff.2 hbot').preimage H.continuousMulEquiv.continuous
 
 /-- If `K'` is a finite extension of `K` contained in `K∞`,
 then it's equal to `Kₙ` for some `n`. -/

@@ -461,4 +461,84 @@ theorem congr_trans_congr : (congr R f).trans (congr R g) = congr R (f.trans g) 
 
 end congr
 
+/-! ## Isomorphism to inverse limit by taking a neighborhood basis -/
+
+section equivInverseLimit
+
+variable {G} {I : Type*} [Preorder I] (N : I → OpenNormalSubgroup G)
+  (hN : (nhds (1 : G)).HasAntitoneBasis fun i ↦ N i)
+
+/-- If `{ N_i }` is a family of open normal subgroups forming a neighborhood basis of `1`,
+then given any open normal subgroup `M`, there exists `i` such that `N_i ≤ M`. -/
+noncomputable def equivInverseLimit.auxIndex (M : OpenNormalSubgroup G) : I :=
+  (hN.mem_iff.1 <| M.isOpen.mem_nhds_iff.2 (one_mem _)).choose
+
+theorem equivInverseLimit.auxIndex_spec (M : OpenNormalSubgroup G) : N (auxIndex N hN M) ≤ M :=
+  (hN.mem_iff.1 <| M.isOpen.mem_nhds_iff.2 (one_mem _)).choose_spec
+
+open equivInverseLimit
+
+/-- If `{ N_i }` is a family of open normal subgroups forming a neighborhood basis of `1`,
+then `CompleteGroupAlgebra.InverseLimit` is the inverse limit of `R[ˣG/N_i]`. -/
+abbrev InverseLimit := Algebra.InverseLimit
+  fun (i i' : I) (hle : i ≤ i') ↦ MonoidAlgebra.mapDomainAlgHom R R
+    (QuotientGroup.map (N i').toSubgroup (N i).toSubgroup (MonoidHom.id G)
+      (hN.antitone hle))
+
+/-- If `{ N_i }` is a family of open normal subgroups forming a neighborhood basis of `1`,
+then there is a map from `R⟦ˣG⟧` to the inverse limit of `R[ˣG/N_i]`. -/
+noncomputable def toInverseLimit : R⟦ˣG⟧ →ₐ[R] InverseLimit R N hN :=
+  Algebra.InverseLimit.lift _ (fun i ↦ proj R G (N i)) fun _ _ hle ↦
+    mapDomainAlgHom_comp_proj R G (hN.antitone hle)
+
+variable [IsDirected I LE.le]
+
+/-- If `{ N_i }` is a family of open normal subgroups forming a neighborhood basis of `1`,
+then there is a map from the inverse limit of `R[ˣG/N_i]` to `R⟦ˣG⟧`. -/
+noncomputable def ofInverseLimit : InverseLimit R N hN →ₐ[R] R⟦ˣG⟧ :=
+  lift R G (fun M ↦ (MonoidAlgebra.mapDomainAlgHom R R (QuotientGroup.map
+    (N (auxIndex N hN M)).toSubgroup M.toSubgroup (MonoidHom.id G) (auxIndex_spec N hN M))).comp
+      (Algebra.InverseLimit.proj _ (auxIndex N hN M)))
+    fun N₁ N₂ hle ↦ by
+      dsimp only
+      obtain ⟨i, hi₁, hi₂⟩ := directed_of LE.le (auxIndex N hN N₁) (auxIndex N hN N₂)
+      rw [← Algebra.InverseLimit.algHom_comp_proj _ hi₁,
+        ← Algebra.InverseLimit.algHom_comp_proj _ hi₂]
+      simp_rw [← AlgHom.comp_assoc, ← MonoidAlgebra.mapDomainAlgHom_comp]
+      congr 2
+      ext; rfl
+
+theorem toInverseLimit_comp_ofInverseLimit :
+    (toInverseLimit R N hN).comp (ofInverseLimit R N hN) = AlgHom.id _ _ := by
+  unfold toInverseLimit ofInverseLimit
+  ext x i : 3
+  simp only [AlgHom.coe_comp, Function.comp_apply, Algebra.InverseLimit.lift_apply_coe, proj_apply,
+    lift_apply_coe, Algebra.InverseLimit.proj_apply, AlgHom.id_apply]
+  obtain ⟨j, h1, h2⟩ := directed_of LE.le (auxIndex N hN (N i)) i
+  conv_lhs => rw [← Algebra.InverseLimit.proj_apply,
+    ← Algebra.InverseLimit.algHom_comp_proj _ h1]
+  conv_rhs => rw [← Algebra.InverseLimit.proj_apply,
+    ← Algebra.InverseLimit.algHom_comp_proj _ h2]
+  simp only [AlgHom.coe_comp, Function.comp_apply, Algebra.InverseLimit.proj_apply]
+  simp_rw [← AlgHom.comp_apply, ← MonoidAlgebra.mapDomainAlgHom_comp]
+  congr 2
+  ext; rfl
+
+theorem ofInverseLimit_comp_toInverseLimit :
+    (ofInverseLimit R N hN).comp (toInverseLimit R N hN) = AlgHom.id _ _ := by
+  unfold toInverseLimit ofInverseLimit
+  ext x M : 2
+  conv_rhs => rw [AlgHom.id_apply, ← proj_apply,
+    ← mapDomainAlgHom_comp_proj R G (auxIndex_spec N hN M)]
+  simp
+
+/-- If `{ N_i }` is a family of open normal subgroups forming a neighborhood basis of `1`,
+then there is an isomorphism from `R⟦ˣG⟧` to the inverse limit of `R[ˣG/N_i]`. -/
+noncomputable def equivInverseLimit : R⟦ˣG⟧ ≃ₐ[R] InverseLimit R N hN :=
+  AlgEquiv.ofAlgHom (toInverseLimit R N hN) (ofInverseLimit R N hN)
+    (toInverseLimit_comp_ofInverseLimit R N hN)
+    (ofInverseLimit_comp_toInverseLimit R N hN)
+
+end equivInverseLimit
+
 end CompleteGroupAlgebra

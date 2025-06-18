@@ -192,9 +192,9 @@ theorem closure_singleton_eq_Γpow_of_closure_singleton_eq
   simpa using H.closure_eq_Γpow_of_closure_eq h n
 
 /-- `Γ ^ (p ^ n)` form a neighborhood basis of `1` in `Γ`. -/
-theorem nhds_one_hasBasis : (nhds (1 : H.Γ)).HasBasis (fun (_ : ℕ) ↦ True) (fun n ↦ H.Γpow n) := by
-  have h1 := PadicInt.nhds_zero_hasBasis_pi_span_p_pow (Fin d) p
-  change (nhds (1 : Multiplicative (Fin d → ℤ_[p]))).HasBasis (fun (_ : ℕ) ↦ True)
+theorem nhds_one_hasAntitoneBasis : (nhds (1 : H.Γ)).HasAntitoneBasis (fun n ↦ H.Γpow n) := by
+  have h1 := PadicInt.nhds_zero_hasAntitoneBasis_pi_span_p_pow (Fin d) p
+  change (nhds (1 : Multiplicative (Fin d → ℤ_[p]))).HasAntitoneBasis
     fun n ↦ ((Ideal.pi fun _ ↦ Ideal.span {(p ^ n : ℤ_[p])} : Ideal (Fin d → ℤ_[p])))
       |>.toAddSubgroup.toSubgroup at h1
   replace h1 := h1.comap H.continuousMulEquiv
@@ -205,9 +205,8 @@ theorem nhds_one_hasBasis : (nhds (1 : H.Γ)).HasBasis (fun (_ : ℕ) ↦ True) 
 
 /-- If `G` is an open subgroup of `Γ`, then it contains `Γ ^ (p ^ n)` for some `n`. -/
 theorem Γpow_le_of_isOpen (G : Subgroup H.Γ) (h : IsOpen (G : Set H.Γ)) :
-    ∃ n, H.Γpow n ≤ G := by
-  obtain ⟨n, -, h⟩ := H.nhds_one_hasBasis.mem_iff.1 <| h.mem_nhds_iff.2 (one_mem _)
-  exact ⟨n, h⟩
+    ∃ n, H.Γpow n ≤ G :=
+  H.nhds_one_hasAntitoneBasis.mem_iff.1 <| h.mem_nhds_iff.2 (one_mem _)
 
 /-- If `K'` is a finite extension of `K` contained in `K∞`,
 then it's contained in `Kₙ` for some `n`. -/

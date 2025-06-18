@@ -67,65 +67,74 @@ theorem PadicInt.index_pi_span_p_pow :
 
 /-! ## Neighborhood basis of `ℤₚ` around `0` -/
 
-theorem PadicInt.nhds_zero_hasBasis_span_p_pow :
-    (nhds (0 : ℤ_[p])).HasBasis (fun (_ : ℕ) ↦ True) (fun n ↦ Ideal.span {(p ^ n : ℤ_[p])}) := by
-  have hp : p.Prime := Fact.out
-  have hp2 := hp.two_le
-  let r : ℝ := 1 / p
-  have hr0 : 0 < r := by positivity
-  have hr1 : r < 1 := by
-    simp_rw [r, one_div]
-    apply inv_lt_one_of_one_lt₀
-    norm_cast
-  have h1 := Metric.nhds_basis_ball_pow (x := (0 : ℤ_[p])) hr0 hr1
-  replace h1 : (nhds (0 : ℤ_[p])).HasBasis (fun (_ : ℕ) ↦ True)
-      fun n ↦ Metric.ball 0 (r ^ (n - 1 : ℤ)) := by
-    refine ⟨fun s ↦ ?_⟩
-    rw [h1.mem_iff]
-    refine ⟨fun ⟨i, _, h⟩ ↦ ⟨i + 1, trivial, by simpa⟩,
-      fun ⟨i, _, h⟩ ↦ ⟨i, trivial, (Metric.ball_subset_ball ?_).trans h⟩⟩
-    rw [← zpow_natCast]
-    apply zpow_le_zpow_right_of_le_one₀ hr0 hr1.le
-    simp
-  convert h1 with n
-  ext
-  simp_rw [SetLike.mem_coe,
-    ← PadicInt.norm_le_pow_iff_mem_span_pow, PadicInt.norm_le_pow_iff_norm_lt_pow_add_one,
-    Metric.mem_ball, dist_zero_right, r, one_div, inv_zpow, ← zpow_neg]
-  congr! 2
-  ring
+theorem PadicInt.nhds_zero_hasAntitoneBasis_span_p_pow :
+    (nhds (0 : ℤ_[p])).HasAntitoneBasis (fun n : ℕ ↦ Ideal.span {(p ^ n : ℤ_[p])}) where
+  toHasBasis := by
+    have hp : p.Prime := Fact.out
+    have hp2 := hp.two_le
+    let r : ℝ := 1 / p
+    have hr0 : 0 < r := by positivity
+    have hr1 : r < 1 := by
+      simp_rw [r, one_div]
+      apply inv_lt_one_of_one_lt₀
+      norm_cast
+    have h1 := Metric.nhds_basis_ball_pow (x := (0 : ℤ_[p])) hr0 hr1
+    replace h1 : (nhds (0 : ℤ_[p])).HasBasis (fun (_ : ℕ) ↦ True)
+        fun n ↦ Metric.ball 0 (r ^ (n - 1 : ℤ)) := by
+      refine ⟨fun s ↦ ?_⟩
+      rw [h1.mem_iff]
+      refine ⟨fun ⟨i, _, h⟩ ↦ ⟨i + 1, trivial, by simpa⟩,
+        fun ⟨i, _, h⟩ ↦ ⟨i, trivial, (Metric.ball_subset_ball ?_).trans h⟩⟩
+      rw [← zpow_natCast]
+      apply zpow_le_zpow_right_of_le_one₀ hr0 hr1.le
+      simp
+    convert h1 with n
+    ext
+    simp_rw [SetLike.mem_coe,
+      ← PadicInt.norm_le_pow_iff_mem_span_pow, PadicInt.norm_le_pow_iff_norm_lt_pow_add_one,
+      Metric.mem_ball, dist_zero_right, r, one_div, inv_zpow, ← zpow_neg]
+    congr! 2
+    ring
+  antitone := antitone_nat_of_succ_le fun n ↦ Ideal.span_singleton_le_span_singleton.2 <| by
+    simp [pow_succ]
 
-theorem PadicInt.nhds_zero_hasBasis_pi_span_p_pow :
-    (nhds (0 : ι → ℤ_[p])).HasBasis (fun (_ : ℕ) ↦ True)
-      (fun n ↦ Ideal.pi fun _ : ι ↦ Ideal.span {(p ^ n : ℤ_[p])}) := by
-  let _ := Fintype.ofFinite ι
-  have hp : p.Prime := Fact.out
-  have hp2 := hp.two_le
-  let r : ℝ := 1 / p
-  have hr0 : 0 < r := by positivity
-  have hr1 : r < 1 := by
-    simp_rw [r, one_div]
-    apply inv_lt_one_of_one_lt₀
-    norm_cast
-  have h1 := Metric.nhds_basis_ball_pow (x := (0 : ι → ℤ_[p])) hr0 hr1
-  replace h1 : (nhds (0 : ι → ℤ_[p])).HasBasis (fun (_ : ℕ) ↦ True)
-      fun n ↦ Metric.ball 0 (r ^ (n - 1 : ℤ)) := by
-    refine ⟨fun s ↦ ?_⟩
-    rw [h1.mem_iff]
-    refine ⟨fun ⟨i, _, h⟩ ↦ ⟨i + 1, trivial, by simpa⟩,
-      fun ⟨i, _, h⟩ ↦ ⟨i, trivial, (Metric.ball_subset_ball ?_).trans h⟩⟩
-    rw [← zpow_natCast]
-    apply zpow_le_zpow_right_of_le_one₀ hr0 hr1.le
-    simp
-  convert h1 with n
-  rw [ball_pi _ (zpow_pos hr0 _)]
-  ext
-  simp_rw [SetLike.mem_coe, Ideal.mem_pi, Pi.zero_apply, Set.mem_pi, Set.mem_univ, forall_const]
-  congr! 1
-  simp_rw [← PadicInt.norm_le_pow_iff_mem_span_pow, PadicInt.norm_le_pow_iff_norm_lt_pow_add_one,
-    Metric.mem_ball, dist_zero_right, r, one_div, inv_zpow, ← zpow_neg]
-  congr! 2
-  ring
+theorem PadicInt.nhds_zero_hasAntitoneBasis_pi_span_p_pow :
+    (nhds (0 : ι → ℤ_[p])).HasAntitoneBasis
+      (fun n : ℕ ↦ Ideal.pi fun _ : ι ↦ Ideal.span {(p ^ n : ℤ_[p])}) where
+  toHasBasis := by
+    let _ := Fintype.ofFinite ι
+    have hp : p.Prime := Fact.out
+    have hp2 := hp.two_le
+    let r : ℝ := 1 / p
+    have hr0 : 0 < r := by positivity
+    have hr1 : r < 1 := by
+      simp_rw [r, one_div]
+      apply inv_lt_one_of_one_lt₀
+      norm_cast
+    have h1 := Metric.nhds_basis_ball_pow (x := (0 : ι → ℤ_[p])) hr0 hr1
+    replace h1 : (nhds (0 : ι → ℤ_[p])).HasBasis (fun (_ : ℕ) ↦ True)
+        fun n ↦ Metric.ball 0 (r ^ (n - 1 : ℤ)) := by
+      refine ⟨fun s ↦ ?_⟩
+      rw [h1.mem_iff]
+      refine ⟨fun ⟨i, _, h⟩ ↦ ⟨i + 1, trivial, by simpa⟩,
+        fun ⟨i, _, h⟩ ↦ ⟨i, trivial, (Metric.ball_subset_ball ?_).trans h⟩⟩
+      rw [← zpow_natCast]
+      apply zpow_le_zpow_right_of_le_one₀ hr0 hr1.le
+      simp
+    convert h1 with n
+    rw [ball_pi _ (zpow_pos hr0 _)]
+    ext
+    simp_rw [SetLike.mem_coe, Ideal.mem_pi, Pi.zero_apply, Set.mem_pi, Set.mem_univ, forall_const]
+    congr! 1
+    simp_rw [← PadicInt.norm_le_pow_iff_mem_span_pow, PadicInt.norm_le_pow_iff_norm_lt_pow_add_one,
+      Metric.mem_ball, dist_zero_right, r, one_div, inv_zpow, ← zpow_neg]
+    congr! 2
+    ring
+  antitone := antitone_nat_of_succ_le fun n x ↦ by
+    simp only [SetLike.mem_coe, Ideal.mem_pi]
+    have hle : Ideal.span {(p ^ (n + 1) : ℤ_[p])} ≤ Ideal.span {(p ^ n : ℤ_[p])} :=
+      Ideal.span_singleton_le_span_singleton.2 (by simp [pow_succ])
+    exact fun h i ↦ hle (h i)
 
 /-! ## Open and closed subgroups of `ℤₚ` -/
 

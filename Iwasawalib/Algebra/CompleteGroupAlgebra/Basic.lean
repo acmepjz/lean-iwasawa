@@ -154,8 +154,8 @@ theorem augmentation_apply (x : R⟦ˣG⟧) : augmentation R G x = x.1 (⊤ : Op
     QuotientGroup.subsingleton_quotient_top
   induction y using MonoidAlgebra.induction_on with
   | hM g => simp [Subsingleton.elim g 1]
-  | hadd x y hx hy => simp [hx, hy, Finsupp.add_apply x y]
-  | hsmul r x hx => simp [hx, Finsupp.smul_apply r x]
+  | hadd x y hx hy => simp only [map_add, hx, hy, Finsupp.add_apply x y]
+  | hsmul r x hx => simp only [map_smul, hx, Finsupp.smul_apply r x]
 
 theorem augmentation_eq_augmentation_comp_proj (N : OpenNormalSubgroup G) :
     augmentation R G = (MonoidAlgebra.augmentation R _).comp (proj R G N) := by
@@ -280,7 +280,7 @@ theorem one_def : (1 : R⟦ˣG⟧) = single R G 1 1 := by
 
 @[simp]
 theorem augmentation_single : augmentation R G (single R G g r) = r := by
-  simp [augmentation]
+  simp [augmentation_eq_augmentation_comp_proj R G default]
 
 theorem augmentation_comp_single : (augmentation R G : R⟦ˣG⟧ →ₗ[R] R) ∘ₗ single R G g = .id := by
   ext1; simp

@@ -103,3 +103,74 @@ instance hasEnoughRootsOfUnity [NeZero (p : K)] (i : ℕ) :
     (show p ^ i ∈ Set.range (p ^ ·) from ⟨i, rfl⟩) NeZero.out, inferInstance⟩
 
 end CyclotomicPinfField
+
+/-! ### Some complemenatry results on cyclotomic character -/
+
+section CyclotomicCharacter
+
+variable (L : Type*) [Field L] [Algebra K L] [Fact p.Prime]
+
+/-- The restriction of `cyclotomicCharacter` to `L ≃ₐ[K] L` and which is continuous. -/
+@[simps toMonoidHom]
+noncomputable def continuousCyclotomicCharacter : (L ≃ₐ[K] L) →ₜ* ℤ_[p]ˣ where
+  toMonoidHom := (cyclotomicCharacter L p).comp (MulSemiringAction.toRingAut (L ≃ₐ[K] L) L)
+  continuous_toFun := cyclotomicCharacter.continuous p K L
+
+@[simp]
+theorem continuousCyclotomicCharacter_apply (f : L ≃ₐ[K] L) :
+    continuousCyclotomicCharacter p K L f = cyclotomicCharacter L p f := rfl
+
+theorem isClosed_ker_continuousCyclotomicCharacter :
+    IsClosed ((continuousCyclotomicCharacter p K L).ker : Set (L ≃ₐ[K] L)) := by
+  rw [MonoidHom.coe_ker]
+  exact isClosed_singleton.preimage (continuousCyclotomicCharacter p K L).continuous
+
+theorem IntermediateField.adjoin_le_fixedField_ker_continuousCyclotomicCharacter
+    [∀ (i : ℕ), HasEnoughRootsOfUnity L (p ^ i)] :
+    adjoin K {x : L | ∃ n : ℕ, x ^ p ^ n = 1} ≤
+      fixedField (continuousCyclotomicCharacter p K L).ker := by
+  intro x h
+  simp only [ContinuousMonoidHom.coe_toMonoidHom, mem_fixedField_iff, MonoidHom.mem_ker,
+    MonoidHom.coe_coe, continuousCyclotomicCharacter_apply]
+  intro f hf
+  induction h using adjoin_induction with
+  | mem y hy =>
+    obtain ⟨n, hy⟩ := hy
+    rcases eq_or_ne n 0 with rfl | hn
+    · simp only [pow_zero, pow_one] at hy
+      simp [hy]
+    have : Fact (1 < p ^ n) := ⟨Nat.one_lt_pow hn ‹Fact p.Prime›.out.one_lt⟩
+    simpa [hf, ZMod.val_one] using cyclotomicCharacter.spec p f y hy
+  | algebraMap y => simp
+  | add x y hx hy ihx ihy => rw [map_add, ihx, ihy]
+  | mul x y hx hy ihx ihy => rw [map_mul, ihx, ihy]
+  | inv x hx ihx => rw [map_inv₀, ihx]
+
+theorem IntermediateField.adjoin_eq_fixedField_ker_continuousCyclotomicCharacter
+    [∀ (i : ℕ), HasEnoughRootsOfUnity L (p ^ i)] [IsGalois K L] :
+    adjoin K {x : L | ∃ n : ℕ, x ^ p ^ n = 1} =
+      fixedField (continuousCyclotomicCharacter p K L).ker := by
+  refine (adjoin_le_fixedField_ker_continuousCyclotomicCharacter p K L).antisymm ?_
+  rw [← map_le_map_iff InfiniteGalois.IntermediateFieldEquivClosedSubgroup]
+  change (adjoin K _).fixingSubgroup ≤ (fixedField _).fixingSubgroup
+  rw [show (fixedField (continuousCyclotomicCharacter p K L).ker).fixingSubgroup =
+    (continuousCyclotomicCharacter p K L).ker from InfiniteGalois.fixingSubgroup_fixedField
+      ⟨_, isClosed_ker_continuousCyclotomicCharacter p K L⟩]
+  intro f h
+  rw [mem_fixingSubgroup_iff] at h
+  rw [ContinuousMonoidHom.coe_toMonoidHom, MonoidHom.mem_ker, MonoidHom.coe_coe,
+    continuousCyclotomicCharacter_apply, Units.ext_iff, ← PadicInt.ext_of_toZModPow]
+  intro n
+  rcases eq_or_ne n 0 with rfl | hn
+  · simp only [Nat.pow_zero]
+    exact Subsingleton.elim _ _
+  have : Fact (1 < p ^ n) := ⟨Nat.one_lt_pow hn ‹Fact p.Prime›.out.one_lt⟩
+  have : NeZero (p ^ n) := NeZero.mk (zero_lt_one.trans this.out).ne'
+  obtain ⟨r, hr⟩ := HasEnoughRootsOfUnity.exists_primitiveRoot L (p ^ n)
+  specialize h r (subset_adjoin _ _ ⟨n, hr.1⟩)
+  have := cyclotomicCharacter.spec p f r hr.1
+  rw [AlgEquiv.coe_ringEquiv, h] at this
+  nth_rw 1 [← pow_one r] at this
+  simpa using congr(($(hr.pow_inj (ZMod.val_lt _) Fact.out this.symm) : ZMod (p ^ n)))
+
+end CyclotomicCharacter

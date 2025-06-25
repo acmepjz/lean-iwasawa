@@ -14,18 +14,31 @@ import Mathlib.NumberTheory.NumberField.ClassNumber
 
 universe u v
 
-variable {p : ℕ} [Fact p.Prime] {K : Type u} {Kinf : Type v}
+variable {p : ℕ} [Fact p.Prime] {ι K Kinf : Type*}
 variable [Field K] [NumberField K] [Field Kinf] [Algebra K Kinf] [IsGalois K Kinf]
 
-namespace IsZpExtension
+namespace MvZpExtension
 
-variable (H : IsZpExtension p K Kinf)
+variable (H : MvZpExtension p ι K Kinf)
 
 /-- **Iwasawa's theorem** on growth of class groups of `ℤₚ`-extension
 of number fields. -/
-theorem multiplicity_classNumber_Kn_eq :
+theorem multiplicity_classNumber_Kn_eq₁ [Unique ι] :
     ∃ (mu lambda nu N : ℕ), ∀ n > N,
       multiplicity (NumberField.classNumber (H.Kn n)) p = mu * p ^ n + lambda * p + nu := by
   sorry
 
-end IsZpExtension
+end MvZpExtension
+
+namespace IsMvZpExtension
+
+variable (H : IsMvZpExtension p 1 K Kinf)
+
+/-- **Iwasawa's theorem** on growth of class groups of `ℤₚ`-extension
+of number fields. -/
+theorem multiplicity_classNumber_Kn_eq₁ :
+    ∃ (mu lambda nu N : ℕ), ∀ n > N,
+      multiplicity (NumberField.classNumber (H.Kn n)) p = mu * p ^ n + lambda * p + nu :=
+  H.mvZpExtension.multiplicity_classNumber_Kn_eq₁
+
+end IsMvZpExtension

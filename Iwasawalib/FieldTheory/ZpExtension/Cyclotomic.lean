@@ -126,7 +126,7 @@ theorem isClosed_ker_continuousCyclotomicCharacter :
   exact isClosed_singleton.preimage (continuousCyclotomicCharacter p K L).continuous
 
 theorem IntermediateField.adjoin_le_fixedField_ker_continuousCyclotomicCharacter
-    [∀ (i : ℕ), HasEnoughRootsOfUnity L (p ^ i)] :
+    [∀ i : ℕ, HasEnoughRootsOfUnity L (p ^ i)] :
     adjoin K {x : L | ∃ n : ℕ, x ^ p ^ n = 1} ≤
       fixedField (continuousCyclotomicCharacter p K L).ker := by
   intro x h
@@ -147,7 +147,7 @@ theorem IntermediateField.adjoin_le_fixedField_ker_continuousCyclotomicCharacter
   | inv x hx ihx => rw [map_inv₀, ihx]
 
 theorem IntermediateField.adjoin_eq_fixedField_ker_continuousCyclotomicCharacter
-    [∀ (i : ℕ), HasEnoughRootsOfUnity L (p ^ i)] [IsGalois K L] :
+    [∀ i : ℕ, HasEnoughRootsOfUnity L (p ^ i)] [IsGalois K L] :
     adjoin K {x : L | ∃ n : ℕ, x ^ p ^ n = 1} =
       fixedField (continuousCyclotomicCharacter p K L).ker := by
   refine (adjoin_le_fixedField_ker_continuousCyclotomicCharacter p K L).antisymm ?_
@@ -172,5 +172,25 @@ theorem IntermediateField.adjoin_eq_fixedField_ker_continuousCyclotomicCharacter
   rw [AlgEquiv.coe_ringEquiv, h] at this
   nth_rw 1 [← pow_one r] at this
   simpa using congr(($(hr.pow_inj (ZMod.val_lt _) Fact.out this.symm) : ZMod (p ^ n)))
+
+theorem continuousCyclotomicCharacter_injective [IsCyclotomicExtension (Set.range (p ^ ·)) K L] :
+    Function.Injective (continuousCyclotomicCharacter p K L) := by
+  have := IsCyclotomicExtension.isGalois (Set.range (p ^ ·)) K L
+  have : ∀ i : ℕ, HasEnoughRootsOfUnity L (p ^ i) := fun i ↦
+    ⟨IsCyclotomicExtension.exists_isPrimitiveRoot K _
+      (show p ^ i ∈ Set.range (p ^ ·) from ⟨i, rfl⟩) NeZero.out, inferInstance⟩
+  apply (MonoidHom.ker_eq_bot_iff (continuousCyclotomicCharacter p K L).toMonoidHom).1
+  suffices (⟨_, isClosed_ker_continuousCyclotomicCharacter p K L⟩ : ClosedSubgroup (L ≃ₐ[K] L)) =
+    ⟨⊥, isClosed_singleton⟩ from congr($(this).toSubgroup)
+  apply_fun _ using InfiniteGalois.IntermediateFieldEquivClosedSubgroup.symm.injective
+  change IntermediateField.fixedField (continuousCyclotomicCharacter p K L).ker =
+    IntermediateField.fixedField ⊥
+  rw [← IntermediateField.adjoin_eq_fixedField_ker_continuousCyclotomicCharacter,
+    IntermediateField.fixedField_bot]
+  apply_fun _ using IntermediateField.toSubalgebra_injective
+  rw [IntermediateField.adjoin_algebraic_toSubalgebra fun x _ ↦ Algebra.IsAlgebraic.isAlgebraic x,
+    IntermediateField.top_toSubalgebra]
+  convert (IsCyclotomicExtension.iff_adjoin_eq_top (Set.range (p ^ ·)) K L).1 ‹_› |>.2 using 2
+  simp [‹Fact p.Prime›.out.ne_zero]
 
 end CyclotomicCharacter

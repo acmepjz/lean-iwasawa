@@ -14,7 +14,12 @@ import Mathlib.Topology.Algebra.Ring.Compact
 
 variable (ι : Type*) [Finite ι] (p : ℕ) [Fact p.Prime] (n : ℕ)
 
-theorem PadicInt.surjective_toZModPow :
+/-! ### Maybe these should be in mathlib -/
+
+theorem PadicInt.toZMod_surjective :
+    Function.Surjective (PadicInt.toZMod (p := p)) := fun x ↦ ⟨x.val, by simp⟩
+
+theorem PadicInt.toZModPow_surjective :
     Function.Surjective (PadicInt.toZModPow (p := p) n) := fun x ↦ ⟨x.val, by simp⟩
 
 /-! ## Open ideal of `ℤₚ` -/
@@ -52,7 +57,7 @@ theorem PadicInt.index_span_p_pow :
   rw [AddSubgroup.index_eq_card]
   change Nat.card (ℤ_[p] ⧸ Ideal.span {(p ^ n : ℤ_[p])}) = _
   convert Nat.card_congr (RingHom.quotientKerEquivOfSurjective
-    (surjective_toZModPow p n)).toEquiv <;> simp [ker_toZModPow]
+    (toZModPow_surjective p n)).toEquiv <;> simp [ker_toZModPow]
 
 theorem PadicInt.index_pi_span_p_pow :
     (Ideal.pi fun _ : ι ↦ Ideal.span {(p ^ n : ℤ_[p])}).toAddSubgroup.index =

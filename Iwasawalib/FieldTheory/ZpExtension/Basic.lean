@@ -7,6 +7,7 @@ import Mathlib.FieldTheory.Galois.Infinite
 import Mathlib.FieldTheory.Galois.Profinite
 import Iwasawalib.NumberTheory.Padics.EquivMvZp
 import Mathlib.Topology.Algebra.ClopenNhdofOne
+import Iwasawalib.Topology.Algebra.Group.Basic
 
 /-!
 
@@ -21,21 +22,6 @@ import Mathlib.Topology.Algebra.ClopenNhdofOne
   isomorphic to `ℤₚᵈ` as a topological group.
 
 -/
-
-@[to_additive]
-theorem MonoidHom.continuous_iff {G H : Type*} [Group G] [Monoid H]
-    [TopologicalSpace G] [TopologicalSpace H] [ContinuousMul G] [ContinuousMul H] (f : G →* H) :
-    Continuous f ↔ ∀ s : Set H, 1 ∈ s → IsOpen s →
-      ∃ t : Set G, 1 ∈ t ∧ IsOpen t ∧ t ⊆ f ⁻¹' s := by
-  refine ⟨fun h s h1 hs ↦ ⟨_, by simp [h1], h.1 s hs, by simp⟩, fun h ↦ ⟨fun s hs ↦ ?_⟩⟩
-  simp_rw [isOpen_iff_mem_nhds, mem_nhds_iff]
-  intro x hx
-  obtain ⟨t, h1, ht, ht'⟩ :=
-    h _ (by simpa using hx) ((show Continuous (· * f x) by fun_prop).1 s hs)
-  refine ⟨_, fun y hy ↦ ?_, (show Continuous (· * x⁻¹) by fun_prop).1 _ ht, by simp [h1]⟩
-  rw [Set.mem_preimage] at hy
-  specialize ht' hy
-  simpa [mul_assoc, ← map_mul f x⁻¹ x] using ht'
 
 theorem AlgEquiv.continuous_autCongr
     {R A₁ A₂ : Type*} [Field R] [Field A₁] [Field A₂] [Algebra R A₁] [Algebra R A₂]

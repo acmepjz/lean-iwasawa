@@ -12,10 +12,14 @@ import Iwasawalib.Topology.Algebra.OpenSubgroup
 
 -/
 
+/-! ### Maybe these should be in mathlib -/
+
 theorem Equiv.arrowCongr_eq_piCongrLeft {M N P : Type*} (f : M ≃ N) :
     f.arrowCongr (.refl P) = f.piCongrLeft fun _ ↦ P := by
   ext g n
   simp [Equiv.piCongrLeft_apply_eq_cast]
+
+/-! ### Actual contents -/
 
 variable (G : Type*) [Group G] [TopologicalSpace G] (p : ℕ) [Fact p.Prime] (d : ℕ) (ι : Type*)
 

@@ -33,8 +33,8 @@ namespace EquivMvZp
 variable {G p d ι}
 
 /-- Transfer `EquivMvZp` along isomorphisms. -/
-def congr (H : EquivMvZp G p ι) {G' : Type*} [Group G'] [TopologicalSpace G'] (f : G ≃ₜ* G')
-    {ι' : Type*} (e : ι ≃ ι') : EquivMvZp G' p ι' :=
+noncomputable def congr (H : EquivMvZp G p ι) {G' : Type*} [Group G'] [TopologicalSpace G']
+    (f : G ≃ₜ* G') {ι' : Type*} (e : ι ≃ ι') : EquivMvZp G' p ι' :=
   letI i1 := (AddEquiv.arrowCongr e (AddEquiv.refl ℤ_[p])).toMultiplicative
   letI i : Multiplicative (ι → ℤ_[p]) ≃ₜ* Multiplicative (ι' → ℤ_[p]) := {
     i1 with
@@ -226,7 +226,7 @@ variable [Unique ι]
 
 /-- An isomorphism from `Γ` to `ℤₚ` gives an `EquivMvZp G p ι` when `ι` consists of
 exactly one element. -/
-def ofContinuousMulEquiv₁ (e : G ≃ₜ* Multiplicative ℤ_[p]) : EquivMvZp G p ι :=
+noncomputable def ofContinuousMulEquiv₁ (e : G ≃ₜ* Multiplicative ℤ_[p]) : EquivMvZp G p ι :=
   letI i1 : Multiplicative (ι → ℤ_[p]) ≃* Multiplicative ℤ_[p] :=
     (AddEquiv.piUnique fun _ ↦ ℤ_[p]).toMultiplicative
   letI i2 : Multiplicative (ι → ℤ_[p]) ≃ₜ Multiplicative ℤ_[p] :=
@@ -236,7 +236,7 @@ def ofContinuousMulEquiv₁ (e : G ≃ₜ* Multiplicative ℤ_[p]) : EquivMvZp G
   ⟨e.trans i.symm⟩
 
 /-- The isomorphism from `Γ` to `ℤₚ`. -/
-def continuousMulEquiv₁ : H.Γ ≃ₜ* Multiplicative ℤ_[p] :=
+noncomputable def continuousMulEquiv₁ : H.Γ ≃ₜ* Multiplicative ℤ_[p] :=
   letI i1 : Multiplicative (ι → ℤ_[p]) ≃* Multiplicative ℤ_[p] :=
     (AddEquiv.piUnique fun _ ↦ ℤ_[p]).toMultiplicative
   letI i2 : Multiplicative (ι → ℤ_[p]) ≃ₜ Multiplicative ℤ_[p] :=

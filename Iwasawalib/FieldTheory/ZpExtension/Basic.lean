@@ -62,7 +62,8 @@ def MvZpExtension [IsGalois K Kinf] := EquivMvZp (Kinf ≃ₐ[K] Kinf) p ι
 
 variable {p ι K Kinf} in
 /-- Transfer `MvZpExtension` along field isomorphisms. -/
-def MvZpExtension.congr [IsGalois K Kinf] (H : MvZpExtension p ι K Kinf) {ι' : Type*} (e : ι ≃ ι')
+noncomputable def MvZpExtension.congr [IsGalois K Kinf] (H : MvZpExtension p ι K Kinf)
+    {ι' : Type*} (e : ι ≃ ι')
     (Kinf' : Type*) [Field Kinf'] [Algebra K Kinf'] (f : Kinf ≃ₐ[K] Kinf') [IsGalois K Kinf'] :
     MvZpExtension p ι' K Kinf' :=
   EquivMvZp.congr H f.continuousAutCongr e
@@ -160,7 +161,7 @@ variable {p d ι K Kinf} [Unique ι] [IsGalois K Kinf]
 
 /-- An isomorphism from `Γ` to `ℤₚ` gives an `MvZpExtension` when `ι` consists of
 exactly one element. -/
-def ofContinuousMulEquiv₁ (e : (Kinf ≃ₐ[K] Kinf) ≃ₜ* Multiplicative ℤ_[p]) :
+noncomputable def ofContinuousMulEquiv₁ (e : (Kinf ≃ₐ[K] Kinf) ≃ₜ* Multiplicative ℤ_[p]) :
     MvZpExtension p ι K Kinf :=
   EquivMvZp.ofContinuousMulEquiv₁ e
 

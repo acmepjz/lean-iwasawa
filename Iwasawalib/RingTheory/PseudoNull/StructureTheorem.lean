@@ -185,7 +185,7 @@ theorem finite_of_finite_isLocalized_maximal
   apply Submodule.eq_top_of_localization_maximal Rₚ Mₚ f
   intro P hP
   rw [← top_le_iff, ← s₂ ⟨P, hP⟩]
-  simp only [Submodule.localized'_span, N]
+  simp only [Submodule.localized'_span]
   apply Submodule.span_le.2
   intro x hx
   lift x to s₁ ⟨P, hP⟩ using hx
@@ -295,7 +295,7 @@ theorem isPrincipalIdealRing_of_isPrincipalIdealRing_localization
     infer_instance
   have : IsDedekindDomain A := {maximalOfPrime := Ring.DimensionLEOne.maximalOfPrime}
   have hp_sub : {P : Ideal A | P.IsPrime} ⊆ {P : Ideal A | P.IsMaximal} ∪ {⊥} := by
-    simp only [Set.mem_setOf_eq, Set.union_singleton, Set.mem_insert_iff]
+    simp only [Set.union_singleton]
     intro P hP
     obtain rfl | hbot := eq_or_ne P ⊥
     · simp

@@ -165,8 +165,8 @@ theorem oneAddXPowSubOne_mem_span_natCast_X_pow :
     rw [(∑ i ∈ Finset.range p, (1 + X) ^ (p ^ n * i)).as_sum_support_C_mul_X_pow]
     refine Ideal.sum_mem _ fun j _ ↦ ?_
     rcases eq_or_ne j 0 with rfl | hj
-    · simp only [finset_sum_coeff, map_sum, pow_zero, mul_one, coeff_one_add_X_pow,
-        Nat.choose_zero_right, Nat.cast_one, map_one, Finset.sum_const, Finset.card_range,
+    · simp only [finset_sum_coeff, pow_zero, mul_one, coeff_one_add_X_pow,
+        Nat.choose_zero_right, Nat.cast_one, Finset.sum_const, Finset.card_range,
         nsmul_eq_mul, map_natCast, Ideal.mem_span_pair]
       exact ⟨1, 0, by simp⟩
     apply Ideal.mul_mem_left

@@ -71,7 +71,7 @@ theorem Module.length_localizedModule_primeCompl_quotient_prime_eq_of_primeHeigh
     ⟨Submodule.Quotient.equiv _ _ (LocalizedModule.equivTensorProduct p.1.primeCompl A ≪≫ₗ
       TensorProduct.AlgebraTensorModule.rid _ _ _) ?_⟩⟩
   change Submodule.map (LinearEquiv.toLinearMap _) _ = _
-  rw [LinearEquiv.map_eq_comap]
+  rw [Submodule.map_equiv_eq_comap_symm]
   ext x
   induction x with | H x =>
   nth_rw 2 [Localization.mk_eq_mk']
@@ -260,7 +260,7 @@ theorem Module.charIdeal_quotient_prime_eq_of_one_le_primeHeight
       refine ⟨by_contra fun H ↦ ?_, hq⟩
       have : q.1.FiniteHeight := ⟨.inr (by simp [q.1.height_eq_primeHeight, hq])⟩
       replace hpq := Ideal.primeHeight_strict_mono (hpq.lt_of_ne' H)
-      exact hp.not_lt (hq ▸ hpq))
+      exact hp.not_gt (hq ▸ hpq))
   have hf' : hf.toFinset = if p.1.primeHeight = 1 then {p} else ∅ := by
     ext
     split_ifs <;> (simp only [Set.toFinite_toFinset, Set.mem_toFinset, Set.mem_inter_iff,

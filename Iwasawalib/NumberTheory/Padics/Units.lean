@@ -555,6 +555,13 @@ theorem torsionUnits_eq_rootsOfUnity :
   exact ⟨fun ⟨y, hy⟩ ↦ hy ▸ (teichmuller_spec p y).1,
     fun h ↦ ⟨_, teichmuller_unitsMap_toZModPow_apply_eq_self_of_pow_eq_one p h⟩⟩
 
+theorem torsionUnits_le_torsion : torsionUnits p ≤ CommGroup.torsion _ := fun x ↦ by
+  rw [torsionUnits_eq_rootsOfUnity, mem_rootsOfUnity, CommGroup.mem_torsion,
+    isOfFinOrder_iff_pow_eq_one]
+  intro hx
+  have := two_le_totient_p_pow_torsionfreeUnitsExponent p
+  exact ⟨_, by positivity, hx⟩
+
 theorem card_torsionUnits :
     Nat.card (torsionUnits p) = (p ^ torsionfreeUnitsExponent p).totient := by
   simpa using Nat.card_range_of_injective (teichmuller_injective p)
@@ -747,6 +754,8 @@ theorem toFun_aux (x : ℤ_[p]) (i : ℕ) :
   refine (show (p ^ i : ℤ) ∣ p ^ (i + 1) by simp [pow_succ]).trans ?_
   exact pow_succ_dvd_one_add_pow_pow_pow_pow_sub_one p n i
 
+/-- The map `ℤₚ → ℤₚ` by sending `x` to the limit of `(1 + pᵏ) ^ (x mod pⁿ)` as `n → ∞`,
+where `k = 2` if `p = 2`, and `k = 1` otherwise. -/
 noncomputable def toFun (x : ℤ_[p]) : ℤ_[p] :=
   .ofIntSeq (fun i ↦ (1 + p ^ torsionfreeUnitsExponent p) ^ x.appr i) <|
     isCauSeq_padicNorm_of_pow_dvd_sub _ _ (toFun_aux p x)
@@ -799,24 +808,20 @@ theorem isUnit_toFun (x : ℤ_[p]) : IsUnit (toFun p x) := by
   rw [toZModPow_toFun, pow_one]
   simp [torsionfreeUnitsExponent_ne_zero p]
 
--- theorem toFun_mem_torsionfreeUnits (x : ℤ_[p]) : (isUnit_toFun p x).unit ∈ torsionfreeUnits p := by
---   rw [torsionfreeUnits, principalUnits, MonoidHom.mem_ker]
---   ext1
---   rw [Units.coe_map, IsUnit.unit_spec, RingHom.toMonoidHom_eq_coe, MonoidHom.coe_coe,
---     toZModPow_toFun, Units.val_one]
---   suffices ((1 + p ^ torsionfreeUnitsExponent p : ℤ) :
---       ZMod (p ^ torsionfreeUnitsExponent p)) = (1 : ℤ) by
---     push_cast at this
---     simp [this]
---   rw [Eq.comm, ZMod.intCast_eq_intCast_iff_dvd_sub]
---   simp
-
 theorem toFun_mem_principalUnits_iff (x : ℤ_[p]) :
     (isUnit_toFun p x).unit ∈ principalUnits p (n + torsionfreeUnitsExponent p) ↔
       x ∈ Ideal.span {(p ^ n : ℤ_[p])} := by
-  sorry
+  have hle : n ≤ n + torsionfreeUnitsExponent p := by simp
+  rw [principalUnits, MonoidHom.mem_ker, Units.ext_iff, Units.coe_map, IsUnit.unit_spec,
+    RingHom.toMonoidHom_eq_coe, MonoidHom.coe_coe, toZModPow_toFun, Units.val_one, ← ker_toZModPow,
+    RingHom.mem_ker, ← orderOf_dvd_iff_pow_eq_one,
+    orderOf_one_add_pow_torsionfreeUnitsExponent_toZModPow, ← Nat.sub_add_cancel (appr_mono x hle),
+    ← Nat.dvd_add_iff_right (dvd_appr_sub_appr x _ _ hle), ← ZMod.val_eq_zero,
+    val_toZModPow_eq_appr]
+  exact ⟨fun h ↦ Nat.eq_zero_of_dvd_of_lt h (appr_lt x n), fun h ↦ by simp [h]⟩
 
-#exit
+theorem toFun_mem_torsionfreeUnits (x : ℤ_[p]) : (isUnit_toFun p x).unit ∈ torsionfreeUnits p := by
+  simpa using toFun_mem_principalUnits_iff p 0 x
 
 theorem toFun_injective : Function.Injective (toFun p) := fun x y H ↦ by
   simp only [← ext_of_toZModPow, toZModPow_toFun] at H ⊢
@@ -871,17 +876,11 @@ theorem toFun_surjective (x : torsionfreeUnits p) : ∃ y, toFun p y = x.1.1 := 
   intro n
   rw [toZModPow_toFun, ← val_toZModPow_eq_appr, h3, ZMod.val_natCast_of_lt (hs n).1, h4]
 
--- theorem continuous_toFun : Continuous (toFun p) := by
---   let f : Multiplicative ℤ_[p] →* torsionfreeUnits p := {
---     toFun := fun x ↦ ⟨_, toFun_mem_torsionfreeUnits p x⟩
---     map_one' := by sorry
---     map_mul' := by sorry
---   }
---   sorry
-
 end equivTorsionfreeUnits
 
 open equivTorsionfreeUnits in
+/-- The continuous group isomorphism `(ℤₚ, +) ≃ (1 + pᵏℤₚ, *)` by sending `x` to the limit of
+`(1 + pᵏ) ^ (x mod pⁿ)` as `n → ∞`, where `k = 2` if `p = 2`, and `k = 1` otherwise. -/
 noncomputable def equivTorsionfreeUnits : Multiplicative ℤ_[p] ≃ₜ* torsionfreeUnits p :=
   letI f : Multiplicative ℤ_[p] → torsionfreeUnits p :=
     fun x ↦ ⟨_, toFun_mem_torsionfreeUnits p x⟩
@@ -890,48 +889,61 @@ noncomputable def equivTorsionfreeUnits : Multiplicative ℤ_[p] ≃ₜ* torsion
     map_one' := by ext : 2; exact toFun_zero p
     map_mul' x y := by ext : 2; exact toFun_add p x y
   }
-  -- haveI h1 : Function.Bijective f := by
-  --   constructor
-  --   · intro x y h
-  --     exact toFun_injective p congr($(h).1.1)
-  --   · intro x
-  --     obtain ⟨y, hy⟩ := toFun_surjective p x
-  --     use y
-  --     ext : 2; exact hy
-  haveI h2 : Continuous f := by
-    refine f0.continuous_iff.2 fun s hs1 ho1 ↦ ?_
-    let s' := (·.1.1) '' s
-    have ho2 := ho1.trans (isOpen_principalUnits p _)
-    rw [Units.isOpenEmbedding_val.isOpen_iff_image_isOpen] at ho2
-    -- dsimp [Multiplicative]
-    sorry
-  sorry
-  letI f1 := Equiv.ofBijective f h1
-  letI f2 := h2.homeoOfEquivCompactToT2 (f := f1)
+  letI f1 := Equiv.ofBijective f <| by
+    refine ⟨fun x y h ↦ toFun_injective p congr($(h).1.1), fun x ↦ ?_⟩
+    obtain ⟨y, hy⟩ := toFun_surjective p x
+    use y
+    ext : 2; exact hy
+  haveI hc : Continuous f := by
+    let f0' : Multiplicative ℤ_[p] →* ℤ_[p]ˣ := {
+      toFun x := (isUnit_toFun p x).unit
+      map_one' := by ext1; exact toFun_zero p
+      map_mul' x y := by ext1; exact toFun_add p x y
+    }
+    suffices Continuous f0' by
+      refine ⟨fun s hs ↦ ?_⟩
+      convert this.isOpen_preimage _ (hs.trans (isOpen_principalUnits p _))
+      rw [show f0' = Subtype.val ∘ f from rfl, Set.preimage_comp]
+      exact congr(f ⁻¹' $((s.preimage_image_eq Subtype.val_injective).symm))
+    refine f0'.continuous_iff.2 fun s hs1 ho1 ↦ ?_
+    have : s ∈ nhds 1 := mem_nhds_iff.2 ⟨s, by rfl, ho1, hs1⟩
+    obtain ⟨n, hn⟩ := (units_nhds_one_hasAntitoneBasis_principalUnits p).mem_iff.1 this
+    refine ⟨(Ideal.span {(p ^ n : ℤ_[p])} : Set ℤ_[p]), zero_mem _, isOpen_span_p_pow p n, ?_⟩
+    rintro (x : ℤ_[p]) (hx : x ∈ Ideal.span {(p ^ n : ℤ_[p])})
+    rw [← toFun_mem_principalUnits_iff] at hx
+    rw [Set.mem_preimage]
+    exact hn (antitone_principalUnits p (show n ≤ n + torsionfreeUnitsExponent p by simp) hx)
+  letI f2 := hc.homeoOfEquivCompactToT2 (f := f1)
   { f1, f0, f2 with }
-
-#check MonoidHom.continuous_iff
-
-#exit
-
--- noncomputable def equivTorsionfreeZModPowUnitsZModPow :
---     torsionfreeZModPowUnits p n ≃ ZMod (p ^ n) := .symm <| .ofBijective (fun x ↦
---       ⟨_, one_add_p_pow_torsionfreeUnitsExponent_mem_torsionfreeZModPowUnits p n⟩ ^ x.val) <| by
---   sorry
-
--- #check Equiv.ofBijective
-
--- /-- The map `1 + pⁿℤₚ → ℤₚ` where `n = 2` if `p = 2`, and `n = 1` otherwise,
--- which maps `(1 + pⁿ)ᵐ` to `m`. -/
--- noncomputable def ofTorsionfreeUnits (x : torsionfreeUnits p) : ℤ_[p] :=
---   sorry
 
 /-! ### Further results of `torsionUnits` -/
 
 theorem torsionUnits_eq_torsion : torsionUnits p = CommGroup.torsion _ := by
-  sorry
-
-#exit
+  refine (torsionUnits_le_torsion p).antisymm fun x hx ↦ ?_
+  suffices ∀ (x : ℤ_[p]ˣ) (hx : x ∈ CommGroup.torsion _) (h : x ∈ torsionfreeUnits p), x = 1 by
+    have h1 : (unitsContinuousEquivTorsionfreeProdTorsion p x).1.1 ∈ CommGroup.torsion _ := by
+      rw [CommGroup.mem_torsion, isOfFinOrder_iff_pow_eq_one] at hx ⊢
+      obtain ⟨n, h1, h2⟩ := hx
+      exact ⟨n, h1, by simp [mul_pow, ← map_pow, h2]⟩
+    have := this _ h1 (unitsContinuousEquivTorsionfreeProdTorsion p x).1.2
+    simp only [val_fst_unitsContinuousEquivTorsionfreeProdTorsion_apply,
+      RingHom.toMonoidHom_eq_coe, mul_eq_one_iff_eq_inv, inv_inv] at this
+    rw [torsionUnits, MonoidHom.mem_range]
+    exact ⟨_, this.symm⟩
+  intro x hx h
+  let x' : torsionfreeUnits p := ⟨x, h⟩
+  rw [CommGroup.mem_torsion, isOfFinOrder_iff_pow_eq_one] at hx
+  obtain ⟨n, h1, h2⟩ := hx
+  have h2' : x' ^ n = 1 := by ext1; exact h2
+  apply_fun (equivTorsionfreeUnits p).symm at h2'
+  rw [map_pow, map_one] at h2'
+  let y : ℤ_[p] := (equivTorsionfreeUnits p).symm x'
+  change n • y = 0 at h2'
+  simp only [nsmul_eq_mul, mul_eq_zero, Nat.cast_eq_zero, h1.ne', false_or] at h2'
+  change (equivTorsionfreeUnits p).symm x' = 1 at h2'
+  apply_fun equivTorsionfreeUnits p at h2'
+  simp only [ContinuousMulEquiv.apply_symm_apply, map_one] at h2'
+  exact congr($(h2').1)
 
 theorem hasEnoughRootsOfUnity_iff :
     HasEnoughRootsOfUnity ℤ_[p] n ↔ n ∣ (p ^ torsionfreeUnitsExponent p).totient := by

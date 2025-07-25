@@ -8,6 +8,7 @@ import Mathlib.Algebra.CharZero.Infinite
 import Mathlib.Analysis.Normed.Ring.Units
 import Mathlib.FieldTheory.Finite.Basic
 import Mathlib.GroupTheory.SpecificGroups.Cyclic
+import Mathlib.LinearAlgebra.Dimension.FreeAndStrongRankCondition
 import Iwasawalib.NumberTheory.Padics.EquivMvZp
 import Mathlib.NumberTheory.Basic
 import Mathlib.NumberTheory.Padics.Hensel
@@ -599,7 +600,8 @@ theorem disjoint_torsionfreeUnits_torsionUnits : Disjoint (torsionfreeUnits p) (
 
 @[simp]
 theorem cardinalMk_units_eq_continuum : Cardinal.mk ℤ_[p]ˣ = Cardinal.continuum := by
-  refine ((Cardinal.mk_le_of_injective Units.ext).trans_eq (cardinalMk_eq_continuum p)).antisymm ?_
+  refine ((Cardinal.mk_le_of_injective Units.val_injective).trans_eq
+    (cardinalMk_eq_continuum p)).antisymm ?_
   have hu (x : ℤ_[p]) : IsUnit (1 + p * x) := by
     refine isUnit_of_map_unit toZMod _ ?_
     simp
@@ -657,7 +659,7 @@ theorem isUnit_one_add_pow_torsionfreeUnitsExponent_toZModPow :
   have h1 := torsionfreeUnitsExponent_ne_zero p
   have h2 : 0 < n + torsionfreeUnitsExponent p := by positivity
   rw [ZMod.isUnit_iff_coprime, Nat.coprime_pow_right_iff h2, Nat.coprime_comm,
-    ‹Fact p.Prime›.out.coprime_iff_not_dvd, ← ZMod.natCast_zmod_eq_zero_iff_dvd]
+    ‹Fact p.Prime›.out.coprime_iff_not_dvd, ← ZMod.natCast_eq_zero_iff]
   simp [h1]
 
 theorem one_add_pow_torsionfreeUnitsExponent_toZModPow_mem_torsionfreeZModPowUnits :

@@ -27,15 +27,6 @@ import Mathlib.Topology.Algebra.Module.Cardinality
 
 /-! ### Maybe these should be in mathlib -/
 
-section
-
-variable {X : Type*} [TopologicalSpace X] [CompactSpace X]
-
-instance : CompactSpace (Additive X) := ‹CompactSpace X›
-instance : CompactSpace (Multiplicative X) := ‹CompactSpace X›
-
-end
-
 theorem Nat.totient_pow_mul_of_prime_of_dvd {p n : ℕ} (hp : Prime p) (h : p ∣ n) (m : ℕ) :
     (p ^ m * n).totient = p ^ m * n.totient := by
   induction m with

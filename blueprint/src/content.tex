@@ -119,6 +119,8 @@ then $\fp^N\subset\fp'$, hence $\fp\subset\fp'$, so $\fp=\fp'$).
 \begin{thm}
 \label{UFD-iff-ht-1-principal}
 \uses{krull-principal-ideal-thm}
+\lean{IsNoetherianRing.uniqueFactorizationMonoid_iff}
+\leanok
 Let $A$ be a Noetherian domain. Then $A$ is a UFD if and only if every prime ideal of height $1$ is principal
 (recall that a prime ideal $\fp$ is of height $1$ if $\fp \neq 0$ and there is no prime ideal lies in between $0$ and $\fp$).
 
@@ -132,7 +134,7 @@ and let $a\in\fp$ be a non-zero element.
 Factor $a$ into a product of irreducible elements
 (= prime elements) $a=p_1\cdots p_r$.
 Then by $a\in\fp$ we obtain $p_i\in\fp$ for some $i$,
-since $(\fp_i)\neq 0$ is a prime ideal contained in $\fp$, we have $\fp=(p_i)$.
+since $(p_i)\neq 0$ is a prime ideal contained in $\fp$, we have $\fp=(p_i)$.
 
 ``$\Leftarrow$'':
 It suffices to show that every irreducible element is prime.

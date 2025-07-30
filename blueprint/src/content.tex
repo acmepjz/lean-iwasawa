@@ -820,7 +820,8 @@ by snake lemma we know that the constructed $M\to T\oplus M/T$
 is a pseudo-isomorphism.
 \end{proof}
 
-The remaining results need regular local ring...
+The remaining results need regular local ring,
+which is WIP in mathlib. We skip these results.
 
 \subsection{Noetherian regular domain}
 
@@ -1454,7 +1455,8 @@ totally ramified. So similarly, we get $X_\infty/(\gamma^{p^n}-1)X_\infty\xright
 X_n$.
 \end{proof}
 
-We state a group theory result.
+\subsection{A group theory result (preliminary)}
+
 Suppose $\CG$ is any group, $\CX$ is a normal abelian subgroup of $\CG$.
 Then $\CG/\CX$ acts on $\CX$ as follows:
 if $\sigma\in{\CG/\CX}$, lift $\sigma$ to an element $\widetilde\sigma$ in $\CG$.
@@ -1540,7 +1542,19 @@ assertion that a ring is of Krull dimension $\leq 1$
 \docs{Ring.DimensionLEOne}
 \end{itemize}
 \item
-Regular local ring \PR{25283}
+Krull dimension of polynomial rings
+\begin{itemize}
+\item
+$\dim R+1\leq\dim R[X]\leq 2\dim R+1$
+
+\docs{ringKrullDim_succ_le_ringKrullDim_polynomial},
+\docs{Polynomial.ringKrullDim_le}
+\item
+$\dim R[X]=\dim R+1$ if $R$ is Noetherian
+\PR{27542}
+\end{itemize}
+\item
+Regular local ring \PR{25283} (stall)
 \end{itemize}
 
 \subsection{Ideals}
@@ -1709,6 +1723,8 @@ if $\mu_{p^\infty}\subset L$
 then $\chi_\cyc:\Aut(L)\to\BZ_p^\times$
 \docs{cyclotomicCharacter}
 \end{itemize}
+
+\therefsection
 
 \begin{thebibliography}{XXXX}
 \bibitem[Nek06]{Mek06}

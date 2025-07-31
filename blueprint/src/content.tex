@@ -128,6 +128,7 @@ Let $A$ be a Noetherian domain. Then $A$ is a UFD if and only if every prime ide
 \end{thm}
 
 \begin{proof}
+\leanok
 ``$\Rightarrow$'':
 Let $\fp$ be a prime ideal of height $1$,
 and let $a\in\fp$ be a non-zero element.
@@ -1158,28 +1159,41 @@ of Hensel's lemma presented in \url{https://ncatlab.org/nlab/show/Hensel's+lemma
 
 \subsection{Characteristic ideal}
 
+Let $\Lambda=\BZ_p[[T]]$.
+
 \begin{prop}
 \label{Lambda-is-reg-of-dim-2}
 \uses{Iwasawa-alg-isom}
-$\Lambda\cong\BZ_p[[T]]$ is a
+$\Lambda$ is a
 Noetherian regular local ring of Krull dimension $2$.
 
 (We try to avoid this result but prove its consequences directly,
 since regular local ring is still WIP in mathlib.)
 \end{prop}
 
+\begin{proof}
+...
+\end{proof}
+
 \begin{cor}
 \label{Lambda-is-UFD}
 \uses{Lambda-is-reg-of-dim-2,regular-local-ring-is-UFD}
-Hence by Proposition \ref{regular-local-ring-is-UFD}, $\Lambda$ is a UFD
-(or maybe one can check directly that the $I$-adic completion of a UFD is a UFD).
+$\Lambda$ is a UFD.
 \end{cor}
+
+\begin{proof}
+A corollary of Proposition \ref{Lambda-is-reg-of-dim-2} and
+Theorem \ref{regular-local-ring-is-UFD}
+(or maybe one can check directly that the $I$-adic completion of a UFD is a UFD).
+
+One can also use Weierstrass preparation theorem: ...
+\end{proof}
 
 \begin{cor}
 \label{Lambda-ht-1-principal}
 \uses{Lambda-is-UFD,UFD-iff-ht-1-principal,weierstrass-preparation}
-Hence by Proposition \ref{UFD-iff-ht-1-principal}, any height $1$ prime $\fp$ of $\Lambda$
-is principal.
+Any height $1$ prime $\fp$ of $\Lambda$
+is principal. Moreover,
 
 {\rm(i)}
 If the generator of $\fp$ is in $p\BZ_p[[T]]$, then
@@ -1190,6 +1204,13 @@ If the generator of $\fp$ is not in $p\BZ_p[[T]]$, then
 by Proposition \ref{weierstrass-preparation} such $\fp$
 has a unique generator which is a distinguished polynomial.
 \end{cor}
+
+\begin{proof}
+By Proposition \ref{UFD-iff-ht-1-principal}, any height $1$ prime of $\Lambda$
+is principal.
+
+...
+\end{proof}
 
 Therefore, we have
 
@@ -1207,6 +1228,10 @@ $p^{\sum_{j=1}^sn_j}\prod_{i=1}^mf_i^{b_i}$
 which is contained in $p^{\sum_{j=1}^sn_j}\BZ_p[[T]]$
 but not in $p^{1+\sum_{j=1}^sn_j}\BZ_p[[T]]$.
 \end{prop}
+
+\begin{proof}
+...
+\end{proof}
 
 \begin{definition}
 \label{iwasawa-mod-invariants}
@@ -1238,9 +1263,15 @@ and $\lambda(X)=\rank_{\BZ_p}X/X[p^\infty]$.
 %is the characteristic polynomial of $T$ acts on $X\otimes_{\BZ_p}\BQ_p$.
 \end{prop}
 
+\begin{proof}
+...
+\end{proof}
+
 ......
 
 \subsection{Growth of coinvariant part}
+
+Let $\Lambda=\BZ_p[[T]]$.
 
 \begin{prop}
 \label{coinvariant-growth}
@@ -1253,6 +1284,10 @@ such that for all sufficiently large $n$,
 $\ord_p(\#(X/(\gamma^{p^n}-1)X))=\mu(X)p^n
 +\lambda(X)n+\nu(X)$.
 \end{prop}
+
+\begin{proof}
+...
+\end{proof}
 
 \section{Arithmetic of $\BZ_p$-extensions}
 

@@ -46,15 +46,28 @@ theorem UniqueFactorizationMonoid.of_primeHeight_eq_one_imp_isPrincipal
     UniqueFactorizationMonoid R where
   irreducible_iff_prime {a} := by
     refine ⟨fun ha ↦ ?_, Prime.irreducible⟩
-    have := ha.not_isUnit
-    rw [← Ideal.span_singleton_eq_top] at this
-    obtain ⟨p, hp⟩ := Ideal.nonempty_minimalPrimes this
-    have h1 : p.height ≤ 1 := by
-      refine (Ideal.height_le_spanRank_toENat_of_mem_minimal_primes _ _ hp).trans ?_
-      rw [← Ideal.submodule_span_eq]
-      grw [Submodule.spanRank_span_le_card]
-      simp
-    sorry
+    have hne := ha.not_isUnit
+    rw [← Ideal.span_singleton_eq_top] at hne
+    obtain ⟨p, hp⟩ := Ideal.nonempty_minimalPrimes hne
+    have := Ideal.minimalPrimes_isPrime hp
+    obtain ⟨b, hb⟩ : p.IsPrincipal := by
+      have : p.height ≤ 1 := by
+        refine (Ideal.height_le_spanRank_toENat_of_mem_minimal_primes _ _ hp).trans ?_
+        rw [← Ideal.submodule_span_eq]
+        grw [Submodule.spanRank_span_le_card]
+        simp
+      rw [Ideal.height_eq_primeHeight] at this
+      rcases this.eq_or_lt with h1 | h1
+      · exact h ⟨p, ‹_›⟩ h1
+      use 0
+      simpa only [Submodule.span_zero_singleton, ENat.lt_one_iff_eq_zero,
+        Ideal.primeHeight_eq_zero_iff,
+        IsDomain.minimalPrimes_eq_singleton_bot, Set.mem_singleton_iff] using h1
+    rw [Ideal.submodule_span_eq] at hb
+    rcases ha.dvd_iff.1 (Ideal.span_singleton_le_span_singleton.1 (hb ▸ hp.1.2)) with h1 | h1
+    · rw [← Ideal.span_singleton_eq_top, ← hb] at h1
+      exact False.elim (this.ne_top h1)
+    rwa [← Ideal.span_singleton_prime ha.ne_zero, Ideal.span_singleton_eq_span_singleton.2 h1, ← hb]
 
 /-- A Noetherian domain is a UFD if and only if every height one prime ideal is principal. -/
 theorem IsNoetherianRing.uniqueFactorizationMonoid_iff

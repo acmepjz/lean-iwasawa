@@ -32,14 +32,14 @@ as topological groups.
 $n\geq 0$, define $K_n:=K_\infty^{\Gamma^{p^n}}$.
 \end{definition}
 
-\begin{thm}[Iwasawa's theorem]
+\begin{thm}[Iwasawa's theorem, {\cite{Was97}, Theorem 13.13}]
 \label{clgp-growth}
 \uses{Zp-ext-def,p:f-g-torsion2,coinvariant-growth,X-inf-coinv-is-X-n}
 \lean{IsMvZpExtension.multiplicity_classNumber_Kn_eq₁}
 \leanok
 Let $K$ be a number field, $p$ be a prime,
 $K_\infty/K$ be a $\BZ_p$-extension.
-Then there exist integers $\lambda,\mu,\nu$
+Then there exist integers $\lambda\geq 0,\mu\geq 0,\nu$
 such that for all sufficiently large $n$,
 $\ord_p(\#\Cl(K_n))=\mu p^n+\lambda n+\nu$.
 \end{thm}

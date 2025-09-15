@@ -34,7 +34,7 @@ $n\geq 0$, define $K_n:=K_\infty^{\Gamma^{p^n}}$.
 
 \begin{thm}[Iwasawa's theorem, {\cite{Was97}, Theorem 13.13}]
 \label{clgp-growth}
-\uses{Zp-ext-def,Xn-isom-qout,coinvariant-growth}
+\uses{Zp-ext-def,Xn-isom-qout,coinvariant-growth-2,Xn-isom-An}
 \lean{IsMvZpExtension.multiplicity_classNumber_Kn_eq₁}
 \leanok
 Let $K$ be a number field, $p$ be a prime,
@@ -1432,6 +1432,7 @@ viewed as a quotient of $\Cl(K_n)$.
 
 \begin{prop}
 \label{Xn-isom-An}
+\uses{Zp-ext-Ln,Zp-ext-An}
 There is a canonical isomorphism $X_n\cong A_n$.
 \end{prop}
 
@@ -1607,7 +1608,7 @@ are isomorphisms.
 \begin{thm}[\cite{Was97}, Lemma 13.15, 13.17]
 \label{Xn-isom-qout-of-totally-ramified}
 \uses{isom-of-totally-ramified,p:unr-outside-p,exists-totally-ramified,
-commutator-eq,p:nak,p:rank-growth}
+commutator-eq,p:nak,p:rank-growth,X-has-Gamma-action}
 Suppose $K_\infty/K$ is totally ramified
 (Definition \ref{Zp-ext-totally-ramified}).
 Then there exists a $\Lambda$-submodule $Y$ of $X_\infty$ of finite index,

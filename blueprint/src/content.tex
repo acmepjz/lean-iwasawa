@@ -281,7 +281,7 @@ Now by Proposition \ref{noeth-local-domain-is-icd-iff}, $A_\fp$ is a DVR.
 
 \begin{lem}
 \label{semilocal-fg-mod}
-\lean{Module.finite_of_finite_localized_maximal}
+\lean{Module.Finite.of_isLocalized_maximal}
 \leanok
 Let $A$ be a semilocal ring, $M$ be an $A$-module such that
 for any maximal ideal $\fm$ of $A$, $M_\fm$ is a finitely generated $A_\fm$-module.
@@ -319,7 +319,7 @@ By definition of $y_{i,k}$, we have $f_i(y_{i,k})$ in right hand side.
 
 \begin{lem}
 \label{semilocal-PID}
-\lean{isPrincipalIdealRing_of_isPrincipalIdealRing_localization}
+\lean{isPrincipalIdealRing_of_isPrincipalIdealRing_isLocalization_maximal}
 \uses{semilocal-fg-mod}
 \leanok
 Let $A$ be a semilocal (i.e.~only finitely many maximal ideals)
@@ -331,22 +331,18 @@ Then $A$ itself is a PID.
 \begin{proof}
 \leanok
 It's known that a semilocal Dedeking domain is a PID
-(\docs{IsPrincipalIdealRing.of_finite_primes}).
+(\docs{IsPrincipalIdealRing.of_finite_maximals}).
 So we only need to show $A$ is a Dedekind domain.
 
 Let $I$ be any ideal of $A$. Apply Lemma \ref{semilocal-fg-mod} to $I$ we know that
 $I$ is finitely generated. Hence $A$ is a Noetherian ring.
 
-Let $\fp\neq 0$ be a prime ideal of $A$.
-Choose a maximal ideal $\fm$ containing $\fp$.
-Then $0\neq\fp A_\fm\subset\fm A_\fm$. Since $A_\fm$ is a PID
-(hence DVR), we have
-$\Spec(A_\fm)=\{0,\fm A_\fm\}$,
-so know that $\fp A_\fm=\fm A_\fm$, hence $\fp=\fm$ is maximal.
+Apply \docs{Ring.krullDimLE_of_isLocalization_maximal}. If $\dim(A_{\fm}) \le n$ for any maximal ideals $\fm$ of $A$, 
+then $\dim(A) \le n$. Hence we have $\dim(A) \le 1$.
 
 It's known that if the localizations of a domain at all maximal ideals
 are integrally closed, then the domain itself is integrally closed
-(\docs{IsIntegrallyClosed.of_localization_maximal}).
+(\docs{IsIntegrallyClosed.of_isLocalization_maximal}).
 Hence our $A$ is integrally closed. This completes the proof.
 \end{proof}
 

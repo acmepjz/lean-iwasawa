@@ -4,8 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jz Pan, Yiming Fu, Shouxin Zhang
 -/
 import Mathlib.Algebra.Module.PID
-import Mathlib.RingTheory.DedekindDomain.PID
-import Mathlib.RingTheory.KrullDimension.Zero
+import Mathlib.RingTheory.Localproperties.Semilocal
 import Iwasawalib.RingTheory.PseudoNull.CharacteristicIdeal
 
 /-!
@@ -118,202 +117,13 @@ class HeightOneLocalizationIsPID (A : Type*) [CommRing A] : Prop where
     IsDomain (Localization (⨅ p ∈ s, p.1.primeCompl)) ∧
     IsPrincipalIdealRing (Localization (⨅ p ∈ s, p.1.primeCompl))
 
-namespace IsLocalizedModule
-
-section numerator
-
-variable {R : Type*} [CommSemiring R] (S : Submonoid R)
-variable {M M' : Type*} [AddCommMonoid M] [AddCommMonoid M']
-variable {R' : Type*} [CommSemiring R'] [Algebra R R'] [Module R' M'] [IsLocalization S R']
-variable [Module R M] [Module R M'] [IsScalarTower R R' M']
-variable (f : M →ₗ[R] M') [IsLocalizedModule S f]
-
-private noncomputable def getNumerator (x : M') : M :=
-  (Classical.choose (IsLocalizedModule.surj S f x)).1
-
-/-- If the image of `getNumerator x` under `f`
-is in a submodule `N'` of `M'`, then `x` itself lies in `N'`. -/
-private lemma mem_of_getNumerator_image_mem {N' : Submodule R' M'} {x : M'}
-    (hx : f (getNumerator S f x) ∈ N') : x ∈ N' := by
-  let Num := (getNumerator S f x)
-  let Den := (Classical.choose (IsLocalizedModule.surj S f x)).2
-  have h : Den • x = f Num := (Classical.choose_spec (IsLocalizedModule.surj S f x))
-  rwa [← IsLocalization.smul_mem_iff (s := Den), h]
-
-private noncomputable def finsetNumerator [DecidableEq M] (s : Finset M') : Finset M :=
-  Finset.image (getNumerator S f) s
-
-end numerator
-
-end IsLocalizedModule
-
-namespace Module
-
-open IsLocalizedModule
-
-variable {R : Type*} [CommSemiring R] [Finite (MaximalSpectrum R)]
-variable (M : Type*) [AddCommMonoid M] [Module R M]
-
-variable
-  (Rₚ : ∀ (P : Ideal R) [P.IsMaximal], Type*)
-  [∀ (P : Ideal R) [P.IsMaximal], CommSemiring (Rₚ P)]
-  [∀ (P : Ideal R) [P.IsMaximal], Algebra R (Rₚ P)]
-  [∀ (P : Ideal R) [P.IsMaximal], IsLocalization.AtPrime (Rₚ P) P]
-  (Mₚ : ∀ (P : Ideal R) [P.IsMaximal], Type*)
-  [∀ (P : Ideal R) [P.IsMaximal], AddCommMonoid (Mₚ P)]
-  [∀ (P : Ideal R) [P.IsMaximal], Module R (Mₚ P)]
-  [∀ (P : Ideal R) [P.IsMaximal], Module (Rₚ P) (Mₚ P)]
-  [∀ (P : Ideal R) [P.IsMaximal], IsScalarTower R (Rₚ P) (Mₚ P)]
-  (f : ∀ (P : Ideal R) [P.IsMaximal], M →ₗ[R] Mₚ P)
-  [∀ (P : Ideal R) [P.IsMaximal], IsLocalizedModule P.primeCompl (f P)]
-
-include f in
-theorem finite_of_finite_isLocalized_maximal
-    (H : ∀ (P : Ideal R) [P.IsMaximal], Module.Finite (Rₚ P) (Mₚ P)) :
-    Module.Finite R M := by
-  classical
-  let _ : Fintype ({ P : Ideal R | P.IsMaximal }) := by
-    rw [← MaximalSpectrum.range_asIdeal]
-    exact Fintype.ofFinite (Set.range MaximalSpectrum.asIdeal)
-  constructor
-  let _ {P : { P : Ideal R | P.IsMaximal }} : P.1.IsMaximal := P.2
-  choose s₁ s₂ using (fun P : { P : Ideal R | P.IsMaximal } ↦ (H P.1).1)
-  let sf := fun P : { P : Ideal R | P.IsMaximal } ↦
-    finsetNumerator P.1.primeCompl (f P.1) (s₁ P)
-  use Finset.biUnion (Finset.univ) sf
-  let N : Submodule R M := Submodule.span R (Finset.univ.biUnion sf)
-  apply Submodule.eq_top_of_localization_maximal Rₚ Mₚ f
-  intro P hP
-  rw [← top_le_iff, ← s₂ ⟨P, hP⟩]
-  simp only [Submodule.localized'_span]
-  apply Submodule.span_le.2
-  intro x hx
-  lift x to s₁ ⟨P, hP⟩ using hx
-  rw [SetLike.mem_coe]
-  let Num := (getNumerator P.primeCompl (f P) x)
-  apply mem_of_getNumerator_image_mem P.primeCompl (f P)
-  refine Submodule.mem_span.mpr fun p a => a ?_
-  simp only [Finset.coe_biUnion, Finset.coe_univ, Set.mem_univ, Set.iUnion_true, Set.mem_image,
-    Set.mem_iUnion, Finset.mem_coe, finsetNumerator, Finset.mem_image, sf]
-  exact ⟨Num, ⟨⟨P, hP⟩, ⟨x, ⟨x.2, rfl⟩⟩⟩, rfl⟩
-
-theorem finite_of_finite_localized_maximal
-    (H : ∀ (P : Ideal R) [P.IsMaximal],
-      Module.Finite (Localization P.primeCompl) (LocalizedModule P.primeCompl M)) :
-    Module.Finite R M :=
-  finite_of_finite_isLocalized_maximal M _ _ (fun _ _ ↦ LocalizedModule.mkLinearMap _ _) H
-
-theorem finite_of_finite_localized_maximal'
-    (H : ∀ p : MaximalSpectrum R,
-      Module.Finite (Localization p.1.primeCompl) (LocalizedModule p.1.primeCompl M)) :
-    Module.Finite R M := by
-  apply finite_of_finite_localized_maximal
-  convert H
-  exact ⟨fun h p ↦ h p.1, fun H P hP ↦ H ⟨P, hP⟩⟩
-
-end Module
-
-namespace Submodule
-
-variable {R : Type*} [CommSemiring R] [Finite (MaximalSpectrum R)]
-variable {M : Type*} [AddCommMonoid M] [Module R M] (N : Submodule R M)
-
-theorem fg_of_fg_localized_maximal'
-    (H : ∀ p : MaximalSpectrum R, (localized (p.1.primeCompl) N).FG) :
-    N.FG := by
-  simp_rw [← Module.Finite.iff_fg] at ⊢ H
-  apply Module.finite_of_finite_localized_maximal'
-  convert H
-  exact Module.Finite.equiv_iff (Submodule.localizedEquiv _ N).symm
-
-end Submodule
-
-namespace Ring
-
--- TODO: Generalize this to `ringKrullDim` for `CommSemiring A`.
-/-- If a commutative domain `A` satisfies that its localization at all maximal ideals is `Ring.DimensionLEOne`,
-then `A` itself is `Ring.DimensionLEOne`. -/
-lemma dimensionLEOne_of_dimensionLEOne_localization_maximal {A : Type*} [CommRing A] [IsDomain A]
-    (h : ∀ (P : Ideal A) [P.IsMaximal], Ring.DimensionLEOne (Localization P.primeCompl)) :
-    Ring.DimensionLEOne A where
-  maximalOfPrime := by
-    intro p hp hpp
-    rcases p.exists_le_maximal (Ideal.IsPrime.ne_top hpp) with ⟨q, hq, hpq⟩
-    let f := (IsLocalization.orderIsoOfPrime q.primeCompl (Localization.AtPrime q)).symm
-    let P := f ⟨p, hpp, hpq.disjoint_compl_left⟩
-    let Q := f ⟨q, hq.isPrime, Set.disjoint_left.mpr fun _ a => a⟩
-    have hinj : Function.Injective (algebraMap A (Localization.AtPrime q)) :=
-      IsLocalization.injective (Localization.AtPrime q) q.primeCompl_le_nonZeroDivisors
-    have hp1 : P.1 ≠ ⊥ := fun x => hp ((p.map_eq_bot_iff_of_injective hinj).mp x)
-    have hq1 : Q.1 ≠ ⊥ :=
-      fun x => (ne_bot_of_le_ne_bot hp hpq) ((q.map_eq_bot_iff_of_injective hinj).mp x)
-    by_cases hqf : IsField (Localization.AtPrime q)
-    · let _ : Field (Localization.AtPrime q) := by exact hqf.toField
-      have huq : ∃! P : Ideal (Localization.AtPrime q), P.IsPrime :=
-        Ring.KrullDimLE.existsUnique_isPrime (Localization.AtPrime q)
-      rw [show p = q from Subtype.val_inj.mpr <| f.injective <|
-        Subtype.val_inj.mp (huq.unique P.2 Q.2)]
-      exact hq
-    · have huq : ∃! P : Ideal (Localization.AtPrime q), P ≠ ⊥ ∧ P.IsPrime := by
-        obtain ⟨P, hP⟩ := Ring.not_isField_iff_exists_prime.1 hqf
-        refine ⟨P, ⟨hP, fun Q hQ ↦ ?_⟩⟩
-        have hpm := Ideal.IsPrime.isMaximal hP.2 hP.1
-        have hqm := Ideal.IsPrime.isMaximal hQ.2 hQ.1
-        exact (IsLocalRing.maximal_ideal_unique _).unique hqm hpm
-      rw [show p = q from Subtype.val_inj.mpr <| f.injective <|
-        Subtype.val_inj.mp (huq.unique ⟨hp1, P.2⟩ ⟨hq1, Q.2⟩)]
-      exact hq
-
-lemma dimensionLEOne_of_dimensionLEOne_localization_maximal' {A : Type*} [CommRing A] [IsDomain A]
-    (h : ∀ p : MaximalSpectrum A, Ring.DimensionLEOne (Localization p.1.primeCompl)) :
-    Ring.DimensionLEOne A := by
-  apply dimensionLEOne_of_dimensionLEOne_localization_maximal
-  convert h
-  exact ⟨fun h p ↦ h p.1, fun H P hP ↦ H ⟨P, hP⟩⟩
-
-end Ring
-
-/-- If a semilocal integral domain satisfies that it localized at all
-maximal ideals is a PID, then itself is a PID. -/
-theorem isPrincipalIdealRing_of_isPrincipalIdealRing_localization
-    (A : Type*) [CommRing A] [IsDomain A] [Finite (MaximalSpectrum A)]
-    (hpid : ∀ p : MaximalSpectrum A, IsPrincipalIdealRing (Localization p.1.primeCompl)) :
-    IsPrincipalIdealRing A := by
-  have : IsNoetherianRing A := by
-    constructor
-    intro N
-    refine Submodule.fg_of_fg_localized_maximal' N (fun p ↦ ?_)
-    exact IsNoetherian.noetherian (Submodule.localized p.asIdeal.primeCompl N)
-  have : IsIntegrallyClosed A := by
-    apply IsIntegrallyClosed.of_localization_maximal
-    intro P _ hP
-    let p : MaximalSpectrum A := ⟨P, hP⟩
-    show IsIntegrallyClosed (Localization p.1.primeCompl)
-    infer_instance
-  have : Ring.DimensionLEOne A := by
-    apply Ring.dimensionLEOne_of_dimensionLEOne_localization_maximal'
-    infer_instance
-  have : IsDedekindDomain A := {maximalOfPrime := Ring.DimensionLEOne.maximalOfPrime}
-  have hp_sub : {P : Ideal A | P.IsPrime} ⊆ {P : Ideal A | P.IsMaximal} ∪ {⊥} := by
-    simp only [Set.union_singleton]
-    intro P hP
-    obtain rfl | hbot := eq_or_ne P ⊥
-    · simp
-    · simp only [Set.mem_insert_iff, hbot, Set.mem_setOf_eq, false_or]
-      exact Ring.DimensionLEOne.maximalOfPrime hbot hP
-  have hp_finite : {P : Ideal A | P.IsPrime}.Finite := by
-    refine Set.Finite.subset (Set.Finite.union ?_ (Set.finite_singleton ⊥)) hp_sub
-    rw [← MaximalSpectrum.range_asIdeal]
-    exact Set.finite_range MaximalSpectrum.asIdeal
-  exact IsPrincipalIdealRing.of_finite_primes hp_finite
-
 instance (priority := 100) IsKrullDomain.heightOneLocalizationIsPID
     (A : Type*) [CommRing A] [IsDomain A] [IsKrullDomain A] : HeightOneLocalizationIsPID A := by
   refine ⟨fun s hs hn hfin ↦ ?_⟩
   set S := ⨅ p ∈ s, p.1.primeCompl
   have hS : S ≤ nonZeroDivisors A :=
     iInf_le_of_le hn.some <| iInf_le_of_le hn.some_mem hn.some.1.primeCompl_le_nonZeroDivisors
-  have : IsDomain (Localization S) := IsLocalization.isDomain_of_le_nonZeroDivisors A hS
+  have : IsDomain (Localization S) := IsLocalization.isDomain_localization hS
   have := Ideal.bot_prime (α := A)
   refine ⟨‹_›, ?_⟩
   have hrange := PrimeSpectrum.localization_comap_range_eq_of_isDomain_of_primeHeight_eq_one
@@ -323,7 +133,11 @@ instance (priority := 100) IsKrullDomain.heightOneLocalizationIsPID
     refine @Finite.of_injective_finite_range _ _ _
       (PrimeSpectrum.localization_comap_injective (Localization S) S) (Set.Finite.to_subtype ?_)
     simp [hrange, hfin]
-  refine isPrincipalIdealRing_of_isPrincipalIdealRing_localization _ fun p ↦ ?_
+  apply isPrincipalIdealRing_of_isPrincipalIdealRing_isLocalization_maximal
+    fun P _ ↦ Localization.AtPrime P
+  suffices h : ∀ p : MaximalSpectrum (Localization S),
+    IsPrincipalIdealRing (Localization p.1.primeCompl) from fun P hP ↦ h ⟨P, hP⟩
+  intro p
   have hp := Set.mem_range_self (f := PrimeSpectrum.comap (algebraMap A (Localization S)))
     p.toPrimeSpectrum
   rw [hrange, Set.union_singleton, Set.mem_insert_iff] at hp

@@ -286,6 +286,7 @@ theorem two_le_totient_p_pow_torsionfreeUnitsExponent :
     apply Nat.le_sub_one_of_lt
     exact Ne.lt_of_le (Ne.symm hp) ‹Fact p.Prime›.out.two_le
 
+open Polynomial in
 theorem existsUnique_pow_eq_one_and_unitsMap_toZModPow_one_eq (x : (ZMod (p ^ 1))ˣ) :
     ∃! y : ℤ_[p]ˣ, y ^ (p - 1) = 1 ∧ Units.map (toZModPow 1).toMonoidHom y = x := by
   obtain ⟨a, rfl⟩ := unitsMap_toZModPow_surjective p 1 x
@@ -293,18 +294,17 @@ theorem existsUnique_pow_eq_one_and_unitsMap_toZModPow_one_eq (x : (ZMod (p ^ 1)
     rw [← isUnit_map_iff toZMod, map_natCast, ZMod.isUnit_iff_coprime,
       ← Nat.coprime_self_sub_left (by simp), Nat.sub_sub_self ‹Fact p.Prime›.out.one_le]
     exact Nat.coprime_one_left p
-  have h1 (a : ℤ_[p]ˣ) : ‖Polynomial.eval a.1 (Polynomial.X ^ (p - 1) - 1)‖ < 1 := by
-    simp only [Polynomial.eval_sub, Polynomial.eval_pow, Polynomial.eval_X, Polynomial.eval_one]
+  have h1 (a : ℤ_[p]ˣ) : ‖eval a.1 (X ^ (p - 1) - 1)‖ < 1 := by
+    simp only [eval_sub, eval_pow, eval_X, eval_one]
     have : toZMod a.1 ≠ 0 := (a.map (toZMod (p := p)).toMonoidHom).ne_zero
     rw [norm_lt_one_iff_dvd, ← Ideal.mem_span_singleton, ← maximalIdeal_eq_span_p, ← ker_toZMod]
     simp [ZMod.pow_card_sub_one_eq_one this]
-  have h2 (a : ℤ_[p]ˣ) :
-      ‖Polynomial.eval a.1 (Polynomial.derivative (Polynomial.X ^ (p - 1) - 1))‖ = 1 := by
-    simp [Polynomial.derivative_X_pow, isUnit_iff.1 hu]
-  obtain ⟨z, hz1, hz2, -, hz3⟩ := hensels_lemma (F := Polynomial.X ^ (p - 1) - 1) (a := a.1) <| by
-    simpa only [h2, one_pow] using h1 a
-  simp only [Polynomial.eval_sub, Polynomial.eval_pow, Polynomial.eval_X,
-    Polynomial.eval_one, sub_eq_zero] at hz1 hz3
+  have h2 (a : ℤ_[p]ˣ) : ‖eval a.1 (derivative (X ^ (p - 1) - 1))‖ = 1 := by
+    simp [derivative_X_pow, isUnit_iff.1 hu]
+  obtain ⟨z, hz1, hz2, -, hz3⟩ := hensels_lemma (R := ℤ_[p]) (F := X ^ (p - 1) - 1) (a := a.1) <| by
+    simpa only [coe_aeval_eq_eval, h2, one_pow] using h1 a
+  simp only [coe_aeval_eq_eval] at hz1 hz2 hz3
+  simp only [eval_sub, eval_pow, eval_X, eval_one, sub_eq_zero] at hz1 hz3
   simp only [h2] at hz2 hz3
   have hp1 : p - 1 ≠ 0 := by
     have := ‹Fact p.Prime›.out.two_le

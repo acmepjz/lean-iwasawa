@@ -51,8 +51,8 @@ variable {H : Type*} [Group H] [TopologicalSpace H]
   (U : OpenNormalSubgroup G) (V : OpenNormalSubgroup H)
 
 /-- The product of two open normal subgroups as an open normal subgroup of the product group. -/
-@[to_additive prod "The product of two open normal subgroups as an open normal subgroup
-of the product group."]
+@[to_additive prod /-- The product of two open normal subgroups as an open normal subgroup
+of the product group. -/]
 def prod : OpenNormalSubgroup (G × H) :=
   ⟨U.toOpenSubgroup.prod V.toOpenSubgroup, U.toSubgroup.prod_normal V.toSubgroup⟩
 
@@ -89,8 +89,8 @@ variable {N : Type*} [Group N] [TopologicalSpace N]
 
 /-- The preimage of an `OpenNormalSubgroup` along a continuous `Monoid` homomorphism
   is an `OpenNormalSubgroup`. -/
-@[to_additive "The preimage of an `OpenNormalAddSubgroup` along a continuous `AddMonoid`
-homomorphism is an `OpenNormalAddSubgroup`."]
+@[to_additive /-- The preimage of an `OpenNormalAddSubgroup` along a continuous `AddMonoid`
+homomorphism is an `OpenNormalAddSubgroup`. -/]
 def comap (f : G →* N) (hf : Continuous f) (H : OpenNormalSubgroup N) : OpenNormalSubgroup G :=
   ⟨.comap f hf H.toOpenSubgroup, Subgroup.normal_comap f⟩
 

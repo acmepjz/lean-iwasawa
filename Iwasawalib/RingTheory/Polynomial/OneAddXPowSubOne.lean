@@ -4,7 +4,6 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jz Pan
 -/
 import Mathlib.Data.Nat.Multiplicity
-import Mathlib.Algebra.GeomSum
 import Mathlib.RingTheory.Ideal.BigOperators
 import Mathlib.RingTheory.Polynomial.Eisenstein.Distinguished
 

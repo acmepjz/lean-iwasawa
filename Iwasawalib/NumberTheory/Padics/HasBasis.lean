@@ -48,7 +48,7 @@ theorem PadicInt.isOpen_pi_span_p_pow :
     IsOpen (Ideal.pi fun _ : ι ↦ Ideal.span {(p ^ n : ℤ_[p])} : Set (ι → ℤ_[p])) := by
   convert isOpen_set_pi (ι := ι) Set.finite_univ (fun _ _ ↦ isOpen_span_p_pow p n)
   ext
-  simp [Ideal.mem_pi]
+  simp [-Ideal.pi_span, Ideal.mem_pi]
 
 /-! ## Index of ideals of `ℤₚ` -/
 
@@ -68,7 +68,7 @@ theorem PadicInt.index_pi_span_p_pow :
     simp [index_span_p_pow p n, pow_mul]
   convert h2
   ext
-  simp [Ideal.mem_pi, AddSubgroup.mem_pi]
+  simp [-Ideal.pi_span, Ideal.mem_pi, AddSubgroup.mem_pi]
 
 /-! ## Neighborhood basis of `ℤₚ` around `0` -/
 

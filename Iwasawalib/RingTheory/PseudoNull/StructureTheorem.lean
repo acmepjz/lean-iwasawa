@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jz Pan, Yiming Fu, Shouxin Zhang
 -/
 import Mathlib.Algebra.Module.PID
-import Mathlib.RingTheory.Localproperties.Semilocal
+import Mathlib.RingTheory.LocalProperties.Semilocal
 import Iwasawalib.RingTheory.PseudoNull.CharacteristicIdeal
 
 /-!

@@ -73,8 +73,8 @@ theorem isCyclotomicExtension' [NeZero (p : K)] (s : Set ℕ) (h1 : s ⊆ {0} �
     rw [Set.mem_setOf_eq]
     exact ⟨n, hx.1⟩
   adjoin_roots x := by
-    rw [← IntermediateField.adjoin_algebraic_toSubalgebra
-      (fun x _ ↦ Algebra.IsAlgebraic.isAlgebraic x)]
+    rw [← IntermediateField.adjoin_toSubalgebra_of_isAlgebraic
+      fun x _ ↦ Algebra.IsAlgebraic.isAlgebraic x]
     apply (IntermediateField.mem_lift x).1
     rw [IntermediateField.lift_adjoin]
     refine (?_ : IntermediateField.adjoin K _ ≤ IntermediateField.adjoin K _) x.2
@@ -188,7 +188,8 @@ theorem continuousCyclotomicCharacter_injective [IsCyclotomicExtension (Set.rang
   rw [← IntermediateField.adjoin_eq_fixedField_ker_continuousCyclotomicCharacter,
     IntermediateField.fixedField_bot]
   apply_fun _ using IntermediateField.toSubalgebra_injective
-  rw [IntermediateField.adjoin_algebraic_toSubalgebra fun x _ ↦ Algebra.IsAlgebraic.isAlgebraic x,
+  rw [IntermediateField.adjoin_toSubalgebra_of_isAlgebraic
+      fun x _ ↦ Algebra.IsAlgebraic.isAlgebraic x,
     IntermediateField.top_toSubalgebra]
   convert (IsCyclotomicExtension.iff_adjoin_eq_top (Set.range (p ^ ·)) K L).1 ‹_› |>.2 using 2
   simp [‹Fact p.Prime›.out.ne_zero]

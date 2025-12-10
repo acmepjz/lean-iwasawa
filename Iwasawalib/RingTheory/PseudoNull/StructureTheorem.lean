@@ -300,7 +300,7 @@ theorem LinearMap.isPseudoIsomorphism_iff_bijective_map
   set K := LinearMap.ker f
   simp_rw [isPseudoIsomorphism_iff, Module.isPseudoNull_iff_primeHeight_le_one_imp_subsingleton, Function.Bijective]
   rw [← ker_eq_bot, ← Submodule.subsingleton_iff_eq_bot, subsingleton_ker_convert]
-  rw [← range_eq_top, ← Submodule.subsingleton_quotient_iff_eq_top, subsingleton_coker_convert]
+  rw [← range_eq_top, ← Submodule.Quotient.subsingleton_iff, subsingleton_coker_convert]
   simp_rw [S, sigma, subsingleton_convert hMT hNT, ← hsigma]
   refine and_congr ?_ ?_
   . refine forall_congr' fun p => ?_

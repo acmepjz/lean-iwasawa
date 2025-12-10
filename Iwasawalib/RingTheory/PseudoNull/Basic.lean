@@ -268,7 +268,7 @@ theorem isPseudoIsomorphism_iff_of_surjective (h : Function.Surjective f) :
   rw [isPseudoIsomorphism_iff, and_iff_left_iff_imp]
   rintro -
   suffices Subsingleton (N ⧸ range f) by infer_instance
-  rw [Submodule.subsingleton_quotient_iff_eq_top]
+  rw [Submodule.Quotient.subsingleton_iff]
   exact range_eq_top_of_surjective f h
 
 theorem isPseudoIsomorphism_of_bijective (h : Function.Bijective f) : f.IsPseudoIsomorphism := by

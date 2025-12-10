@@ -259,7 +259,7 @@ theorem topologicalGenerator_spec :
   rw [← Homeomorph.image_closure]
   convert Set.image_univ_of_surjective H.continuousMulEquiv₁.symm.surjective
   have := AddSubgroup.toSubgroup_closure {(1 : ℤ_[p])}
-  rw [Set.preimage_equiv_eq_image_symm, Multiplicative.toAdd_symm_eq,
+  rw [← Equiv.image_symm_eq_preimage, Multiplicative.toAdd_symm_eq,
     Set.image_singleton] at this
   rw [← this]
   change closure (AddSubgroup.closure {(1 : ℤ_[p])} : Set ℤ_[p]) = _

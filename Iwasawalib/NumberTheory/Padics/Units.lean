@@ -79,7 +79,7 @@ theorem Field.isAddCyclic_iff (F : Type*) [Field F] : IsAddCyclic F ↔ (Nat.car
     have := Fact.mk hp
     let _ := ZMod.algebra F p
     have hrank : Module.rank (ZMod p) F = 1 := by
-      refine le_antisymm (rank_le_one_iff.2 ?_) (Cardinal.one_le_iff_pos.2 rank_pos_of_free)
+      refine le_antisymm (rank_le_one_iff.2 ?_) (Cardinal.one_le_iff_pos.2 Module.rank_pos_of_free)
       obtain ⟨a, hsurj⟩ := exists_zsmul_surjective F
       refine ⟨a, fun v ↦ ?_⟩
       obtain ⟨n, hn⟩ := hsurj v

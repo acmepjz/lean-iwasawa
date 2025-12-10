@@ -85,10 +85,11 @@ theorem degree_oneAddXPowSubOne_of_ne_zero [Nontrivial R] (hn : n ≠ 0) :
     rw [h1]
     exact degree_sum_fin_lt _
   have h3 (m : WithBot ℕ) (hm : m < n + 1) : m ≤ n := by
-    rcases m with ⟨⟩ | m
-    · nofun
-    · have : m < n + 1 := WithBot.coe_lt_coe.1 hm
-      exact WithBot.coe_le_coe.2 (Nat.lt_add_one_iff.1 this)
+    rcases eq_or_ne m ⊥ with rfl | h
+    · simp
+    obtain ⟨m, rfl⟩ := WithBot.ne_bot_iff_exists.1 h
+    have : m < n + 1 := WithBot.coe_lt_coe.1 hm
+    exact WithBot.coe_le_coe.2 (Nat.lt_add_one_iff.1 this)
   exact h3 _ h2
 
 theorem natDegree_oneAddXPowSubOne [Nontrivial R] : (oneAddXPowSubOne R n).natDegree = n := by

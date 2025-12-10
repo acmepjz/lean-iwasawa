@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jz Pan
 -/
 import Mathlib.Algebra.Module.LocalizedModule.Exact
-import Mathlib.Algebra.Module.Torsion
+import Mathlib.Algebra.Module.Torsion.Basic
 import Mathlib.RingTheory.Ideal.AssociatedPrime.Finiteness
 import Mathlib.RingTheory.Ideal.Height
 import Mathlib.RingTheory.Support

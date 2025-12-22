@@ -3,8 +3,12 @@ Copyright (c) 2025 Jz Pan. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jz Pan
 -/
-import Iwasawalib.RingTheory.CharacteristicIdeal.Basic
-import Iwasawalib.RingTheory.PseudoNull.Basic
+module
+
+public import Iwasawalib.RingTheory.CharacteristicIdeal.Basic
+public import Iwasawalib.RingTheory.PseudoNull.Basic
+
+@[expose] public section
 
 /-!
 

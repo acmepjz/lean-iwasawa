@@ -3,12 +3,16 @@ Copyright (c) 2025 Jz Pan. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jz Pan
 -/
-import Iwasawalib.Algebra.InverseLimit.Basic
-import Mathlib.Algebra.MonoidAlgebra.Basic
-import Mathlib.LinearAlgebra.Finsupp.Pi
-import Mathlib.Topology.Algebra.ClopenNhdofOne
-import Mathlib.Topology.Algebra.ContinuousMonoidHom
-import Iwasawalib.Topology.Algebra.OpenSubgroup
+module
+
+public import Iwasawalib.Algebra.InverseLimit.Basic
+public import Mathlib.Algebra.MonoidAlgebra.Basic
+public import Mathlib.LinearAlgebra.Finsupp.Pi
+public import Mathlib.Topology.Algebra.ClopenNhdofOne
+public import Mathlib.Topology.Algebra.ContinuousMonoidHom
+public import Iwasawalib.Topology.Algebra.OpenSubgroup
+
+@[expose] public section
 
 /-!
 

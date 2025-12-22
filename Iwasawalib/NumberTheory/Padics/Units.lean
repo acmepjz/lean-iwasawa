@@ -3,21 +3,25 @@ Copyright (c) 2025 Jz Pan. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jz Pan
 -/
-import Mathlib.Algebra.Algebra.ZMod
-import Mathlib.Algebra.CharZero.Infinite
-import Mathlib.Analysis.Normed.Ring.Units
-import Mathlib.FieldTheory.Finite.Basic
-import Mathlib.GroupTheory.SpecificGroups.Cyclic
-import Mathlib.LinearAlgebra.Dimension.FreeAndStrongRankCondition
-import Iwasawalib.NumberTheory.Padics.EquivMvZp
-import Mathlib.NumberTheory.Basic
-import Mathlib.NumberTheory.Padics.Hensel
-import Mathlib.RingTheory.Localization.Cardinality
-import Mathlib.RingTheory.RootsOfUnity.EnoughRootsOfUnity
-import Mathlib.RingTheory.ZMod.UnitsCyclic
-import Mathlib.SetTheory.Cardinal.Continuum
-import Iwasawalib.Topology.Algebra.Group.Basic
-import Mathlib.Topology.Algebra.Module.Cardinality
+module
+
+public import Mathlib.Algebra.Algebra.ZMod
+public import Mathlib.Algebra.CharZero.Infinite
+public import Mathlib.Analysis.Normed.Ring.Units
+public import Mathlib.FieldTheory.Finite.Basic
+public import Mathlib.GroupTheory.SpecificGroups.Cyclic
+public import Mathlib.LinearAlgebra.Dimension.FreeAndStrongRankCondition
+public import Mathlib.NumberTheory.Basic
+public import Iwasawalib.NumberTheory.Padics.HasBasis
+public import Mathlib.NumberTheory.Padics.Hensel
+public import Mathlib.RingTheory.Localization.Cardinality
+public import Mathlib.RingTheory.RootsOfUnity.EnoughRootsOfUnity
+public import Mathlib.RingTheory.ZMod.UnitsCyclic
+public import Mathlib.SetTheory.Cardinal.Continuum
+public import Iwasawalib.Topology.Algebra.Group.Basic
+public import Mathlib.Topology.Algebra.Module.Cardinality
+
+@[expose] public section
 
 /-!
 

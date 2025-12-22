@@ -6,11 +6,11 @@ defaultTargets = ["Iwasawalib"]
 [leanOptions]
 pp.unicode.fun = true # pretty-prints `fun a ↦ b`
 autoImplicit = false
+experimental.module = true
 
 [[require]]
 name = "mathlib"
 scope = "leanprover-community"
-
 
 [[require]]
 name = "checkdecls"
@@ -20,5 +20,6 @@ git = "https://github.com/PatrickMassot/checkdecls.git"
 name = "«doc-gen4»"
 git = "https://github.com/leanprover/doc-gen4"
 rev = "main"
+
 [[lean_lib]]
 name = "Iwasawalib"

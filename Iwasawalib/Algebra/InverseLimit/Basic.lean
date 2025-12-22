@@ -3,10 +3,14 @@ Copyright (c) 2025 Jz Pan. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jz Pan
 -/
-import Mathlib.Algebra.Algebra.Pi
-import Mathlib.Algebra.Algebra.Subalgebra.Basic
--- import Mathlib.Data.Rel
-import Mathlib.RingTheory.Ideal.Maps
+module
+
+public import Mathlib.Algebra.Algebra.Pi
+public import Mathlib.Algebra.Algebra.Subalgebra.Basic
+-- public import Mathlib.Data.Rel
+public import Mathlib.RingTheory.Ideal.Maps
+
+@[expose] public section
 
 /-!
 

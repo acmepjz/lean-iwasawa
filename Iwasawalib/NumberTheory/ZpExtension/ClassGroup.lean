@@ -3,8 +3,12 @@ Copyright (c) 2025 Jz Pan. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jz Pan
 -/
-import Iwasawalib.NumberTheory.ZpExtension.Basic
-import Mathlib.NumberTheory.NumberField.ClassNumber
+module
+
+public import Iwasawalib.NumberTheory.ZpExtension.Basic
+public import Mathlib.NumberTheory.NumberField.ClassNumber
+
+@[expose] public section
 
 /-!
 

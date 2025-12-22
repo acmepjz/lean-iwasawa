@@ -3,7 +3,9 @@ Copyright (c) 2025 Jz Pan. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jz Pan
 -/
-import Mathlib.RingTheory.PowerSeries.WeierstrassPreparation
+module
+
+public import Mathlib.RingTheory.PowerSeries.WeierstrassPreparation
 
 /-!
 

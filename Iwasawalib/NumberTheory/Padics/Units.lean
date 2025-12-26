@@ -27,6 +27,32 @@ public import Mathlib.Topology.Algebra.Module.Cardinality
 
 # Structure of `ℤₚˣ`
 
+- `PadicInt.torsionfreeUnitsExponent`: the smallest integer `n` such that the subgroup `1 + pⁿℤₚ`
+  of `ℤₚˣ` is torsion-free. More explicitly, `n = 2` if `p = 2`, and `n = 1` otherwise.
+- `PadicInt.teichmuller`: the Teichmüller map `(ℤ/pⁿℤ)ˣ →* ℤₚˣ` where `n = 2` if `p = 2`, and
+  `n = 1` otherwise, which maps `a` to the unique `ϕ(pⁿ)`-th roots of unity
+  (`PadicInt.torsionUnits_eq_torsion` shows that it is indeed the unique roots of unity)
+  in `ℤₚ` such that it is congruent to `a` modulo `pⁿ`.
+- `PadicInt.principalUnits`: maps a natural number `n` to the subgroup `1 + pⁿℤₚ` of `ℤₚˣ`.
+- `PadicInt.torsionfreeUnits`: the subgroup `1 + pⁿℤₚ` of `ℤₚˣ` where `n = 2` if `p = 2`,
+  and `n = 1` otherwise.
+- `PadicInt.torsionUnits`: the subgroup `(ℤₚˣ)ₜₒᵣ` of torsion elements of `ℤₚˣ`. Note that for
+  definitionally equal reason, its actual definition is the image of the Teichmüller map
+  (`PadicInt.teichmuller`). `PadicInt.torsionUnits_eq_torsion` shows that it is indeed equal to
+  the set of torsion elements of `ℤₚˣ`.
+- `PadicInt.unitsContinuousEquivTorsionfreeProdTorsion`:
+  the natural continuous group isomorphism `ℤₚˣ ≃ (1 + pⁿℤₚ) × (ℤₚˣ)ₜₒᵣ`,
+  where `n = 2` if `p = 2`, and `n = 1` otherwise.
+- `PadicInt.torsionfreeZModPowUnits`: maps a natural number `n` to the subgroup `1 + pᵏℤ` of
+  `(ℤ/pⁿ⁺ᵏℤ)ˣ` where `k = 2` if `p = 2`, and `k = 1` otherwise.
+- `PadicInt.torsionfreeZModPowUnits.generator`: maps a natural number `n` to the element `1 + pᵏ`
+  in the subgroup `1 + pᵏℤ` of `(ℤ/pⁿ⁺ᵏℤ)ˣ` where `k = 2` if `p = 2`, and `k = 1` otherwise.
+- `PadicInt.equivTorsionfreeUnits.toFun`: the map `ℤₚ → ℤₚ` by sending `x` to the limit of
+  `(1 + pᵏ) ^ (x mod pⁿ)` as `n → ∞`, where `k = 2` if `p = 2`, and `k = 1` otherwise.
+- `PadicInt.equivTorsionfreeUnits`: the continuous group isomorphism `(ℤₚ, +) ≃ (1 + pᵏℤₚ, *)` by
+  sending `x` to the limit of `(1 + pᵏ) ^ (x mod pⁿ)` as `n → ∞`, where `k = 2` if `p = 2`, and
+  `k = 1` otherwise.
+
 -/
 
 /-! ### Maybe these should be in mathlib -/
@@ -912,6 +938,10 @@ noncomputable def equivTorsionfreeUnits : Multiplicative ℤ_[p] ≃ₜ* torsion
     exact hn (antitone_principalUnits p (show n ≤ n + torsionfreeUnitsExponent p by simp) hx)
   letI f2 := hc.homeoOfEquivCompactToT2 (f := f1)
   { f1, f0, f2 with }
+
+@[simp]
+theorem coe_equivTorsionfreeUnits_apply (x : ℤ_[p]) :
+    (equivTorsionfreeUnits p x).1.1 = equivTorsionfreeUnits.toFun p x := rfl
 
 /-! ### Further results of `torsionUnits` -/
 

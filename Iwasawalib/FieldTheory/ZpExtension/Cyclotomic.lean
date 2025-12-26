@@ -17,11 +17,19 @@ public import Mathlib.RingTheory.RootsOfUnity.AlgebraicallyClosed
 
 -/
 
-variable (p : ℕ) (K : Type*) [Field K]
+variable (p : ℕ) (K Kinf Kinf' : Type*) [Field K] [Field Kinf] [Algebra K Kinf] [IsGalois K Kinf]
+  [Field Kinf'] [Algebra K Kinf'] [IsGalois K Kinf']
 
-/-! ### The field $K(\mu_{p^\infty})$ -/
+/-! ### The assertion that a field extension is a cyclotomic $p^∞$-extension -/
 
-/-- The field $K(\mu_{p^\infty})$. Internally it is defined to be an
+/-- `IsCyclotomicPinfExtension p A B` is the assertion that `B / A` is a cyclotomic
+$p^∞$-extension. See `IsCyclotomicExtension` for more details. -/
+abbrev IsCyclotomicPinfExtension (A B : Type*) [CommRing A] [CommRing B] [Algebra A B] :=
+  IsCyclotomicExtension (Set.range (p ^ ·)) A B
+
+/-! ### The field $K(μ_{p^∞})$ -/
+
+/-- The field $K(μ_{p^∞})$ inside the separable closure of `K`. Internally it is defined to be an
 `IntermediateField K (SeparableClosure K)`, but please avoid using it in the public interface.
 Instead, use `IsSepClosed.lift` to construct a map of it to `SeparableClosure K`. -/
 def CyclotomicPinfField : Type _ :=
@@ -65,7 +73,7 @@ instance instNoZeroSMulDivisors (R : Type*) [CommRing R] [Algebra R K] [IsFracti
 instance isSeparable : Algebra.IsSeparable K (CyclotomicPinfField p K) :=
   inferInstanceAs (Algebra.IsSeparable K (IntermediateField.adjoin K _))
 
-theorem isCyclotomicExtension' [NeZero (p : K)] (s : Set ℕ) (h1 : s ⊆ {0} ∪ Set.range (p ^ ·))
+theorem isCyclotomicExtension [NeZero (p : K)] (s : Set ℕ) (h1 : s ⊆ {0} ∪ Set.range (p ^ ·))
     (h2 : ∀ N, ∃ n ≥ N, p ^ n ∈ s) : IsCyclotomicExtension s K (CyclotomicPinfField p K) where
   exists_isPrimitiveRoot {n} ha ha' := by
     specialize h1 ha
@@ -96,15 +104,27 @@ theorem isCyclotomicExtension' [NeZero (p : K)] (s : Set ℕ) (h1 : s ⊆ {0} �
     use ⟨z, IntermediateField.subset_adjoin _ _ ⟨n, hN⟩⟩
     exact ⟨⟨_, hn', (Nat.pow_pos hp).ne', Subtype.val_injective hN⟩, rfl⟩
 
-instance isCyclotomicExtension [NeZero (p : K)] :
-    IsCyclotomicExtension (Set.range (p ^ ·)) K (CyclotomicPinfField p K) :=
-  isCyclotomicExtension' p K _ (by simp) fun N ↦ ⟨N, le_rfl, N, rfl⟩
+instance isCyclotomicPinfExtension [NeZero (p : K)] :
+    IsCyclotomicPinfExtension p K (CyclotomicPinfField p K) :=
+  isCyclotomicExtension p K _ (by simp) fun N ↦ ⟨N, le_rfl, N, rfl⟩
 
 instance hasEnoughRootsOfUnity [NeZero (p : K)] (i : ℕ) :
     HasEnoughRootsOfUnity (CyclotomicPinfField p K) (p ^ i) :=
   have := (‹NeZero (p : K)›.of_map (algebraMap ℕ K)).pow (n := i)
   ⟨IsCyclotomicExtension.exists_isPrimitiveRoot K _
     (show p ^ i ∈ Set.range (p ^ ·) from ⟨i, rfl⟩) NeZero.out, inferInstance⟩
+
+instance isAbelianGalois [NeZero (p : K)] : IsAbelianGalois K (CyclotomicPinfField p K) :=
+  (isCyclotomicPinfExtension p K).isAbelianGalois ..
+
+/-- The intermediate field of $K(μ_{p^∞}) / K$ fixed by the torsion subgroup of the Galois group. -/
+noncomputable def cyclotomicZpSubfield : IntermediateField K (CyclotomicPinfField p K) :=
+  open scoped Classical in
+  if _ : NeZero (p : K) then .fixedField (CommGroup.torsion _) else ⊥
+
+theorem cyclotomicZpSubfield_eq_fixedField [NeZero (p : K)] :
+    cyclotomicZpSubfield p K = .fixedField (CommGroup.torsion _) := by
+  rw [cyclotomicZpSubfield, dif_pos ‹_›]
 
 end CyclotomicPinfField
 
@@ -177,7 +197,7 @@ theorem IntermediateField.adjoin_eq_fixedField_ker_continuousCyclotomicCharacter
   nth_rw 1 [← pow_one r] at this
   simpa using congr(($(hr.pow_inj (ZMod.val_lt _) Fact.out this.symm) : ZMod (p ^ n)))
 
-theorem continuousCyclotomicCharacter_injective [IsCyclotomicExtension (Set.range (p ^ ·)) K L] :
+theorem continuousCyclotomicCharacter_injective [IsCyclotomicPinfExtension p K L] :
     Function.Injective (continuousCyclotomicCharacter p K L) := by
   have := IsCyclotomicExtension.isGalois (Set.range (p ^ ·)) K L
   have : ∀ i : ℕ, HasEnoughRootsOfUnity L (p ^ i) := fun i ↦
@@ -199,3 +219,35 @@ theorem continuousCyclotomicCharacter_injective [IsCyclotomicExtension (Set.rang
   simp [‹Fact p.Prime›.out.ne_zero]
 
 end CyclotomicCharacter
+
+/-! ### The assertion that a field extension is a cyclotomic `ℤₚ`-extension -/
+
+/-- `K∞ / K` is a cyclotomic `ℤₚ`-extension, if it is a `ℤₚ`-extension, and `K∞` can be realized as
+an intermediate field of $K(μ_{p^∞}) / K$. -/
+structure IsCyclotomicZpExtension [Fact p.Prime] : Prop where
+  isZpExtension : IsMvZpExtension p 1 K Kinf
+  nonempty_algHom_cyclotomicPinfField : Nonempty (Kinf →ₐ[K] CyclotomicPinfField p K)
+
+namespace IsCyclotomicZpExtension
+
+variable {p K Kinf Kinf'} [Fact p.Prime] (H : IsCyclotomicZpExtension p K Kinf)
+include H
+
+theorem neZero : NeZero (p : K) := by
+  sorry
+
+/-- A random map from `K∞` to $K(μ_{p^∞})$. -/
+noncomputable def algHomCyclotomicPinfField := H.2.some
+
+theorem fieldRange_eq_cyclotomicZpSubfield (f : Kinf →ₐ[K] CyclotomicPinfField p K) :
+    f.fieldRange = CyclotomicPinfField.cyclotomicZpSubfield p K := by
+  sorry
+
+theorem unique (H' : IsCyclotomicZpExtension p K Kinf') : Nonempty (Kinf ≃ₐ[K] Kinf') := by
+  have h := H.fieldRange_eq_cyclotomicZpSubfield H.algHomCyclotomicPinfField
+  rw [← H'.fieldRange_eq_cyclotomicZpSubfield H'.algHomCyclotomicPinfField] at h
+  exact ⟨(AlgEquiv.ofInjectiveField H.algHomCyclotomicPinfField).trans
+    (IntermediateField.equivOfEq h) |>.trans
+    (AlgEquiv.ofInjectiveField H'.algHomCyclotomicPinfField).symm⟩
+
+end IsCyclotomicZpExtension

@@ -17,7 +17,10 @@ public import Mathlib.RingTheory.RootsOfUnity.AlgebraicallyClosed
 
 -/
 
-variable (p : ℕ) (K Kinf Kinf' : Type*) [Field K] [Field Kinf] [Algebra K Kinf] [IsGalois K Kinf]
+universe u
+
+variable (p : ℕ) (K : Type u) (Kinf Kinf' : Type*) [Field K]
+  [Field Kinf] [Algebra K Kinf] [IsGalois K Kinf]
   [Field Kinf'] [Algebra K Kinf'] [IsGalois K Kinf']
 
 /-! ### The assertion that a field extension is a cyclotomic $p^∞$-extension -/
@@ -26,6 +29,14 @@ variable (p : ℕ) (K Kinf Kinf' : Type*) [Field K] [Field Kinf] [Algebra K Kinf
 $p^∞$-extension. See `IsCyclotomicExtension` for more details. -/
 abbrev IsCyclotomicPinfExtension (A B : Type*) [CommRing A] [CommRing B] [Algebra A B] :=
   IsCyclotomicExtension (Set.range (p ^ ·)) A B
+
+namespace IsCyclotomicPinfExtension
+
+theorem equiv (A B : Type*) [CommRing A] [CommRing B] [Algebra A B] {C : Type*} [CommRing C]
+    [Algebra A C] [IsCyclotomicPinfExtension p A B] (f : B ≃ₐ[A] C) :
+    IsCyclotomicPinfExtension p A C := IsCyclotomicExtension.equiv _ A B f
+
+end IsCyclotomicPinfExtension
 
 /-! ### The field $K(μ_{p^∞})$ -/
 
@@ -114,17 +125,31 @@ instance hasEnoughRootsOfUnity [NeZero (p : K)] (i : ℕ) :
   ⟨IsCyclotomicExtension.exists_isPrimitiveRoot K _
     (show p ^ i ∈ Set.range (p ^ ·) from ⟨i, rfl⟩) NeZero.out, inferInstance⟩
 
-instance isAbelianGalois [NeZero (p : K)] : IsAbelianGalois K (CyclotomicPinfField p K) :=
-  (isCyclotomicPinfExtension p K).isAbelianGalois ..
+theorem nonempty_algEquiv_prime_pow_mul (q k : ℕ) [ExpChar K q] :
+    Nonempty (CyclotomicPinfField (q ^ k * p) K ≃ₐ[K] CyclotomicPinfField p K) := by
+  refine ⟨IntermediateField.equivOfEq ?_⟩
+  simp_rw [mul_pow, ← pow_mul q k, ExpChar.pow_prime_pow_mul_eq_one_iff]
+
+instance isAbelianGalois [NeZero p] : IsAbelianGalois K (CyclotomicPinfField p K) := by
+  obtain ⟨q, _ | hq⟩ := ExpChar.exists K
+  · exact (isCyclotomicPinfExtension p K).isAbelianGalois ..
+  have := Fact.mk hq
+  obtain ⟨r, h1, h2⟩ :=
+    (Nat.finiteMultiplicity_iff.2 ⟨hq.ne_one, Nat.pos_of_neZero p⟩).exists_eq_pow_mul_and_not_dvd
+  rw [h1]
+  refine @IsAbelianGalois.of_algHom _ _ _ _ _ _ _ _
+    (nonempty_algEquiv_prime_pow_mul r K q (multiplicity q p)).some.toAlgHom ?_
+  rw [← CharP.cast_eq_zero_iff K] at h2
+  have := NeZero.mk h2
+  exact (isCyclotomicPinfExtension r K).isAbelianGalois ..
 
 /-- The intermediate field of $K(μ_{p^∞}) / K$ fixed by the torsion subgroup of the Galois group. -/
 noncomputable def cyclotomicZpSubfield : IntermediateField K (CyclotomicPinfField p K) :=
-  open scoped Classical in
-  if _ : NeZero (p : K) then .fixedField (CommGroup.torsion _) else ⊥
+  if h : p ≠ 0 then haveI := NeZero.mk h; .fixedField (CommGroup.torsion _) else ⊥
 
-theorem cyclotomicZpSubfield_eq_fixedField [NeZero (p : K)] :
+theorem cyclotomicZpSubfield_eq_fixedField [NeZero p] :
     cyclotomicZpSubfield p K = .fixedField (CommGroup.torsion _) := by
-  rw [cyclotomicZpSubfield, dif_pos ‹_›]
+  rw [cyclotomicZpSubfield, dif_pos NeZero.out]
 
 end CyclotomicPinfField
 
@@ -232,6 +257,10 @@ namespace IsCyclotomicZpExtension
 
 variable {p K Kinf Kinf'} [Fact p.Prime] (H : IsCyclotomicZpExtension p K Kinf)
 include H
+
+theorem congr (f : Kinf ≃ₐ[K] Kinf') : IsCyclotomicZpExtension p K Kinf' where
+  isZpExtension := H.1.congr _ f
+  nonempty_algHom_cyclotomicPinfField := ⟨H.2.some.comp f.symm⟩
 
 theorem neZero : NeZero (p : K) := by
   sorry

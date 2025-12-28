@@ -143,7 +143,8 @@ instance isAbelianGalois [NeZero p] : IsAbelianGalois K (CyclotomicPinfField p K
   have := NeZero.mk h2
   exact (isCyclotomicPinfExtension r K).isAbelianGalois ..
 
-/-- The intermediate field of $K(μ_{p^∞}) / K$ fixed by the torsion subgroup of the Galois group. -/
+/-- The intermediate field of $K(μ_{p^∞}) / K$ fixed by the torsion subgroup of the Galois group
+of $K(μ_{p^∞}) / K$. -/
 noncomputable def cyclotomicZpSubfield : IntermediateField K (CyclotomicPinfField p K) :=
   if h : p ≠ 0 then haveI := NeZero.mk h; .fixedField (CommGroup.torsion _) else ⊥
 
@@ -249,6 +250,7 @@ end CyclotomicCharacter
 
 /-- `K∞ / K` is a cyclotomic `ℤₚ`-extension, if it is a `ℤₚ`-extension, and `K∞` can be realized as
 an intermediate field of $K(μ_{p^∞}) / K$. -/
+@[mk_iff]
 structure IsCyclotomicZpExtension [Fact p.Prime] : Prop where
   isZpExtension : IsMvZpExtension p 1 K Kinf
   nonempty_algHom_cyclotomicPinfField : Nonempty (Kinf →ₐ[K] CyclotomicPinfField p K)
@@ -262,8 +264,24 @@ theorem congr (f : Kinf ≃ₐ[K] Kinf') : IsCyclotomicZpExtension p K Kinf' whe
   isZpExtension := H.1.congr _ f
   nonempty_algHom_cyclotomicPinfField := ⟨H.2.some.comp f.symm⟩
 
+theorem infinite_dimensional : ¬FiniteDimensional K Kinf := H.1.infinite_dimensional
+
+theorem infinite_dimensional_cyclotomicPinfField :
+    ¬FiniteDimensional K (CyclotomicPinfField p K) := fun _ ↦
+  H.infinite_dimensional (AlgEquiv.ofInjectiveField H.2.some).toLinearEquiv.symm.finiteDimensional
+
 theorem neZero : NeZero (p : K) := by
-  sorry
+  refine ⟨fun hp ↦ H.infinite_dimensional_cyclotomicPinfField ?_⟩
+  rw [← CharP.charP_iff_prime_eq_zero Fact.out] at hp
+  have := CyclotomicPinfField.nonempty_algEquiv_prime_pow_mul 1 K p 1
+  rw [pow_one, mul_one] at this
+  obtain ⟨i⟩ := this
+  refine @LinearEquiv.finiteDimensional _ _ _ _ _ _ _ _ i.toLinearEquiv.symm ?_
+  unfold CyclotomicPinfField
+  suffices IntermediateField.adjoin K {x : SeparableClosure K | ∃ n : ℕ, x ^ 1 ^ n = 1} = ⊥ by
+    have h : FiniteDimensional K (⊥ : IntermediateField K (SeparableClosure K)) := inferInstance
+    rwa [← this] at h
+  simp
 
 /-- A random map from `K∞` to $K(μ_{p^∞})$. -/
 noncomputable def algHomCyclotomicPinfField := H.2.some
@@ -273,10 +291,54 @@ theorem fieldRange_eq_cyclotomicZpSubfield (f : Kinf →ₐ[K] CyclotomicPinfFie
   sorry
 
 theorem unique (H' : IsCyclotomicZpExtension p K Kinf') : Nonempty (Kinf ≃ₐ[K] Kinf') := by
-  have h := H.fieldRange_eq_cyclotomicZpSubfield H.algHomCyclotomicPinfField
-  rw [← H'.fieldRange_eq_cyclotomicZpSubfield H'.algHomCyclotomicPinfField] at h
-  exact ⟨(AlgEquiv.ofInjectiveField H.algHomCyclotomicPinfField).trans
-    (IntermediateField.equivOfEq h) |>.trans
-    (AlgEquiv.ofInjectiveField H'.algHomCyclotomicPinfField).symm⟩
+  have h := H.fieldRange_eq_cyclotomicZpSubfield H.2.some
+  rw [← H'.fieldRange_eq_cyclotomicZpSubfield H'.2.some] at h
+  exact ⟨(AlgEquiv.ofInjectiveField H.2.some).trans (IntermediateField.equivOfEq h) |>.trans
+    (AlgEquiv.ofInjectiveField H'.2.some).symm⟩
 
 end IsCyclotomicZpExtension
+
+-- theorem CyclotomicPinfField.isZpExtension_cyclotomicZpSubfield
+--     [Fact p.Prime] [NeZero (p : K)] :
+--     IsMvZpExtension p 1 K (CyclotomicPinfField.cyclotomicZpSubfield p K) := by
+--   sorry
+
+-- theorem CyclotomicPinfField.isCyclotomicZpExtension_cyclotomicZpSubfield
+--     [Fact p.Prime] [NeZero (p : K)] :
+--     IsCyclotomicZpExtension p K (CyclotomicPinfField.cyclotomicZpSubfield p K) where
+--   isZpExtension := isZpExtension_cyclotomicZpSubfield p K
+--   nonempty_algHom_cyclotomicPinfField := ⟨IntermediateField.val _⟩
+
+-- variable {p K Kinf} in
+-- theorem isCyclotomicZpExtension_iff_exists_fieldRange_eq_cyclotomicZpSubfield [Fact p.Prime] :
+--     IsCyclotomicZpExtension p K Kinf ↔ (p : K) ≠ 0 ∧
+--     ∃ (f : Kinf →ₐ[K] CyclotomicPinfField p K),
+--     f.fieldRange = CyclotomicPinfField.cyclotomicZpSubfield p K := by
+--   refine ⟨fun H ↦ ⟨H.neZero.out, H.2.some, H.fieldRange_eq_cyclotomicZpSubfield _⟩,
+--     fun ⟨hp, f, hf⟩ ↦ ?_⟩
+--   have := NeZero.mk hp
+--   have := CyclotomicPinfField.isCyclotomicZpExtension_cyclotomicZpSubfield p K
+--   rw [← hf] at this
+--   exact this.congr (AlgEquiv.ofInjectiveField f).symm
+
+/-! ### The assertion that a field have a cyclotomic `ℤₚ`-extension -/
+
+/-- `HasCyclotomicZpExtension p K` is the assertion that the field `K` have a
+cyclotomic `ℤₚ`-extension. -/
+@[mk_iff]
+class HasCyclotomicZpExtension [Fact p.Prime] : Prop where
+  exists_isCyclotomicZpExtension :
+    ∃ (Kinf : Type u) (_ : Field Kinf) (_ : Algebra K Kinf) (_ : IsGalois K Kinf),
+    IsCyclotomicZpExtension p K Kinf
+
+/-- `K` have a cyclotomic `ℤₚ`-extension if and only if $K(μ_{p^∞}) / K$
+is an infinite extension. -/
+theorem hasCyclotomicZpExtension_iff_infinite_dimensional [Fact p.Prime] :
+    HasCyclotomicZpExtension p K ↔ ¬FiniteDimensional K (CyclotomicPinfField p K) := by
+  sorry
+
+variable {p K Kinf} in
+theorem IsCyclotomicZpExtension.hasCyclotomicZpExtension [Fact p.Prime]
+    (H : IsCyclotomicZpExtension p K Kinf) : HasCyclotomicZpExtension p K := by
+  rw [hasCyclotomicZpExtension_iff_infinite_dimensional]
+  sorry

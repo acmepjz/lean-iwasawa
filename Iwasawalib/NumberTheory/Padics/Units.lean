@@ -33,7 +33,7 @@ public import Mathlib.Topology.Algebra.Module.Cardinality
   `n = 1` otherwise, which maps `a` to the unique `ϕ(pⁿ)`-th roots of unity
   (`PadicInt.torsionUnits_eq_torsion` shows that it is indeed the unique roots of unity)
   in `ℤₚ` such that it is congruent to `a` modulo `pⁿ`.
-- `PadicInt.principalUnits`: maps a natural number `n` to the subgroup `1 + pⁿℤₚ` of `ℤₚˣ`.
+- `PadicInt.principalUnits p n`: the subgroup `1 + pⁿℤₚ` of `ℤₚˣ`.
 - `PadicInt.torsionfreeUnits`: the subgroup `1 + pⁿℤₚ` of `ℤₚˣ` where `n = 2` if `p = 2`,
   and `n = 1` otherwise.
 - `PadicInt.torsionUnits`: the subgroup `(ℤₚˣ)ₜₒᵣ` of torsion elements of `ℤₚˣ`. Note that for
@@ -43,9 +43,9 @@ public import Mathlib.Topology.Algebra.Module.Cardinality
 - `PadicInt.unitsContinuousEquivTorsionfreeProdTorsion`:
   the natural continuous group isomorphism `ℤₚˣ ≃ (1 + pⁿℤₚ) × (ℤₚˣ)ₜₒᵣ`,
   where `n = 2` if `p = 2`, and `n = 1` otherwise.
-- `PadicInt.torsionfreeZModPowUnits`: maps a natural number `n` to the subgroup `1 + pᵏℤ` of
+- `PadicInt.torsionfreeZModPowUnits p n`: the subgroup `1 + pᵏℤ` of
   `(ℤ/pⁿ⁺ᵏℤ)ˣ` where `k = 2` if `p = 2`, and `k = 1` otherwise.
-- `PadicInt.torsionfreeZModPowUnits.generator`: maps a natural number `n` to the element `1 + pᵏ`
+- `PadicInt.torsionfreeZModPowUnits.generator p n`: the element `1 + pᵏ`
   in the subgroup `1 + pᵏℤ` of `(ℤ/pⁿ⁺ᵏℤ)ˣ` where `k = 2` if `p = 2`, and `k = 1` otherwise.
 - `PadicInt.equivTorsionfreeUnits.toFun`: the map `ℤₚ → ℤₚ` by sending `x` to the limit of
   `(1 + pᵏ) ^ (x mod pⁿ)` as `n → ∞`, where `k = 2` if `p = 2`, and `k = 1` otherwise.

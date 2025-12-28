@@ -136,16 +136,16 @@ theorem strictMono_Kn [Nonempty ι] : StrictMono H.Kn :=
 
 /-- If `K'` is a finite extension of `K` contained in `K∞`,
 then it's contained in `Kₙ` for some `n`. -/
-theorem le_Kn_of_finite (K' : IntermediateField K Kinf) [FiniteDimensional K K'] :
+theorem le_Kn_of_finiteDimensional (K' : IntermediateField K Kinf) [FiniteDimensional K K'] :
     ∃ n, K' ≤ H.Kn n := by
   obtain ⟨n, _⟩ := H.Γpow_le_of_isOpen _ K'.fixingSubgroup_isOpen
   exact ⟨n, by rwa [Kn, IntermediateField.le_iff_le]⟩
 
 /-- If `K'` is a finite extension of `K` contained in `K∞`,
 then `[K' : K] = p ^ n` for some `n`. -/
-theorem finrank_eq_pow_of_finite (K' : IntermediateField K Kinf) [FiniteDimensional K K'] :
-    ∃ n, Module.finrank K K' = p ^ n := by
-  obtain ⟨m, h⟩ := H.le_Kn_of_finite K'
+theorem finrank_eq_pow_of_finiteDimensional (K' : IntermediateField K Kinf)
+    [FiniteDimensional K K'] : ∃ n, Module.finrank K K' = p ^ n := by
+  obtain ⟨m, h⟩ := H.le_Kn_of_finiteDimensional K'
   have h1 : Module.finrank K K' ∣ p ^ (m * Nat.card ι) := by
     let L := IntermediateField.extendScalars h
     have := Module.Free.of_divisionRing K' L
@@ -154,6 +154,21 @@ theorem finrank_eq_pow_of_finite (K' : IntermediateField K Kinf) [FiniteDimensio
     exact dvd_of_mul_right_eq _ this
   obtain ⟨n, -, h2⟩ := (Nat.dvd_prime_pow Fact.out).1 h1
   exact ⟨n, h2⟩
+
+theorem finiteDimensional_iff_isEmpty : FiniteDimensional K Kinf ↔ IsEmpty ι := by
+  refine ⟨fun _ ↦ ?_, fun _ ↦ ?_⟩
+  · rcases isEmpty_or_nonempty ι with _ | _
+    · assumption
+    obtain ⟨n, h⟩ := H.le_Kn_of_finiteDimensional ⊤
+    simpa using h.trans_lt (H.strictMono_Kn (Nat.lt_add_one n))
+  · have : Finite Gal(Kinf/K) := by
+      rw [← Cardinal.lt_aleph0_iff_finite]
+      convert Cardinal.one_lt_aleph0
+      simpa using H.1.toEquiv.lift_cardinal_eq
+    exact IsGalois.finiteDimensional_of_finite K Kinf
+
+theorem infinite_dimensional [Nonempty ι] : ¬FiniteDimensional K Kinf := by
+  rwa [H.finiteDimensional_iff_isEmpty, not_isEmpty_iff]
 
 end Finite
 
@@ -178,7 +193,7 @@ theorem finrank_Kn₁ (n : ℕ) : Module.finrank K (H.Kn n) = p ^ n := by
 
 /-- If `K'` is a finite extension of `K` contained in `K∞`,
 then it's equal to `Kₙ` for some `n`. -/
-theorem eq_Kn_of_finite (K' : IntermediateField K Kinf) [FiniteDimensional K K'] :
+theorem eq_Kn_of_finiteDimensional (K' : IntermediateField K Kinf) [FiniteDimensional K K'] :
     ∃ n, K' = H.Kn n := by
   obtain ⟨n, h⟩ := H.eq_Γpow_of_isOpen _ K'.fixingSubgroup_isOpen
   replace h := congr(IntermediateField.fixedField $h)
@@ -197,7 +212,7 @@ theorem eq_top_or_Kn (K' : IntermediateField K Kinf) :
 
 /-- If `K'` is an infinite extension of `K` contained in `K∞`,
 then it's equal to `K∞`. -/
-theorem eq_top_of_infinite (K' : IntermediateField K Kinf)
+theorem eq_top_of_infinite_dimensional (K' : IntermediateField K Kinf)
     (h : ¬FiniteDimensional K K') : K' = ⊤ := by
   obtain h | ⟨n, rfl⟩ := H.eq_top_or_Kn K'
   · exact h
@@ -211,7 +226,7 @@ theorem eq_Kn_of_finrank_eq (K' : IntermediateField K Kinf)
     have := (Fact.out : p.Prime).pos
     rw [h]
     positivity
-  obtain ⟨m, hm⟩ := H.eq_Kn_of_finite K'
+  obtain ⟨m, hm⟩ := H.eq_Kn_of_finiteDimensional K'
   convert hm
   replace hm := congr(Module.finrank K $hm)
   rw [h, H.finrank_Kn₁] at hm
@@ -285,15 +300,22 @@ theorem strictMono_Kn [NeZero d] : StrictMono H.Kn := H.mvZpExtension.strictMono
 
 /-- If `K'` is a finite extension of `K` contained in `K∞`,
 then it's contained in `Kₙ` for some `n`. -/
-theorem le_Kn_of_finite (K' : IntermediateField K Kinf) [FiniteDimensional K K'] :
+theorem le_Kn_of_finiteDimensional (K' : IntermediateField K Kinf) [FiniteDimensional K K'] :
     ∃ n, K' ≤ H.Kn n :=
-  H.mvZpExtension.le_Kn_of_finite K'
+  H.mvZpExtension.le_Kn_of_finiteDimensional K'
 
 /-- If `K'` is a finite extension of `K` contained in `K∞`,
 then `[K' : K] = p ^ n` for some `n`. -/
-theorem finrank_eq_pow_of_finite (K' : IntermediateField K Kinf) [FiniteDimensional K K'] :
-    ∃ n, Module.finrank K K' = p ^ n :=
-  H.mvZpExtension.finrank_eq_pow_of_finite K'
+theorem finrank_eq_pow_of_finiteDimensional (K' : IntermediateField K Kinf)
+    [FiniteDimensional K K'] : ∃ n, Module.finrank K K' = p ^ n :=
+  H.mvZpExtension.finrank_eq_pow_of_finiteDimensional K'
+
+theorem finiteDimensional_iff_eq_zero : FiniteDimensional K Kinf ↔ d = 0 := by
+  rw [H.mvZpExtension.finiteDimensional_iff_isEmpty, ← not_iff_not, not_isEmpty_iff,
+    ← Fin.pos_iff_nonempty, ← Nat.ne_zero_iff_zero_lt]
+
+theorem infinite_dimensional [NeZero d] : ¬FiniteDimensional K Kinf :=
+  H.mvZpExtension.infinite_dimensional
 
 end Finite
 
@@ -316,9 +338,9 @@ theorem finrank_Kn₁ (n : ℕ) : Module.finrank K (H.Kn n) = p ^ n :=
 
 /-- If `K'` is a finite extension of `K` contained in `K∞`,
 then it's equal to `Kₙ` for some `n`. -/
-theorem eq_Kn_of_finite (K' : IntermediateField K Kinf) [FiniteDimensional K K'] :
+theorem eq_Kn_of_finiteDimensional (K' : IntermediateField K Kinf) [FiniteDimensional K K'] :
     ∃ n, K' = H.Kn n :=
-  H.mvZpExtension.eq_Kn_of_finite K'
+  H.mvZpExtension.eq_Kn_of_finiteDimensional K'
 
 /-- If `K'` is an extension of `K` contained in `K∞`,
 then it's equal to `K∞` or `Kₙ` for some `n`. -/
@@ -328,9 +350,9 @@ theorem eq_top_or_Kn (K' : IntermediateField K Kinf) :
 
 /-- If `K'` is an infinite extension of `K` contained in `K∞`,
 then it's equal to `K∞`. -/
-theorem eq_top_of_infinite (K' : IntermediateField K Kinf)
+theorem eq_top_of_infinite_dimensional (K' : IntermediateField K Kinf)
     (h : ¬FiniteDimensional K K') : K' = ⊤ :=
-  H.mvZpExtension.eq_top_of_infinite K' h
+  H.mvZpExtension.eq_top_of_infinite_dimensional K' h
 
 /-- If `K'` is an extension of `K` of degree `p ^ n` contained in `K∞`,
 then it's equal to `Kₙ`. -/

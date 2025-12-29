@@ -11,6 +11,8 @@ public import Iwasawalib.FieldTheory.ZpExtension.Basic
 public import Iwasawalib.FieldTheory.ZpExtension.Cyclotomic
 public import Iwasawalib.NumberTheory.Cyclotomic.FiniteField
 public import Iwasawalib.NumberTheory.Padics.EquivMvZp
+public import Iwasawalib.NumberTheory.Padics.ForMathlib
+public import Iwasawalib.NumberTheory.Padics.ForMathlib1
 public import Iwasawalib.NumberTheory.Padics.HasBasis
 public import Iwasawalib.NumberTheory.Padics.Units
 public import Iwasawalib.NumberTheory.ZpExtension.Basic

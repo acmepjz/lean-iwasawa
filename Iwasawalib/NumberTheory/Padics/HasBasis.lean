@@ -5,6 +5,7 @@ Authors: Jz Pan
 -/
 module
 
+public import Iwasawalib.NumberTheory.Padics.ForMathlib1
 public import Mathlib.NumberTheory.Padics.ProperSpace
 public import Mathlib.Topology.Algebra.Ring.Compact
 
@@ -17,14 +18,6 @@ public import Mathlib.Topology.Algebra.Ring.Compact
 -/
 
 variable (ι : Type*) [Finite ι] (p : ℕ) [Fact p.Prime] (n : ℕ)
-
-/-! ### Maybe these should be in mathlib -/
-
-theorem PadicInt.toZMod_surjective :
-    Function.Surjective (PadicInt.toZMod (p := p)) := fun x ↦ ⟨x.val, by simp⟩
-
-theorem PadicInt.toZModPow_surjective :
-    Function.Surjective (PadicInt.toZModPow (p := p) n) := fun x ↦ ⟨x.val, by simp⟩
 
 /-! ## Open ideal of `ℤₚ` -/
 

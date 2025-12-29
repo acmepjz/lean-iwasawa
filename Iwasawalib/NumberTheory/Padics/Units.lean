@@ -5,21 +5,13 @@ Authors: Jz Pan
 -/
 module
 
-public import Mathlib.Algebra.Algebra.ZMod
-public import Mathlib.Algebra.CharZero.Infinite
 public import Mathlib.Analysis.Normed.Ring.Units
-public import Mathlib.FieldTheory.Finite.Basic
-public import Mathlib.GroupTheory.SpecificGroups.Cyclic
-public import Mathlib.LinearAlgebra.Dimension.FreeAndStrongRankCondition
 public import Mathlib.NumberTheory.Basic
+public import Iwasawalib.NumberTheory.Padics.ForMathlib
 public import Iwasawalib.NumberTheory.Padics.HasBasis
 public import Mathlib.NumberTheory.Padics.Hensel
-public import Mathlib.RingTheory.Localization.Cardinality
-public import Mathlib.RingTheory.RootsOfUnity.EnoughRootsOfUnity
 public import Mathlib.RingTheory.ZMod.UnitsCyclic
-public import Mathlib.SetTheory.Cardinal.Continuum
 public import Iwasawalib.Topology.Algebra.Group.Basic
-public import Mathlib.Topology.Algebra.Module.Cardinality
 
 @[expose] public section
 
@@ -55,233 +47,9 @@ public import Mathlib.Topology.Algebra.Module.Cardinality
 
 -/
 
-/-! ### Maybe these should be in mathlib -/
-
-theorem Nat.totient_pow_mul_of_prime_of_dvd {p n : ℕ} (hp : Prime p) (h : p ∣ n) (m : ℕ) :
-    (p ^ m * n).totient = p ^ m * n.totient := by
-  induction m with
-  | zero => simp
-  | succ m ih =>
-    rw [pow_succ', mul_assoc, totient_mul_of_prime_of_dvd hp (Nat.dvd_mul_left_of_dvd h (p ^ m)),
-      ih, mul_assoc]
-
-instance hasEnoughRootsOfUnity_two (R : Type*) [CommRing R] [IsDomain R] [NeZero (2 : R)] :
-    HasEnoughRootsOfUnity R 2 := by
-  refine ⟨⟨-1, by simp, fun n hn ↦ ?_⟩, inferInstance⟩
-  have hneq : (-1 : R) ≠ 1 := fun h' ↦ ‹NeZero (2 : R)›.out <| by linear_combination -h'
-  rwa [neg_one_pow_eq_one_iff_even hneq, even_iff_two_dvd] at hn
-
-@[to_additive]
-theorem IsCyclic.cardinalMk_le_aleph0 (G : Type*) [Pow G ℤ] [IsCyclic G] :
-    Cardinal.mk G ≤ Cardinal.aleph0 := by
-  simpa using Cardinal.lift_mk_le_lift_mk_of_surjective (exists_zpow_surjective G).choose_spec
-
-@[simp]
-theorem Padic.cardinalMk_eq_continuum (p : ℕ) [Fact p.Prime] :
-    Cardinal.mk ℚ_[p] = Cardinal.continuum :=
-  le_antisymm (Cardinal.mk_quotient_le.trans <| (Cardinal.mk_subtype_le _).trans <|
-    by simp) (continuum_le_cardinal_of_nontriviallyNormedField _)
-
-@[simp]
-theorem PadicInt.cardinalMk_eq_continuum (p : ℕ) [Fact p.Prime] :
-    Cardinal.mk ℤ_[p] = Cardinal.continuum := by
-  rw [← IsFractionRing.cardinalMk ℤ_[p] ℚ_[p], Padic.cardinalMk_eq_continuum]
-
-theorem Field.isAddCyclic_iff (F : Type*) [Field F] : IsAddCyclic F ↔ (Nat.card F).Prime := by
-  obtain ⟨p, _ | ⟨hp⟩⟩ := ExpChar.exists F
-  · suffices ¬IsAddCyclic F by simp [this, Nat.not_prime_zero]
-    rintro ⟨a, hsurj⟩
-    have ha : a ≠ 0 := by
-      rintro rfl
-      refine not_subsingleton F ⟨fun x y ↦ ?_⟩
-      obtain ⟨_, rfl⟩ := hsurj x
-      obtain ⟨_, rfl⟩ := hsurj y
-      simp
-    obtain ⟨n, hn⟩ := hsurj ((2⁻¹ : ℚ) • a)
-    simp_rw [← algebraMap_smul ℚ n a] at hn
-    replace hn := congr(2 * $(smul_left_injective ℚ ha hn))
-    simp only [algebraMap_int_eq, eq_intCast, ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true,
-      mul_inv_cancel₀] at hn
-    norm_cast at hn
-    omega
-  refine ⟨fun _ ↦ ?_, fun h ↦ ?_⟩
-  · convert hp
-    have := Fact.mk hp
-    let _ := ZMod.algebra F p
-    have hrank : Module.rank (ZMod p) F = 1 := by
-      refine le_antisymm (rank_le_one_iff.2 ?_) (Cardinal.one_le_iff_pos.2 Module.rank_pos_of_free)
-      obtain ⟨a, hsurj⟩ := exists_zsmul_surjective F
-      refine ⟨a, fun v ↦ ?_⟩
-      obtain ⟨n, hn⟩ := hsurj v
-      use algebraMap _ _ n
-      simp_rw [← hn, algebraMap_smul]
-    have : Module.Finite (ZMod p) F := Module.rank_lt_aleph0_iff.1 (by simp [hrank])
-    have := congr(Cardinal.toNat
-      $(lift_cardinalMk_eq_lift_cardinalMk_field_pow_lift_rank (ZMod p) F))
-    simpa [hrank] using this
-  · have := Fact.mk h
-    exact isAddCyclic_of_prime_card rfl
-
-theorem Field.not_isAddCyclic_of_infinite (F : Type*) [Field F] [Infinite F] : ¬IsAddCyclic F := by
-  simp [isAddCyclic_iff, Nat.not_prime_zero]
-
-theorem PadicInt.not_isAddCyclic (p : ℕ) [Fact p.Prime] : ¬IsAddCyclic ℤ_[p] := fun _ ↦ by
-  have := IsAddCyclic.cardinalMk_le_aleph0 ℤ_[p]
-  rw [cardinalMk_eq_continuum] at this
-  exact this.not_gt Cardinal.aleph0_lt_continuum
-
-namespace MonoidHom
-
-variable {B C : Type*} [CommGroup B] [Group C]
-  (f : B →* C) (g : C →* B) (hfg : Function.LeftInverse f g)
-
-/-- If a surjective group homomorphism `f : B →* C` has a section `g : C →* B`, then there is a
-natural isomorphism of `B` to `ker(f) × im(g)`. We use `im(g)` instead of `C` since if `B`
-has topology, then both of `ker(f)` and `im(g)` will also get topology automatically. -/
-def equivKerProdRangeOfLeftInverse : B ≃* f.ker × g.range where
-  toFun b := (⟨b * (g (f b))⁻¹, by simp [hfg (f b)]⟩, ⟨g (f b), by simp⟩)
-  invFun x := x.1.1 * x.2.1
-  left_inv x := by simp
-  right_inv x := by
-    ext : 2 <;> (obtain ⟨y, hy⟩ := x.2.2; simp [MonoidHom.mem_ker.1 x.1.2, ← hy, hfg y])
-  map_mul' x y := by
-    ext : 2
-    · simp only [map_mul, mul_inv_rev, Prod.mk_mul_mk, MulMemClass.mk_mul_mk]
-      conv_lhs => rw [mul_assoc x y, mul_comm y]
-      conv_rhs => rw [mul_comm y, mul_assoc x, ← mul_assoc _ _ y]
-      congr 2
-      rw [mul_comm]
-    · simp
-
-@[simp]
-theorem val_fst_equivKerProdRangeOfLeftInverse_apply (x) :
-    (equivKerProdRangeOfLeftInverse f g hfg x).1.1 = x * (g (f x))⁻¹ := rfl
-
-@[simp]
-theorem val_snd_equivKerProdRangeOfLeftInverse_apply (x) :
-    (equivKerProdRangeOfLeftInverse f g hfg x).2.1 = g (f x) := rfl
-
-@[simp]
-theorem equivKerProdRangeOfLeftInverse_symm_apply (x) :
-    (equivKerProdRangeOfLeftInverse f g hfg).symm x = x.1.1 * x.2.1 := rfl
-
-theorem continuous_equivKerProdRangeOfLeftInverse_symm [TopologicalSpace B] [ContinuousMul B] :
-    Continuous (equivKerProdRangeOfLeftInverse f g hfg).symm := by
-  dsimp [equivKerProdRangeOfLeftInverse]
-  fun_prop
-
-variable [TopologicalSpace B] [IsTopologicalGroup B] (hc : Continuous (g ∘ f))
-include hc
-
-theorem continuous_equivKerProdRangeOfLeftInverse :
-    Continuous (equivKerProdRangeOfLeftInverse f g hfg) := by
-  dsimp [equivKerProdRangeOfLeftInverse]
-  continuity -- `fun_prop` does not work here, and `continuity` is slow
-
-/-- Continuous version of `equivKerProdRangeOfLeftInverse`. -/
-def continuousEquivKerProdRangeOfLeftInverse : B ≃ₜ* f.ker × g.range where
-  toMulEquiv := equivKerProdRangeOfLeftInverse f g hfg
-  continuous_toFun := continuous_equivKerProdRangeOfLeftInverse f g hfg hc
-  continuous_invFun := continuous_equivKerProdRangeOfLeftInverse_symm f g hfg
-
-@[simp]
-theorem val_fst_continuousEquivKerProdRangeOfLeftInverse_apply (x) :
-    (continuousEquivKerProdRangeOfLeftInverse f g hfg hc x).1.1 = x * (g (f x))⁻¹ := rfl
-
-@[simp]
-theorem val_snd_continuousEquivKerProdRangeOfLeftInverse_apply (x) :
-    (continuousEquivKerProdRangeOfLeftInverse f g hfg hc x).2.1 = g (f x) := rfl
-
-@[simp]
-theorem continuousEquivKerProdRangeOfLeftInverse_symm_apply (x) :
-    (continuousEquivKerProdRangeOfLeftInverse f g hfg hc).symm x = x.1.1 * x.2.1 := rfl
-
-end MonoidHom
-
 variable (p : ℕ) [Fact p.Prime] (n : ℕ)
 
 namespace PadicInt
-
-instance isLocalHom_toZMod : IsLocalHom (toZMod (p := p)) := by
-  refine ⟨fun x hx ↦ ?_⟩
-  simpa only [← IsLocalRing.notMem_maximalIdeal, ← ker_toZMod, RingHom.mem_ker] using hx.ne_zero
-
-theorem zmod_cast_comp_toZModPow_eq_toZMod (n : ℕ) (h : n ≠ 0) :
-    (ZMod.castHom (dvd_pow_self p h) (ZMod p)).comp (@toZModPow p _ n) = @toZMod p _ := by
-  have h1 := congr((ZMod.castHom (show p ∣ p ^ 1 by simp) (ZMod p)).comp
-    $(zmod_cast_comp_toZModPow (p := p) 1 n (Nat.one_le_iff_ne_zero.2 h)))
-  rw [← RingHom.comp_assoc, ZMod.castHom_comp] at h1
-  rw [h1]
-  have hb := @ZMod.castHom_bijective (p ^ 1) (ZMod p) _
-    (by rw [pow_one]; infer_instance) _ (by simp)
-  apply ZMod.ringHom_eq_of_ker_eq
-  suffices RingHom.ker (toZModPow (p := p) 1) = RingHom.ker toZMod by
-    rw [← this]
-    exact RingHom.ker_comp_of_injective _ hb.injective
-  rw [ker_toZModPow, ker_toZMod, maximalIdeal_eq_span_p, pow_one]
-
-instance isLocalHom_toZModPow [NeZero n] : IsLocalHom (toZModPow (p := p) n) := by
-  have h := isLocalHom_toZMod p
-  rw [← zmod_cast_comp_toZModPow_eq_toZMod p n NeZero.out] at h
-  exact @isLocalHom_of_comp _ _ _ _ _ _ _ _ h
-
-theorem unitsMap_toZMod_surjective :
-    Function.Surjective (Units.map (toZMod (p := p)).toMonoidHom) :=
-  IsLocalRing.surjective_units_map_of_local_ringHom _ (toZMod_surjective p) inferInstance
-
-theorem unitsMap_toZModPow_surjective :
-    Function.Surjective (Units.map (toZModPow (p := p) n).toMonoidHom) := by
-  rcases eq_or_ne n 0 with rfl | h
-  · convert Function.surjective_to_subsingleton _
-    · infer_instance
-    · simp only [Nat.pow_zero]
-      infer_instance
-  have := NeZero.mk h
-  exact IsLocalRing.surjective_units_map_of_local_ringHom _ (toZModPow_surjective p n) inferInstance
-
-/-! ### Some silly results for `ZMod` -/
-
-theorem _root_.ZMod.units_eq_one_of_eq_two
-    {q : ℕ} (hq : q = 2) (x : (ZMod q)ˣ) : x = 1 := by
-  subst hq
-  exact Subsingleton.elim x 1
-
-theorem _root_.ZMod.units_eq_one_or_neg_one_of_eq_three
-    {q : ℕ} (hq : q = 3) (x : (ZMod q)ˣ) : x = 1 ∨ x = -1 := by
-  subst hq
-  fin_cases x <;> decide
-
-theorem _root_.ZMod.units_eq_one_or_neg_one_of_eq_four
-    {q : ℕ} (hq : q = 4) (x : (ZMod q)ˣ) : x = 1 ∨ x = -1 := by
-  subst hq
-  fin_cases x <;> decide
-
-theorem _root_.ZMod.units_eq_one_or_neg_one_of_eq_six
-    {q : ℕ} (hq : q = 6) (x : (ZMod q)ˣ) : x = 1 ∨ x = -1 := by
-  subst hq
-  fin_cases x <;> decide
-
-theorem _root_.ZMod.eq_one_of_eq_two_of_isUnit
-    {q : ℕ} (hq : q = 2) (x : ZMod q) (hx : IsUnit x) : x = 1 :=
-  congr($(ZMod.units_eq_one_of_eq_two hq hx.unit).1)
-
-theorem _root_.ZMod.eq_one_or_neg_one_of_eq_three_of_isUnit
-    {q : ℕ} (hq : q = 3) (x : ZMod q) (hx : IsUnit x) : x = 1 ∨ x = -1 := by
-  rcases ZMod.units_eq_one_or_neg_one_of_eq_three hq hx.unit with h | h
-  · exact Or.inl congr($(h).1)
-  · exact Or.inr congr($(h).1)
-
-theorem _root_.ZMod.eq_one_or_neg_one_of_eq_four_of_isUnit
-    {q : ℕ} (hq : q = 4) (x : ZMod q) (hx : IsUnit x) : x = 1 ∨ x = -1 := by
-  rcases ZMod.units_eq_one_or_neg_one_of_eq_four hq hx.unit with h | h
-  · exact Or.inl congr($(h).1)
-  · exact Or.inr congr($(h).1)
-
-theorem _root_.ZMod.eq_one_or_neg_one_of_eq_six_of_isUnit
-    {q : ℕ} (hq : q = 6) (x : ZMod q) (hx : IsUnit x) : x = 1 ∨ x = -1 := by
-  rcases ZMod.units_eq_one_or_neg_one_of_eq_six hq hx.unit with h | h
-  · exact Or.inl congr($(h).1)
-  · exact Or.inr congr($(h).1)
 
 /-! ### Teichmüller map -/
 
@@ -471,17 +239,22 @@ theorem continuous_teichmuller_comp_unitsMap_toZModPow :
 /-- The subgroup `1 + pⁿℤₚ` of `ℤₚˣ`. -/
 noncomputable def principalUnits : Subgroup ℤ_[p]ˣ := (Units.map (toZModPow n).toMonoidHom).ker
 
+theorem index_principalUnits : (principalUnits p n).index = (p ^ n).totient := by
+  rw [principalUnits, Subgroup.index_ker, MonoidHom.range_eq_top_of_surjective _
+    (unitsMap_toZModPow_surjective p n)]
+  simp
+
+instance finiteIndex_principalUnits : (principalUnits p n).FiniteIndex := by
+  refine ⟨fun h ↦ ?_⟩
+  simp [index_principalUnits, ‹Fact p.Prime›.out.ne_zero] at h
+
 @[simp]
 theorem principalUnits_zero : principalUnits p 0 = ⊤ := by
-  rw [eq_top_iff]
-  rintro x -
-  simp [principalUnits, Subsingleton.elim _ (1 : (ZMod 1)ˣ)]
+  simp [← Subgroup.index_eq_one, index_principalUnits]
 
 @[simp]
 theorem principalUnits_two_one : principalUnits 2 1 = ⊤ := by
-  rw [eq_top_iff]
-  rintro x -
-  simp [principalUnits, Subsingleton.elim _ (1 : (ZMod 2)ˣ)]
+  simp [← Subgroup.index_eq_one, index_principalUnits]
 
 theorem mem_principalUnits_iff_coe_sub_one_mem (x) :
     x ∈ principalUnits p n ↔ (x - 1 : ℤ_[p]) ∈ RingHom.ker (toZModPow n) := by
@@ -541,6 +314,13 @@ theorem units_nhds_one_hasAntitoneBasis_principalUnits :
 noncomputable def torsionfreeUnits : Subgroup ℤ_[p]ˣ :=
   principalUnits p (torsionfreeUnitsExponent p)
 
+theorem index_torsionfreeUnits :
+    (torsionfreeUnits p).index = (p ^ torsionfreeUnitsExponent p).totient :=
+  index_principalUnits ..
+
+instance finiteIndex_torsionfreeUnits : (torsionfreeUnits p).FiniteIndex :=
+  finiteIndex_principalUnits ..
+
 /-- The subgroup `(ℤₚˣ)ₜₒᵣ` of torsion elements of `ℤₚˣ`. Note that for definitionally equal reason,
 its actual definition is the image of the Teichmüller map. Later we will show that it is
 indeed equal to the set of torsion elements of `ℤₚˣ`. -/
@@ -569,6 +349,11 @@ theorem val_snd_unitsContinuousEquivTorsionfreeProdTorsion_apply (x) :
 @[simp]
 theorem unitsContinuousEquivTorsionfreeProdTorsion_symm_apply (x) :
     (unitsContinuousEquivTorsionfreeProdTorsion p).symm x = x.1.1 * x.2.1 := rfl
+
+theorem units_eq_unitsContinuousEquivTorsionfreeProdTorsion_mul (x) :
+    x = (unitsContinuousEquivTorsionfreeProdTorsion p x).1.1 *
+      (unitsContinuousEquivTorsionfreeProdTorsion p x).2.1 := by
+  simp
 
 theorem torsionUnits_eq_rootsOfUnity :
     torsionUnits p = rootsOfUnity (p ^ torsionfreeUnitsExponent p).totient _ := by
@@ -1005,5 +790,77 @@ theorem hasEnoughRootsOfUnity_iff :
 instance hasEnoughRootsOfUnity_sub_one : HasEnoughRootsOfUnity ℤ_[p] (p - 1) := by
   rw [hasEnoughRootsOfUnity_iff, torsionfreeUnitsExponent]
   split_ifs <;> simp only [Nat.totient_prime_pow_succ ‹Fact p.Prime›.out, Nat.dvd_mul_left]
+
+/-! ### Closed subgroups of `ℤₚˣ` -/
+
+/-- A closed subgroup of `ℤₚˣ` is either finite or is of finite index. -/
+theorem finite_or_finiteIndex_of_subgroup_units_of_isClosed
+    (G : Subgroup ℤ_[p]ˣ) (hG : IsClosed (G : Set ℤ_[p]ˣ)) :
+    (G : Set ℤ_[p]ˣ).Finite ∧ G ≤ torsionUnits p ∨ G.FiniteIndex ∧ IsOpen (G : Set ℤ_[p]ˣ) := by
+  rcases (G : Set ℤ_[p]ˣ).finite_or_infinite with hf | hf
+  · refine .inl ⟨‹_›, fun g hg ↦ ?_⟩
+    rw [torsionUnits_eq_torsion, CommGroup.mem_torsion, ← finite_zpowers]
+    exact hf.subset (Subgroup.zpowers_le_of_mem hg)
+  suffices G.FiniteIndex from .inr ⟨this, G.isOpen_of_isClosed_of_finiteIndex hG⟩
+  let G' := G.subgroupOf (torsionfreeUnits p)
+  suffices G'.index ≠ 0 by
+    simp_rw [G'] at this
+    rw [← Subgroup.relIndex] at this
+    refine @Subgroup.finiteIndex_of_le _ _ (G ⊓ torsionfreeUnits p) G ?_ inf_le_left
+    constructor
+    rw [← Subgroup.relIndex_mul_index inf_le_right, Subgroup.inf_relIndex_right, mul_ne_zero_iff]
+    exact ⟨this, Subgroup.FiniteIndex.index_ne_zero⟩
+  replace hf : (G' : Set (torsionfreeUnits p)).Infinite := by
+    contrapose! hf
+    suffices Nat.card G ≠ 0 from Nat.finite_of_card_ne_zero this
+    replace hf : (Subgroup.map (torsionfreeUnits p).subtype G' : Set ℤ_[p]ˣ).Finite :=
+      hf.image (torsionfreeUnits p).subtype
+    simp_rw [G', Subgroup.subgroupOf_map_subtype] at hf
+    have h := Subgroup.relIndex_inf_mul_relIndex ⊥ (torsionfreeUnits p) G
+    simp_rw [bot_inf_eq, Subgroup.relIndex_bot_left] at h
+    rw [← h, inf_comm, mul_ne_zero_iff]
+    exact ⟨Nat.card_ne_zero.2 ⟨inferInstance, hf⟩,
+      ne_zero_of_dvd_ne_zero Subgroup.FiniteIndex.index_ne_zero
+        (Subgroup.relIndex_dvd_index_of_normal (torsionfreeUnits p) G)⟩
+  replace hG : IsClosed (G' : Set (torsionfreeUnits p)) :=
+    hG.preimage (f := (torsionfreeUnits p).subtype) continuous_subtype_val
+  let G'' := Subgroup.toAddSubgroup' (G'.comap (equivTorsionfreeUnits p).toMonoidHom)
+  suffices G''.index ≠ 0 by
+    simp_rw [G''] at this
+    rwa [← AddSubgroup.index_toSubgroup, OrderIso.apply_symm_apply, Subgroup.index_comap,
+      (equivTorsionfreeUnits p).toMonoidHom.range_eq_top_of_surjective
+        (equivTorsionfreeUnits p).surjective, Subgroup.relIndex_top_right] at this
+  replace hf : (G'' : Set ℤ_[p]).Infinite := by
+    change (equivTorsionfreeUnits p ⁻¹' G').Infinite
+    exact hf.preimage (by simp [(equivTorsionfreeUnits p).surjective.range_eq])
+  replace hG : IsClosed (G'' : Set ℤ_[p]) := hG.preimage (equivTorsionfreeUnits p).continuous
+  obtain ⟨I, hI⟩ := exists_eq_ideal_of_addSubgroup_of_isClosed p G'' hG
+  rcases eq_or_ne I ⊥ with rfl | hx
+  · simp_all
+  obtain ⟨n, rfl⟩ := ideal_eq_span_pow_p hx
+  suffices G''.index = p ^ n by simp [this, ‹Fact p.Prime›.out.ne_zero]
+  rw [AddSubgroup.index, hI]
+  change Nat.card (ℤ_[p] ⧸ Ideal.span {(p ^ n : ℤ_[p])}) = p ^ n
+  rw [← ker_toZModPow, Nat.card_congr
+    (RingHom.quotientKerEquivOfSurjective (toZModPow_surjective p n)).toEquiv,
+    Nat.card_eq_fintype_card, ZMod.card]
+
+/-- If an infinite compact topological group `G` embeds into `ℤₚˣ`, then `G / Gₜₒᵣ ≃ ℤₚ`. -/
+theorem nonempty_continuousMulEquiv_of_continuousMonoidHom_units
+    (G : Type*) [Infinite G] [CommGroup G] [TopologicalSpace G] [CompactSpace G]
+    (f : G →ₜ* ℤ_[p]ˣ) (hf : Function.Injective f) :
+    Nonempty (G ⧸ CommGroup.torsion G ≃ₜ* Multiplicative ℤ_[p]) := by
+  let Δ := (torsionUnits p).comap f.toMonoidHom
+  have hΔ₁ : Δ = CommGroup.torsion G := sorry
+  let f₁ := (ContinuousMonoidHom.fst _ _).comp <|
+    (unitsContinuousEquivTorsionfreeProdTorsion p :
+      ℤ_[p]ˣ →ₜ* torsionfreeUnits p × torsionUnits p).comp f
+  have hΔ₂ : CommGroup.torsion G ≤ f₁.ker := by
+    sorry
+  let f₂ : G ⧸ CommGroup.torsion G →ₜ* torsionfreeUnits p := {
+    toMonoidHom := QuotientGroup.lift _ f₁ hΔ₂
+    continuous_toFun := sorry
+  }
+  sorry
 
 end PadicInt

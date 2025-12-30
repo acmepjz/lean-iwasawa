@@ -156,6 +156,7 @@ theorem existsUnique_pow_eq_one_and_unitsMap_toZModPow_torsionfreeUnitsExponent_
 maps `a` to the unique `ϕ(pⁿ)`-th roots of unity
 (later we will show that in fact it is the unique roots of unity)
 in `ℤₚ` such that it is congruent to `a` modulo `pⁿ`. -/
+@[no_expose]
 noncomputable def teichmuller : (ZMod (p ^ torsionfreeUnitsExponent p))ˣ →* ℤ_[p]ˣ where
   toFun x :=
     (existsUnique_pow_eq_one_and_unitsMap_toZModPow_torsionfreeUnitsExponent_eq p x).exists.choose
@@ -354,6 +355,35 @@ theorem units_eq_unitsContinuousEquivTorsionfreeProdTorsion_mul (x) :
     x = (unitsContinuousEquivTorsionfreeProdTorsion p x).1.1 *
       (unitsContinuousEquivTorsionfreeProdTorsion p x).2.1 := by
   simp
+
+@[simp]
+theorem fst_unitsContinuousEquivTorsionfreeProdTorsion_eq_one_iff (x) :
+    (unitsContinuousEquivTorsionfreeProdTorsion p x).1 = 1 ↔ x ∈ torsionUnits p := by
+  refine ⟨fun h ↦ ?_, fun h ↦ ?_⟩
+  · convert (unitsContinuousEquivTorsionfreeProdTorsion p x).2.2
+    conv_lhs => rw [units_eq_unitsContinuousEquivTorsionfreeProdTorsion_mul p x]
+    simp [h]
+  · rw [torsionUnits, MonoidHom.mem_range] at h
+    obtain ⟨y, rfl⟩ := h
+    ext1
+    simp only [val_fst_unitsContinuousEquivTorsionfreeProdTorsion_apply,
+      RingHom.toMonoidHom_eq_coe, OneMemClass.coe_one]
+    suffices (teichmuller p) y * ((teichmuller p) y)⁻¹ = 1 by
+      convert this using 4
+      exact (teichmuller_spec p y).2
+    simp
+
+@[simp]
+theorem snd_unitsContinuousEquivTorsionfreeProdTorsion_eq_one_iff (x) :
+    (unitsContinuousEquivTorsionfreeProdTorsion p x).2 = 1 ↔ x ∈ torsionfreeUnits p := by
+  refine ⟨fun h ↦ ?_, fun h ↦ ?_⟩
+  · convert (unitsContinuousEquivTorsionfreeProdTorsion p x).1.2
+    conv_lhs => rw [units_eq_unitsContinuousEquivTorsionfreeProdTorsion_mul p x]
+    simp [h]
+  · ext1
+    simp only [val_snd_unitsContinuousEquivTorsionfreeProdTorsion_apply,
+      RingHom.toMonoidHom_eq_coe, OneMemClass.coe_one, map_eq_one_iff _ (teichmuller_injective p)]
+    exact h
 
 theorem torsionUnits_eq_rootsOfUnity :
     torsionUnits p = rootsOfUnity (p ^ torsionfreeUnitsExponent p).totient _ := by
@@ -845,22 +875,71 @@ theorem finite_or_finiteIndex_of_subgroup_units_of_isClosed
     (RingHom.quotientKerEquivOfSurjective (toZModPow_surjective p n)).toEquiv,
     Nat.card_eq_fintype_card, ZMod.card]
 
-/-- If an infinite compact topological group `G` embeds into `ℤₚˣ`, then `G / Gₜₒᵣ ≃ ℤₚ`. -/
+/-- TODO: go to mathlib -/
+@[to_additive]
+theorem _root_.CommGroup.torsion_le_comap_torsion {G H : Type*} [CommGroup G] [CommGroup H]
+    (f : G →* H) : CommGroup.torsion G ≤ (CommGroup.torsion H).comap f := fun g hg ↦ by
+  simp only [Subgroup.mem_comap, CommGroup.mem_torsion] at hg ⊢
+  exact f.isOfFinOrder hg
+
+/-- TODO: go to mathlib -/
+@[to_additive]
+theorem _root_.CommGroup.torsion_eq_comap_torsion_of_finite_ker {G H : Type*} [CommGroup G]
+    [CommGroup H] (f : G →* H) [Finite f.ker] :
+    CommGroup.torsion G = (CommGroup.torsion H).comap f := by
+  refine (CommGroup.torsion_le_comap_torsion f).antisymm fun g hg ↦ ?_
+  simp only [Subgroup.mem_comap, CommGroup.mem_torsion, isOfFinOrder_iff_pow_eq_one] at hg ⊢
+  obtain ⟨n, hn, hg⟩ := hg
+  rw [← map_pow, ← f.mem_ker] at hg
+  obtain ⟨m, hm, h⟩ := (isOfFinOrder_of_finite (G := f.ker) ⟨_, hg⟩).exists_pow_eq_one
+  exact ⟨n * m, by positivity, by simpa [pow_mul] using congr($h.1)⟩
+
+/-- If there is a continuous group homomorphism from an infinite compact topological group `G`
+to `ℤₚˣ` with finite kernel, then `G / Gₜₒᵣ ≃ ℤₚ`. -/
 theorem nonempty_continuousMulEquiv_of_continuousMonoidHom_units
     (G : Type*) [Infinite G] [CommGroup G] [TopologicalSpace G] [CompactSpace G]
-    (f : G →ₜ* ℤ_[p]ˣ) (hf : Function.Injective f) :
+    (f : G →ₜ* ℤ_[p]ˣ) [Finite f.ker] :
     Nonempty (G ⧸ CommGroup.torsion G ≃ₜ* Multiplicative ℤ_[p]) := by
-  let Δ := (torsionUnits p).comap f.toMonoidHom
-  have hΔ₁ : Δ = CommGroup.torsion G := sorry
-  let f₁ := (ContinuousMonoidHom.fst _ _).comp <|
-    (unitsContinuousEquivTorsionfreeProdTorsion p :
-      ℤ_[p]ˣ →ₜ* torsionfreeUnits p × torsionUnits p).comp f
-  have hΔ₂ : CommGroup.torsion G ≤ f₁.ker := by
-    sorry
-  let f₂ : G ⧸ CommGroup.torsion G →ₜ* torsionfreeUnits p := {
-    toMonoidHom := QuotientGroup.lift _ f₁ hΔ₂
-    continuous_toFun := sorry
-  }
+  -- let Δ := (torsionUnits p).comap f.toMonoidHom
+  -- have h1 : Δ = CommGroup.torsion G := sorry
+  let f0 := (ContinuousMonoidHom.fst _ _).comp
+    (unitsContinuousEquivTorsionfreeProdTorsion p : ℤ_[p]ˣ →ₜ* torsionfreeUnits p × torsionUnits p)
+  -- have hf0surj : Function.Surjective f0 := by
+  --   change Function.Surjective (Prod.fst ∘ unitsContinuousEquivTorsionfreeProdTorsion p)
+  --   simp [Prod.fst_surjective]
+  let f1 := f0.comp f
+  have hf1ker : f1.ker = (torsionUnits p).comap f := by
+    have : f0.ker = torsionUnits p := by ext; simp [f0]
+    simpa only [← this] using MonoidHom.comap_ker f0.toMonoidHom f.toMonoidHom
+  have : Finite f1.ker := by
+    change (f1.ker : Set G).Finite
+    rw [hf1ker]
+    refine Set.Finite.preimage' (f := f) (s := torsionUnits p) (Nat.finite_of_card_ne_zero ?_)
+      fun x _ ↦ ?_
+    · simp [card_torsionUnits, ‹Fact p.Prime›.out.ne_zero]
+    · by_cases hx : x ∈ Set.range f
+      · obtain ⟨y, rfl⟩ := hx
+        exact Finite.of_equiv _ (f.fiberEquivKer y).symm
+      simp [Set.preimage_singleton_eq_empty.2 hx]
+  have h2 : CommGroup.torsion G = f1.ker := by
+    rw [hf1ker, torsionUnits_eq_torsion]
+    exact CommGroup.torsion_eq_comap_torsion_of_finite_ker f.toMonoidHom
+  rw [h2]
+  let f2 := QuotientGroup.quotientKerEquivRange f1.toMonoidHom
+  suffices f1.range ≃ₜ* Multiplicative ℤ_[p] by
+    refine ⟨ContinuousMulEquiv.trans ?_ this⟩
+    let f3 := (show Continuous f2 from
+      f1.continuous.rangeFactorization.quotient_lift _).homeoOfEquivCompactToT2
+    exact { f2, f3 with }
+  have : Infinite f1.range := by
+    rename Infinite G => hg
+    contrapose! hg
+    rw [← f2.finite_iff] at hg
+    exact .of_subgroup_quotient f1.ker
+  -- let f₂ : G ⧸ CommGroup.torsion G →ₜ* torsionfreeUnits p := {
+  --   toMonoidHom := QuotientGroup.lift _ f₁ hΔ₂
+  --   continuous_toFun := Continuous.quotient_lift f₁.continuous _
+  -- }
   sorry
 
 end PadicInt

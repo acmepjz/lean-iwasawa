@@ -199,46 +199,52 @@ theorem unitsMap_toZModPow_surjective :
   have := NeZero.mk h
   exact IsLocalRing.surjective_units_map_of_local_ringHom _ (toZModPow_surjective p n) inferInstance
 
+end PadicInt
+
 /-! ### Some silly results for `ZMod` -/
 
-theorem _root_.ZMod.units_eq_one_of_eq_two
+namespace ZMod
+
+theorem units_eq_one_of_eq_two
     {q : ℕ} (hq : q = 2) (x : (ZMod q)ˣ) : x = 1 := by
   subst hq
   exact Subsingleton.elim x 1
 
-theorem _root_.ZMod.units_eq_one_or_neg_one_of_eq_three
+theorem units_eq_one_or_neg_one_of_eq_three
     {q : ℕ} (hq : q = 3) (x : (ZMod q)ˣ) : x = 1 ∨ x = -1 := by
   subst hq
   fin_cases x <;> decide
 
-theorem _root_.ZMod.units_eq_one_or_neg_one_of_eq_four
+theorem units_eq_one_or_neg_one_of_eq_four
     {q : ℕ} (hq : q = 4) (x : (ZMod q)ˣ) : x = 1 ∨ x = -1 := by
   subst hq
   fin_cases x <;> decide
 
-theorem _root_.ZMod.units_eq_one_or_neg_one_of_eq_six
+theorem units_eq_one_or_neg_one_of_eq_six
     {q : ℕ} (hq : q = 6) (x : (ZMod q)ˣ) : x = 1 ∨ x = -1 := by
   subst hq
   fin_cases x <;> decide
 
-theorem _root_.ZMod.eq_one_of_eq_two_of_isUnit
+theorem eq_one_of_eq_two_of_isUnit
     {q : ℕ} (hq : q = 2) (x : ZMod q) (hx : IsUnit x) : x = 1 :=
   congr($(ZMod.units_eq_one_of_eq_two hq hx.unit).1)
 
-theorem _root_.ZMod.eq_one_or_neg_one_of_eq_three_of_isUnit
+theorem eq_one_or_neg_one_of_eq_three_of_isUnit
     {q : ℕ} (hq : q = 3) (x : ZMod q) (hx : IsUnit x) : x = 1 ∨ x = -1 := by
   rcases ZMod.units_eq_one_or_neg_one_of_eq_three hq hx.unit with h | h
   · exact Or.inl congr($(h).1)
   · exact Or.inr congr($(h).1)
 
-theorem _root_.ZMod.eq_one_or_neg_one_of_eq_four_of_isUnit
+theorem eq_one_or_neg_one_of_eq_four_of_isUnit
     {q : ℕ} (hq : q = 4) (x : ZMod q) (hx : IsUnit x) : x = 1 ∨ x = -1 := by
   rcases ZMod.units_eq_one_or_neg_one_of_eq_four hq hx.unit with h | h
   · exact Or.inl congr($(h).1)
   · exact Or.inr congr($(h).1)
 
-theorem _root_.ZMod.eq_one_or_neg_one_of_eq_six_of_isUnit
+theorem eq_one_or_neg_one_of_eq_six_of_isUnit
     {q : ℕ} (hq : q = 6) (x : ZMod q) (hx : IsUnit x) : x = 1 ∨ x = -1 := by
   rcases ZMod.units_eq_one_or_neg_one_of_eq_six hq hx.unit with h | h
   · exact Or.inl congr($(h).1)
   · exact Or.inr congr($(h).1)
+
+end ZMod

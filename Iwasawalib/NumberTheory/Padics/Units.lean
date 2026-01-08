@@ -403,6 +403,10 @@ theorem card_torsionUnits :
     Nat.card (torsionUnits p) = (p ^ torsionfreeUnitsExponent p).totient := by
   simpa using Nat.card_range_of_injective (teichmuller_injective p)
 
+instance finite_torsionUnits : Finite (torsionUnits p) := by
+  apply Nat.finite_of_card_ne_zero
+  simp [card_torsionUnits, ‹Fact p.Prime›.out.ne_zero]
+
 @[simp]
 theorem torsionfreeUnits_sup_torsionUnits :
     torsionfreeUnits p ⊔ torsionUnits p = ⊤ := by
@@ -896,17 +900,13 @@ theorem _root_.CommGroup.torsion_eq_comap_torsion_of_finite_ker {G H : Type*} [C
 
 /-- If there is a continuous group homomorphism from an infinite compact topological group `G`
 to `ℤₚˣ` with finite kernel, then `G / Gₜₒᵣ ≃ ℤₚ`. -/
-theorem nonempty_continuousMulEquiv_of_continuousMonoidHom_units
+theorem nonempty_continuousMulEquiv_of_continuousMonoidHom_units_of_finite_ker
     (G : Type*) [Infinite G] [CommGroup G] [TopologicalSpace G] [CompactSpace G]
     (f : G →ₜ* ℤ_[p]ˣ) [Finite f.ker] :
     Nonempty (G ⧸ CommGroup.torsion G ≃ₜ* Multiplicative ℤ_[p]) := by
-  -- let Δ := (torsionUnits p).comap f.toMonoidHom
-  -- have h1 : Δ = CommGroup.torsion G := sorry
-  let f0 := (ContinuousMonoidHom.fst _ _).comp
+  let f0 := ((equivTorsionfreeUnits p).symm : torsionfreeUnits p →ₜ* Multiplicative ℤ_[p]).comp <|
+    (ContinuousMonoidHom.fst _ _).comp
     (unitsContinuousEquivTorsionfreeProdTorsion p : ℤ_[p]ˣ →ₜ* torsionfreeUnits p × torsionUnits p)
-  -- have hf0surj : Function.Surjective f0 := by
-  --   change Function.Surjective (Prod.fst ∘ unitsContinuousEquivTorsionfreeProdTorsion p)
-  --   simp [Prod.fst_surjective]
   let f1 := f0.comp f
   have hf1ker : f1.ker = (torsionUnits p).comap f := by
     have : f0.ker = torsionUnits p := by ext; simp [f0]
@@ -914,20 +914,18 @@ theorem nonempty_continuousMulEquiv_of_continuousMonoidHom_units
   have : Finite f1.ker := by
     change (f1.ker : Set G).Finite
     rw [hf1ker]
-    refine Set.Finite.preimage' (f := f) (s := torsionUnits p) (Nat.finite_of_card_ne_zero ?_)
-      fun x _ ↦ ?_
-    · simp [card_torsionUnits, ‹Fact p.Prime›.out.ne_zero]
-    · by_cases hx : x ∈ Set.range f
-      · obtain ⟨y, rfl⟩ := hx
-        exact Finite.of_equiv _ (f.fiberEquivKer y).symm
-      simp [Set.preimage_singleton_eq_empty.2 hx]
+    refine Set.Finite.preimage' (f := f) (s := torsionUnits p) (finite_torsionUnits p) fun x _ ↦ ?_
+    by_cases hx : x ∈ Set.range f
+    · obtain ⟨y, rfl⟩ := hx
+      exact Finite.of_equiv _ (f.fiberEquivKer y).symm
+    simp [Set.preimage_singleton_eq_empty.2 hx]
   have h2 : CommGroup.torsion G = f1.ker := by
     rw [hf1ker, torsionUnits_eq_torsion]
     exact CommGroup.torsion_eq_comap_torsion_of_finite_ker f.toMonoidHom
   rw [h2]
   let f2 := QuotientGroup.quotientKerEquivRange f1.toMonoidHom
-  suffices f1.range ≃ₜ* Multiplicative ℤ_[p] by
-    refine ⟨ContinuousMulEquiv.trans ?_ this⟩
+  suffices Nonempty (f1.range ≃ₜ* Multiplicative ℤ_[p]) by
+    obtain ⟨g⟩ := this; refine ⟨ContinuousMulEquiv.trans ?_ g⟩
     let f3 := (show Continuous f2 from
       f1.continuous.rangeFactorization.quotient_lift _).homeoOfEquivCompactToT2
     exact { f2, f3 with }
@@ -936,10 +934,27 @@ theorem nonempty_continuousMulEquiv_of_continuousMonoidHom_units
     contrapose! hg
     rw [← f2.finite_iff] at hg
     exact .of_subgroup_quotient f1.ker
-  -- let f₂ : G ⧸ CommGroup.torsion G →ₜ* torsionfreeUnits p := {
-  --   toMonoidHom := QuotientGroup.lift _ f₁ hΔ₂
-  --   continuous_toFun := Continuous.quotient_lift f₁.continuous _
-  -- }
-  sorry
+  obtain ⟨I, hI⟩ := exists_eq_ideal_of_addSubgroup_of_isClosed p (Subgroup.toAddSubgroup' f1.range)
+    (isCompact_range f1.continuous).isClosed
+  rcases eq_or_ne I ⊥ with rfl | hI'
+  · rw [show f1.range = ⊥ by simpa using hI, ← not_finite_iff_infinite] at this
+    exact (this inferInstance).elim
+  obtain ⟨i⟩ := IsDedekindDomain.nonempty_continuousLinearEquiv_of_ne_bot hI'
+  suffices Nonempty (Subgroup.toAddSubgroup' f1.range ≃ₜ+ ℤ_[p]) by
+    obtain ⟨g⟩ := this
+    exact ⟨{ g with map_mul' := g.map_add' }⟩
+  rw [hI]
+  exact show Nonempty (I ≃ₜ+ ℤ_[p]) from ⟨{ i with }⟩
+
+/-- If there is a continuous group embedding from an infinite compact topological group `G`
+to `ℤₚˣ`, then `G / Gₜₒᵣ ≃ ℤₚ`. -/
+theorem nonempty_continuousMulEquiv_of_continuousMonoidHom_units_of_injective
+    (G : Type*) [Infinite G] [CommGroup G] [TopologicalSpace G] [CompactSpace G]
+    (f : G →ₜ* ℤ_[p]ˣ) (hf : Function.Injective f) :
+    Nonempty (G ⧸ CommGroup.torsion G ≃ₜ* Multiplicative ℤ_[p]) :=
+  have : Finite f.ker := by
+    rw [f.ker_eq_bot_iff.2 hf]
+    infer_instance
+  nonempty_continuousMulEquiv_of_continuousMonoidHom_units_of_finite_ker p G f
 
 end PadicInt

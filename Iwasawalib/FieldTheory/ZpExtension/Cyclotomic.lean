@@ -5,8 +5,13 @@ Authors: Jz Pan
 -/
 module
 
+public import Mathlib.FieldTheory.Galois.Profinite
+public import Mathlib.FieldTheory.PolynomialGaloisGroup
 public import Iwasawalib.FieldTheory.ZpExtension.Basic
 public import Mathlib.NumberTheory.Cyclotomic.CyclotomicCharacter
+public import Mathlib.NumberTheory.Cyclotomic.Gal
+-- public import Mathlib.NumberTheory.LocalField.Basic
+public import Iwasawalib.NumberTheory.Padics.Units
 public import Mathlib.RingTheory.RootsOfUnity.AlgebraicallyClosed
 
 @[expose] public section
@@ -144,7 +149,9 @@ instance isAbelianGalois [NeZero p] : IsAbelianGalois K (CyclotomicPinfField p K
   exact (isCyclotomicPinfExtension r K).isAbelianGalois ..
 
 /-- The intermediate field of $K(μ_{p^∞}) / K$ fixed by the torsion subgroup of the Galois group
-of $K(μ_{p^∞}) / K$. -/
+of $K(μ_{p^∞}) / K$. `CyclotomicPinfField.isCyclotomicZpExtension_cyclotomicZpSubfield` shows that,
+if $K(μ_{p^∞}) / K$ is an infinite extension,
+then this field over `K` is a cyclotomic `ℤₚ`-extension. -/
 noncomputable def cyclotomicZpSubfield : IntermediateField K (CyclotomicPinfField p K) :=
   if h : p ≠ 0 then haveI := NeZero.mk h; .fixedField (CommGroup.torsion _) else ⊥
 
@@ -166,7 +173,6 @@ noncomputable def continuousCyclotomicCharacter : (L ≃ₐ[K] L) →ₜ* ℤ_[p
   toMonoidHom := (cyclotomicCharacter L p).comp (MulSemiringAction.toRingAut (L ≃ₐ[K] L) L)
   continuous_toFun := cyclotomicCharacter.continuous p K L
 
-@[simp]
 theorem continuousCyclotomicCharacter_apply (f : L ≃ₐ[K] L) :
     continuousCyclotomicCharacter p K L f = cyclotomicCharacter L p f := rfl
 
@@ -244,6 +250,33 @@ theorem continuousCyclotomicCharacter_injective [IsCyclotomicPinfExtension p K L
   convert (IsCyclotomicExtension.iff_adjoin_eq_top (Set.range (p ^ ·)) K L).1 ‹_› |>.2 using 2
   simp [‹Fact p.Prime›.out.ne_zero]
 
+theorem IsCyclotomicPinfExtension.finite_torsion_gal [IsCyclotomicPinfExtension p K L] :
+    haveI := IsCyclotomicExtension.isAbelianGalois (Set.range (p ^ ·)) K L
+    Finite (CommGroup.torsion Gal(L/K)) := by
+  have := IsCyclotomicExtension.isAbelianGalois (Set.range (p ^ ·)) K L
+  refine Set.Finite.subset ?_ <| CommGroup.torsion_le_comap_torsion <| MonoidHomClass.toMonoidHom
+    <| continuousCyclotomicCharacter p K L
+  refine Set.Finite.preimage (s := (CommGroup.torsion ℤ_[p]ˣ : Set ℤ_[p]ˣ))
+    (continuousCyclotomicCharacter_injective p K L).injOn ?_
+  rw [← PadicInt.torsionUnits_eq_torsion]
+  exact PadicInt.finite_torsionUnits p
+
+/-- The torsion subgroup of the Galois group of $K(μ_{p^∞}) / K$, which is a closed subgroup. -/
+@[simps toSubgroup]
+noncomputable def CyclotomicPinfField.torsionGal [NeZero (p : K)] :
+    ClosedSubgroup Gal(CyclotomicPinfField p K/K) where
+  toSubgroup := CommGroup.torsion Gal(CyclotomicPinfField p K/K)
+  isClosed' := Set.Finite.isClosed
+    (IsCyclotomicPinfExtension.finite_torsion_gal p K (CyclotomicPinfField p K))
+
+theorem CyclotomicPinfField.fixingSubgroup_cyclotomicZpSubfield [NeZero (p : K)] :
+    (cyclotomicZpSubfield p K).fixingSubgroup = CommGroup.torsion _ := by
+  simpa only [cyclotomicZpSubfield_eq_fixedField] using
+    InfiniteGalois.fixingSubgroup_fixedField (torsionGal p K)
+
+instance CyclotomicPinfField.finite_torsionGal [NeZero (p : K)] : Finite (torsionGal p K) :=
+  IsCyclotomicPinfExtension.finite_torsion_gal p K (CyclotomicPinfField p K)
+
 end CyclotomicCharacter
 
 /-! ### The assertion that a field extension is a cyclotomic `ℤₚ`-extension -/
@@ -288,7 +321,47 @@ noncomputable def algHomCyclotomicPinfField := H.2.some
 
 theorem fieldRange_eq_cyclotomicZpSubfield (f : Kinf →ₐ[K] CyclotomicPinfField p K) :
     f.fieldRange = CyclotomicPinfField.cyclotomicZpSubfield p K := by
-  sorry
+  have := H.neZero
+  replace H : IsCyclotomicZpExtension p K f.fieldRange := H.congr (AlgEquiv.ofInjectiveField f)
+  suffices f.fieldRange.fixingSubgroup = CommGroup.torsion _ by
+    simpa only [InfiniteGalois.fixedField_fixingSubgroup,
+      CyclotomicPinfField.cyclotomicZpSubfield_eq_fixedField] using
+        congr(IntermediateField.fixedField $(this))
+  have hfin : Finite f.fieldRange.fixingSubgroup := by
+    have hc : IsClosed ((f.fieldRange.fixingSubgroup.map <| MonoidHomClass.toMonoidHom <|
+        continuousCyclotomicCharacter p K (CyclotomicPinfField p K)) : Set ℤ_[p]ˣ) :=
+      (InfiniteGalois.fixingSubgroup_isClosed f.fieldRange).isCompact.image
+        (continuousCyclotomicCharacter p K (CyclotomicPinfField p K)).continuous |>.isClosed
+    rcases PadicInt.finite_or_finiteIndex_of_subgroup_units_of_isClosed p _ hc with ⟨h, -⟩ | ⟨-, h⟩
+    · exact h.of_finite_image
+        (continuousCyclotomicCharacter_injective p K (CyclotomicPinfField p K)).injOn
+    suffices IsOpen (f.fieldRange.fixingSubgroup : Set Gal(CyclotomicPinfField p K/K)) from
+      H.isZpExtension.infinite_dimensional ((InfiniteGalois.isOpen_iff_finite _).1 this) |>.elim
+    simpa [(continuousCyclotomicCharacter_injective p K (CyclotomicPinfField p K)).preimage_image]
+      using h.preimage (continuousCyclotomicCharacter p K (CyclotomicPinfField p K)).continuous
+  refine le_antisymm (fun g hg ↦ ?_) (fun g hg ↦ ?_)
+  · rw [CommGroup.mem_torsion, ← finite_zpowers]
+    exact Set.Finite.subset hfin (Subgroup.zpowers_le_of_mem hg)
+  suffices CommGroup.torsion Gal(f.fieldRange/K) = ⊥ by
+    rw [CommGroup.mem_torsion] at hg
+    replace hg := (AlgEquiv.restrictNormalHom f.fieldRange).isOfFinOrder hg
+    rwa [← CommGroup.mem_torsion, this, Subgroup.mem_bot, ← MonoidHom.mem_ker,
+      IntermediateField.restrictNormalHom_ker] at hg
+  suffices ht : AddCommGroup.torsion ℤ_[p] = ⊥ from eq_bot_iff.2 fun x hx ↦ by
+    let i := H.isZpExtension.continuousMulEquiv₁
+    rw [CommGroup.mem_torsion] at hx
+    replace hx : IsOfFinAddOrder (i x).toAdd := i.toMonoidHom.isOfFinOrder hx
+    rw [← AddCommGroup.mem_torsion, ht, AddSubgroup.mem_bot] at hx
+    simpa using congr(i.symm $(show i x = 1 from hx))
+  refine eq_bot_iff.2 fun x hx ↦ ?_
+  rw [AddCommGroup.mem_torsion, isOfFinAddOrder_iff_nsmul_eq_zero] at hx
+  obtain ⟨n, h1, h2⟩ := hx
+  simpa [h1.ne'] using h2
+
+theorem isCyclotomicZpExtension_cyclotomicZpSubfield :
+    IsCyclotomicZpExtension p K (CyclotomicPinfField.cyclotomicZpSubfield p K) :=
+  H.congr <| (AlgEquiv.ofInjectiveField H.2.some).trans <| IntermediateField.equivOfEq <|
+    H.fieldRange_eq_cyclotomicZpSubfield H.2.some
 
 theorem unique (H' : IsCyclotomicZpExtension p K Kinf') : Nonempty (Kinf ≃ₐ[K] Kinf') := by
   have h := H.fieldRange_eq_cyclotomicZpSubfield H.2.some
@@ -298,28 +371,50 @@ theorem unique (H' : IsCyclotomicZpExtension p K Kinf') : Nonempty (Kinf ≃ₐ[
 
 end IsCyclotomicZpExtension
 
--- theorem CyclotomicPinfField.isZpExtension_cyclotomicZpSubfield
---     [Fact p.Prime] [NeZero (p : K)] :
---     IsMvZpExtension p 1 K (CyclotomicPinfField.cyclotomicZpSubfield p K) := by
---   sorry
+/-- If `H` is a closed normal subgroup of `Gal(K / k)`,
+then `Gal(fixedField H / k)` is isomorphic to `Gal(K / k) ⧸ H` as a topological group.
 
--- theorem CyclotomicPinfField.isCyclotomicZpExtension_cyclotomicZpSubfield
---     [Fact p.Prime] [NeZero (p : K)] :
---     IsCyclotomicZpExtension p K (CyclotomicPinfField.cyclotomicZpSubfield p K) where
---   isZpExtension := isZpExtension_cyclotomicZpSubfield p K
---   nonempty_algHom_cyclotomicPinfField := ⟨IntermediateField.val _⟩
+TODO: should go to mathlib -/
+@[simps! toMulEquiv]
+noncomputable def InfiniteGalois.normalAutContinuousEquivQuotient {k K : Type*} [Field k] [Field K]
+    [Algebra k K] [IsGalois k K]  (H : ClosedSubgroup Gal(K/k)) [H.Normal] :
+    Gal(K/k) ⧸ H.1 ≃ₜ* Gal(IntermediateField.fixedField H.1/k) :=
+  letI f : Gal(K/k) ⧸ H.1 ≃* Gal(IntermediateField.fixedField H.1/k) := normalAutEquivQuotient H
+  haveI hc : Continuous f := by simpa only [(QuotientGroup.isQuotientMap_mk H.1).continuous_iff]
+    using InfiniteGalois.restrictNormalHom_continuous (IntermediateField.fixedField H.1)
+  letI f1 : Gal(K/k) ⧸ H.1 ≃ₜ Gal(IntermediateField.fixedField H.1/k) :=
+    hc.homeoOfEquivCompactToT2 (f := f)
+  { f, f1 with }
 
--- variable {p K Kinf} in
--- theorem isCyclotomicZpExtension_iff_exists_fieldRange_eq_cyclotomicZpSubfield [Fact p.Prime] :
---     IsCyclotomicZpExtension p K Kinf ↔ (p : K) ≠ 0 ∧
---     ∃ (f : Kinf →ₐ[K] CyclotomicPinfField p K),
---     f.fieldRange = CyclotomicPinfField.cyclotomicZpSubfield p K := by
---   refine ⟨fun H ↦ ⟨H.neZero.out, H.2.some, H.fieldRange_eq_cyclotomicZpSubfield _⟩,
---     fun ⟨hp, f, hf⟩ ↦ ?_⟩
---   have := NeZero.mk hp
---   have := CyclotomicPinfField.isCyclotomicZpExtension_cyclotomicZpSubfield p K
---   rw [← hf] at this
---   exact this.congr (AlgEquiv.ofInjectiveField f).symm
+/-- If $K(μ_{p^∞}) / K$ is an infinite extension, then $K(μ_{p^∞})^Δ / K$ is a cyclotomic
+`ℤₚ`-extension, where `Δ` is the torsion subgroup of the Galois group of $K(μ_{p^∞}) / K$. -/
+theorem CyclotomicPinfField.isCyclotomicZpExtension_cyclotomicZpSubfield
+    [Fact p.Prime] [NeZero (p : K)] (H : ¬FiniteDimensional K (CyclotomicPinfField p K)) :
+    IsCyclotomicZpExtension p K (cyclotomicZpSubfield p K) := by
+  refine ⟨?_, ⟨IntermediateField.val _⟩⟩
+  rw [isMvZpExtension₁_iff]
+  have h : Nonempty _ := ⟨InfiniteGalois.normalAutContinuousEquivQuotient (torsionGal p K)⟩
+  simp only [torsionGal_toSubgroup] at h
+  rw [← cyclotomicZpSubfield_eq_fixedField] at h
+  obtain ⟨f⟩ := h
+  have : Infinite Gal(CyclotomicPinfField p K/K) := by
+    contrapose! H
+    exact IsGalois.finiteDimensional_of_finite ..
+  obtain ⟨g⟩ := PadicInt.nonempty_continuousMulEquiv_of_continuousMonoidHom_units_of_injective p
+    Gal(CyclotomicPinfField p K/K) _ (continuousCyclotomicCharacter_injective ..)
+  exact ⟨f.symm.trans g⟩
+
+theorem isCyclotomicZpExtension_iff_exists_fieldRange_eq_cyclotomicZpSubfield [Fact p.Prime] :
+    IsCyclotomicZpExtension p K Kinf ↔
+      (p : K) ≠ 0 ∧ ¬FiniteDimensional K (CyclotomicPinfField p K) ∧
+      ∃ (f : Kinf →ₐ[K] CyclotomicPinfField p K),
+        f.fieldRange = CyclotomicPinfField.cyclotomicZpSubfield p K := by
+  refine ⟨fun H ↦ ⟨H.neZero.out, H.infinite_dimensional_cyclotomicPinfField, H.2.some,
+    H.fieldRange_eq_cyclotomicZpSubfield _⟩, fun ⟨hp, hinf, f, hf⟩ ↦ ?_⟩
+  have := NeZero.mk hp
+  have := CyclotomicPinfField.isCyclotomicZpExtension_cyclotomicZpSubfield p K hinf
+  rw [← hf] at this
+  exact this.congr (AlgEquiv.ofInjectiveField f).symm
 
 /-! ### The assertion that a field have a cyclotomic `ℤₚ`-extension -/
 
@@ -331,14 +426,58 @@ class HasCyclotomicZpExtension [Fact p.Prime] : Prop where
     ∃ (Kinf : Type u) (_ : Field Kinf) (_ : Algebra K Kinf) (_ : IsGalois K Kinf),
     IsCyclotomicZpExtension p K Kinf
 
+theorem hasCyclotomicZpExtension_iff_isCyclotomicZpExtension_cyclotomicZpSubfield [Fact p.Prime] :
+    HasCyclotomicZpExtension p K ↔
+      IsCyclotomicZpExtension p K (CyclotomicPinfField.cyclotomicZpSubfield p K) :=
+  ⟨fun ⟨_, _, _, _, H⟩ ↦ H.isCyclotomicZpExtension_cyclotomicZpSubfield, fun H ↦ ⟨_, _, _, _, H⟩⟩
+
+variable {p K Kinf} in
+theorem IsCyclotomicZpExtension.hasCyclotomicZpExtension
+    [Fact p.Prime] (H : IsCyclotomicZpExtension p K Kinf) : HasCyclotomicZpExtension p K :=
+  (hasCyclotomicZpExtension_iff_isCyclotomicZpExtension_cyclotomicZpSubfield p K).2
+    H.isCyclotomicZpExtension_cyclotomicZpSubfield
+
 /-- `K` have a cyclotomic `ℤₚ`-extension if and only if $K(μ_{p^∞}) / K$
 is an infinite extension. -/
 theorem hasCyclotomicZpExtension_iff_infinite_dimensional [Fact p.Prime] :
-    HasCyclotomicZpExtension p K ↔ ¬FiniteDimensional K (CyclotomicPinfField p K) := by
-  sorry
+    HasCyclotomicZpExtension p K ↔ (p : K) ≠ 0 ∧ ¬FiniteDimensional K (CyclotomicPinfField p K) :=
+  ⟨fun ⟨_, _, _, _, H⟩ ↦ ⟨H.neZero.out, H.infinite_dimensional_cyclotomicPinfField⟩, fun ⟨h, hi⟩ ↦
+    have := NeZero.mk h
+    ⟨_, _, _, _, CyclotomicPinfField.isCyclotomicZpExtension_cyclotomicZpSubfield p K hi⟩⟩
 
-variable {p K Kinf} in
-theorem IsCyclotomicZpExtension.hasCyclotomicZpExtension [Fact p.Prime]
-    (H : IsCyclotomicZpExtension p K Kinf) : HasCyclotomicZpExtension p K := by
+/-- Any number field has a cyclotomic `ℤₚ`-extension. -/
+instance NumberField.hasCyclotomicZpExtension [Fact p.Prime] [NumberField K] :
+    HasCyclotomicZpExtension p K := by
   rw [hasCyclotomicZpExtension_iff_infinite_dimensional]
-  sorry
+  refine ⟨mod_cast ‹Fact p.Prime›.out.ne_zero, fun H ↦ ?_⟩
+  have := algebraRat.charZero (CyclotomicPinfField p K)
+  have := FiniteDimensional.trans ℚ K (CyclotomicPinfField p K)
+  have : NumberField (CyclotomicPinfField p K) := ⟨⟩
+  have h1 (m) : ∃ n, m < (p ^ n).totient := by
+    use m + 1
+    rw [Nat.totient_prime_pow_succ Fact.out]
+    have h1 := ‹Fact p.Prime›.out.one_lt
+    have h2 := Nat.lt_pow_self (n := m) h1
+    conv_lhs => rw [← mul_one m]
+    exact Nat.mul_lt_mul_of_lt_of_le' h2 (by omega) zero_lt_one
+  obtain ⟨n, hn⟩ := h1 (Module.finrank ℚ (CyclotomicPinfField p K))
+  have : IsCyclotomicExtension .. := CyclotomicPinfField.isCyclotomicPinfExtension p K
+  have hpn : p ^ n ≠ 0 := by simp [‹Fact p.Prime›.out.ne_zero]
+  obtain ⟨x, hx⟩ := IsCyclotomicExtension.exists_isPrimitiveRoot (S := (Set.range (p ^ ·))) K
+    (CyclotomicPinfField p K) (n := p ^ n) (by simp) hpn
+  have hi := Polynomial.cyclotomic.irreducible_rat (Nat.pos_of_ne_zero hpn)
+  have := Fact.mk hi
+  have hroot := hx.isRoot_cyclotomic (Nat.pos_of_ne_zero hpn)
+  let f := AdjoinRoot.liftAlgHom (Polynomial.cyclotomic (p ^ n) ℚ) (Algebra.ofId ℚ _) x <| by
+    rwa [Polynomial.IsRoot.def, ← Polynomial.map_cyclotomic _
+      (algebraMap ℚ (CyclotomicPinfField p K)), Polynomial.eval_map] at hroot
+  have hle := LinearMap.finrank_le_finrank_of_injective (f := f.toLinearMap) f.injective
+  rw [show Module.finrank ℚ (AdjoinRoot (Polynomial.cyclotomic (p ^ n) ℚ)) = _ from
+    finrank_quotient_span_eq_natDegree, Polynomial.natDegree_cyclotomic] at hle
+  exact hn.not_ge hle
+
+-- /-- Any local field has a cyclotomic `ℤₚ`-extension. -/
+-- instance IsNonarchimedeanLocalField.hasCyclotomicZpExtension [Fact p.Prime] [NeZero (p : K)]
+--     [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K] :
+--     HasCyclotomicZpExtension p K := by
+--   sorry

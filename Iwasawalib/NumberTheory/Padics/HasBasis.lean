@@ -7,6 +7,7 @@ module
 
 public import Iwasawalib.NumberTheory.Padics.ForMathlib1
 public import Mathlib.NumberTheory.Padics.ProperSpace
+public import Mathlib.Topology.Algebra.Module.Equiv
 public import Mathlib.Topology.Algebra.Ring.Compact
 
 @[expose] public section
@@ -35,6 +36,27 @@ theorem isOpen_span_singleton_pow_of_irreducible
     {p : R} (hp : Irreducible p) (n : ℕ) : IsOpen (Ideal.span {p ^ n} : Set R) := by
   apply isOpen_span_singleton_of_ne_zero
   simp [hp.ne_zero]
+
+/-- If `x ≠ 0`, then `R ≃ ⟨x⟩`, `a ↦ x * a` is an isomorphism of topological module. -/
+noncomputable def continuousLinearEquivOfNeZero {x : R} (hx : x ≠ 0) : R ≃L[R] Ideal.span {x} :=
+  letI f1 : R ≃ₗ[R] LinearMap.range (LinearMap.mul R R x) := .ofInjective (.mul R R x) <| by
+    simp [injective_iff_map_eq_zero, hx]
+  haveI hc : Continuous f1 := continuous_mul.curry_right.rangeFactorization
+  letI f2 : R ≃ₜ LinearMap.range (LinearMap.mul R R x) := hc.homeoOfEquivCompactToT2 (f := f1)
+  letI f3 : R ≃L[R] LinearMap.range (LinearMap.mul R R x) := { f1, f2 with }
+  f3.trans <| .ofEq _ _ (Ideal.range_mul' x)
+
+@[simp]
+theorem coe_continuousLinearEquivOfNeZero_apply {x : R} (hx : x ≠ 0) (a : R) :
+    continuousLinearEquivOfNeZero hx a = x * a := rfl
+
+theorem nonempty_continuousLinearEquiv_of_ne_bot
+    [IsPrincipalIdealRing R] {I : Ideal R} (hI : I ≠ ⊥) : Nonempty (I ≃L[R] R) := by
+  obtain ⟨x, h⟩ := IsPrincipalIdealRing.principal I
+  rw [Ideal.submodule_span_eq] at h
+  refine ⟨((continuousLinearEquivOfNeZero ?_).trans <| .ofEq _ _ h.symm).symm⟩
+  rintro rfl
+  simp_all
 
 end IsDedekindDomain
 

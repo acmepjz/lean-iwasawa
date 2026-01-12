@@ -12,11 +12,33 @@
 
 \section{Introduction}
 
+\emph{Notations}.
+A ``{\checkmark}'' in a theorem/lemma/definition means that its \emph{statement}
+is formalized in {\Lean} (but not proof!). A ``{\checkmark}'' in a proof means that
+the proof is also formalized in {\Lean} (but it could have dependencies which
+are not yet formalized).
+
 \subsection{Iwasawa's theorem on growth of class groups}
 
-The first goal of this project is formalize the proof of
-Iwasawa's theorem on growth of class groups in a $\BZ_p$-extension tower
-in {\Lean}.
+Iwasawa theory is a branch of modern number theory,
+initiated by Kenkichi Iwasawa in 1959,
+which studies arithmetic objects
+over infinite towers of number fields.
+It was motivated by the study of
+class groups of cyclotomic fields, which are very important in number theory.
+
+\begin{thm}[Fermat's Last Theorem, regular prime case]
+If a prime $p\geq 3$ does not divide the class number of $\BQ(\mu_p)$, then
+$x^p+y^p=z^p$, $xyz\neq 0$ does not have integral solution.
+\end{thm}
+
+The class group of $\BQ(\mu_p)$ is studied via
+infinite tower of cyclotomic fields
+$$
+\BQ(\mu_p)\subset\BQ(\mu_{p^2})\subset\BQ(\mu_{p^3})\subset\cdots
+\subset\BQ(\mu_{p^\infty}),
+$$
+which is an example of a $\BZ_p$-extension.
 
 \begin{definition}
 \label{Zp-ext-def}
@@ -31,6 +53,13 @@ as topological groups.
 {\rm(ii)} If $K_\infty/K$ is a $\BZ_p$-extension, then for any
 $n\geq 0$, define $K_n:=K_\infty^{\Gamma^{p^n}}$.
 \end{definition}
+
+The $K_n$ form an infinite tower
+$$
+K=K_0\subset K_1\subset K_2\subset\cdots\subset K_\infty.
+$$
+Iwasawa in 1959
+studied the growth of class groups of $K_n$ in a $\BZ_p$-extension.
 
 \begin{thm}[Iwasawa's theorem, {\cite{Was97}, Theorem 13.13}]
 \label{clgp-growth}
@@ -55,6 +84,10 @@ torsion $\Lambda$-module and each $X_n$ is isomorphic to certain quotient of $X_
 Proposition \ref{coinvariant-growth-2} asserts the growth of such quotient
 is of form $\mu p^n+\lambda n+\nu$.
 \end{proof}
+
+The first goal of our project is formalize the proof of the above
+Iwasawa's theorem on growth of class groups in a $\BZ_p$-extension tower
+in {\Lean}.
 
 \section{Preliminaries in commutative algebra}
 
@@ -337,7 +370,7 @@ So we only need to show $A$ is a Dedekind domain.
 Let $I$ be any ideal of $A$. Apply Lemma \ref{semilocal-fg-mod} to $I$ we know that
 $I$ is finitely generated. Hence $A$ is a Noetherian ring.
 
-Apply \docs{Ring.krullDimLE_of_isLocalization_maximal}. If $\dim(A_{\fm}) \le n$ for any maximal ideals $\fm$ of $A$, 
+Apply \docs{Ring.krullDimLE_of_isLocalization_maximal}. If $\dim(A_{\fm}) \le n$ for any maximal ideals $\fm$ of $A$,
 then $\dim(A) \le n$. Hence we have $\dim(A) \le 1$.
 
 It's known that if the localizations of a domain at all maximal ideals

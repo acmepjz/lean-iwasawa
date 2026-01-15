@@ -9,6 +9,7 @@ public import Iwasawalib.Algebra.InverseLimit.Basic
 public import Iwasawalib.Algebra.Module.Torsion
 public import Iwasawalib.FieldTheory.ZpExtension.Basic
 public import Iwasawalib.FieldTheory.ZpExtension.Cyclotomic
+public import Iwasawalib.GroupTheory.Torsion
 public import Iwasawalib.NumberTheory.Cyclotomic.FiniteField
 public import Iwasawalib.NumberTheory.NumberField.HilbertClassField
 public import Iwasawalib.NumberTheory.Padics.EquivMvZp

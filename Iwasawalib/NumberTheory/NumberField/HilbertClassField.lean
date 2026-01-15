@@ -7,6 +7,7 @@ module
 
 public import Mathlib.FieldTheory.Galois.Abelian
 public import Mathlib.NumberTheory.NumberField.ClassNumber
+public import Mathlib.NumberTheory.NumberField.Ideal.Basic
 public import Mathlib.NumberTheory.RamificationInertia.Unramified
 public import Mathlib.RingTheory.Frobenius
 
@@ -31,32 +32,32 @@ and all infinite places. Only makes sense when the base field `F` is a number fi
 class IsUnramifiedEverywhere : Prop where
   isUnramifiedAt_of_heightOneSpectrum (E : IntermediateField F K) [FiniteDimensional F E]
     (w : IsDedekindDomain.HeightOneSpectrum (𝓞 E)) : Algebra.IsUnramifiedAt (𝓞 F) w.asIdeal
-  isUnramified_of_infinitePlace (E : IntermediateField F K) [FiniteDimensional F E]
-    (w : InfinitePlace E) : w.IsUnramified F
+  isUnramifiedAtInfinitePlaces (E : IntermediateField F K) [FiniteDimensional F E] :
+    IsUnramifiedAtInfinitePlaces F E
 
 theorem isUnramifiedEverywhere_iff_of_finiteDimensional [FiniteDimensional F K] :
     IsUnramifiedEverywhere F K ↔
       (∀ w : IsDedekindDomain.HeightOneSpectrum (𝓞 K), Algebra.IsUnramifiedAt (𝓞 F) w.asIdeal) ∧
-        ∀ w : InfinitePlace K, InfinitePlace.IsUnramified F w := by
+        IsUnramifiedAtInfinitePlaces F K := by
   sorry
 
-/-- The maximal unramified abelian extension of a number field `F` inside `K`. -/
+/-- The maximal unramified abelian subextension of a number field `F` inside `K`. -/
 def maximalUnramifiedAbelianExtension : IntermediateField F K :=
-  sSup {E | FiniteDimensional F E ∧ IsAbelianGalois F E ∧ IsUnramifiedEverywhere F E}
+  sSup {E | IsAbelianGalois F E ∧ IsUnramifiedEverywhere F E}
 
-/-- The maximal unramified abelian extension is a finite extension.
+/-- The maximal unramified abelian subextension is a finite extension.
 A result in global class field theory. We cannot prove it here. -/
 instance finiteDimensional_maximalUnramifiedAbelianExtension [NumberField F] :
     FiniteDimensional F (maximalUnramifiedAbelianExtension F K) := sorry
 
-/-- The maximal unramified abelian extension is an abelian extension.
+/-- The maximal unramified abelian subextension is an abelian extension.
 Because compositum of abelian Galois extensions is also abelian.
 Proof: the group homomorphism `Gal(⨆ i, E_i/F) → Π i, Gal(E_i/F)` is injective.
 Should go mathlib. -/
 instance isAbelianGalois_maximalUnramifiedAbelianExtension :
     IsAbelianGalois F (maximalUnramifiedAbelianExtension F K) := sorry
 
-/-- The maximal unramified abelian extension is unramified everywhere.
+/-- The maximal unramified abelian subextension is unramified everywhere.
 Because when considering only one place,
 compositum of unramified extensions is also unramified.
 Should find a proof and submit to mathlib. -/
@@ -69,10 +70,12 @@ instance numberField_maximalUnramifiedAbelianExtension [NumberField F] :
 
 namespace IsUnramifiedEverywhere
 
+/-- An unramified everywhere abelian extension of a number field must be finite. -/
 instance (priority := low) finiteDimensional
     [NumberField F] [IsUnramifiedEverywhere F K] [IsAbelianGalois F K] :
     FiniteDimensional F K := sorry
 
+/-- An unramified everywhere abelian extension of a number field must be a number field. -/
 theorem numberField
     [NumberField F] [IsUnramifiedEverywhere F K] [IsAbelianGalois F K] :
     NumberField K := by
@@ -94,13 +97,13 @@ theorem artinMap_spec
     (p : IsDedekindDomain.HeightOneSpectrum (𝓞 F))
     (P : IsDedekindDomain.HeightOneSpectrum (𝓞 K))
     (h : P.asIdeal.under (𝓞 F) = p.asIdeal) :
-    haveI : SMulCommClass Gal(K/F) (𝓞 F) (𝓞 K) := sorry
-    haveI : Algebra.IsInvariant (𝓞 F) (𝓞 K) Gal(K/F) := sorry
-    haveI : Finite (𝓞 K ⧸ P.asIdeal) := sorry
+    haveI := numberField F K
     artinMap F K (.mk0 ⟨p.asIdeal, mem_nonZeroDivisors_of_ne_zero p.ne_bot⟩) =
       arithFrobAt (𝓞 F) Gal(K/F) P.asIdeal :=
   sorry
 
+/-- The Artin map is `p ↦ Frobₚ` surjective. It is a consequence of a stronger result:
+Chebotarev density theorem. -/
 theorem surjective_artinMap
     [NumberField F] [IsUnramifiedEverywhere F K] [IsAbelianGalois F K] :
     Function.Surjective (artinMap F K) :=
@@ -110,7 +113,7 @@ end IsUnramifiedEverywhere
 
 /-! ### Hilbert class field -/
 
-/-- The Hilbert class field of a number field `F`, defined as a `Type` corresponding to
+/-- The Hilbert class field `H_F` of a number field `F`, defined as a `Type` corresponding to
 the maximal unramified abelian extension of `F` inside its separable closure. -/
 def HilbertClassField : Type _ := maximalUnramifiedAbelianExtension F (SeparableClosure F)
 
@@ -152,18 +155,23 @@ instance instNoZeroSMulDivisors (R : Type*) [CommRing R] [Algebra R F] [IsFracti
 instance isSeparable : Algebra.IsSeparable F (HilbertClassField F) :=
   inferInstanceAs (Algebra.IsSeparable F (maximalUnramifiedAbelianExtension ..))
 
+/-- The Hilbert class field `H_F` is a finite extension of `F`. -/
 instance finiteDimensional [NumberField F] : FiniteDimensional F (HilbertClassField F) :=
   inferInstanceAs (FiniteDimensional F (maximalUnramifiedAbelianExtension ..))
 
+/-- The Hilbert class field `H_F` is an abelian extension of `F`. -/
 instance isAbelianGalois : IsAbelianGalois F (HilbertClassField F) :=
   inferInstanceAs (IsAbelianGalois F (maximalUnramifiedAbelianExtension ..))
 
+/-- The Hilbert class field `H_F` is unramified everywhere over `F`. -/
 instance isUnramifiedEverywhere : IsUnramifiedEverywhere F (HilbertClassField F) :=
   inferInstanceAs (IsUnramifiedEverywhere F (maximalUnramifiedAbelianExtension ..))
 
+/-- The Hilbert class field `H_F` is a number field. -/
 instance numberField [NumberField F] : NumberField (HilbertClassField F) :=
   inferInstanceAs (NumberField (maximalUnramifiedAbelianExtension ..))
 
+/-- The Artin map `Cl(F) → Gal(H_F / F)` is bijective. -/
 theorem bijective_artinMap [NumberField F] :
     Function.Bijective (IsUnramifiedEverywhere.artinMap F (HilbertClassField F)) :=
   sorry

@@ -94,25 +94,24 @@ theorem _root_.IsNoetherianRing.exists_nilradical_pow_eq_bot [IsNoetherianRing A
   rw [Finset.coe_insert, Ideal.span_insert, eq_bot_iff]
   exact Ideal.sup_pow_add_le_pow_sup_pow.trans (by simp [hm, hn])
 
+open PrimeSpectrum in
 theorem _root_.IsNoetherianRing.exists_pow_le_of_zeroLocus_eq_singleton [IsNoetherianRing A]
-    {I : Ideal A} {p : PrimeSpectrum A} (h : PrimeSpectrum.zeroLocus I = {p}) :
+    {I : Ideal A} {p : PrimeSpectrum A} (h : zeroLocus I = {p}) :
     ∃ n, p.1 ^ n ≤ I := by
-  have hrange := PrimeSpectrum.range_comap_of_surjective _ (Ideal.Quotient.mk I)
-    Ideal.Quotient.mk_surjective
+  have hrange := range_comap_of_surjective _ (Ideal.Quotient.mk I) Ideal.Quotient.mk_surjective
   rw [Ideal.mk_ker, h] at hrange
   obtain ⟨q, hq⟩ := hrange ▸ Set.mem_singleton p
   have hnil : nilradical (A ⧸ I) = q.1 := by
-    rw [PrimeSpectrum.nilradical_eq_iInf]
+    rw [nilradical_eq_iInf]
     refine le_antisymm (iInf_le _ _) (le_iInf fun r ↦ ?_)
     have := Set.mem_singleton_iff.1 (hrange ▸ Set.mem_range_self r)
     rw [← this] at hq
-    rw [PrimeSpectrum.comap_injective_of_surjective (Ideal.Quotient.mk I)
-      Ideal.Quotient.mk_surjective hq]
+    rw [comap_injective_of_surjective (Ideal.Quotient.mk I) Ideal.Quotient.mk_surjective hq]
   obtain ⟨n, hn⟩ := IsNoetherianRing.exists_nilradical_pow_eq_bot (A ⧸ I)
   use n
   rw [hnil] at hn
   apply_fun Ideal.comap (Ideal.Quotient.mk I) at hn
-  rw [← hq, PrimeSpectrum.comap_asIdeal]
+  rw [← hq, comap_asIdeal]
   refine (Ideal.le_comap_pow _ _).trans ?_
   rw [hn, ← RingHom.ker_eq_comap_bot, Ideal.mk_ker]
 

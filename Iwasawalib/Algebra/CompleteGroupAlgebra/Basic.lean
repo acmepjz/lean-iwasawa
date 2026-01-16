@@ -16,7 +16,7 @@ public import Iwasawalib.Topology.Algebra.OpenSubgroup
 
 /-!
 
-# Complete group algebras
+# Complete group algebras (experimental)
 
 In this file we state basic definitions of complete group algebras.
 
@@ -254,7 +254,8 @@ theorem ofMonoidAlgebra_injective [IsTopologicalGroup G] [CompactSpace G]
   ext1 g
   by_cases hg : g ∈ s
   · rw [← Finsupp.mapDomain_apply' s x Set.subset_union_left hinj hg,
-      ← Finsupp.mapDomain_apply' s y Set.subset_union_right hinj hg, hxy]
+      ← Finsupp.mapDomain_apply' s y Set.subset_union_right hinj hg]
+    congr 1
   · rw [(Finsupp.support_subset_iff (f := x)).1 Set.subset_union_left g hg,
       (Finsupp.support_subset_iff (f := y)).1 Set.subset_union_right g hg]
 

@@ -5,7 +5,7 @@ Authors: Jz Pan
 -/
 module
 
-public import Mathlib.FieldTheory.Galois.Abelian
+public import Iwasawalib.FieldTheory.Galois.Abelian
 public import Mathlib.NumberTheory.NumberField.ClassNumber
 public import Mathlib.NumberTheory.NumberField.Ideal.Basic
 public import Mathlib.NumberTheory.RamificationInertia.Unramified

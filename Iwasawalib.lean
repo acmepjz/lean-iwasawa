@@ -7,7 +7,8 @@ public import Iwasawalib.Algebra.Exact.Basic
 public import Iwasawalib.Algebra.Exact.KerCokerComp
 public import Iwasawalib.Algebra.InverseLimit.Basic
 public import Iwasawalib.Algebra.Module.Torsion
-public import Iwasawalib.FieldTheory.IntermediateField.MaximalAbelianP
+public import Iwasawalib.FieldTheory.Galois.Abelian
+public import Iwasawalib.FieldTheory.IntermediateField.MaximalAbelian
 public import Iwasawalib.FieldTheory.ZpExtension.Basic
 public import Iwasawalib.FieldTheory.ZpExtension.Cyclotomic
 public import Iwasawalib.GroupTheory.Torsion

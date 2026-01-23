@@ -5,6 +5,7 @@ Authors: Jz Pan
 -/
 module
 
+public import Mathlib.FieldTheory.Galois.Abelian
 public import Mathlib.FieldTheory.Galois.Infinite
 public import Mathlib.FieldTheory.Galois.Profinite
 public import Iwasawalib.NumberTheory.Padics.EquivMvZp
@@ -79,6 +80,14 @@ section Finite
 variable {p d ι K Kinf} [Finite ι] [IsGalois K Kinf] (H : MvZpExtension p ι K Kinf)
 include H
 
+omit [Finite ι] in
+/-- `K∞ / K` is abelian. -/
+theorem isAbelianGalois_Kinf : IsAbelianGalois K Kinf where
+  is_comm := by
+    refine ⟨fun x y ↦ ?_⟩
+    apply_fun H.continuousMulEquiv using H.continuousMulEquiv.injective
+    simp only [map_mul, mul_comm]
+
 /-- Any subgroup in `Γ` is a normal subgroup. -/
 instance normal (G : Subgroup H.Γ) : G.Normal := inferInstance
 
@@ -98,8 +107,17 @@ theorem isGalois (K' : IntermediateField K Kinf) : IsGalois K K' := by
   have : IntermediateField.fixedField G = K' := InfiniteGalois.fixedField_fixingSubgroup _
   convert ← IsGalois.of_fixedField_normal_subgroup G
 
+omit [Finite ι] in
+/-- Any intermediate field of `K∞ / K` is abelian. -/
+theorem isAbelianGalois (K' : IntermediateField K Kinf) : IsAbelianGalois K K' := by
+  have := H.isAbelianGalois_Kinf
+  exact .tower_bot K K' Kinf
+
 /-- `Kₙ / K` is Galois. -/
 instance isGalois_Kn (n : ℕ) : IsGalois K (H.Kn n) := H.isGalois _
+
+/-- `Kₙ / K` is abelian. -/
+instance isAbelianGalois_Kn (n : ℕ) : IsAbelianGalois K (H.Kn n) := H.isAbelianGalois _
 
 /-- The fixing subgroup of `Kₙ` is `Γ ^ (p ^ n)`. -/
 @[simp]
@@ -259,6 +277,9 @@ theorem congr (Kinf' : Type*) [Field Kinf'] [Algebra K Kinf'] (f : Kinf ≃ₐ[K
 /-- A random isomorphism from `Γ` to `ℤₚᵈ`. -/
 noncomputable def mvZpExtension : MvZpExtension p (Fin d) K Kinf := H.some
 
+/-- `K∞ / K` is abelian. -/
+theorem isAbelianGalois_Kinf : IsAbelianGalois K Kinf := H.mvZpExtension.isAbelianGalois_Kinf
+
 /-- Any subgroup in `Γ` is a normal subgroup. -/
 instance normal (G : Subgroup H.Γ) : G.Normal := inferInstance
 
@@ -274,8 +295,15 @@ theorem Kn_zero : H.Kn 0 = ⊥ := H.mvZpExtension.Kn_zero
 theorem isGalois (K' : IntermediateField K Kinf) : IsGalois K K' :=
   H.mvZpExtension.isGalois K'
 
+/-- Any intermediate field of `K∞ / K` is abelian. -/
+theorem isAbelianGalois (K' : IntermediateField K Kinf) : IsAbelianGalois K K' :=
+  H.mvZpExtension.isAbelianGalois K'
+
 /-- `Kₙ / K` is Galois. -/
 instance isGalois_Kn (n : ℕ) : IsGalois K (H.Kn n) := H.isGalois _
+
+/-- `Kₙ / K` is abelian. -/
+instance isAbelianGalois_Kn (n : ℕ) : IsAbelianGalois K (H.Kn n) := H.isAbelianGalois _
 
 /-- The fixing subgroup of `Kₙ` is `Γ ^ (p ^ n)`. -/
 @[simp]

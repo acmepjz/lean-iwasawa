@@ -41,6 +41,26 @@ theorem isUnramifiedEverywhere_iff_of_finiteDimensional [FiniteDimensional F K] 
         IsUnramifiedAtInfinitePlaces F K := by
   sorry
 
+section IsScalarTower
+
+variable (L : Type*) [Field L] [Algebra F L] [Algebra K L] [IsScalarTower F K L]
+
+theorem IsUnramifiedEverywhere.tower_top [IsUnramifiedEverywhere F L] :
+    IsUnramifiedEverywhere K L := by
+  sorry
+
+theorem IsUnramifiedEverywhere.tower_bot [IsUnramifiedEverywhere F L] :
+    IsUnramifiedEverywhere F K := by
+  sorry
+
+theorem IsUnramifiedEverywhere.trans [IsUnramifiedEverywhere F K] [IsUnramifiedEverywhere K L] :
+    IsUnramifiedEverywhere F L := by
+  sorry
+
+end IsScalarTower
+
+/-! ### Maximal unramified abelian subextension -/
+
 /-- The maximal unramified abelian subextension of a number field `F` inside `K`. -/
 def maximalUnramifiedAbelianExtension : IntermediateField F K :=
   sSup {E | IsAbelianGalois F E ∧ IsUnramifiedEverywhere F E}
@@ -88,12 +108,10 @@ theorem numberField
 /-- If `K / F` is an unramified abelian extension, then there is a natural map `Cl(F) → Gal(K/F)`
 sending a prime ideal `p` to the Frobenius element `Frobₚ` in `Gal(K/F)`.
 We cannot give the formal definition of it here, but use `sorry` instead. -/
-noncomputable def artinMap
-    [NumberField F] [IsUnramifiedEverywhere F K] [IsAbelianGalois F K] :
+noncomputable def artinMap [NumberField F] [IsUnramifiedEverywhere F K] [IsAbelianGalois F K] :
     ClassGroup (𝓞 F) →* Gal(K/F) := sorry
 
-theorem artinMap_spec
-    [NumberField F] [IsUnramifiedEverywhere F K] [IsAbelianGalois F K]
+theorem artinMap_spec [NumberField F] [IsUnramifiedEverywhere F K] [IsAbelianGalois F K]
     (p : IsDedekindDomain.HeightOneSpectrum (𝓞 F))
     (P : IsDedekindDomain.HeightOneSpectrum (𝓞 K))
     (h : P.asIdeal.under (𝓞 F) = p.asIdeal) :
@@ -104,10 +122,14 @@ theorem artinMap_spec
 
 /-- The Artin map is `p ↦ Frobₚ` surjective. It is a consequence of a stronger result:
 Chebotarev density theorem. -/
-theorem surjective_artinMap
-    [NumberField F] [IsUnramifiedEverywhere F K] [IsAbelianGalois F K] :
+theorem surjective_artinMap [NumberField F] [IsUnramifiedEverywhere F K] [IsAbelianGalois F K] :
     Function.Surjective (artinMap F K) :=
   sorry
+
+theorem finrank_dvd_classNumber [NumberField F] [IsUnramifiedEverywhere F K] [IsAbelianGalois F K] :
+    Module.finrank F K ∣ classNumber F := by
+  rw [classNumber, Fintype.card_eq_nat_card, ← IsGalois.card_aut_eq_finrank]
+  exact Subgroup.card_dvd_of_surjective _ (surjective_artinMap F K)
 
 end IsUnramifiedEverywhere
 
@@ -183,6 +205,11 @@ noncomputable def artinEquiv [NumberField F] :
 
 theorem artinEquiv_apply [NumberField F] (p) :
     artinEquiv F p = IsUnramifiedEverywhere.artinMap F _ p := rfl
+
+theorem finrank_eq_classNumber [NumberField F] :
+    Module.finrank F (HilbertClassField F) = classNumber F := by
+  rw [classNumber, Fintype.card_eq_nat_card, ← IsGalois.card_aut_eq_finrank]
+  exact Nat.card_congr (artinEquiv F).symm.toEquiv
 
 /-- Any unramified abelian extension is a subfield of Hilbert class field. -/
 noncomputable def lift

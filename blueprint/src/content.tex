@@ -1436,6 +1436,8 @@ $K_\infty/K$ be a $\BZ_p$-extension.
 
 \begin{definition}
 \label{p-primary-part}
+\lean{CommGroup.primaryComponent,CommGroup.equivPrimeToComponentProdPrimaryComponent}
+\leanok
 If $M$ is a finite abelian group, $p$ is a prime, let $M(p)$ be the $p$-primary
 part of $M$, which is the $p$-Sylow subgroup of $M$, or the subgroup of $M$
 consisting of elements whose order is power of $p$.
@@ -1445,6 +1447,8 @@ By definition it is a subgroup of $M$, and is also canonically a quotient group 
 \begin{definition}
 \label{Zp-ext-Ln}
 \uses{Zp-ext-def}
+\lean{MvZpExtension.Ln}
+\leanok
 For each $n\geq 0$ let $L_n$ be the
 maximal unramified abelian extension of $K_n$
 of exponent $p$.
@@ -1462,16 +1466,21 @@ viewed as a quotient of $\Cl(K_n)$.
 \begin{prop}
 \label{Xn-isom-An}
 \uses{Zp-ext-Ln,Zp-ext-An}
+\lean{MvZpExtension.finrank_Ln}
+\leanok
 There is a canonical isomorphism $X_n\cong A_n$.
 \end{prop}
 
 \begin{proof}
+\leanok
 Class field theory.
 \end{proof}
 
 \begin{lem}
 \label{Ln-K-Gal}
 \uses{Zp-ext-Ln}
+\lean{MvZpExtension.isGalois_K_Ln}
+\leanok
 Each $L_n$ is Galois over $K$.
 \end{lem}
 

@@ -29,7 +29,7 @@ variable (H : MvZpExtension p ι K Kinf)
 of number fields. -/
 theorem multiplicity_classNumber_Kn_eq₁ [Unique ι] :
     ∃ (mu lambda nu N : ℕ), ∀ n > N,
-      multiplicity (NumberField.classNumber (H.Kn n)) p = mu * p ^ n + lambda * p + nu := by
+      multiplicity p (NumberField.classNumber (H.Kn n)) = mu * p ^ n + lambda * p + nu := by
   sorry
 
 end MvZpExtension
@@ -42,7 +42,7 @@ variable (H : IsMvZpExtension p 1 K Kinf)
 of number fields. -/
 theorem multiplicity_classNumber_Kn_eq₁ :
     ∃ (mu lambda nu N : ℕ), ∀ n > N,
-      multiplicity (NumberField.classNumber (H.Kn n)) p = mu * p ^ n + lambda * p + nu :=
+      multiplicity p (NumberField.classNumber (H.Kn n)) = mu * p ^ n + lambda * p + nu :=
   H.mvZpExtension.multiplicity_classNumber_Kn_eq₁
 
 end IsMvZpExtension

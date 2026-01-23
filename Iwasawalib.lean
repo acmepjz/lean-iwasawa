@@ -21,6 +21,7 @@ public import Iwasawalib.NumberTheory.Padics.HasBasis
 public import Iwasawalib.NumberTheory.Padics.Units
 public import Iwasawalib.NumberTheory.ZpExtension.Basic
 public import Iwasawalib.NumberTheory.ZpExtension.ClassGroup
+public import Iwasawalib.NumberTheory.ZpExtension.Ln
 public import Iwasawalib.RingTheory.CharacteristicIdeal.Basic
 public import Iwasawalib.RingTheory.Ideal.KrullsHeightTheorem
 public import Iwasawalib.RingTheory.Polynomial.OneAddXPowSubOne

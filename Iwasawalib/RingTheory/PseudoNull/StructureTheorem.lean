@@ -23,7 +23,7 @@ theorem PrimeSpectrum.localization_comap_range_eq_of_isDomain_of_primeHeight_eq_
     {R : Type*} (S : Type*) [CommRing R] [CommRing S] [IsDomain R] [Algebra R S]
     (s : Set (PrimeSpectrum R)) (hs : s ⊆ {p : PrimeSpectrum R | p.1.primeHeight = 1})
     (hn : s.Nonempty) (hfin : s.Finite) [IsLocalization (⨅ p ∈ s, p.1.primeCompl) S] :
-    Set.range (PrimeSpectrum.comap (algebraMap R S)) = s ∪ {⟨⊥, Ideal.bot_prime⟩} := by
+    Set.range (PrimeSpectrum.comap (algebraMap R S)) = s ∪ {⟨⊥, Ideal.isPrime_bot⟩} := by
   set M := ⨅ p ∈ s, p.1.primeCompl
   rw [PrimeSpectrum.localization_comap_range S M]
   ext p
@@ -44,7 +44,7 @@ theorem PrimeSpectrum.localization_comap_range_eq_of_isDomain_of_primeHeight_eq_
         ← PrimeSpectrum.ext_iff] at hmem
       right; rwa [← hmem]
     replace hh := ENat.lt_one_iff_eq_zero.1 (hle'.lt_of_ne hh)
-    have := Ideal.bot_prime (α := R)
+    have := Ideal.isPrime_bot (α := R)
     rw [Ideal.primeHeight_eq_zero_iff, minimalPrimes, Ideal.minimalPrimes_eq_subsingleton_self,
       Set.mem_singleton_iff] at hh
     left; ext1; exact hh
@@ -128,7 +128,7 @@ instance (priority := 100) IsKrullDomain.heightOneLocalizationIsPID
   have hS : S ≤ nonZeroDivisors A :=
     iInf_le_of_le hn.some <| iInf_le_of_le hn.some_mem hn.some.1.primeCompl_le_nonZeroDivisors
   have : IsDomain (Localization S) := IsLocalization.isDomain_localization hS
-  have := Ideal.bot_prime (α := A)
+  have := Ideal.isPrime_bot (α := A)
   refine ⟨‹_›, ?_⟩
   have hrange := PrimeSpectrum.localization_comap_range_eq_of_isDomain_of_primeHeight_eq_one
     (Localization S) s hs hn hfin
@@ -147,8 +147,8 @@ instance (priority := 100) IsKrullDomain.heightOneLocalizationIsPID
   rw [hrange, Set.union_singleton, Set.mem_insert_iff] at hp
   rcases hp with hp | hp
   · have : p.1.primeCompl = nonZeroDivisors (Localization S) := by
-      have hp' : PrimeSpectrum.comap (algebraMap A (Localization S)) ⟨⊥, Ideal.bot_prime⟩ =
-          ⟨⊥, Ideal.bot_prime⟩ := by
+      have hp' : PrimeSpectrum.comap (algebraMap A (Localization S)) ⟨⊥, Ideal.isPrime_bot⟩ =
+          ⟨⊥, Ideal.isPrime_bot⟩ := by
         ext1
         exact Ideal.comap_bot_of_injective (algebraMap A (Localization S))
           (IsLocalization.injective _ hS)

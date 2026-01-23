@@ -58,6 +58,20 @@ theorem CommMonoid.mem_primeToComponent [CommMonoid G] (n : ℕ) (g : G) :
 theorem CommGroup.mem_primeToComponent [CommGroup G] (n : ℕ) (g : G) :
     g ∈ CommGroup.primeToComponent G n ↔ (orderOf g).Coprime n := Iff.rfl
 
+@[to_additive]
+theorem CommGroup.card_primeToComponent_coprime [CommGroup G] [Finite G] (n : ℕ) :
+    (Nat.card (primeToComponent G n)).Coprime n := by
+  rw [Nat.Coprime]
+  by_contra! H
+  obtain ⟨p, hp, hdvd⟩ := Nat.exists_prime_and_dvd H
+  have := Fact.mk hp
+  obtain ⟨g, hg⟩ := exists_prime_orderOf_dvd_card' p (hdvd.trans (Nat.gcd_dvd_left ..))
+  replace hdvd := hdvd.trans (Nat.gcd_dvd_right ..)
+  have h := g.2
+  rw [mem_primeToComponent, show orderOf g.1 = _ from
+    orderOf_injective (Subgroup.subtype _) Subtype.val_injective g, hg, hp.coprime_iff_not_dvd] at h
+  contradiction
+
 /-- TODO: go to mathlib -/
 @[to_additive]
 theorem orderOf_zpow_dvd {G} [Group G] {x : G} (n : ℤ) : orderOf (x ^ n) ∣ orderOf x := by
@@ -71,6 +85,9 @@ theorem orderOf_zpow_eq_orderOf_pow_natAbs {G} [Group G] {x : G} (n : ℤ) :
 
 /-- A torsion abelian group is canonically isomorphic to the product of its prime-to-`p` component
 and its `p`-primary component. -/
+@[to_additive (attr := simps symm_apply) AddCommGroup.equivPrimeToComponentProdPrimaryComponent
+      /-- A torsion additive abelian group is canonically isomorphic to the product of its
+      prime-to-`p` component and its `p`-primary component. -/]
 noncomputable def CommGroup.equivPrimeToComponentProdPrimaryComponent
     [CommGroup G] (p : ℕ) [Fact p.Prime] (ht : Monoid.IsTorsion G) :
     G ≃* CommGroup.primeToComponent G p × CommGroup.primaryComponent G p :=
@@ -137,3 +154,24 @@ noncomputable def CommGroup.equivPrimeToComponentProdPrimaryComponent
     simp [map_mul_1, left_inv.eq]
   { toFun := toFun, invFun := invFun,
     map_mul' := map_mul', left_inv := left_inv, right_inv := right_inv }
+
+theorem CommGroup.card_primaryComponent [CommGroup G] [Finite G] (p : ℕ) [Fact p.Prime] :
+    Nat.card (primaryComponent G p) = p ^ (Nat.card G).factorization p := by
+  obtain ⟨n, hn⟩ := (CommGroup.primaryComponent.isPGroup (G := G) (p := p)).exists_card_eq
+  rw [hn, eq_comm]
+  congr 1
+  have h1 := Nat.card_congr
+    (equivPrimeToComponentProdPrimaryComponent G p isTorsion_of_finite).toEquiv
+  rw [Nat.card_prod, hn] at h1
+  have h2 := CommGroup.card_primeToComponent_coprime G p
+  rw [Nat.coprime_comm, ‹Fact p.Prime›.out.coprime_iff_not_dvd] at h2
+  apply_fun (Nat.factorization · p) at h1
+  rw [Nat.factorization_mul Nat.card_pos.ne' (by simp [‹Fact p.Prime›.out.ne_zero])] at h1
+  simpa [‹Fact p.Prime›.out.factorization_self, Nat.factorization_eq_zero_of_not_dvd h2] using h1
+
+theorem CommGroup.card_primeToComponent [CommGroup G] [Finite G] (p : ℕ) [Fact p.Prime] :
+    Nat.card (primeToComponent G p) = Nat.card G / p ^ (Nat.card G).factorization p := by
+  have h1 := Nat.card_congr
+    (equivPrimeToComponentProdPrimaryComponent G p isTorsion_of_finite).toEquiv
+  rw [Nat.card_prod, card_primaryComponent] at h1
+  rw [Nat.div_eq_of_eq_mul_left (by simp [‹Fact p.Prime›.out.pos]) h1]

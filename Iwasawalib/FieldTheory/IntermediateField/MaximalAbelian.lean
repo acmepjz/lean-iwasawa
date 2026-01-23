@@ -36,6 +36,15 @@ theorem le_maximalAbelianExtension (E : IntermediateField F K) [IsAbelianGalois 
     E ≤ maximalAbelianExtension F K :=
   le_sSup ‹_›
 
+theorem fixingSubgroup_maximalAbelianExtension_of_finiteDimensional
+    [IsGalois F K] [FiniteDimensional F K] :
+    (maximalAbelianExtension F K).fixingSubgroup = commutator Gal(K/F) := by
+  sorry
+
+theorem fixingSubgroup_maximalAbelianExtension [IsGalois F K] :
+    (maximalAbelianExtension F K).fixingSubgroup = (commutator Gal(K/F)).topologicalClosure := by
+  sorry
+
 /-! ### Maximal abelian `p`-subextension -/
 
 variable (p : ℕ)
@@ -83,12 +92,30 @@ theorem exists_finrank_maximalAbelianPExtension_eq :
 
 variable [IsAbelianGalois F K]
 
-theorem not_dvd_finrank_maximalAbelianPExtension :
-    ¬p ∣ Module.finrank (maximalAbelianPExtension F K p) K := fun H ↦ by
-  sorry
-
 theorem fixingSubgroup_maximalAbelianPExtension :
     (maximalAbelianPExtension F K p).fixingSubgroup = CommGroup.primeToComponent Gal(K/F) p := by
   sorry
+
+theorem finrank_maximalAbelianPExtension_top : Module.finrank (maximalAbelianPExtension F K p) K =
+    Module.finrank F K / p ^ (Module.finrank F K).factorization p := by
+  simp_rw [← IsGalois.card_fixingSubgroup_eq_finrank, fixingSubgroup_maximalAbelianPExtension,
+    CommGroup.card_primeToComponent, IsGalois.card_aut_eq_finrank]
+
+theorem finrank_maximalAbelianPExtension_bot : Module.finrank F (maximalAbelianPExtension F K p) =
+    p ^ (Module.finrank F K).factorization p := by
+  have h := (Nat.div_eq_of_eq_mul_left Module.finrank_pos
+    (Module.finrank_mul_finrank F (maximalAbelianPExtension F K p) K).symm).symm
+  rwa [finrank_maximalAbelianPExtension_top,
+    Nat.div_div_self (Nat.ordProj_dvd ..) Module.finrank_pos.ne'] at h
+
+theorem maximalAbelianPExtension_eq_bot_iff :
+    maximalAbelianPExtension F K p = ⊥ ↔ ¬p ∣ Module.finrank F K := by
+  simp [← finrank_eq_one_iff, finrank_maximalAbelianPExtension_bot, Module.finrank_pos.ne',
+    Nat.factorization_eq_zero_iff, ‹Fact p.Prime›.out, ‹Fact p.Prime›.out.ne_one]
+
+theorem not_dvd_finrank_maximalAbelianPExtension_top :
+    ¬p ∣ Module.finrank (maximalAbelianPExtension F K p) K := by
+  rw [finrank_maximalAbelianPExtension_top]
+  exact Nat.not_dvd_ordCompl Fact.out Module.finrank_pos.ne'
 
 end IntermediateField

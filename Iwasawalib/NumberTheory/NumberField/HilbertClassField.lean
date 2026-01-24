@@ -65,6 +65,13 @@ end IsScalarTower
 def maximalUnramifiedAbelianExtension : IntermediateField F K :=
   sSup {E | IsAbelianGalois F E ∧ IsUnramifiedEverywhere F E}
 
+/-- If `L / K / F` is a field extension tower, such that `L / F` and `K / F` are Galois,
+then `H / F` is also Galois, where `H` is the maximal unramified abelian subextension of `L / K`. -/
+theorem isGalois_maximalUnramifiedAbelianExtension_of_isGalois
+    (L : Type*) [Field L] [Algebra F L] [Algebra K L] [IsScalarTower F K L]
+    [IsGalois F L] [IsGalois F K] : IsGalois F (maximalUnramifiedAbelianExtension K L) := by
+  sorry
+
 /-- The maximal unramified abelian subextension is a finite extension.
 A result in global class field theory. We cannot prove it here. -/
 instance finiteDimensional_maximalUnramifiedAbelianExtension [NumberField F] :
@@ -192,6 +199,13 @@ instance isUnramifiedEverywhere : IsUnramifiedEverywhere F (HilbertClassField F)
 /-- The Hilbert class field `H_F` is a number field. -/
 instance numberField [NumberField F] : NumberField (HilbertClassField F) :=
   inferInstanceAs (NumberField (maximalUnramifiedAbelianExtension ..))
+
+/-- If `K / F` is a Galois extension, then `H_K / F` is also Galois,
+where `H_K` is the Hilbert class field of `K`. -/
+theorem isGalois_of_isGalois [IsGalois F K] :
+    IsGalois F (HilbertClassField K) := by
+  have : IsSepClosure F (SeparableClosure K) := .mk inferInstance (.trans F K _)
+  exact isGalois_maximalUnramifiedAbelianExtension_of_isGalois F K _
 
 /-- The Artin map `Cl(F) → Gal(H_F / F)` is bijective. -/
 theorem bijective_artinMap [NumberField F] :

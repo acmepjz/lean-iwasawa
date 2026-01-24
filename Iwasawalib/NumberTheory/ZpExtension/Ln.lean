@@ -28,8 +28,8 @@ variable (H : MvZpExtension p ι K Kinf)
 
 /-- The maximal unramified abelian `p`-extension `Lₙ / Kₙ` of `Kₙ`, defined as an intermediate field
 of `Hₙ / Kₙ` where `Hₙ` is the Hilbert class field (`NumberField.HilbertClassField`) of `Kₙ`. -/
-noncomputable def Ln (n : ℕ) : IntermediateField (H.Kn n)
-    (NumberField.HilbertClassField (H.Kn n)) := .maximalAbelianPExtension _ _ p
+noncomputable def Ln (n : ℕ) :=
+  IntermediateField.maximalAbelianPExtension (H.Kn n) (NumberField.HilbertClassField (H.Kn n)) p
 
 instance isAbelianGalois_Ln (n : ℕ) : IsAbelianGalois (H.Kn n) (H.Ln n) :=
   IntermediateField.isAbelianGalois_maximalAbelianPExtension _ _ p
@@ -54,6 +54,7 @@ theorem finrank_Ln (n : ℕ) : Module.finrank (H.Kn n) (H.Ln n) =
     Nat.multiplicity_eq_factorization Fact.out (NumberField.classNumber_ne_zero _)]
 
 instance isGalois_K_Ln (n : ℕ) : IsGalois K (H.Ln n) := by
-  sorry
+  have := NumberField.HilbertClassField.isGalois_of_isGalois K (H.Kn n)
+  exact IntermediateField.isGalois_maximalAbelianPExtension_of_isGalois K _ _ p
 
 end MvZpExtension

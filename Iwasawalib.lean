@@ -19,6 +19,7 @@ public import Iwasawalib.NumberTheory.Padics.ForMathlib
 public import Iwasawalib.NumberTheory.Padics.ForMathlib1
 public import Iwasawalib.NumberTheory.Padics.HasBasis
 public import Iwasawalib.NumberTheory.Padics.Units
+public import Iwasawalib.NumberTheory.RamificationInertia.Infinite
 public import Iwasawalib.NumberTheory.ZpExtension.Basic
 public import Iwasawalib.NumberTheory.ZpExtension.ClassGroup
 public import Iwasawalib.NumberTheory.ZpExtension.Ln

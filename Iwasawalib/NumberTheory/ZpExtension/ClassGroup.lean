@@ -25,10 +25,9 @@ namespace MvZpExtension
 
 variable (H : MvZpExtension p ι K Kinf)
 
-/-- **Iwasawa's theorem** on growth of class groups of `ℤₚ`-extension
-of number fields. -/
+/-- **Iwasawa's theorem** on growth of class groups of `ℤₚ`-extension of number fields. -/
 theorem multiplicity_classNumber_Kn_eq₁ [Unique ι] :
-    ∃ (mu lambda nu N : ℕ), ∀ n > N,
+    ∃ (mu lambda : ℕ) (nu : ℤ) (N : ℕ), ∀ n > N,
       multiplicity p (NumberField.classNumber (H.Kn n)) = mu * p ^ n + lambda * p + nu := by
   sorry
 
@@ -38,10 +37,9 @@ namespace IsMvZpExtension
 
 variable (H : IsMvZpExtension p 1 K Kinf)
 
-/-- **Iwasawa's theorem** on growth of class groups of `ℤₚ`-extension
-of number fields. -/
+/-- **Iwasawa's theorem** on growth of class groups of `ℤₚ`-extension of number fields. -/
 theorem multiplicity_classNumber_Kn_eq₁ :
-    ∃ (mu lambda nu N : ℕ), ∀ n > N,
+    ∃ (mu lambda : ℕ) (nu : ℤ) (N : ℕ), ∀ n > N,
       multiplicity p (NumberField.classNumber (H.Kn n)) = mu * p ^ n + lambda * p + nu :=
   H.mvZpExtension.multiplicity_classNumber_Kn_eq₁
 

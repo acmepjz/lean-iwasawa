@@ -21,13 +21,14 @@ are not yet formalized).
 \subsection{Iwasawa's theorem on growth of class groups}
 
 Iwasawa theory is a branch of modern number theory,
-initiated by Kenkichi Iwasawa in 1959,
+initiated by Kenkichi Iwasawa in 1959 \cite{Iwa59},
 which studies arithmetic objects
 over infinite towers of number fields.
 It was motivated by the study of
 class groups of cyclotomic fields, which are very important in number theory.
 
 \begin{thm}[Fermat's Last Theorem, regular prime case]
+\label{flt-regular}
 If a prime $p\geq 3$ does not divide the class number of $\BQ(\mu_p)$, then
 $x^p+y^p=z^p$, $xyz\neq 0$ does not have integral solution.
 \end{thm}
@@ -58,10 +59,11 @@ The $K_n$ form an infinite tower
 $$
 K=K_0\subset K_1\subset K_2\subset\cdots\subset K_\infty.
 $$
-Iwasawa in 1959
+Iwasawa in 1959 \cite{Iwa59}
 studied the growth of class groups of $K_n$ in a $\BZ_p$-extension.
 
-\begin{thm}[Iwasawa's theorem, {\cite{Was97}, Theorem 13.13}]
+\begin{thm}[Iwasawa's theorem, \cite{Was97}, Theorem 13.13,
+\cite{Iwa59}, Theorem 11]
 \label{clgp-growth}
 \uses{Zp-ext-def,Xn-isom-qout,coinvariant-growth-2,Xn-isom-An}
 \lean{IsMvZpExtension.multiplicity_classNumber_Kn_eq₁}
@@ -1558,7 +1560,8 @@ Class field theory.
 
 \subsection{Ramification of primes in a $\BZ_p$-extension}
 
-\begin{prop}[\cite{Was97}, Proposition 13.2]
+\begin{prop}[\cite{Was97}, Proposition 13.2,
+\cite{Iwa59}, Lemma 7.1]
 \label{p:unr-outside-p}
 \uses{Zp-ext-def}
 If $K$ is any number field, $K_\infty/K$ is any $\BZ_p$-extension,
@@ -2085,16 +2088,20 @@ then $\chi_\cyc:\Aut(L)\to\BZ_p^\times$
 \therefsection
 
 \begin{thebibliography}{XXXX}
-\bibitem[Nek06]{Mek06}
-J. Nekov\'{a}\v{r}.
-\emph{Selmer complexes}.
-Ast\'erisque No. 310 (2006), viii+559 pp.
-\bibitem[NSW08]{NSW08}
-J. Neukirch, A. Schmidt, K. Wingberg.
-\emph{Cohomology of number fields}.
-Second edition.
-Grundlehren Math. Wiss., 323.
-Springer-Verlag, Berlin, 2008. xvi+825 pp.
+\bibitem[Iwa59]{Iwa59}
+K. Iwasawa.
+\emph{On $\Gamma$-extensions of algebraic number fields}.
+Bull. Amer. Math. Soc. 65 (1959), 183--226.
+%\bibitem[Nek06]{Nek06}
+%J. Nekov\'{a}\v{r}.
+%\emph{Selmer complexes}.
+%Ast\'erisque No. 310 (2006), viii+559 pp.
+%\bibitem[NSW08]{NSW08}
+%J. Neukirch, A. Schmidt, K. Wingberg.
+%\emph{Cohomology of number fields}.
+%Second edition.
+%Grundlehren Math. Wiss., 323.
+%Springer-Verlag, Berlin, 2008. xvi+825 pp.
 \bibitem[Was97]{Was97}
 L. C. Washington.
 \emph{Introduction to cyclotomic fields}.

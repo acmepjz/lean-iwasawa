@@ -5,6 +5,7 @@ Authors: Jz Pan
 -/
 module
 
+public import Iwasawalib.Algebra.Algebra.Equiv
 public import Mathlib.FieldTheory.Galois.Abelian
 
 @[expose] public section
@@ -17,10 +18,10 @@ public import Mathlib.FieldTheory.Galois.Abelian
 
 /-! ### Product of a family of group homomorphisms (should go mathlib) -/
 
-/-- Combine a family of `MonoidHom`s `f_i : M →* N_i` into `M →* ∏ i, N i`
+/-- Combine a family of `MonoidHom`s `f_i : M →* N_i` into `M →* Π i, N i`
 given by `x ↦ (i ↦ f_i x)`. -/
 @[to_additive (attr := simps)
-      /-- Combine a family of `AddMonoidHom`s `f_i : M →+ N_i` into `M →+ ∏ i, N i`
+      /-- Combine a family of `AddMonoidHom`s `f_i : M →+ N_i` into `M →+ Π i, N i`
       given by `x ↦ (i ↦ f_i x)`. -/]
 protected def MonoidHom.pi {M ι : Type*} {N : ι → Type*} [MulOneClass M] [∀ i, MulOneClass (N i)]
     (f : (i : ι) → (M →* N i)) : M →* ((i : ι) → N i) where
@@ -54,6 +55,9 @@ of `K / F` which are normal over `F`. -/
 noncomputable def piRestrictNormalHom : Gal(K/F) →* ((i : ι) → Gal(E i/F)) :=
   MonoidHom.pi fun i ↦ AlgEquiv.restrictNormalHom (E i)
 
+theorem continuous_piRestrictNormalHom : Continuous (piRestrictNormalHom E) :=
+  continuous_pi fun i ↦ InfiniteGalois.restrictNormalHom_continuous (E i)
+
 theorem ker_piRestrictNormalHom : (piRestrictNormalHom E).ker = (⨆ i, E i).fixingSubgroup := by
   simp_rw [piRestrictNormalHom, MonoidHom.ker_pi, restrictNormalHom_ker, fixingSubgroup_iSup]
 
@@ -63,24 +67,32 @@ theorem injective_piRestrictNormalHom_of_iSup_eq_top (h : ⨆ i, E i = ⊤) :
 
 /-- The (injective) group homomorphism `Gal((⨆ i, E_i)/F) → Π i, Gal(E_i/F)` for a family `E_i` of
 intermediate fields of `K / F` which are normal over `F`. -/
-noncomputable def piRestrictNormalHom' :
-    Gal((⨆ i, E i : IntermediateField F K)/F) →* ((i : ι) → Gal(E i/F)) :=
-  haveI (i : ι) : Normal F (restrict (le_iSup E i)) :=
-    Normal.of_algEquiv (restrict_algEquiv (le_iSup E i))
-  letI f := piRestrictNormalHom fun i ↦ restrict (le_iSup E i)
-  letI g := MulEquiv.piCongrRight fun i ↦ (restrict_algEquiv (le_iSup E i)).symm.autCongr
+noncomputable def piRestrictNormalHom' (E' : IntermediateField F K) (h : ⨆ i, E i = E') :
+    Gal(E'/F) →* ((i : ι) → Gal(E i/F)) :=
+  haveI h' (i : ι) : E i ≤ E' := h ▸ le_iSup E i
+  haveI (i : ι) : Normal F (restrict (h' i)) := .of_algEquiv (restrict_algEquiv (h' i))
+  letI f := piRestrictNormalHom fun i ↦ restrict (h' i)
+  letI g := MulEquiv.piCongrRight fun i ↦ (restrict_algEquiv (h' i)).symm.autCongr
   MonoidHom.comp g f
 
-theorem injective_piRestrictNormalHom' : Function.Injective (piRestrictNormalHom' E) := by
-  have (i : ι) : Normal F (restrict (le_iSup E i)) :=
-    Normal.of_algEquiv (restrict_algEquiv (le_iSup E i))
+theorem continuous_piRestrictNormalHom' (E' : IntermediateField F K) (h : ⨆ i, E i = E') :
+    Continuous (piRestrictNormalHom' E E' h) := by
+  have h' (i : ι) : E i ≤ E' := h ▸ le_iSup E i
+  have (i : ι) : Normal F (restrict (h' i)) := .of_algEquiv (restrict_algEquiv (h' i))
+  let g := Homeomorph.piCongrRight fun i ↦
+    (restrict_algEquiv (h' i)).symm.autContinuousCongr.toHomeomorph
+  exact g.continuous.comp (continuous_piRestrictNormalHom fun i ↦ restrict (h' i))
+
+theorem injective_piRestrictNormalHom' (E' : IntermediateField F K) (h : ⨆ i, E i = E') :
+    Function.Injective (piRestrictNormalHom' E E' h) := by
+  have h' (i : ι) : E i ≤ E' := h ▸ le_iSup E i
+  have (i : ι) : Normal F (restrict (h' i)) := .of_algEquiv (restrict_algEquiv (h' i))
   simp only [piRestrictNormalHom', MonoidHom.coe_comp, MonoidHom.coe_coe, EquivLike.comp_injective]
   refine injective_piRestrictNormalHom_of_iSup_eq_top _ ?_
   apply_fun _ using lift_injective _
-  simp only [lift_top, iSup_eq_adjoin, lift_adjoin, Set.image_iUnion]
+  simp_rw [lift_top, ← h, iSup_eq_adjoin, lift_adjoin, Set.image_iUnion]
   congr with i x
-  have := le_iSup E i
-  simpa [mem_restrict] using @this x
+  simpa [mem_restrict] using @h' i x
 
 end Normal
 
@@ -95,8 +107,8 @@ instance isAbelianGalois_iSup [∀ i, IsAbelianGalois F (E i)] :
     have : IsGalois F L := ⟨⟩
     exact ⟨⟩
   refine ⟨⟨fun x y ↦ ?_⟩⟩
-  apply_fun _ using injective_piRestrictNormalHom' E
-  simp_rw [map_mul]; exact mul_comm _ _
+  apply_fun _ using injective_piRestrictNormalHom' E _ rfl
+  simp only [map_mul, mul_comm]
 
 instance isAbelianGalois_sup (E1 E2 : IntermediateField F K) [IsAbelianGalois F E1]
     [IsAbelianGalois F E2] : IsAbelianGalois F (E1 ⊔ E2 : IntermediateField F K) := by
@@ -108,5 +120,21 @@ instance isAbelianGalois_sup (E1 E2 : IntermediateField F K) [IsAbelianGalois F 
   convert isAbelianGalois_iSup E
 
 end IsAbelianGalois
+
+/-! ### Abelian extension can be transferred by ring isomorphisms -/
+
+/-- TODO: go mathlib -/
+theorem _root_.IsAbelianGalois.of_equiv_equiv
+    {F E : Type*} [Field F] [Field E] [Algebra F E]
+    {M N : Type*} [Field M] [Field N] [Algebra M N]
+    {f : F ≃+* M} {g : E ≃+* N}
+    (hcomp : (algebraMap M N).comp f = RingHom.comp g (algebraMap F E)) [IsAbelianGalois F E] :
+    IsAbelianGalois M N := by
+  have := IsGalois.of_equiv_equiv hcomp
+  have : IsMulCommutative Gal(N/M) := by
+    refine ⟨⟨fun x y ↦ ?_⟩⟩
+    apply_fun _ using (AlgEquiv.autCongrOfSurjective f.surjective hcomp).symm.injective
+    simp only [map_mul, mul_comm]
+  exact ⟨⟩
 
 end IntermediateField

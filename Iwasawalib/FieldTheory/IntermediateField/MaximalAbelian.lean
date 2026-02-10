@@ -6,7 +6,7 @@ Authors: Jz Pan
 module
 
 public import Iwasawalib.FieldTheory.Galois.Abelian
-public import Iwasawalib.GroupTheory.Torsion
+public import Iwasawalib.FieldTheory.IntermediateField.MaximalGaloisSExtension
 
 @[expose] public section
 
@@ -30,11 +30,42 @@ instance isAbelianGalois_maximalAbelianExtension :
     IsAbelianGalois F (maximalAbelianExtension F K) := by
   rw [maximalAbelianExtension, sSup_eq_iSup']
   have (E : {E : IntermediateField F K | IsAbelianGalois F E}) : IsAbelianGalois F E.1 := E.2
-  exact IntermediateField.isAbelianGalois_iSup Subtype.val
+  infer_instance
 
+variable {F K} in
 theorem le_maximalAbelianExtension (E : IntermediateField F K) [IsAbelianGalois F E] :
     E ≤ maximalAbelianExtension F K :=
   le_sSup ‹_›
+
+variable {F K} in
+theorem le_maximalAbelianExtension_iff (E : IntermediateField F K) :
+    E ≤ maximalAbelianExtension F K ↔ IsAbelianGalois F E := by
+  refine ⟨fun h ↦ ?_, fun _ ↦ E.le_maximalAbelianExtension⟩
+  have : IsAbelianGalois F (extendScalars h) := isAbelianGalois_maximalAbelianExtension F K
+  exact .tower_bot F E (extendScalars h)
+
+theorem maximalAbelianExtension_eq_top [IsAbelianGalois F K] : maximalAbelianExtension F K = ⊤ := by
+  simpa only [eq_top_iff] using le_maximalAbelianExtension (⊤ : IntermediateField F K)
+
+variable {F K} in
+theorem maximalAbelianExtension_eq_top_iff :
+    maximalAbelianExtension F K = ⊤ ↔ IsAbelianGalois F K :=
+  ⟨fun h ↦ @IsAbelianGalois.of_algEquiv F _ _ _ K _ _ _
+    (h ▸ isAbelianGalois_maximalAbelianExtension F K) topEquiv,
+      fun _ ↦ maximalAbelianExtension_eq_top ..⟩
+
+variable {F K} in
+theorem sup_le_maximalAbelianExtension {E1 E2 : IntermediateField F K}
+    (h1 : E1 ≤ maximalAbelianExtension F K) (h2 : E2 ≤ maximalAbelianExtension F K) :
+    E1 ⊔ E2 ≤ maximalAbelianExtension F K := by
+  rw [le_maximalAbelianExtension_iff] at h1 h2 ⊢
+  infer_instance
+
+variable {F K} in
+theorem iSup_le_maximalAbelianExtension {ι : Type*} {E : ι → IntermediateField F K}
+    (h : ∀ i, E i ≤ maximalAbelianExtension F K) : ⨆ i, E i ≤ maximalAbelianExtension F K := by
+  simp_rw [le_maximalAbelianExtension_iff] at h ⊢
+  infer_instance
 
 theorem fixingSubgroup_maximalAbelianExtension_of_finiteDimensional
     [IsGalois F K] [FiniteDimensional F K] :
@@ -45,51 +76,7 @@ theorem fixingSubgroup_maximalAbelianExtension [IsGalois F K] :
     (maximalAbelianExtension F K).fixingSubgroup = (commutator Gal(K/F)).topologicalClosure := by
   sorry
 
-section Adhoc
-
-variable {F} {K} {L : Type*} [Field L] [Algebra F L] [Algebra K L]
-  (E : IntermediateField F L) (algebra_map_mem : ∀ x : K, (algebraMap K L) x ∈ E)
-include algebra_map_mem
-
-section
-
-omit [Algebra F K]
-
-/-- TODO: adhoc -/
-def extendScalars' : IntermediateField K L := E.toSubfield.toIntermediateField algebra_map_mem
-
-@[simp]
-theorem coe_extendScalars' : (extendScalars' E algebra_map_mem : Set L) = (E : Set L) := rfl
-
-@[simp]
-theorem extendScalars'_toSubfield :
-  (extendScalars' E algebra_map_mem).toSubfield = E.toSubfield := rfl
-
-@[simp]
-theorem mem_extendScalars' (x) : x ∈ extendScalars' E algebra_map_mem ↔ x ∈ E := Iff.rfl
-
-end
-
-@[simp]
-theorem extendScalars'_restrictScalars [IsScalarTower F K L] :
-    (extendScalars' E algebra_map_mem).restrictScalars F = E := rfl
-
-end Adhoc
-
-/-- ... Similar to `IsGalois.normalAutEquivQuotient`. -/
-noncomputable def autQuotientEquivAutOfIsGalois {F L : Type*} [Field F] [Field L] [Algebra F L]
-    (K : IntermediateField F L) [IsGalois F K] [IsGalois F L] :
-    Gal(L/F) ⧸ K.fixingSubgroup ≃* Gal(K/F) := by
-  refine MulEquiv.ofBijective (QuotientGroup.lift _ (AlgEquiv.restrictNormalHom K)
-    (restrictNormalHom_ker K).ge) ⟨?_, QuotientGroup.lift_surjective_of_surjective _ _
-      (AlgEquiv.restrictNormalHom_surjective _) _⟩
-  rw [← MonoidHom.ker_eq_bot_iff, QuotientGroup.ker_lift, restrictNormalHom_ker,
-    QuotientGroup.map_mk'_self]
-
-theorem autQuotientEquivAutOfIsGalois_apply {F L : Type*} [Field F] [Field L] [Algebra F L]
-    (K : IntermediateField F L) [IsGalois F K] [IsGalois F L] (σ : Gal(L/F)) :
-    K.autQuotientEquivAutOfIsGalois σ = AlgEquiv.restrictNormalHom K σ := rfl
-
+/-- Unused result. TODO: go mathlib -/
 theorem fixingSubgroup_restrictScalars
     (K : Type*) {L L' : Type*} [Field K] [Field L] [Field L'] [Algebra K L]
     [Algebra K L'] [Algebra L' L] [IsScalarTower K L' L] [Normal K L] (E : IntermediateField L' L) :
@@ -106,80 +93,8 @@ theorem fixingSubgroup_restrictScalars
   }
   exact ⟨g, by simpa [g], by ext; simp [g]⟩
 
--- /-- ... -/
--- noncomputable def quotientFixingSubgroupEquivQuotientFixingSubgroup
---     {F L : Type*} [Field F] [Field L] [Algebra F L]
---     {K H : IntermediateField F L} (hle : K ≤ H) [IsGalois F L] [IsGalois K (extendScalars hle)] :
---     Gal(L/K) ⧸ (extendScalars hle).fixingSubgroup ≃* Gal(L/F) ⧸ H.fixingSubgroup :=
---   sorry
-
-/-- If `K ≤ H` are intermediate fields of `L / F`, `σ ∈ Gal(L/F)`, then there is a
-natural isomorphism between `Gal(H/K)` and `Gal(σ(H)/σ(K))` given by conjugation by `σ`. -/
-noncomputable def autEquivAutMapMap
-    {F L : Type*} [Field F] [Field L] [Algebra F L]
-    {K H : IntermediateField F L} (hle : K ≤ H) [IsGalois F L] [IsGalois K (extendScalars hle)]
-    (σ : Gal(L/F)) :
-    Gal(extendScalars hle/K) ≃*
-    Gal(extendScalars (map_mono (AlgHomClass.toAlgHom σ) hle)/map (AlgHomClass.toAlgHom σ) K) :=
-  let K' := map (AlgHomClass.toAlgHom σ) K
-  have hle' := map_mono (AlgHomClass.toAlgHom σ) hle
-  let i4 := K.fixingSubgroupEquiv.symm.trans ((MulAut.conj σ).subgroupMap _) |>.trans
-    (MulEquiv.subgroupCongr (IsGalois.map_fixingSubgroup K σ).symm) |>.trans K'.fixingSubgroupEquiv
-  have hfix : (extendScalars hle').fixingSubgroup = (extendScalars hle).fixingSubgroup.map i4 := by
-    apply le_antisymm
-    · intro g
-      simp only [mem_fixingSubgroup_iff, Subgroup.mem_map, mem_extendScalars]
-      refine fun h ↦ ⟨i4.symm g, fun x hx ↦ ?_, EquivLike.apply_coe_symm_apply i4 g⟩
-      simp [i4, fixingSubgroupEquiv, h (σ x) ⟨x, hx, rfl⟩]
-    · rw [Subgroup.map_le_iff_le_comap, Subgroup.comap_equiv_eq_map_symm]
-      intro g
-      simp only [mem_fixingSubgroup_iff, Subgroup.mem_map, mem_extendScalars]
-      refine fun h ↦ ⟨i4 g, fun x ⟨y, h1, h2⟩ ↦ ?_, EquivLike.coe_symm_apply_apply i4 g⟩
-      simp [← h2, h y h1, i4, fixingSubgroupEquiv]
-  have : IsGalois K' (extendScalars hle') := by
-    have : (extendScalars hle).fixingSubgroup.Normal := (InfiniteGalois.normal_iff_isGalois _).2 ‹_›
-    rw [← InfiniteGalois.normal_iff_isGalois, hfix]
-    exact this.map (MonoidHomClass.toMonoidHom i4) i4.surjective
-  (extendScalars hle).autQuotientEquivAutOfIsGalois.symm.trans
-    (QuotientGroup.congr _ _ i4 hfix.symm) |>.trans
-      (extendScalars hle').autQuotientEquivAutOfIsGalois
-
-/-- Version of `autEquivAutMapMap` with `K / F` Galois. -/
-noncomputable def autEquivAutMapOfIsGalois
-    {F L : Type*} [Field F] [Field L] [Algebra F L]
-    {K H : IntermediateField F L} (hle : K ≤ H) [IsGalois F L] [IsGalois K (extendScalars hle)]
-    [IsGalois F K] (σ : Gal(L/F)) :
-    haveI : K ≤ map (AlgHomClass.toAlgHom σ) H :=
-      (normal_iff_forall_map_eq' (K := K)).1 inferInstance σ ▸ map_mono (AlgHomClass.toAlgHom σ) hle
-    Gal(extendScalars hle/K) ≃* Gal(extendScalars this/K) :=
-  have hle' : K ≤ map (AlgHomClass.toAlgHom σ) H :=
-    (normal_iff_forall_map_eq' (K := K)).1 inferInstance σ ▸ map_mono (AlgHomClass.toAlgHom σ) hle
-  let i4 := K.fixingSubgroupEquiv.symm.trans ((MulAut.conj σ).subgroupMap _) |>.trans
-    (MulEquiv.subgroupCongr (by
-      nth_rw 2 [← (normal_iff_forall_map_eq' (K := K)).1 inferInstance σ]
-      rw [IsGalois.map_fixingSubgroup]
-      rfl)) |>.trans K.fixingSubgroupEquiv
-  have hfix : (extendScalars hle').fixingSubgroup = (extendScalars hle).fixingSubgroup.map i4 := by
-    apply le_antisymm
-    · intro g
-      simp only [mem_fixingSubgroup_iff, Subgroup.mem_map, mem_extendScalars]
-      refine fun h ↦ ⟨i4.symm g, fun x hx ↦ ?_, EquivLike.apply_coe_symm_apply i4 g⟩
-      simp [i4, fixingSubgroupEquiv, h (σ x) ⟨x, hx, rfl⟩]
-    · rw [Subgroup.map_le_iff_le_comap, Subgroup.comap_equiv_eq_map_symm]
-      intro g
-      simp only [mem_fixingSubgroup_iff, Subgroup.mem_map, mem_extendScalars]
-      refine fun h ↦ ⟨i4 g, fun x ⟨y, h1, h2⟩ ↦ ?_, EquivLike.coe_symm_apply_apply i4 g⟩
-      simp [← h2, h y h1, i4, fixingSubgroupEquiv]
-  have : IsGalois K (extendScalars hle') := by
-    have : (extendScalars hle).fixingSubgroup.Normal := (InfiniteGalois.normal_iff_isGalois _).2 ‹_›
-    rw [← InfiniteGalois.normal_iff_isGalois, hfix]
-    exact this.map (MonoidHomClass.toMonoidHom i4) i4.surjective
-  (extendScalars hle).autQuotientEquivAutOfIsGalois.symm.trans
-    (QuotientGroup.congr _ _ i4 hfix.symm) |>.trans
-      (extendScalars hle').autQuotientEquivAutOfIsGalois
-
-/-- If `L / K / F` is a field extension tower, such that `L / F` and `K / F` are Galois,
-then `H / F` is also Galois, where `H` is the maximal abelian subextension of `L / K`. -/
+/-- Suppose `L / K / F` is a field extension tower, such that `L / F` and `K / F` are Galois.
+Let `H / K` be the maximal abelian subextension of `L / K`. Then `H / F` is also Galois. -/
 theorem isGalois_maximalAbelianExtension_of_isGalois
     (L : Type*) [Field L] [Algebra F L] [Algebra K L] [IsScalarTower F K L]
     [IsGalois F L] [IsGalois F K] : IsGalois F (maximalAbelianExtension K L) := by
@@ -192,112 +107,117 @@ theorem isGalois_maximalAbelianExtension_of_isGalois
   change Normal F (restrictScalars F H)
   rw [normal_iff_forall_map_le']
   intro σ
-  let K' := (IsScalarTower.toAlgHom F K L).fieldRange
-  have hle : K' ≤ restrictScalars F H := by
-    rintro _ ⟨x, rfl⟩
-    exact algebraMap_mem _ x
-  let i1 : K ≃+* K' := (AlgEquiv.ofInjectiveField (IsScalarTower.toAlgHom F K L)).toRingEquiv
-  let i2 : H ≃+* extendScalars hle := RingEquiv.refl H
-  have hcomp : (algebraMap K' (extendScalars hle)).comp (RingHomClass.toRingHom i1) =
-      (RingHomClass.toRingHom i2).comp (algebraMap K H) := by
-    ext; rfl
-  have : IsGalois K' (extendScalars hle) := {
-    to_isSeparable := .of_equiv_equiv i1 i2 hcomp
-    to_normal := .of_equiv_equiv hcomp
-  }
-  -- let i := autEquivAutMapMap hle σ
-  have hle' := map_mono (AlgHomClass.toAlgHom σ) hle
-  have hK' : IsGalois F K' := .of_algEquiv
-    (show K ≃ₐ[F] K' from .ofInjectiveField (IsScalarTower.toAlgHom F K L))
-  -- rw [normal_iff_forall_map_eq'] at hK'
-  let i := autEquivAutMapOfIsGalois hle σ
-  sorry
-  -- let σH := (map (AlgHomClass.toAlgHom σ) (restrictScalars F H)).extendScalars' (K := K) fun x ↦ by
-  --   apply hle'
-  --   rw [hK']
-  --   exact ⟨x, rfl⟩
-  -- suffices σH ≤ H from fun x hx ↦ this hx
-  -- suffices IsAbelianGalois K σH from le_maximalAbelianExtension ..
-  -- sorry
+  let σH := ((restrictScalars F H).map (AlgHomClass.toAlgHom σ)).toSubfield.toIntermediateField
+      fun (x : K) ↦ by
+    simp only [toSubfield_map, AlgHomClass.toRingHom_toAlgHom, restrictScalars_toSubfield,
+      Subfield.mem_map, mem_toSubfield, RingHom.coe_coe]
+    use algebraMap K L (σ.symm.restrictNormal K x), algebraMap_mem ..
+    simp
+  suffices σH ≤ H from fun x hx ↦ this hx
+  let f := (σ.restrictNormal K).toRingEquiv
+  let g : H ≃+* σH := ((restrictScalars F H).equivMap (AlgHomClass.toAlgHom σ)).toRingEquiv
+  have hcomp : (algebraMap K σH).comp f = RingHom.comp g (algebraMap K H) := by
+    ext x
+    simp only [AlgEquiv.toRingEquiv_eq_coe, AlgEquiv.toRingEquiv_toRingHom, RingHom.coe_comp,
+      RingHom.coe_coe, Function.comp_apply, SubalgebraClass.coe_algebraMap,
+      AlgEquiv.restrictNormal_commutes, f, g]
+    rfl
+  have : IsAbelianGalois K σH := .of_equiv_equiv hcomp
+  exact le_maximalAbelianExtension ..
 
-/-! ### Maximal abelian `p`-subextension -/
+/-! ### Maximal abelian `S`-subextension -/
 
-variable (p : ℕ)
+variable (S : Set ℕ) (p : ℕ) [Fact p.Prime]
 
-/-- The maximal abelian `p`-subextension of `K / F` is the compositum of all
-abelian subextension of `K / F` whose degree is a power of `p`. -/
-def maximalAbelianPExtension : IntermediateField F K :=
-  sSup {E | IsAbelianGalois F E ∧ ∃ n, Module.finrank F E = p ^ n}
+/-- The maximal abelian `S`-subextension of `K / F` is defined to be the maximal Galois
+`S`-subextension of the maximal abelian subextension of `K / F`. -/
+def maximalAbelianSExtension : IntermediateField F K :=
+  lift (maximalGaloisSExtension F (maximalAbelianExtension F K) S)
 
-instance isAbelianGalois_maximalAbelianPExtension :
-    IsAbelianGalois F (maximalAbelianPExtension F K p) := by
-  rw [maximalAbelianPExtension, sSup_eq_iSup']
-  have (E : {E : IntermediateField F K | IsAbelianGalois F E ∧
-    ∃ n, Module.finrank F E = p ^ n}) : IsAbelianGalois F E.1 := E.2.1
-  exact IntermediateField.isAbelianGalois_iSup Subtype.val
+/-- The maximal abelian `S`-subextension of `K / F` is equal to
+the compositum of all finite abelian subextensions `E` of `K / F` such that the prime factors of
+`[E : F]` is contained in `S`. -/
+theorem maximalAbelianSExtension_eq_sSup : maximalAbelianSExtension F K S =
+    sSup {E : IntermediateField F K | FiniteDimensional F E ∧ IsAbelianGalois F E ∧
+      ↑(Module.finrank F E).primeFactors ⊆ S} := by
+  apply le_antisymm
+  · simp_rw [maximalAbelianSExtension, maximalGaloisSExtension, sSup_eq_iSup', iSup_eq_adjoin,
+      lift_adjoin]
+    apply adjoin.mono
+    intro x hx
+    simp only [Set.coe_setOf, Set.mem_setOf_eq, Set.mem_image, Set.mem_iUnion, SetLike.mem_coe,
+      Subtype.exists, exists_prop, exists_and_right, exists_eq_right] at hx ⊢
+    obtain ⟨_, E, ⟨_, _, hS⟩, h⟩ := hx
+    use lift E, ⟨(liftAlgEquiv E).toLinearEquiv.finiteDimensional, .of_algEquiv (liftAlgEquiv E), by
+      rwa [(liftAlgEquiv E).toLinearEquiv.finrank_eq] at hS⟩
+    rwa [← mem_lift] at h
+  · rw [sSup_le_iff]
+    rintro E ⟨_, _, hS⟩
+    have h1 := E.le_maximalAbelianExtension
+    let E' := restrict h1
+    suffices E' ≤ maximalGaloisSExtension F _ S by
+      intro x hx
+      rw [maximalAbelianSExtension]
+      exact (mem_lift _).2 <| this <| (mem_restrict h1 ⟨x, h1 hx⟩).2 hx
+    have : FiniteDimensional F E' := (restrict_algEquiv h1).toLinearEquiv.finiteDimensional
+    have : IsAbelianGalois F E' := .of_algEquiv (restrict_algEquiv h1)
+    rw [(restrict_algEquiv h1).toLinearEquiv.finrank_eq] at hS
+    exact le_maximalGaloisSExtension E' hS
 
-theorem le_maximalAbelianPExtension (E : IntermediateField F K) [IsAbelianGalois F E]
-    (h : ∃ n, Module.finrank F E = p ^ n) : E ≤ maximalAbelianPExtension F K p :=
-  le_sSup ⟨‹_›, h⟩
+instance isAbelianGalois_maximalAbelianSExtension :
+    IsAbelianGalois F (maximalAbelianSExtension F K S) :=
+  .of_algEquiv (liftAlgEquiv _)
 
-/-- If `L / K / F` is a field extension tower, such that `L / F` and `K / F` are Galois,
-then `H / F` is also Galois, where `H` is the maximal abelian `p`-subextension of `L / K`. -/
-theorem isGalois_maximalAbelianPExtension_of_isGalois
+variable {F K S} in
+theorem le_maximalAbelianSExtension (E : IntermediateField F K) [FiniteDimensional F E]
+    [IsAbelianGalois F E] (h : ↑(Module.finrank F E).primeFactors ⊆ S) :
+    E ≤ maximalAbelianSExtension F K S := by
+  rw [maximalAbelianSExtension_eq_sSup]
+  exact le_sSup ⟨‹_›, ‹_›, h⟩
+
+variable {F K p} in
+theorem le_maximalAbelianSExtension_singleton (E : IntermediateField F K) [IsAbelianGalois F E]
+    (h : ∃ n, Module.finrank F E = p ^ n) : E ≤ maximalAbelianSExtension F K {p} := by
+  rw [maximalAbelianSExtension_eq_sSup]
+  obtain ⟨n, hn⟩ := h
+  refine le_sSup ⟨.of_finrank_pos (by simp [hn, ‹Fact p.Prime›.out.pos]), ‹_›, ?_⟩
+  rcases eq_or_ne n 0 with rfl | hne
+  · simp [hn]
+  · simp [hn, Nat.primeFactors_prime_pow hne Fact.out]
+
+theorem maximalAbelianSExtension_le_maximalAbelianExtension :
+    maximalAbelianSExtension F K S ≤ maximalAbelianExtension F K := lift_le ..
+
+theorem maximalAbelianSExtension_le_maximalGaloisSExtension :
+    maximalAbelianSExtension F K S ≤ maximalGaloisSExtension F K S := by
+  rw [maximalAbelianSExtension_eq_sSup, maximalGaloisSExtension, sSup_le_iff]
+  rintro E ⟨_, _, hS⟩
+  exact le_sSup ⟨inferInstance, inferInstance, hS⟩
+
+theorem maximalAbelianSExtension_eq_maximalGaloisSExtension [IsAbelianGalois F K] :
+    maximalAbelianSExtension F K S = maximalGaloisSExtension F K S := by
+  have h1 (E : IntermediateField F K) : IsAbelianGalois F E := inferInstance
+  have h2 (E : IntermediateField F K) : IsGalois F E := inferInstance
+  simp only [maximalAbelianSExtension_eq_sSup, maximalGaloisSExtension, h1, h2]
+
+/-- Suppose `L / K / F` is a field extension tower, such that `L / F` and `K / F` are Galois.
+Let `H / K` be the maximal abelian `S`-subextension of `L / K`. Then `H / F` is also Galois. -/
+theorem isGalois_maximalAbelianSExtension_of_isGalois
     (L : Type*) [Field L] [Algebra F L] [Algebra K L] [IsScalarTower F K L]
-    [IsGalois F L] [IsGalois F K] (p : ℕ) : IsGalois F (maximalAbelianPExtension K L p) := by
-  sorry
+    [IsGalois F L] [IsGalois F K] : IsGalois F (maximalAbelianSExtension K L S) := by
+  have := isGalois_maximalAbelianExtension_of_isGalois F K L
+  have := isGalois_maximalGaloisSExtension_of_isGalois F K S (maximalAbelianExtension K L)
+  exact .of_algEquiv ((liftAlgEquiv _).restrictScalars F)
 
-variable [Fact p.Prime] [FiniteDimensional F K]
+section FiniteDimensional
 
-theorem exists_finrank_maximalAbelianPExtension_eq :
-    ∃ n, Module.finrank F (maximalAbelianPExtension F K p) = p ^ n := by
-  simp_rw [← IsGalois.card_aut_eq_finrank, ← IsPGroup.iff_card, maximalAbelianPExtension]
-  rw [sSup_eq_iSup']
-  refine fun g ↦ ⟨orderOf g, ?_⟩
-  have (E : {E : IntermediateField F K | IsAbelianGalois F E ∧
-    ∃ n, Module.finrank F E = p ^ n}) : IsAbelianGalois F E.1 := E.2.1
-  let f := IntermediateField.piRestrictNormalHom' fun E : {E : IntermediateField F K |
-    IsAbelianGalois F E ∧ ∃ n, Module.finrank F E = p ^ n} ↦ E.1
-  have hf : Function.Injective f := IntermediateField.injective_piRestrictNormalHom' _
-  apply_fun f using hf
-  ext1 E
-  simp only [map_pow, Pi.pow_apply, map_one, Pi.one_apply, ← orderOf_dvd_iff_pow_eq_one]
-  have h1 : orderOf (f g E) ≤ orderOf g := Nat.le_of_dvd (Nat.pos_of_ne_zero <|
-    orderOf_ne_zero_iff.2 <| isOfFinOrder_of_finite g) <| by rw [orderOf_dvd_iff_pow_eq_one,
-      ← orderOf_injective f hf g, ← Pi.pow_apply, pow_orderOf_eq_one, Pi.one_apply]
-  replace h1 := h1.trans (Nat.lt_pow_self ‹Fact p.Prime›.out.one_lt).le
-  obtain ⟨n, hn⟩ := E.2.2
-  rw [← IsGalois.card_aut_eq_finrank] at hn
-  obtain ⟨m, -, hm⟩ := (Nat.dvd_prime_pow Fact.out).1 (hn ▸ orderOf_dvd_natCard (f g E))
-  rw [hm] at h1 ⊢
-  rwa [Nat.pow_dvd_pow_iff_pow_le_pow ‹Fact p.Prime›.out.pos]
+variable [FiniteDimensional F K]
 
-variable [IsAbelianGalois F K]
+theorem exists_finrank_maximalAbelianSExtension_singleton_eq_pow :
+    ∃ n, Module.finrank F (maximalAbelianSExtension F K {p}) = p ^ n :=
+  exists_finrank_eq_pow_of_le_maximalGaloisSExtension_singleton
+    (maximalAbelianSExtension_le_maximalGaloisSExtension ..)
 
-theorem fixingSubgroup_maximalAbelianPExtension :
-    (maximalAbelianPExtension F K p).fixingSubgroup = CommGroup.primeToComponent Gal(K/F) p := by
-  sorry
-
-theorem finrank_maximalAbelianPExtension_top : Module.finrank (maximalAbelianPExtension F K p) K =
-    Module.finrank F K / p ^ (Module.finrank F K).factorization p := by
-  simp_rw [← IsGalois.card_fixingSubgroup_eq_finrank, fixingSubgroup_maximalAbelianPExtension,
-    CommGroup.card_primeToComponent, IsGalois.card_aut_eq_finrank]
-
-theorem finrank_maximalAbelianPExtension_bot : Module.finrank F (maximalAbelianPExtension F K p) =
-    p ^ (Module.finrank F K).factorization p := by
-  have h := (Nat.div_eq_of_eq_mul_left Module.finrank_pos
-    (Module.finrank_mul_finrank F (maximalAbelianPExtension F K p) K).symm).symm
-  rwa [finrank_maximalAbelianPExtension_top,
-    Nat.div_div_self (Nat.ordProj_dvd ..) Module.finrank_pos.ne'] at h
-
-theorem maximalAbelianPExtension_eq_bot_iff :
-    maximalAbelianPExtension F K p = ⊥ ↔ ¬p ∣ Module.finrank F K := by
-  simp [← finrank_eq_one_iff, finrank_maximalAbelianPExtension_bot, Module.finrank_pos.ne',
-    Nat.factorization_eq_zero_iff, ‹Fact p.Prime›.out, ‹Fact p.Prime›.out.ne_one]
-
-theorem not_dvd_finrank_maximalAbelianPExtension_top :
-    ¬p ∣ Module.finrank (maximalAbelianPExtension F K p) K := by
-  rw [finrank_maximalAbelianPExtension_top]
-  exact Nat.not_dvd_ordCompl Fact.out Module.finrank_pos.ne'
+end FiniteDimensional
 
 end IntermediateField

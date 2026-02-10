@@ -124,6 +124,17 @@ end IsAbelianGalois
 /-! ### Abelian extension can be transferred by ring isomorphisms -/
 
 /-- TODO: go mathlib -/
+theorem _root_.IsAbelianGalois.of_algEquiv
+    {F E : Type*} [Field F] [Field E] {E' : Type*} [Field E'] [Algebra F E'] [Algebra F E]
+    [IsAbelianGalois F E] (f : E ≃ₐ[F] E') : IsAbelianGalois F E' := by
+  have := IsGalois.of_algEquiv f
+  have : IsMulCommutative Gal(E'/F) := by
+    refine ⟨⟨fun x y ↦ ?_⟩⟩
+    apply_fun _ using (AlgEquiv.autCongr f).symm.injective
+    simp only [map_mul, mul_comm]
+  exact ⟨⟩
+
+/-- TODO: go mathlib -/
 theorem _root_.IsAbelianGalois.of_equiv_equiv
     {F E : Type*} [Field F] [Field E] [Algebra F E]
     {M N : Type*} [Field M] [Field N] [Algebra M N]

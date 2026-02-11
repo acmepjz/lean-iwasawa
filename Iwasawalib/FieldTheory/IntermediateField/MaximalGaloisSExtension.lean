@@ -97,7 +97,8 @@ theorem exists_finset_of_le_iSup {F : Type*} [Field F] {E : Type*} [Field E] [Al
   | smul _ _ _ h => exact smul_mem _ h
 
 /-- TODO: go mathlib -/
-theorem _root_.Nat.primeFactors_prod {ι : Type*} {f : ι → ℕ} {s : Finset ι} (h : ∀ i ∈ s, f i ≠ 0) :
+theorem _root_.Nat.primeFactors_prod_eq_biUnion {ι : Type*} {f : ι → ℕ} {s : Finset ι}
+    (h : ∀ i ∈ s, f i ≠ 0) :
     (∏ i ∈ s, f i).primeFactors = s.biUnion fun i ↦ (f i).primeFactors := by
   classical induction s using Finset.induction with
   | empty => simp
@@ -126,7 +127,7 @@ theorem primeFactors_finrank_subset_of_le_maximalGaloisSExtension
       (fun x : { x // x ∈ s } ↦ x.1.1) E' rfl) (injective_piRestrictNormalHom' ..)
     simp_rw [Nat.card_pi, IsGalois.card_aut_eq_finrank F _] at h1
     have h2 := Nat.primeFactors_mono h1 (by simp [Finset.prod_ne_zero_iff, Module.finrank_pos.ne'])
-    rw [Nat.primeFactors_prod (by simp [Module.finrank_pos.ne'])] at h2
+    rw [Nat.primeFactors_prod_eq_biUnion (by simp [Module.finrank_pos.ne'])] at h2
     grind
   simp [Module.finrank_of_infinite_dimensional hfin]
 

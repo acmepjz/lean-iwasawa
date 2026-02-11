@@ -5,14 +5,17 @@ Authors: Jz Pan
 -/
 module
 
+public import Mathlib.Algebra.Order.Ring.IsNonarchimedean
+public import Mathlib.Analysis.Normed.Algebra.GelfandMazur
 public import Mathlib.RingTheory.Valuation.RamificationGroup
 public import Mathlib.NumberTheory.NumberField.InfinitePlace.Basic
+public import Mathlib.NumberTheory.Ostrowski
 
 @[expose] public section
 
 /-!
 
-# Inertia subgroup, etc. for an infinite extension of algebraic number fields
+# Inertia subgroup, etc. for a possibly infinite extension of algebraic number fields
 
 We will use the following conventions:
 
@@ -29,16 +32,132 @@ References:
 
 namespace AbsoluteValue
 
+/-! ### Criterion for a place to be finite -/
+
+/-- An absolute value `v` is archimedean if and only if there exists `x` such that `v x ≤ 1`
+and `v (x + 1) > 1`. -/
+theorem not_isNonarchimedean_iff_exists_apply_le_one_and_apply_add_one_gt_one
+    {K : Type*} [Field K] (v : AbsoluteValue K ℝ) :
+    ¬IsNonarchimedean v ↔ ∃ x : K, v x ≤ 1 ∧ v (x + 1) > 1 := by
+  simp only [IsNonarchimedean, le_sup_iff, not_forall, not_or, not_le, gt_iff_lt]
+  refine ⟨fun ⟨x, y, h1, h2⟩ ↦ ?_, fun ⟨x, h1, h2⟩ ↦ ⟨x, 1, by linarith, by rwa [map_one]⟩⟩
+  wlog hxy : v x ≤ v y generalizing x y
+  · rw [add_comm x y] at h1 h2
+    exact this y x h2 h1 (not_le.1 hxy).le
+  rcases eq_or_ne y 0 with rfl | hy
+  · simp at h1
+  rw [← div_le_one (v.pos hy), ← map_div₀] at hxy
+  replace h2 := div_lt_div_of_pos_right h2 (v.pos hy)
+  rw [← map_div₀, div_self hy, map_one, ← map_div₀, add_div, div_self hy] at h2
+  use x / y
+
+/-- An archimedean absolute value is not trivial. -/
+theorem isNontrivial_of_not_isNonarchimedean
+    {K : Type*} [Field K] (v : AbsoluteValue K ℝ) (h : ¬IsNonarchimedean v) : v.IsNontrivial := by
+  rw [not_isNonarchimedean_iff_exists_apply_le_one_and_apply_add_one_gt_one] at h
+  obtain ⟨x, -, h⟩ := h
+  use x + 1, (by rw [← v.ne_zero_iff]; linarith), h.ne'
+
+/-- An absolute value `v` is non-archimedean if and only if `v(ℕ)` is bounded. -/
+theorem isNonarchimedean_iff_exists_forall_apply_natCast_le
+    {K : Type*} [Field K] (v : AbsoluteValue K ℝ) :
+    IsNonarchimedean v ↔ ∃ C : ℝ, ∀ n : ℕ, v n ≤ C := by
+  refine ⟨fun h ↦ ⟨1, fun n ↦ h.apply_natCast_le_one_of_isNonarchimedean⟩, fun ⟨C, h⟩ ↦ ?_⟩
+  by_contra H
+  rw [not_isNonarchimedean_iff_exists_apply_le_one_and_apply_add_one_gt_one] at H
+  obtain ⟨x, h1, h2⟩ := H
+  have h3 (n : ℕ) : v (x + 1) ^ n ≤ (n + 1 :) * C := by
+    rw [← map_pow, add_pow]
+    refine (v.sum_le ..).trans ?_
+    calc
+      _ ≤ ∑ i ∈ Finset.range (n + 1), C := by
+        gcongr with i _
+        simp only [one_pow, mul_one, map_mul, map_pow]
+        rw [← one_mul C, ← one_pow i]
+        gcongr 2
+        exact h _
+      _ = _ := by simp
+  have h4 := tendsto_exp_mul_div_rpow_atTop 1 _ (Real.log_pos h2)
+  simp_rw [← Real.rpow_def_of_pos (zero_lt_one.trans h2), Real.rpow_one,
+    Filter.tendsto_atTop_atTop] at h4
+  specialize h4 (v (x + 1) * C + 1)
+  obtain ⟨N, h4⟩ := h4
+  obtain ⟨n, hn⟩ := exists_nat_gt N
+  specialize h3 n
+  specialize h4 (n + 1 :) (hn.le.trans (by simp))
+  rw [le_div_iff₀ (by norm_cast; simp), Real.rpow_natCast, pow_succ'] at h4
+  replace h3 := h4.trans (mul_le_mul_of_nonneg_left h3 (zero_lt_one.trans h2).le)
+  rw [add_mul, ← mul_assoc, mul_right_comm _ _ C, one_mul, add_le_iff_nonpos_right] at h3
+  norm_cast at h3
+
+theorem isNonarchimedean_comp_iff
+    {K L : Type*} [Field K] [Field L] (v : AbsoluteValue L ℝ) (f : K →+* L) :
+    IsNonarchimedean (v.comp f.injective) ↔ IsNonarchimedean v := by
+  have h (n : ℕ) : v.comp f.injective n = v n := show v (f n) = _ by simp
+  simp_rw [isNonarchimedean_iff_exists_forall_apply_natCast_le, h]
+
+theorem isNonarchimedean_iff_of_equiv
+    {K : Type*} [Field K] {v w : AbsoluteValue K ℝ} (h0 : v ≈ w) :
+    IsNonarchimedean v ↔ IsNonarchimedean w := by
+  suffices ∀ v w : AbsoluteValue K ℝ, v ≈ w → IsNonarchimedean v → IsNonarchimedean w from
+    ⟨this v w h0, this w v h0.symm⟩
+  rintro v w (h0 : v.IsEquiv w) h
+  rw [isEquiv_iff_exists_rpow_eq] at h0
+  rw [isNonarchimedean_iff_exists_forall_apply_natCast_le] at h ⊢
+  obtain ⟨C, h⟩ := h
+  obtain ⟨c, hc, h0⟩ := h0
+  refine ⟨C ^ c, fun n ↦ ?_⟩
+  simp only [← congr($h0 n)]
+  gcongr 1
+  exact h n
+
+/-- If a field `K` has an infinite place, then it must be of characteristic zero. -/
+theorem charZero_of_not_isNonarchimedean
+    {K : Type*} [Field K] (v : AbsoluteValue K ℝ) (h : ¬IsNonarchimedean v) : CharZero K := by
+  rcases CharP.exists' K with hc | ⟨p, hp, hc⟩
+  · exact hc
+  refine False.elim (h ?_)
+  rw [isNonarchimedean_iff_exists_forall_apply_natCast_le]
+  use ((Finset.range (p + 1)).image (fun (n : ℕ) ↦ v n)).max' (by simp)
+  intro n
+  rw [CharP.cast_eq_mod]
+  apply Finset.le_max'
+  simp only [Finset.mem_image, Finset.mem_range, Order.lt_add_one_iff]
+  use n % p, (n.mod_lt hp.out.pos).le
+
+/-- TODO: go mathlib -/
+theorem _root_.Rat.AbsoluteValue.isNonarchimedean_padic (p : ℕ) [Fact p.Prime] :
+    IsNonarchimedean (Rat.AbsoluteValue.padic p) := by
+  rw [isNonarchimedean_iff_exists_forall_apply_natCast_le]
+  exact ⟨1, fun n ↦ Rat.AbsoluteValue.padic_le_one p n⟩
+
+/-- TODO: go mathlib -/
+theorem _root_.Rat.AbsoluteValue.not_isNonarchimedean_real :
+    ¬IsNonarchimedean Rat.AbsoluteValue.real := by
+  simpa [isNonarchimedean_iff_exists_forall_apply_natCast_le] using exists_nat_gt
+
 /-- **Gelfand-Tornheim theorem**: if a field `K` has an infinite place,
 then there exists an embedding `K →+* ℂ` such that the absolute value is *equivalent* to
-the usual absolute value on `ℂ`.
+the usual absolute value `| |` on `ℂ`. Note that it is not necessary equal to `| |` as it is
+in fact equal to `| | ^ c` for some `0 < c ≤ 1`.
 
 Proof: see E. Artin, *Theory of Algebraic Numbers*, pp. 45 and 67. -/
 theorem exists_ringHom_complex_of_not_isNonarchimedean
-    {K : Type*} [Field K] (v : AbsoluteValue K ℝ)
-    (h1 : v.IsNontrivial) (h2 : ¬IsNonarchimedean v) :
+    {K : Type*} [Field K] (v : AbsoluteValue K ℝ) (h : ¬IsNonarchimedean v) :
     ∃ φ : K →+* ℂ, NumberField.place φ ≈ v := by
-  sorry
+  have := v.charZero_of_not_isNonarchimedean h
+  let vQ := v.comp (algebraMap ℚ K).injective
+  have h1 : ¬IsNonarchimedean vQ := by rwa [isNonarchimedean_comp_iff]
+  have h2 := vQ.isNontrivial_of_not_isNonarchimedean h1
+  rcases Rat.AbsoluteValue.equiv_real_or_padic vQ h2 with h3 | h3
+  · let R := vQ.Completion
+    let Khat := v.Completion
+    -- #check NormedAlgebra.Real.nonempty_algEquiv_or
+    sorry
+  obtain ⟨p, hp, h4⟩ := h3.exists
+  have := Rat.AbsoluteValue.isNonarchimedean_padic p
+  rw [← isNonarchimedean_iff_of_equiv h4] at this
+  contradiction
 
 /-- A non-archimedean absolute value is a valuation. -/
 @[simps]
@@ -86,6 +205,13 @@ theorem apply_le_one_iff_of_mem_decompositionSubgroup
   refine ⟨fun hx ↦ ?_, fun hx ↦ v.apply_le_one_of_mem_decompositionSubgroup h hx⟩
   simpa using v.apply_le_one_of_mem_decompositionSubgroup (inv_mem h) hx
 
+/-- An element is contained in the decomposition subgroup of `v` if and only if it is continuous
+under the `v`-adic topology. (Is this correct?) -/
+theorem mem_decompositionSubgroup_iff_continuous
+    (F : Type*) {K : Type*} [Field F] [Field K] [Algebra F K] (v : AbsoluteValue K ℝ) (σ) :
+    σ ∈ v.decompositionSubgroup F ↔ Continuous (X := WithAbs v) (Y := WithAbs v) σ := by
+  sorry
+
 /-- Our definition is the same as `ValuationSubring.decompositionSubgroup` for finite places. -/
 theorem decompositionSubgroup_eq_of_isNonarchimedean
     (F : Type*) {K : Type*} [Field F] [Field K] [Algebra F K] (v : AbsoluteValue K ℝ)
@@ -94,6 +220,33 @@ theorem decompositionSubgroup_eq_of_isNonarchimedean
   ext g
   simp only [mem_decompositionSubgroup_iff, MulAction.mem_stabilizer_iff, SetLike.ext'_iff]
   congr!
+
+/-- If `L / K / F` is an extension tower with `L / F` Galois, `v` is a place of `L`, then
+`Dᵥ(L/K) = Dᵥ(L/F) ⊓ Gal(L/K)`. -/
+theorem decompositionSubgroup_eq_comap
+    (F K : Type*) [Field F] [Field K] [Algebra F K]
+    {L : Type*} [Field L] [Algebra F L] [Algebra K L] [IsScalarTower F K L] [Normal F L]
+    (v : AbsoluteValue L ℝ) :
+    v.decompositionSubgroup K = (v.decompositionSubgroup F).comap
+      (IntermediateField.restrictRestrictAlgEquivMapHom F L K L) := by
+  sorry
+
+/-- If `L / K / F` is an extension tower with `L / F` Galois, `v` is a place of `L`, then
+`Iᵥ(L/K) ≤ Iᵥ(L/F)`. -/
+theorem map_decompositionSubgroup_le
+    (F K : Type*) [Field F] [Field K] [Algebra F K]
+    {L : Type*} [Field L] [Algebra F L] [Algebra K L] [IsScalarTower F K L] [Normal F L]
+    (v : AbsoluteValue L ℝ) :
+    (v.decompositionSubgroup K).map
+      (IntermediateField.restrictRestrictAlgEquivMapHom F L K L) ≤ v.decompositionSubgroup F := by
+  simpa only [Subgroup.map_le_iff_le_comap] using (v.decompositionSubgroup_eq_comap F K).le
+
+/-- Decomposition subgroup for an infinite place is either trivial or `ℤ/2ℤ`. (Is this correct?) -/
+theorem card_decompositionSubgroup_dvd_two_of_not_isNonarchimedean
+    (F : Type*) {K : Type*} [Field F] [Field K] [Algebra F K] (v : AbsoluteValue K ℝ)
+    (h : ¬IsNonarchimedean v) :
+    Nat.card (v.decompositionSubgroup F) ∣ 2 := by
+  sorry
 
 /-! ### Inertia subgroup for a place -/
 
@@ -206,28 +359,6 @@ theorem inertiaSubgroup_eq_of_isNonarchimedean
       rw [← h2]
       exact h1
 
-/-! ### Assertion that a place is unramified -/
-
-/-- If `L / K / F` is an extension tower with `L / F` Galois, `v` is a place of `L`, then
-`Dᵥ(L/K) = Dᵥ(L/F) ⊓ Gal(L/K)`. -/
-theorem decompositionSubgroup_eq_comap
-    (F K : Type*) [Field F] [Field K] [Algebra F K]
-    {L : Type*} [Field L] [Algebra F L] [Algebra K L] [IsScalarTower F K L] [Normal F L]
-    (v : AbsoluteValue L ℝ) :
-    v.decompositionSubgroup K = (v.decompositionSubgroup F).comap
-      (IntermediateField.restrictRestrictAlgEquivMapHom F L K L) := by
-  sorry
-
-/-- If `L / K / F` is an extension tower with `L / F` Galois, `v` is a place of `L`, then
-`Iᵥ(L/K) ≤ Iᵥ(L/F)`. -/
-theorem map_decompositionSubgroup_le
-    (F K : Type*) [Field F] [Field K] [Algebra F K]
-    {L : Type*} [Field L] [Algebra F L] [Algebra K L] [IsScalarTower F K L] [Normal F L]
-    (v : AbsoluteValue L ℝ) :
-    (v.decompositionSubgroup K).map
-      (IntermediateField.restrictRestrictAlgEquivMapHom F L K L) ≤ v.decompositionSubgroup F := by
-  simpa only [Subgroup.map_le_iff_le_comap] using (v.decompositionSubgroup_eq_comap F K).le
-
 /-- If `L / K / F` is an extension tower with `L / F` Galois, `v` is a place of `L`, then
 `Iᵥ(L/K) = Iᵥ(L/F) ⊓ Gal(L/K)`. -/
 theorem inertiaSubgroup_eq_comap
@@ -248,8 +379,50 @@ theorem map_inertiaSubgroup_le
       (IntermediateField.restrictRestrictAlgEquivMapHom F L K L) ≤ v.inertiaSubgroup F := by
   simpa only [Subgroup.map_le_iff_le_comap] using (v.inertiaSubgroup_eq_comap F K).le
 
+/-! ### Ramification index for a place in an extension -/
+
+/-- If `L / K / F` is an extension tower with `L / F` Galois, `v` is a place of `L`, then the
+ramification index of `v` in `K / F` is defined to be the index of `Iᵥ(L/K)` in `Iᵥ(L/F)`
+(`0` means infinite). Later we will show that this depends only on the place of `K` below `v`,
+and is independent of the choice of `L` (`AbsoluteValue.ramificationIdx_spec`). -/
+noncomputable def ramificationIdxOfIsScalarTower
+    (F K : Type*) [Field F] [Field K] [Algebra F K]
+    {L : Type*} [Field L] [Algebra F L] [Algebra K L] [IsScalarTower F K L] [Normal F L]
+    (v : AbsoluteValue L ℝ) : ℕ :=
+    ((v.inertiaSubgroup K).map
+      (IntermediateField.restrictRestrictAlgEquivMapHom F L K L)).relIndex (v.inertiaSubgroup F)
+
+/-- If `K / F` is an algebraic extension, then any place `v` of `F` can be extended to `K`.
+(Is this correct?) -/
+theorem exists_liesOver
+    {F : Type*} (K : Type*) [Field F] [Field K] [Algebra F K] [Algebra.IsAlgebraic F K]
+    (v : AbsoluteValue F ℝ) : ∃ w : AbsoluteValue K ℝ, w.LiesOver v := by
+  sorry
+
+/-- If `K / F` is an algebraic extension, `v` is a place of `K`, then the
+ramification index of `v` in `F` is defined to be the ramification index of `w`
+in `K / F`, where `w` is any extension of `v` to the algebraic closure of `K`. -/
+noncomputable def ramificationIdx
+    (F : Type*) {K : Type*} [Field F] [Field K] [Algebra F K] [Algebra.IsAlgebraic F K]
+    (v : AbsoluteValue K ℝ) : ℕ :=
+  (v.exists_liesOver (AlgebraicClosure K)).choose.ramificationIdxOfIsScalarTower F K
+
+/-- (Is this correct?) -/
+theorem ramificationIdx_spec
+    (F : Type*) {K : Type*} [Field F] [Field K] [Algebra F K]
+    {L : Type*} [Field L] [Algebra F L] [Algebra K L] [IsScalarTower F K L] [Normal F L]
+    (v : AbsoluteValue K ℝ) (w : AbsoluteValue L ℝ) [w.LiesOver v] :
+    haveI := Algebra.IsAlgebraic.tower_bot F K L
+    v.ramificationIdx F = w.ramificationIdxOfIsScalarTower F K := by
+  sorry
+
+/-! ### Assertion that a place is unramified in an extension -/
+
 /-- If `L / K / F` is an extension tower with `L / F` Galois, `v` is a place of `L`, then `v` is
-called unramified in `L / K`, if `Iᵥ(L/F) ≤ Gal(L/K)`, or equivalently `Iᵥ(L/K) = Iᵥ(L/F)`. -/
+called unramified in `K / F`, if `Iᵥ(L/F) ≤ Gal(L/K)`, or equivalently `Iᵥ(L/K) = Iᵥ(L/F)`
+(`AbsoluteValue.isUnramifiedOfIsScalarTower_iff_map_inertiaSubgroup_eq`).
+Later we will show that this depends only on the place of `K` below `v`, and is independent of the
+choice of `L` (`AbsoluteValue.isUnramified_spec`). -/
 def IsUnramifiedOfIsScalarTower
     (F K : Type*) [Field F] [Field K] [Algebra F K]
     {L : Type*} [Field L] [Algebra F L] [Algebra K L] [IsScalarTower F K L] [Normal F L]
@@ -266,5 +439,36 @@ theorem isUnramifiedOfIsScalarTower_iff_map_inertiaSubgroup_eq
     (IntermediateField.restrictRestrictAlgEquivMapHom F L K L))
   rw [Subgroup.map_comap_eq] at h
   rw [h, inf_eq_right, IsUnramifiedOfIsScalarTower]
+
+theorem isUnramifiedOfIsScalarTower_iff_ramificationIdxOfIsScalarTower_eq_one
+    (F K : Type*) [Field F] [Field K] [Algebra F K]
+    {L : Type*} [Field L] [Algebra F L] [Algebra K L] [IsScalarTower F K L] [Normal F L]
+    (v : AbsoluteValue L ℝ) :
+    v.IsUnramifiedOfIsScalarTower F K ↔ v.ramificationIdxOfIsScalarTower F K = 1 := by
+  rw [isUnramifiedOfIsScalarTower_iff_map_inertiaSubgroup_eq, le_antisymm_iff]
+  simp [ramificationIdxOfIsScalarTower, v.map_inertiaSubgroup_le F K]
+
+/-- If `K / F` is an algebraic extension, `v` is a place of `K`, then `v` is called
+unramified in `F`, if `w` is unramified in `K / F`, where `w` is any extension of `v` to the
+algebraic closure of `K`. -/
+def IsUnramified
+    (F : Type*) {K : Type*} [Field F] [Field K] [Algebra F K] [Algebra.IsAlgebraic F K]
+    (v : AbsoluteValue K ℝ) : Prop :=
+  (v.exists_liesOver (AlgebraicClosure K)).choose.IsUnramifiedOfIsScalarTower F K
+
+theorem isUnramified_iff_ramificationIdx_eq_one
+    (F : Type*) {K : Type*} [Field F] [Field K] [Algebra F K] [Algebra.IsAlgebraic F K]
+    (v : AbsoluteValue K ℝ) :
+    v.IsUnramified F ↔ v.ramificationIdx F = 1 :=
+  isUnramifiedOfIsScalarTower_iff_ramificationIdxOfIsScalarTower_eq_one ..
+
+theorem isUnramified_spec
+    (F : Type*) {K : Type*} [Field F] [Field K] [Algebra F K]
+    {L : Type*} [Field L] [Algebra F L] [Algebra K L] [IsScalarTower F K L] [Normal F L]
+    (v : AbsoluteValue K ℝ) (w : AbsoluteValue L ℝ) [w.LiesOver v] :
+    haveI := Algebra.IsAlgebraic.tower_bot F K L
+    v.IsUnramified F ↔ w.IsUnramifiedOfIsScalarTower F K := by
+  rw [isUnramified_iff_ramificationIdx_eq_one, v.ramificationIdx_spec F w,
+    isUnramifiedOfIsScalarTower_iff_ramificationIdxOfIsScalarTower_eq_one]
 
 end AbsoluteValue

@@ -15,7 +15,7 @@ public import Mathlib.NumberTheory.Ostrowski
 
 /-!
 
-# Inertia subgroup, etc. for a possibly infinite extension of algebraic number fields
+# Ramification index and inertia subgroup for a place (`AbsoluteValue`)
 
 We will use the following conventions:
 
@@ -32,7 +32,7 @@ References:
 
 namespace AbsoluteValue
 
-/-! ### Criterion for a place to be finite -/
+/-! ### Criterion for a place to be non-archimedean -/
 
 /-- An absolute value `v` is archimedean if and only if there exists `x` such that `v x ≤ 1`
 and `v (x + 1) > 1`. -/
@@ -96,6 +96,12 @@ theorem isNonarchimedean_comp_iff
   have h (n : ℕ) : v.comp f.injective n = v n := show v (f n) = _ by simp
   simp_rw [isNonarchimedean_iff_exists_forall_apply_natCast_le, h]
 
+theorem isNonarchimedean_iff_of_liesOver
+    {K L : Type*} [Field K] [Field L] [Algebra K L]
+    (v : AbsoluteValue K ℝ) (w : AbsoluteValue L ℝ) [w.LiesOver v] :
+    IsNonarchimedean v ↔ IsNonarchimedean w := by
+  rw [← LiesOver.comp_eq w v, isNonarchimedean_comp_iff]
+
 theorem isNonarchimedean_iff_of_equiv
     {K : Type*} [Field K] {v w : AbsoluteValue K ℝ} (h0 : v ≈ w) :
     IsNonarchimedean v ↔ IsNonarchimedean w := by
@@ -110,6 +116,53 @@ theorem isNonarchimedean_iff_of_equiv
   simp only [← congr($h0 n)]
   gcongr 1
   exact h n
+
+theorem isNontrivial_of_isNontrivial_comp
+    {K L : Type*} [Field K] [Field L] (v : AbsoluteValue L ℝ) {f : K →+* L}
+    (h : (v.comp f.injective).IsNontrivial) : v.IsNontrivial := by
+  rw [IsNontrivial] at h ⊢
+  obtain ⟨x, h1, h2⟩ := h
+  exact ⟨f x, by rwa [map_ne_zero_iff f f.injective], h2⟩
+
+theorem isNontrivial_iff_of_liesOver
+    {K L : Type*} [Field K] [Field L] [Algebra K L] [Algebra.IsAlgebraic K L]
+    (v : AbsoluteValue K ℝ) (w : AbsoluteValue L ℝ) [w.LiesOver v] :
+    v.IsNontrivial ↔ w.IsNontrivial := by
+  rw [← LiesOver.comp_eq w v]
+  refine ⟨w.isNontrivial_of_isNontrivial_comp, fun h ↦ ?_⟩
+  contrapose! h
+  have hn : IsNonarchimedean w := by
+    rw [← w.isNonarchimedean_comp_iff (algebraMap K L)]
+    contrapose! h
+    exact isNontrivial_of_not_isNonarchimedean _ h
+  rw [not_isNontrivial_iff] at h ⊢
+  replace h (x) : w (algebraMap K L x) ≤ 1 := by
+    rcases eq_or_ne x 0 with rfl | hx
+    · simp
+    · exact (h x hx).le
+  suffices ∀ x : L, x ≠ 0 → ¬w x > 1 by
+    intro x hx
+    rcases lt_trichotomy (w x) 1 with hlt | heq | hgt
+    · refine False.elim (this x⁻¹ (by simpa) ?_)
+      rwa [map_inv₀, gt_iff_lt, one_lt_inv₀ (w.pos hx)]
+    · exact heq
+    · exact False.elim (this x hx hgt)
+  intro x hx hgt
+  have h1 := congr(w $(minpoly.aeval K x))
+  have h2 := minpoly.monic (Algebra.IsAlgebraic.isAlgebraic (R := K) x).isIntegral
+  have h3 : w (∑ n ∈ Finset.range (minpoly K x).natDegree, (minpoly K x).coeff n • x ^ n) <
+      w (x ^ (minpoly K x).natDegree) := by
+    rcases (Finset.range (minpoly K x).natDegree).eq_empty_or_nonempty with h3 | h3
+    · simp [h3, w.pos hx]
+    · obtain ⟨i, hi, h4⟩ :=
+        hn.finset_image_add_of_nonempty (fun n ↦ (minpoly K x).coeff n • x ^ n) h3
+      refine h4.trans_lt ?_
+      rw [Algebra.smul_def, map_mul]
+      refine (mul_le_of_le_one_left (w.nonneg _) (h _)).trans_lt ?_
+      simpa [pow_lt_pow_iff_right₀ hgt] using hi
+  rw [Polynomial.aeval_eq_sum_range, Finset.sum_range_succ, h2.coeff_natDegree, one_smul,
+    map_zero, hn.add_eq_max_of_ne h3.ne, max_eq_right h3.le] at h1
+  simp [hx] at h1
 
 /-- If a field `K` has an infinite place, then it must be of characteristic zero. -/
 theorem charZero_of_not_isNonarchimedean
@@ -193,6 +246,17 @@ def decompositionSubgroup
 theorem mem_decompositionSubgroup_iff
     (F : Type*) {K : Type*} [Field F] [Field K] [Algebra F K] (v : AbsoluteValue K ℝ) (σ) :
     σ ∈ v.decompositionSubgroup F ↔ σ '' {x | v x ≤ 1} = {x | v x ≤ 1} := Iff.rfl
+
+theorem decompositionSubgroup_eq_top_of_not_isNontrivial
+    (F : Type*) {K : Type*} [Field F] [Field K] [Algebra F K] (v : AbsoluteValue K ℝ)
+    (h : ¬v.IsNontrivial) : v.decompositionSubgroup F = ⊤ := by
+  rw [eq_top_iff]
+  rintro σ -
+  have (x : K) : v x ≤ 1 := by
+    rcases eq_or_ne x 0 with rfl | hx
+    · simp
+    · exact (not_isNontrivial_apply h hx).le
+  simp [mem_decompositionSubgroup_iff, this]
 
 theorem apply_le_one_of_mem_decompositionSubgroup
     {F : Type*} {K : Type*} [Field F] [Field K] [Algebra F K] (v : AbsoluteValue K ℝ) {σ}
@@ -299,6 +363,24 @@ theorem mem_inertiaSubgroup_iff_of_not_isNonarchimedean
     σ ∈ v.inertiaSubgroup F ↔ σ '' {x | v x ≤ 1} = {x | v x ≤ 1} := by
   simp [mem_inertiaSubgroup_iff, h]
 
+theorem inertiaSubgroup_eq_bot_of_not_isNontrivial
+    (F : Type*) {K : Type*} [Field F] [Field K] [Algebra F K] (v : AbsoluteValue K ℝ)
+    (h : ¬v.IsNontrivial) : v.inertiaSubgroup F = ⊥ := by
+  rw [eq_bot_iff]
+  rintro σ hσ
+  rw [Subgroup.mem_bot]
+  ext x
+  rw [v.mem_inertiaSubgroup_iff_of_isNonarchimedean F (by
+    contrapose! h; exact isNontrivial_of_not_isNonarchimedean _ h)] at hσ
+  replace hσ := hσ.2 x <| by
+    rcases eq_or_ne x 0 with rfl | hx
+    · simp
+    · exact (not_isNontrivial_apply h hx).le
+  replace hσ : σ x - x = 0 := by
+    contrapose! hσ
+    exact (not_isNontrivial_apply h hσ).ge
+  simpa [sub_eq_zero] using hσ
+
 theorem inertiaSubgroup_le_decompositionSubgroup
     (F : Type*) {K : Type*} [Field F] [Field K] [Algebra F K] (v : AbsoluteValue K ℝ) :
     v.inertiaSubgroup F ≤ v.decompositionSubgroup F := fun _ ↦ by
@@ -379,10 +461,10 @@ theorem map_inertiaSubgroup_le
       (IntermediateField.restrictRestrictAlgEquivMapHom F L K L) ≤ v.inertiaSubgroup F := by
   simpa only [Subgroup.map_le_iff_le_comap] using (v.inertiaSubgroup_eq_comap F K).le
 
-/-! ### Ramification index for a place in an extension -/
+/-! ### Ramification index of a place for an extension -/
 
 /-- If `L / K / F` is an extension tower with `L / F` Galois, `v` is a place of `L`, then the
-ramification index of `v` in `K / F` is defined to be the index of `Iᵥ(L/K)` in `Iᵥ(L/F)`
+ramification index of `v` for `K / F` is defined to be the index of `Iᵥ(L/K)` in `Iᵥ(L/F)`
 (`0` means infinite). Later we will show that this depends only on the place of `K` below `v`,
 and is independent of the choice of `L` (`AbsoluteValue.ramificationIdx_spec`). -/
 noncomputable def ramificationIdxOfIsScalarTower
@@ -400,8 +482,8 @@ theorem exists_liesOver
   sorry
 
 /-- If `K / F` is an algebraic extension, `v` is a place of `K`, then the
-ramification index of `v` in `F` is defined to be the ramification index of `w`
-in `K / F`, where `w` is any extension of `v` to the algebraic closure of `K`. -/
+ramification index of `v` for `K / F` is defined to be the ramification index of `w`
+for `K / F`, where `w` is any extension of `v` to the algebraic closure of `K`. -/
 noncomputable def ramificationIdx
     (F : Type*) {K : Type*} [Field F] [Field K] [Algebra F K] [Algebra.IsAlgebraic F K]
     (v : AbsoluteValue K ℝ) : ℕ :=
@@ -416,10 +498,10 @@ theorem ramificationIdx_spec
     v.ramificationIdx F = w.ramificationIdxOfIsScalarTower F K := by
   sorry
 
-/-! ### Assertion that a place is unramified in an extension -/
+/-! ### Assertion that a place is unramified for an extension -/
 
 /-- If `L / K / F` is an extension tower with `L / F` Galois, `v` is a place of `L`, then `v` is
-called unramified in `K / F`, if `Iᵥ(L/F) ≤ Gal(L/K)`, or equivalently `Iᵥ(L/K) = Iᵥ(L/F)`
+called unramified for `K / F`, if `Iᵥ(L/F) ≤ Gal(L/K)`, or equivalently `Iᵥ(L/K) = Iᵥ(L/F)`
 (`AbsoluteValue.isUnramifiedOfIsScalarTower_iff_map_inertiaSubgroup_eq`).
 Later we will show that this depends only on the place of `K` below `v`, and is independent of the
 choice of `L` (`AbsoluteValue.isUnramified_spec`). -/
@@ -449,7 +531,7 @@ theorem isUnramifiedOfIsScalarTower_iff_ramificationIdxOfIsScalarTower_eq_one
   simp [ramificationIdxOfIsScalarTower, v.map_inertiaSubgroup_le F K]
 
 /-- If `K / F` is an algebraic extension, `v` is a place of `K`, then `v` is called
-unramified in `F`, if `w` is unramified in `K / F`, where `w` is any extension of `v` to the
+unramified for `K / F`, if `w` is unramified for `K / F`, where `w` is any extension of `v` to the
 algebraic closure of `K`. -/
 def IsUnramified
     (F : Type*) {K : Type*} [Field F] [Field K] [Algebra F K] [Algebra.IsAlgebraic F K]
@@ -470,5 +552,12 @@ theorem isUnramified_spec
     v.IsUnramified F ↔ w.IsUnramifiedOfIsScalarTower F K := by
   rw [isUnramified_iff_ramificationIdx_eq_one, v.ramificationIdx_spec F w,
     isUnramifiedOfIsScalarTower_iff_ramificationIdxOfIsScalarTower_eq_one]
+
+/-- If `K / F` is an algebraic extension, `v` is a place of `F`, then `v` is called
+unramified for `K / F`, if all place `w` of `K` above `v` is unramified for `K / F`. -/
+def IsUnramifiedIn
+    {F : Type*} (K : Type*) [Field F] [Field K] [Algebra F K] [Algebra.IsAlgebraic F K]
+    (v : AbsoluteValue F ℝ) : Prop :=
+    ∀ w : AbsoluteValue K ℝ, w.LiesOver v → w.IsUnramified F
 
 end AbsoluteValue

@@ -8,7 +8,7 @@ module
 public import Iwasawalib.FieldTheory.Galois.Abelian
 public import Mathlib.NumberTheory.NumberField.ClassNumber
 public import Mathlib.NumberTheory.NumberField.Ideal.Basic
-public import Mathlib.NumberTheory.RamificationInertia.Unramified
+public import Iwasawalib.NumberTheory.RamificationInertia.AbsoluteValue
 public import Mathlib.RingTheory.Frobenius
 
 @[expose] public section
@@ -23,54 +23,206 @@ variable (F K : Type*) [Field F] [Field K] [Algebra F K]
 
 namespace NumberField
 
-/-! ### Assertion that a finite extension is unramified everywhere -/
+/-! ### Assertion that a field extension is unramified outside `S` -/
 
-/-- A typeclass asserting that a (potentially infinite) field extension `K / F` is unramified
-everywhere. Defined to be that any finite subextension `E / F` is unramified at all finite places
-and all infinite places. Only makes sense when the base field `F` is a number field. -/
+/-- A typeclass asserting that an algebraic extension `K / F` is unramified outside `S`, where `S`
+is a set of places of a subfield `L` of `K`. -/
 @[mk_iff]
-class IsUnramifiedEverywhere : Prop where
-  isUnramifiedAt_of_heightOneSpectrum (E : IntermediateField F K) [FiniteDimensional F E]
-    (w : IsDedekindDomain.HeightOneSpectrum (𝓞 E)) : Algebra.IsUnramifiedAt (𝓞 F) w.asIdeal
-  isUnramifiedAtInfinitePlaces (E : IntermediateField F K) [FiniteDimensional F E] :
-    IsUnramifiedAtInfinitePlaces F E
+class IsUnramifiedOutside (F K L : Type*) [Field F] [Field K] [Field L] [Algebra F K]
+    [Algebra L K] [Algebra.IsAlgebraic F K] (S : Set (AbsoluteValue L ℝ)) : Prop where
+  isUnramifiedIn (F K L S) (v : AbsoluteValue L ℝ) (h1 : v.IsNontrivial)
+    (h2 : ∀ w ∈ S, ¬v ≈ w) : v.IsUnramifiedIn F K
 
-theorem isUnramifiedEverywhere_iff_of_finiteDimensional [FiniteDimensional F K] :
-    IsUnramifiedEverywhere F K ↔
-      (∀ w : IsDedekindDomain.HeightOneSpectrum (𝓞 K), Algebra.IsUnramifiedAt (𝓞 F) w.asIdeal) ∧
-        IsUnramifiedAtInfinitePlaces F K := by
-  sorry
+theorem isUnramifiedOutside_of_isUnramifiedOutside_preimage [Algebra.IsAlgebraic F K]
+    (L L' : Type*) [Field L] [Field L'] [Algebra L K]
+    [Algebra L' L] [Algebra L' K] [IsScalarTower L' L K] (S : Set (AbsoluteValue L' ℝ))
+    [H : IsUnramifiedOutside F K L ((AbsoluteValue.comp · (algebraMap L' L).injective) ⁻¹' S)] :
+    IsUnramifiedOutside F K L' S := by
+  simp_rw [isUnramifiedOutside_iff, AbsoluteValue.IsUnramifiedIn] at H ⊢
+  rintro v h1 h2 w h3
+  have hwv : (w.comp (algebraMap L K).injective).comp (algebraMap L' L).injective = v := by
+    ext x
+    simpa [← IsScalarTower.algebraMap_apply] using congr($(h3.comp_eq') x)
+  refine H (w.comp (algebraMap L K).injective) ?_ (fun u hu ↦ ?_) w inferInstance
+  · rw [← hwv] at h1
+    exact AbsoluteValue.isNontrivial_of_isNontrivial_comp _ h1
+  · simp only [Set.mem_preimage] at hu
+    specialize h2 _ hu
+    contrapose! h2
+    simpa only [hwv] using AbsoluteValue.IsEquiv.comp h2 (algebraMap L' L).injective
+
+/-- TODO: ... -/
+@[simps apply]
+noncomputable def _root_.AbsoluteValue.rpowOfLeOneOrIsNonarchimedean {R : Type*} [Semiring R]
+    (v : AbsoluteValue R ℝ)
+    (c : ℝ) (h1 : 0 < c) (h2 : c ≤ 1 ∨ IsNonarchimedean v) : AbsoluteValue R ℝ where
+  toFun x := v x ^ c
+  map_mul' x y := by rw [map_mul, Real.mul_rpow (v.nonneg x) (v.nonneg y)]
+  nonneg' x := Real.rpow_nonneg (v.nonneg x) c
+  eq_zero' x := by rw [Real.rpow_eq_zero (v.nonneg x) h1.ne', v.eq_zero]
+  add_le' x y := by
+    rcases h2 with h2 | h2
+    · exact (Real.rpow_le_rpow (v.nonneg _) (v.add_le x y) h1.le).trans
+        (Real.rpow_add_le_add_rpow (v.nonneg x) (v.nonneg y) h1.le h2)
+    · exact (Real.rpow_le_rpow (v.nonneg _) (h2 x y) h1.le).trans_eq
+        (Real.rpow_max (v.nonneg x) (v.nonneg y) h1.le) |>.trans
+        (max_le_add_of_nonneg (by positivity) (by positivity))
+
+variable {F K} in
+theorem _root_.AbsoluteValue.exists_equiv_and_liesOver_of_comp_equiv (v : AbsoluteValue K ℝ)
+    (w : AbsoluteValue F ℝ) (h : v.comp (algebraMap F K).injective ≈ w) :
+    ∃ v' : AbsoluteValue K ℝ, v' ≈ v ∧ v'.LiesOver w := by
+  by_cases hn : IsNonarchimedean v
+  · obtain ⟨c, hc, h1⟩ := AbsoluteValue.isEquiv_iff_exists_rpow_eq.1 h
+    refine ⟨v.rpowOfLeOneOrIsNonarchimedean c hc (.inr hn),
+      .symm (AbsoluteValue.isEquiv_iff_exists_rpow_eq.2 ⟨c, hc, rfl⟩), ?_⟩
+    rw [AbsoluteValue.liesOver_iff]
+    ext x
+    simpa using congr($h1 x)
+  obtain ⟨φ, hφ⟩ := v.exists_ringHom_complex_of_not_isNonarchimedean hn
+  obtain ⟨c, hc, h1⟩ := AbsoluteValue.isEquiv_iff_exists_rpow_eq.1 hφ
+  have hφ' := (AbsoluteValue.IsEquiv.comp hφ (algebraMap F K).injective).trans h
+  obtain ⟨c', hc', h2⟩ := AbsoluteValue.isEquiv_iff_exists_rpow_eq.1 hφ'
+  have hc'1 : c' ≤ 1 := by
+    have h3 : 2 ^ c' = w 2 := by simpa [map_ofNat] using congr($h2 2)
+    have h4 : w 2 ≤ 2 := by simpa [one_add_one_eq_two] using w.add_le 1 1
+    rw [← h3] at h4
+    contrapose! h4
+    exact Real.self_lt_rpow_of_one_lt one_lt_two h4
+  refine ⟨(place φ).rpowOfLeOneOrIsNonarchimedean c' hc' (.inl hc'1),
+    AbsoluteValue.isEquiv_iff_exists_rpow_eq.2 ?_, ?_⟩
+  · refine ⟨c'⁻¹ * c, by positivity, ?_⟩
+    ext x
+    rw [← h1, AbsoluteValue.rpowOfLeOneOrIsNonarchimedean_apply,
+      ← Real.rpow_mul ((place φ).nonneg x), ← mul_assoc, mul_inv_cancel₀ hc'.ne', one_mul]
+  · rw [AbsoluteValue.liesOver_iff]
+    ext x
+    simpa using congr($h2 x)
+
+theorem isUnramifiedOutside_preimage_iff [Algebra.IsAlgebraic F K]
+    (L L' : Type*) [Field L] [Field L'] [Algebra L K] [Algebra L' L] [Algebra.IsAlgebraic L' L]
+    [Algebra L' K] [IsScalarTower L' L K] (S : Set (AbsoluteValue L' ℝ)) :
+    IsUnramifiedOutside F K L ((AbsoluteValue.comp · (algebraMap L' L).injective) ⁻¹' S) ↔
+    IsUnramifiedOutside F K L' S := by
+  refine ⟨fun _ ↦ isUnramifiedOutside_of_isUnramifiedOutside_preimage F K L L' S, ?_⟩
+  simp_rw [isUnramifiedOutside_iff, AbsoluteValue.IsUnramifiedIn]
+  rintro H v h1 h2 w _
+  simp only [Set.mem_preimage] at h2
+  refine H (v.comp (algebraMap L' L).injective) ?_ (fun u hu h' ↦ ?_) w (.trans w v _)
+  · rwa [AbsoluteValue.isNontrivial_iff_of_liesOver _ v]
+  · obtain ⟨v', h3, h4⟩ := AbsoluteValue.exists_equiv_and_liesOver_of_comp_equiv _ _ h'
+    exact h2 v' (h4.comp_eq' ▸ hu) h3.symm
+
+/-- A typeclass asserting that an algebraic extension `K / F` is unramified everywhere. -/
+abbrev IsUnramifiedEverywhere [Algebra.IsAlgebraic F K] : Prop := IsUnramifiedOutside F K K ∅
+
+theorem isUnramifiedEverywhere_iff [Algebra.IsAlgebraic F K] : IsUnramifiedEverywhere F K ↔
+    ∀ v : AbsoluteValue K ℝ, v.IsNontrivial → v.IsUnramified F := by
+  simp [isUnramifiedOutside_iff]
+
+theorem isUnramifiedOutside_empty_iff (F K L : Type*) [Field F] [Field K] [Field L] [Algebra F K]
+    [Algebra L K] [Algebra.IsAlgebraic F K] [Algebra.IsAlgebraic L K] :
+    IsUnramifiedOutside F K L ∅ ↔ IsUnramifiedEverywhere F K := by
+  rw [IsUnramifiedEverywhere, ← isUnramifiedOutside_preimage_iff F K K L ∅, Set.preimage_empty]
 
 section IsScalarTower
 
-variable (L : Type*) [Field L] [Algebra F L] [Algebra K L] [IsScalarTower F K L]
+variable (M : Type*) [Field M] [Algebra F M] [Algebra K M] [IsScalarTower F K M]
+  (L : Type*) [Field L] [Algebra L K] [Algebra L M] [IsScalarTower L K M]
+  (S : Set (AbsoluteValue L ℝ))
 
-theorem IsUnramifiedEverywhere.tower_top [IsUnramifiedEverywhere F L] :
-    IsUnramifiedEverywhere K L := by
+theorem IsUnramifiedOutside.tower_top [Algebra.IsAlgebraic F M] [IsUnramifiedOutside F M L S] :
+    haveI := Algebra.IsAlgebraic.tower_top (K := F) (L := K) (A := M)
+    IsUnramifiedOutside K M L S := by
   sorry
 
-theorem IsUnramifiedEverywhere.tower_bot [IsUnramifiedEverywhere F L] :
+theorem IsUnramifiedOutside.tower_bot [Algebra.IsAlgebraic F M] [IsUnramifiedOutside F M L S] :
+    haveI := Algebra.IsAlgebraic.tower_bot (K := F) (L := K) (A := M)
+    IsUnramifiedOutside F K L S := by
+  sorry
+
+theorem IsUnramifiedOutside.trans [Algebra.IsAlgebraic F K] [IsUnramifiedOutside F K L S]
+    [Algebra.IsAlgebraic K M] [IsUnramifiedOutside K M L S] :
+    haveI := Algebra.IsAlgebraic.trans F K M
+    IsUnramifiedOutside F M L S := by
+  sorry
+
+theorem IsUnramifiedEverywhere.tower_top [Algebra.IsAlgebraic F M] [IsUnramifiedEverywhere F M] :
+    haveI := Algebra.IsAlgebraic.tower_top (K := F) (L := K) (A := M)
+    IsUnramifiedEverywhere K M := by
+  have := Algebra.IsAlgebraic.tower_top (K := F) (L := K) (A := M)
+  simp only [← isUnramifiedOutside_empty_iff _ _ F] at *
+  exact .tower_top F K M F ∅
+
+theorem IsUnramifiedEverywhere.tower_bot [Algebra.IsAlgebraic F M] [IsUnramifiedEverywhere F M] :
+    haveI := Algebra.IsAlgebraic.tower_bot (K := F) (L := K) (A := M)
     IsUnramifiedEverywhere F K := by
-  sorry
+  have := Algebra.IsAlgebraic.tower_bot (K := F) (L := K) (A := M)
+  simp only [← isUnramifiedOutside_empty_iff _ _ F] at *
+  exact .tower_bot F K M F ∅
 
-theorem IsUnramifiedEverywhere.trans [IsUnramifiedEverywhere F K] [IsUnramifiedEverywhere K L] :
-    IsUnramifiedEverywhere F L := by
-  sorry
+theorem IsUnramifiedEverywhere.trans [Algebra.IsAlgebraic F K] [IsUnramifiedEverywhere F K]
+    [Algebra.IsAlgebraic K M] [IsUnramifiedEverywhere K M] :
+    haveI := Algebra.IsAlgebraic.trans F K M
+    IsUnramifiedEverywhere F M := by
+  have := Algebra.IsAlgebraic.trans F K M
+  simp only [← isUnramifiedOutside_empty_iff _ _ F] at *
+  exact .trans F K M F ∅
 
 end IsScalarTower
 
-/-! ### Maximal unramified abelian subextension -/
+/-! ### Maximal unramified algebra subextension -/
 
-/-- The maximal unramified abelian subextension of a number field `F` inside `K`. -/
-def maximalUnramifiedAbelianExtension : IntermediateField F K :=
-  sSup {E | IsAbelianGalois F E ∧ IsUnramifiedEverywhere F E}
+/-- The maximal algebra subextension of `K / F` unramified outside `S`, where `S` is a set of
+places of a subfield `L` of `F`. -/
+def maximalExtensionUnramifiedOutside (L : Type*) [Field L] [Algebra L F]
+    (S : Set (AbsoluteValue L ℝ)) : IntermediateField F K :=
+  sSup {E | ∃ (_ : Algebra.IsAlgebraic F E),
+    IsUnramifiedOutside F E F ((AbsoluteValue.comp · (algebraMap L F).injective) ⁻¹' S)}
 
-/-- If `L / K / F` is a field extension tower, such that `L / F` and `K / F` are Galois,
-then `H / F` is also Galois, where `H` is the maximal unramified abelian subextension of `L / K`. -/
-theorem isGalois_maximalUnramifiedAbelianExtension_of_isGalois
-    (L : Type*) [Field L] [Algebra F L] [Algebra K L] [IsScalarTower F K L]
-    [IsGalois F L] [IsGalois F K] : IsGalois F (maximalUnramifiedAbelianExtension K L) := by
+/-- The maximal unramified algebra subextension of `K / F`. -/
+abbrev maximalUnramifiedExtension : IntermediateField F K :=
+  maximalExtensionUnramifiedOutside F K F ∅
+
+instance isAlgebraic_maximalExtensionUnramifiedOutside (L : Type*) [Field L] [Algebra L F]
+    (S : Set (AbsoluteValue L ℝ)) :
+    Algebra.IsAlgebraic F (maximalExtensionUnramifiedOutside F K L S) := by
+  rw [maximalExtensionUnramifiedOutside, sSup_eq_iSup']
+  have (E : {E : IntermediateField F K | ∃ (_ : Algebra.IsAlgebraic F E),
+    IsUnramifiedOutside F E F ((AbsoluteValue.comp · (algebraMap L F).injective) ⁻¹' S)}) :
+    Algebra.IsAlgebraic F E := E.2.choose
+  exact IntermediateField.isAlgebraic_iSup this
+
+instance isUnramifiedOutside_maximalExtensionUnramifiedOutside (L : Type*) [Field L] [Algebra L F]
+    (S : Set (AbsoluteValue L ℝ)) :
+    IsUnramifiedOutside F (maximalExtensionUnramifiedOutside F K L S)
+      F ((AbsoluteValue.comp · (algebraMap L F).injective) ⁻¹' S) := by
   sorry
+
+instance isUnramifiedOutside_maximalExtensionUnramifiedOutside' (L : Type*) [Field L] [Algebra L F]
+    [Algebra L K] [IsScalarTower L F K] (S : Set (AbsoluteValue L ℝ)) :
+    IsUnramifiedOutside F (maximalExtensionUnramifiedOutside F K L S) L S :=
+  isUnramifiedOutside_of_isUnramifiedOutside_preimage F _ F L S
+
+/-- Suppose `M / K / F` is a field extension tower, such that `M / F` and `K / F` are Galois.
+Let `H / K` be the maximal algebra subextension of `M / K` unramified outside `S`, where `S` is a
+set of places of a subfield `L` of `F`. Then `H / F` is also Galois. -/
+theorem isGalois_maximalExtensionUnramifiedOutside_of_isGalois
+    (M : Type*) [Field M] [Algebra F M] [Algebra K M] [IsScalarTower F K M]
+    [IsGalois F M] [IsGalois F K]
+    (L : Type*) [Field L] [Algebra L F] [Algebra L K] [IsScalarTower L F K]
+    (S : Set (AbsoluteValue L ℝ)) : IsGalois F (maximalExtensionUnramifiedOutside K M L S) := by
+  sorry
+
+/-- Suppose `M / K / F` is a field extension tower, such that `M / F` and `K / F` are Galois.
+Let `H / K` be the maximal unramified algebra subextension of `M / K`.
+Then `H / F` is also Galois. -/
+theorem isGalois_maximalUnramifiedExtension_of_isGalois
+    (M : Type*) [Field M] [Algebra F M] [Algebra K M] [IsScalarTower F K M]
+    [IsGalois F M] [IsGalois F K] : IsGalois F (maximalUnramifiedExtension K M) :=
+  isGalois_maximalExtensionUnramifiedOutside_of_isGalois F K M F ∅
+
+#exit
 
 /-- The maximal unramified abelian subextension is a finite extension.
 A result in global class field theory. We cannot prove it here. -/

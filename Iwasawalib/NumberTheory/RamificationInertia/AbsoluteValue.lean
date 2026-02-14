@@ -32,6 +32,55 @@ References:
 
 namespace AbsoluteValue
 
+/-- TODO: go mathlib -/
+@[simp]
+theorem comp_apply {R S T : Type*} [Semiring T] [Semiring R] [Semiring S] [PartialOrder S]
+    (v : AbsoluteValue R S) {f : T →+* R} (hf : Function.Injective f) (x) :
+    v.comp hf x = v (f x) := rfl
+
+/-- TODO: go mathlib -/
+@[simp]
+theorem comp_id {R S : Type*} [Semiring R] [Semiring S] [PartialOrder S] (v : AbsoluteValue R S) :
+    v.comp (f := RingHom.id R) Function.injective_id = v := rfl
+
+/-- TODO: go mathlib -/
+theorem IsEquiv.comp {R S T : Type*} [Semiring T] [Semiring R] [Semiring S] [PartialOrder S]
+    {v w : AbsoluteValue R S} (h : v.IsEquiv w) {f : T →+* R} (hf : Function.Injective f) :
+    (v.comp hf).IsEquiv (w.comp hf) := by
+  simp_all [IsEquiv]
+
+/-- TODO: use `@[mk_iff]` instead -/
+theorem liesOver_iff {K L S : Type*} [CommRing K] [IsSimpleRing K] [CommRing L] [Algebra K L]
+    [PartialOrder S] [Nontrivial L] [Semiring S] {w : AbsoluteValue L S} {v : AbsoluteValue K S} :
+    w.LiesOver v ↔ w.comp (algebraMap K L).injective = v :=
+  ⟨fun ⟨h⟩ ↦ h, fun h ↦ ⟨h⟩⟩
+
+/-- TODO: go mathlib -/
+instance liesOver_comp {K L S : Type*} [CommRing K] [IsSimpleRing K] [CommRing L] [Algebra K L]
+    [PartialOrder S] [Nontrivial L] [Semiring S] (w : AbsoluteValue L S) :
+    w.LiesOver (w.comp (algebraMap K L).injective) := ⟨rfl⟩
+
+/-- TODO: go mathlib -/
+instance liesOver_self {K S : Type*} [CommRing K] [IsSimpleRing K] [PartialOrder S] [Semiring S]
+    (v : AbsoluteValue K S) : v.LiesOver v := ⟨rfl⟩
+
+/-- TODO: go mathlib -/
+theorem liesOver_self_iff {K S : Type*} [CommRing K] [IsSimpleRing K] [PartialOrder S] [Semiring S]
+    (v w : AbsoluteValue K S) : v.LiesOver w ↔ v = w := by
+  simp [liesOver_iff]
+
+/-- TODO: go mathlib -/
+theorem LiesOver.trans {K L M S : Type*}
+    [CommRing K] [CommRing L] [CommRing M] [Algebra K L] [Algebra K M] [Algebra L M]
+    [IsScalarTower K L M] [IsSimpleRing K] [IsSimpleRing L] [Nontrivial M]
+    [PartialOrder S] [Semiring S]
+    (w : AbsoluteValue M S) (v : AbsoluteValue L S) (u : AbsoluteValue K S)
+    [hwv : w.LiesOver v] [hvu : v.LiesOver u] : w.LiesOver u := by
+  rw [liesOver_iff] at hwv hvu ⊢
+  rw [← hvu, ← hwv]
+  ext
+  simp [← IsScalarTower.algebraMap_apply K L M]
+
 /-! ### Criterion for a place to be non-archimedean -/
 
 /-- An absolute value `v` is archimedean if and only if there exists `x` such that `v x ≤ 1`
@@ -553,11 +602,20 @@ theorem isUnramified_spec
   rw [isUnramified_iff_ramificationIdx_eq_one, v.ramificationIdx_spec F w,
     isUnramifiedOfIsScalarTower_iff_ramificationIdxOfIsScalarTower_eq_one]
 
-/-- If `K / F` is an algebraic extension, `v` is a place of `F`, then `v` is called
-unramified for `K / F`, if all place `w` of `K` above `v` is unramified for `K / F`. -/
+/-- If `L / K` is an algebraic extension, `L / F` is a field extension, `v` is a place of `F`, then
+`v` is called unramified for `L / K`, if all place `w` of `L` above `v` is
+unramified for `L / K`. -/
 def IsUnramifiedIn
-    {F : Type*} (K : Type*) [Field F] [Field K] [Algebra F K] [Algebra.IsAlgebraic F K]
+    {F : Type*} (K L : Type*) [Field F] [Field K] [Field L]
+    [Algebra F L] [Algebra K L] [Algebra.IsAlgebraic K L]
     (v : AbsoluteValue F ℝ) : Prop :=
-    ∀ w : AbsoluteValue K ℝ, w.LiesOver v → w.IsUnramified F
+    ∀ w : AbsoluteValue L ℝ, w.LiesOver v → w.IsUnramified K
+
+@[simp]
+theorem isUnramifiedIn_self_iff
+    (F : Type*) {K : Type*} [Field F] [Field K] [Algebra F K] [Algebra.IsAlgebraic F K]
+    (v : AbsoluteValue K ℝ) :
+    v.IsUnramifiedIn F K ↔ v.IsUnramified F := by
+  simp [IsUnramifiedIn, liesOver_self_iff]
 
 end AbsoluteValue

@@ -26,35 +26,50 @@ namespace MvZpExtension
 
 variable (H : MvZpExtension p ι K Kinf)
 
-/-- The maximal unramified abelian `p`-extension `Lₙ / Kₙ` of `Kₙ`, defined as an intermediate field
-of `Hₙ / Kₙ` where `Hₙ` is the Hilbert class field (`NumberField.HilbertClassField`) of `Kₙ`. -/
+/-- The maximal unramified abelian `p`-extension `Lₙ / Kₙ` of `Kₙ`, defined to be an
+intermediate field of `Kₙ` and the separable closure of `K∞`. -/
 noncomputable def Ln (n : ℕ) :=
-  IntermediateField.maximalAbelianPExtension (H.Kn n) (NumberField.HilbertClassField (H.Kn n)) p
+  IntermediateField.lift <| IntermediateField.maximalGaloisSExtension (H.Kn n)
+    (NumberField.maximalUnramifiedAbelianExtension (H.Kn n) (SeparableClosure Kinf)) {p}
 
 instance isAbelianGalois_Ln (n : ℕ) : IsAbelianGalois (H.Kn n) (H.Ln n) :=
-  IntermediateField.isAbelianGalois_maximalAbelianPExtension _ _ p
+  .of_algEquiv (IntermediateField.liftAlgEquiv ..)
 
+-- TODO: need IsUnramifiedEverywhere.of_algEquiv, etc.
 instance isUnramifiedEverywhere_Ln (n : ℕ) :
     NumberField.IsUnramifiedEverywhere (H.Kn n) (H.Ln n) :=
-  .tower_bot (H.Kn n) (H.Ln n) (NumberField.HilbertClassField (H.Kn n))
+  sorry
 
-instance finiteDimensional_Ln (n : ℕ) : FiniteDimensional (H.Kn n) (H.Ln n) := by
-  rw [Ln]
-  have := NumberField.HilbertClassField.finiteDimensional (H.Kn n)
-  infer_instance
+instance finiteDimensional_Ln (n : ℕ) : FiniteDimensional (H.Kn n) (H.Ln n) :=
+  (IntermediateField.liftAlgEquiv <| IntermediateField.maximalGaloisSExtension (H.Kn n)
+    (NumberField.maximalUnramifiedAbelianExtension (H.Kn n) (SeparableClosure Kinf))
+      {p}).toLinearEquiv.finiteDimensional
 
-instance numberField_Ln (n : ℕ) : NumberField (H.Ln n) := by
-  rw [Ln]
-  infer_instance
+instance numberField_Ln (n : ℕ) : NumberField (H.Ln n) where
+  to_finiteDimensional := .trans ℚ (H.Kn n) (H.Ln n)
 
 theorem finrank_Ln (n : ℕ) : Module.finrank (H.Kn n) (H.Ln n) =
     p ^ multiplicity p (NumberField.classNumber (H.Kn n)) := by
-  rw [Ln, IntermediateField.finrank_maximalAbelianPExtension_bot,
-    NumberField.HilbertClassField.finrank_eq_classNumber,
+  rw [Ln, ← (IntermediateField.liftAlgEquiv <| IntermediateField.maximalGaloisSExtension (H.Kn n)
+    (NumberField.maximalUnramifiedAbelianExtension (H.Kn n) (SeparableClosure Kinf))
+      {p}).toLinearEquiv.finrank_eq,
+    IntermediateField.finrank_maximalGaloisSExtension_singleton_bot,
+    NumberField.IsUnramifiedEverywhere.finrank_eq_classNumber_of_isSepClosed,
     Nat.multiplicity_eq_factorization Fact.out (NumberField.classNumber_ne_zero _)]
 
+/-- TODO: go mathlib -/
+theorem _root_.IsSepClosure.ofSeparable
+    (K J L : Type*) [Field K] [Field J] [Field L] [Algebra K J] [Algebra J L] [IsSepClosure J L]
+    [Algebra K L] [IsScalarTower K J L] [Algebra.IsSeparable K J] : IsSepClosure K L :=
+  .mk (‹IsSepClosure J L›.sep_closed) (.trans K J L)
+
 instance isGalois_K_Ln (n : ℕ) : IsGalois K (H.Ln n) := by
-  have := NumberField.HilbertClassField.isGalois_of_isGalois K (H.Kn n)
-  exact IntermediateField.isGalois_maximalAbelianPExtension_of_isGalois K _ _ p
+  rw [Ln, ← ((IntermediateField.liftAlgEquiv <| IntermediateField.maximalGaloisSExtension (H.Kn n)
+    (NumberField.maximalUnramifiedAbelianExtension (H.Kn n) (SeparableClosure Kinf))
+      {p}).restrictScalars K).transfer_galois]
+  have := IsSepClosure.ofSeparable K Kinf (SeparableClosure Kinf)
+  have := NumberField.isGalois_maximalUnramifiedAbelianExtension_of_isGalois K (H.Kn n)
+    (SeparableClosure Kinf)
+  exact IntermediateField.isGalois_maximalGaloisSExtension_of_isGalois ..
 
 end MvZpExtension

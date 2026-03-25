@@ -5,7 +5,7 @@ Authors: Jz Pan
 -/
 module
 
-public import Iwasawalib.FieldTheory.Galois.Abelian
+public import Iwasawalib.FieldTheory.IntermediateField.MaximalAbelian
 public import Mathlib.NumberTheory.NumberField.ClassNumber
 public import Mathlib.NumberTheory.NumberField.Ideal.Basic
 public import Iwasawalib.NumberTheory.RamificationInertia.AbsoluteValue
@@ -125,6 +125,12 @@ theorem isUnramifiedOutside_empty_iff (F K L : Type*) [Field F] [Field K] [Field
     IsUnramifiedOutside F K L ∅ ↔ IsUnramifiedEverywhere F K := by
   rw [IsUnramifiedEverywhere, ← isUnramifiedOutside_preimage_iff F K K L ∅, Set.preimage_empty]
 
+instance (priority := low) isUnramifiedOutside_empty_of_isUnramifiedEverywhere
+    (F K L : Type*) [Field F] [Field K] [Field L] [Algebra F K]
+    [Algebra L K] [Algebra.IsAlgebraic F K] [Algebra.IsAlgebraic L K] [IsUnramifiedEverywhere F K] :
+    IsUnramifiedOutside F K L ∅ :=
+  (isUnramifiedOutside_empty_iff F K L).2 ‹_›
+
 section IsScalarTower
 
 variable (M : Type*) [Field M] [Algebra F M] [Algebra K M] [IsScalarTower F K M]
@@ -151,14 +157,14 @@ theorem IsUnramifiedEverywhere.tower_top [Algebra.IsAlgebraic F M] [IsUnramified
     haveI := Algebra.IsAlgebraic.tower_top (K := F) (L := K) (A := M)
     IsUnramifiedEverywhere K M := by
   have := Algebra.IsAlgebraic.tower_top (K := F) (L := K) (A := M)
-  simp only [← isUnramifiedOutside_empty_iff _ _ F] at *
+  rw [← isUnramifiedOutside_empty_iff _ _ F]
   exact .tower_top F K M F ∅
 
 theorem IsUnramifiedEverywhere.tower_bot [Algebra.IsAlgebraic F M] [IsUnramifiedEverywhere F M] :
     haveI := Algebra.IsAlgebraic.tower_bot (K := F) (L := K) (A := M)
     IsUnramifiedEverywhere F K := by
   have := Algebra.IsAlgebraic.tower_bot (K := F) (L := K) (A := M)
-  simp only [← isUnramifiedOutside_empty_iff _ _ F] at *
+  rw [← isUnramifiedOutside_empty_iff _ _ F]
   exact .tower_bot F K M F ∅
 
 theorem IsUnramifiedEverywhere.trans [Algebra.IsAlgebraic F K] [IsUnramifiedEverywhere F K]
@@ -166,7 +172,7 @@ theorem IsUnramifiedEverywhere.trans [Algebra.IsAlgebraic F K] [IsUnramifiedEver
     haveI := Algebra.IsAlgebraic.trans F K M
     IsUnramifiedEverywhere F M := by
   have := Algebra.IsAlgebraic.trans F K M
-  simp only [← isUnramifiedOutside_empty_iff _ _ F] at *
+  rw [← isUnramifiedOutside_empty_iff _ _ F]
   exact .trans F K M F ∅
 
 end IsScalarTower
@@ -204,6 +210,59 @@ instance isUnramifiedOutside_maximalExtensionUnramifiedOutside' (L : Type*) [Fie
     IsUnramifiedOutside F (maximalExtensionUnramifiedOutside F K L S) L S :=
   isUnramifiedOutside_of_isUnramifiedOutside_preimage F _ F L S
 
+instance isUnramifiedEverywhere_maximalUnramifiedExtension :
+    IsUnramifiedEverywhere F (maximalUnramifiedExtension F K) := by
+  rw [← isUnramifiedOutside_empty_iff F _ F]
+  exact isUnramifiedOutside_maximalExtensionUnramifiedOutside' F _ F ∅
+
+theorem le_maximalExtensionUnramifiedOutside (L : Type*) [Field L] [Algebra L F]
+    (S : Set (AbsoluteValue L ℝ)) (E : IntermediateField F K) [Algebra.IsAlgebraic F E]
+    [IsUnramifiedOutside F E F ((AbsoluteValue.comp · (algebraMap L F).injective) ⁻¹' S)] :
+    E ≤ maximalExtensionUnramifiedOutside F K L S :=
+  le_sSup ⟨‹_›, ‹_›⟩
+
+theorem le_maximalExtensionUnramifiedOutside_iff (L : Type*) [Field L] [Algebra L F]
+    (S : Set (AbsoluteValue L ℝ)) (E : IntermediateField F K) :
+    E ≤ maximalExtensionUnramifiedOutside F K L S ↔ ∃ (_ : Algebra.IsAlgebraic F E),
+      IsUnramifiedOutside F E F ((AbsoluteValue.comp · (algebraMap L F).injective) ⁻¹' S) := by
+  refine ⟨fun h ↦ ?_, fun ⟨_, _⟩ ↦ le_maximalExtensionUnramifiedOutside F K L S E⟩
+  have : Algebra.IsAlgebraic F (IntermediateField.extendScalars h) :=
+    isAlgebraic_maximalExtensionUnramifiedOutside F K L S
+  have : IsUnramifiedOutside F (IntermediateField.extendScalars h)
+      F ((AbsoluteValue.comp · (algebraMap L F).injective) ⁻¹' S) :=
+    isUnramifiedOutside_maximalExtensionUnramifiedOutside F K L S
+  have h1 := Algebra.IsAlgebraic.tower_bot F E (IntermediateField.extendScalars h)
+  have h2 := IsUnramifiedOutside.tower_bot F E (IntermediateField.extendScalars h)
+    F ((AbsoluteValue.comp · (algebraMap L F).injective) ⁻¹' S)
+  exact ⟨h1, h2⟩
+
+theorem le_maximalExtensionUnramifiedOutside' (L : Type*) [Field L] [Algebra L F]
+    [Algebra.IsAlgebraic L F] [Algebra L K] [IsScalarTower L F K] (S : Set (AbsoluteValue L ℝ))
+    (E : IntermediateField F K) [Algebra.IsAlgebraic F E] [IsUnramifiedOutside F E L S] :
+    E ≤ maximalExtensionUnramifiedOutside F K L S := by
+  simp only [← isUnramifiedOutside_preimage_iff F E F L S] at *
+  exact le_maximalExtensionUnramifiedOutside F K L S E
+
+theorem le_maximalExtensionUnramifiedOutside_iff' (L : Type*) [Field L] [Algebra L F]
+    [Algebra.IsAlgebraic L F] [Algebra L K] [IsScalarTower L F K] (S : Set (AbsoluteValue L ℝ))
+    (E : IntermediateField F K) :
+    E ≤ maximalExtensionUnramifiedOutside F K L S ↔ ∃ (_ : Algebra.IsAlgebraic F E),
+      IsUnramifiedOutside F E L S := by
+  refine ⟨fun h ↦ ?_, fun ⟨_, _⟩ ↦ le_maximalExtensionUnramifiedOutside' F K L S E⟩
+  obtain ⟨h1, h2⟩ := (le_maximalExtensionUnramifiedOutside_iff F K L S E).1 h
+  rw [isUnramifiedOutside_preimage_iff] at h2
+  exact ⟨h1, h2⟩
+
+theorem le_maximalUnramifiedExtension (E : IntermediateField F K) [Algebra.IsAlgebraic F E]
+    [IsUnramifiedEverywhere F E] : E ≤ maximalUnramifiedExtension F K :=
+  le_maximalExtensionUnramifiedOutside' ..
+
+theorem le_maximalUnramifiedExtension_iff (E : IntermediateField F K) :
+    E ≤ maximalUnramifiedExtension F K ↔ ∃ (_ : Algebra.IsAlgebraic F E),
+      IsUnramifiedEverywhere F E := by
+  simp only [← isUnramifiedOutside_empty_iff _ _ F]
+  exact le_maximalExtensionUnramifiedOutside_iff' ..
+
 /-- Suppose `M / K / F` is a field extension tower, such that `M / F` and `K / F` are Galois.
 Let `H / K` be the maximal algebra subextension of `M / K` unramified outside `S`, where `S` is a
 set of places of a subfield `L` of `F`. Then `H / F` is also Galois. -/
@@ -222,55 +281,51 @@ theorem isGalois_maximalUnramifiedExtension_of_isGalois
     [IsGalois F M] [IsGalois F K] : IsGalois F (maximalUnramifiedExtension K M) :=
   isGalois_maximalExtensionUnramifiedOutside_of_isGalois F K M F ∅
 
-#exit
-
-/-- The maximal unramified abelian subextension is a finite extension.
-A result in global class field theory. We cannot prove it here. -/
-instance finiteDimensional_maximalUnramifiedAbelianExtension [NumberField F] :
-    FiniteDimensional F (maximalUnramifiedAbelianExtension F K) := sorry
-
-/-- The maximal unramified abelian subextension is an abelian extension.
-Because compositum of abelian Galois extensions is also abelian.
-Proof: the group homomorphism `Gal(⨆ i, E_i/F) → Π i, Gal(E_i/F)` is injective.
-Should go mathlib. -/
-instance isAbelianGalois_maximalUnramifiedAbelianExtension :
-    IsAbelianGalois F (maximalUnramifiedAbelianExtension F K) := sorry
-
-/-- The maximal unramified abelian subextension is unramified everywhere.
-Because when considering only one place,
-compositum of unramified extensions is also unramified.
-Should find a proof and submit to mathlib. -/
-instance isUnramifiedEverywhere_maximalUnramifiedAbelianExtension :
-    IsUnramifiedEverywhere F (maximalUnramifiedAbelianExtension F K) := sorry
-
-instance numberField_maximalUnramifiedAbelianExtension [NumberField F] :
-    NumberField (maximalUnramifiedAbelianExtension F K) where
-  to_finiteDimensional := FiniteDimensional.trans ℚ F _
+/-! ### Artin map of an unramified abelian extension -/
 
 namespace IsUnramifiedEverywhere
 
-/-- An unramified everywhere abelian extension of a number field must be finite. -/
-instance (priority := low) finiteDimensional
-    [NumberField F] [IsUnramifiedEverywhere F K] [IsAbelianGalois F K] :
-    FiniteDimensional F K := sorry
+/-- If `K / F` is an unramified abelian extension of number fields,
+then there is a natural map `Cl(F) → Gal(K/F)`
+sending a prime ideal `p` to the Frobenius element `Frobₚ` in `Gal(K/F)`.
+Its definition should not involve class field theory.
+We omit its formal definition here, but use `sorry` instead.
 
-/-- An unramified everywhere abelian extension of a number field must be a number field. -/
-theorem numberField
-    [NumberField F] [IsUnramifiedEverywhere F K] [IsAbelianGalois F K] :
-    NumberField K := by
+NOTE: a priori we don't know `K / F` is finite, so for `x : K` the `Frobₚ x`
+should be defined by the Frobenius on `F(x) / F` instead, which is a finite extension. -/
+noncomputable def artinMap
+    [NumberField F] [IsAbelianGalois F K] [IsUnramifiedEverywhere F K] :
+    ClassGroup (𝓞 F) →* Gal(K/F) := sorry
+
+variable [NumberField F] [IsAbelianGalois F K] [IsUnramifiedEverywhere F K]
+
+/-- The Artin map `p ↦ Frobₚ` is surjective. When `K / F` is finite, it could be proved by
+Chebotarev density theorem. In general suppose there exists `σ : Gal(K/F)`
+such that `Frobₚ ≠ σ` for all `p : Cl(K)`, then for each `p : Cl(K)` there is `x_p : K` such that
+`Frobₚ x_p ≠ σ x_p`, hence the Artin map is not surjective on `F(x_p | p : Gal(K/F)) / F`,
+which is a contradiction, since this is a finite extension. -/
+theorem surjective_artinMap : Function.Surjective (artinMap F K) :=
+  sorry
+
+/-- An unramified abelian extension of a number field is a finite extension. -/
+instance (priority := low) finiteDimensional : FiniteDimensional F K := by
+  have := Finite.of_surjective _ (surjective_artinMap F K)
+  exact IsGalois.finiteDimensional_of_finite F K
+
+include F in
+/-- An unramified abelian extension of a number field is a number field. -/
+theorem numberField : NumberField K := by
   have := charZero_of_injective_algebraMap (algebraMap F K).injective
   have := FiniteDimensional.trans ℚ F K
   exact ⟨⟩
 
-/-! ### Artin map of an unramified abelian extension -/
+/-- The degree of an unramified abelian extension of a number field divides the class number of
+the base field. -/
+theorem finrank_dvd_classNumber : Module.finrank F K ∣ classNumber F := by
+  rw [classNumber, Fintype.card_eq_nat_card, ← IsGalois.card_aut_eq_finrank]
+  exact Subgroup.card_dvd_of_surjective _ (surjective_artinMap F K)
 
-/-- If `K / F` is an unramified abelian extension, then there is a natural map `Cl(F) → Gal(K/F)`
-sending a prime ideal `p` to the Frobenius element `Frobₚ` in `Gal(K/F)`.
-We cannot give the formal definition of it here, but use `sorry` instead. -/
-noncomputable def artinMap [NumberField F] [IsUnramifiedEverywhere F K] [IsAbelianGalois F K] :
-    ClassGroup (𝓞 F) →* Gal(K/F) := sorry
-
-theorem artinMap_spec [NumberField F] [IsUnramifiedEverywhere F K] [IsAbelianGalois F K]
+theorem artinMap_spec
     (p : IsDedekindDomain.HeightOneSpectrum (𝓞 F))
     (P : IsDedekindDomain.HeightOneSpectrum (𝓞 K))
     (h : P.asIdeal.under (𝓞 F) = p.asIdeal) :
@@ -279,110 +334,152 @@ theorem artinMap_spec [NumberField F] [IsUnramifiedEverywhere F K] [IsAbelianGal
       arithFrobAt (𝓞 F) Gal(K/F) P.asIdeal :=
   sorry
 
-/-- The Artin map is `p ↦ Frobₚ` surjective. It is a consequence of a stronger result:
-Chebotarev density theorem. -/
-theorem surjective_artinMap [NumberField F] [IsUnramifiedEverywhere F K] [IsAbelianGalois F K] :
-    Function.Surjective (artinMap F K) :=
+end IsUnramifiedEverywhere
+
+/-! ### Maximal unramified abelian subextension -/
+
+/-- The maximal abelian subextension of `K / F` unramified outside `S`, where `S` is a set of
+places of a subfield `L` of `F`, is defined to be the maximal abelian
+subextension of the maximal algebraic subextension of `K / F` unramified outside `S`. -/
+def maximalAbelianExtensionUnramifiedOutside (L : Type*) [Field L] [Algebra L F]
+    (S : Set (AbsoluteValue L ℝ)) : IntermediateField F K :=
+  .lift (.maximalAbelianExtension F (maximalExtensionUnramifiedOutside F K L S))
+
+/-- The maximal unramified abelian subextension of `K / F`, is defined to be the maximal abelian
+subextension of the maximal unramified algebraic subextension of `K / F`. -/
+abbrev maximalUnramifiedAbelianExtension : IntermediateField F K :=
+  maximalAbelianExtensionUnramifiedOutside F K F ∅
+
+instance isAbelianGalois_maximalAbelianExtensionUnramifiedOutside
+    (L : Type*) [Field L] [Algebra L F] (S : Set (AbsoluteValue L ℝ)) :
+    IsAbelianGalois F (maximalAbelianExtensionUnramifiedOutside F K L S) :=
+  .of_algEquiv (IntermediateField.liftAlgEquiv ..)
+
+-- TODO: need IsUnramifiedEverywhere.of_algEquiv etc.
+instance isUnramifiedOutside_maximalAbelianExtensionUnramifiedOutside
+    (L : Type*) [Field L] [Algebra L F] (S : Set (AbsoluteValue L ℝ)) :
+    IsUnramifiedOutside F (maximalAbelianExtensionUnramifiedOutside F K L S)
+      F ((AbsoluteValue.comp · (algebraMap L F).injective) ⁻¹' S) := by
   sorry
 
-theorem finrank_dvd_classNumber [NumberField F] [IsUnramifiedEverywhere F K] [IsAbelianGalois F K] :
-    Module.finrank F K ∣ classNumber F := by
-  rw [classNumber, Fintype.card_eq_nat_card, ← IsGalois.card_aut_eq_finrank]
-  exact Subgroup.card_dvd_of_surjective _ (surjective_artinMap F K)
+instance isUnramifiedOutside_maximalAbelianExtensionUnramifiedOutside'
+    (L : Type*) [Field L] [Algebra L F]
+    [Algebra L K] [IsScalarTower L F K] (S : Set (AbsoluteValue L ℝ)) :
+    IsUnramifiedOutside F (maximalAbelianExtensionUnramifiedOutside F K L S) L S :=
+  isUnramifiedOutside_of_isUnramifiedOutside_preimage F _ F L S
 
-end IsUnramifiedEverywhere
+instance isUnramifiedEverywhere_maximalUnramifiedAbelianExtension :
+    IsUnramifiedEverywhere F (maximalUnramifiedAbelianExtension F K) := by
+  rw [← isUnramifiedOutside_empty_iff F _ F]
+  exact isUnramifiedOutside_maximalAbelianExtensionUnramifiedOutside' F _ F ∅
+
+theorem le_maximalAbelianExtensionUnramifiedOutside (L : Type*) [Field L] [Algebra L F]
+    (S : Set (AbsoluteValue L ℝ)) (E : IntermediateField F K) [IsAbelianGalois F E]
+    [IsUnramifiedOutside F E F ((AbsoluteValue.comp · (algebraMap L F).injective) ⁻¹' S)] :
+    E ≤ maximalAbelianExtensionUnramifiedOutside F K L S := by
+  sorry
+
+theorem le_maximalAbelianExtensionUnramifiedOutside_iff (L : Type*) [Field L] [Algebra L F]
+    (S : Set (AbsoluteValue L ℝ)) (E : IntermediateField F K) :
+    E ≤ maximalAbelianExtensionUnramifiedOutside F K L S ↔ ∃ (_ : IsAbelianGalois F E),
+      IsUnramifiedOutside F E F ((AbsoluteValue.comp · (algebraMap L F).injective) ⁻¹' S) := by
+  refine ⟨fun h ↦ ?_, fun ⟨_, _⟩ ↦ le_maximalAbelianExtensionUnramifiedOutside F K L S E⟩
+  have : IsAbelianGalois F (IntermediateField.extendScalars h) :=
+    isAbelianGalois_maximalAbelianExtensionUnramifiedOutside F K L S
+  have : IsUnramifiedOutside F (IntermediateField.extendScalars h)
+      F ((AbsoluteValue.comp · (algebraMap L F).injective) ⁻¹' S) :=
+    isUnramifiedOutside_maximalAbelianExtensionUnramifiedOutside F K L S
+  have h1 := IsAbelianGalois.tower_bot F E (IntermediateField.extendScalars h)
+  have h2 := IsUnramifiedOutside.tower_bot F E (IntermediateField.extendScalars h)
+    F ((AbsoluteValue.comp · (algebraMap L F).injective) ⁻¹' S)
+  exact ⟨h1, h2⟩
+
+theorem le_maximalAbelianExtensionUnramifiedOutside' (L : Type*) [Field L] [Algebra L F]
+    [Algebra.IsAlgebraic L F] [Algebra L K] [IsScalarTower L F K] (S : Set (AbsoluteValue L ℝ))
+    (E : IntermediateField F K) [IsAbelianGalois F E] [IsUnramifiedOutside F E L S] :
+    E ≤ maximalAbelianExtensionUnramifiedOutside F K L S := by
+  simp only [← isUnramifiedOutside_preimage_iff F E F L S] at *
+  exact le_maximalAbelianExtensionUnramifiedOutside F K L S E
+
+theorem le_maximalAbelianExtensionUnramifiedOutside_iff' (L : Type*) [Field L] [Algebra L F]
+    [Algebra.IsAlgebraic L F] [Algebra L K] [IsScalarTower L F K] (S : Set (AbsoluteValue L ℝ))
+    (E : IntermediateField F K) :
+    E ≤ maximalAbelianExtensionUnramifiedOutside F K L S ↔ ∃ (_ : IsAbelianGalois F E),
+      IsUnramifiedOutside F E L S := by
+  refine ⟨fun h ↦ ?_, fun ⟨_, _⟩ ↦ le_maximalAbelianExtensionUnramifiedOutside' F K L S E⟩
+  obtain ⟨h1, h2⟩ := (le_maximalAbelianExtensionUnramifiedOutside_iff F K L S E).1 h
+  rw [isUnramifiedOutside_preimage_iff] at h2
+  exact ⟨h1, h2⟩
+
+theorem le_maximalUnramifiedAbelianExtension (E : IntermediateField F K) [IsAbelianGalois F E]
+    [IsUnramifiedEverywhere F E] : E ≤ maximalUnramifiedAbelianExtension F K :=
+  le_maximalAbelianExtensionUnramifiedOutside' ..
+
+theorem le_maximalUnramifiedAbelianExtension_iff (E : IntermediateField F K) :
+    E ≤ maximalUnramifiedAbelianExtension F K ↔ ∃ (_ : IsAbelianGalois F E),
+      IsUnramifiedEverywhere F E := by
+  simp only [← isUnramifiedOutside_empty_iff _ _ F]
+  exact le_maximalAbelianExtensionUnramifiedOutside_iff' ..
+
+/-- Suppose `M / K / F` is a field extension tower, such that `M / F` and `K / F` are Galois.
+Let `H / K` be the maximal abelian subextension of `M / K` unramified outside `S`, where `S` is a
+set of places of a subfield `L` of `F`. Then `H / F` is also Galois. -/
+theorem isGalois_maximalAbelianExtensionUnramifiedOutside_of_isGalois
+    (M : Type*) [Field M] [Algebra F M] [Algebra K M] [IsScalarTower F K M]
+    [IsGalois F M] [IsGalois F K]
+    (L : Type*) [Field L] [Algebra L F] [Algebra L K] [IsScalarTower L F K]
+    (S : Set (AbsoluteValue L ℝ)) :
+    IsGalois F (maximalAbelianExtensionUnramifiedOutside K M L S) := by
+  sorry
+
+/-- Suppose `M / K / F` is a field extension tower, such that `M / F` and `K / F` are Galois.
+Let `H / K` be the maximal unramified abelian subextension of `M / K`.
+Then `H / F` is also Galois. -/
+theorem isGalois_maximalUnramifiedAbelianExtension_of_isGalois
+    (M : Type*) [Field M] [Algebra F M] [Algebra K M] [IsScalarTower F K M]
+    [IsGalois F M] [IsGalois F K] : IsGalois F (maximalUnramifiedAbelianExtension K M) :=
+  isGalois_maximalAbelianExtensionUnramifiedOutside_of_isGalois F K M F ∅
+
+/-- The maximal unramified abelian subextension is a finite extension. -/
+instance finiteDimensional_maximalUnramifiedAbelianExtension [NumberField F] :
+    FiniteDimensional F (maximalUnramifiedAbelianExtension F K) :=
+  IsUnramifiedEverywhere.finiteDimensional F _
+
+instance numberField_maximalUnramifiedAbelianExtension [NumberField F] :
+    NumberField (maximalUnramifiedAbelianExtension F K) :=
+  IsUnramifiedEverywhere.numberField F _
 
 /-! ### Hilbert class field -/
 
-/-- The Hilbert class field `H_F` of a number field `F`, defined as a `Type` corresponding to
-the maximal unramified abelian extension of `F` inside its separable closure. -/
-def HilbertClassField : Type _ := maximalUnramifiedAbelianExtension F (SeparableClosure F)
+namespace IsUnramifiedEverywhere
 
-namespace HilbertClassField
-
-noncomputable instance instField : Field (HilbertClassField F) :=
-  inferInstanceAs (Field (maximalUnramifiedAbelianExtension ..))
-
-noncomputable instance algebra : Algebra F (HilbertClassField F) :=
-  inferInstanceAs (Algebra F (maximalUnramifiedAbelianExtension ..))
-
-noncomputable instance instInhabited : Inhabited (HilbertClassField F) := ⟨0⟩
-
-instance instCharZero [CharZero F] : CharZero (HilbertClassField F) :=
-  charZero_of_injective_algebraMap (algebraMap F _).injective
-
-instance instCharP (p : ℕ) [CharP F p] : CharP (HilbertClassField F) p :=
-  charP_of_injective_algebraMap (algebraMap F _).injective p
-
-instance instExpChar (p : ℕ) [ExpChar F p] : ExpChar (HilbertClassField F) p :=
-  expChar_of_injective_algebraMap (algebraMap F _).injective p
-
-noncomputable instance algebra' (R : Type*) [CommRing R] [Algebra R F] :
-    Algebra R (HilbertClassField F) :=
-  inferInstanceAs (Algebra R (maximalUnramifiedAbelianExtension ..))
-
-instance instIsScalarTower (R : Type*) [CommRing R] [Algebra R F] :
-    IsScalarTower R F (HilbertClassField F) :=
-  inferInstanceAs (IsScalarTower R F (maximalUnramifiedAbelianExtension ..))
-
-instance instNoZeroSMulDivisors (R : Type*) [CommRing R] [Algebra R F] [IsFractionRing R F] :
-    NoZeroSMulDivisors R (HilbertClassField F) := by
-  rw [NoZeroSMulDivisors.iff_faithfulSMul, faithfulSMul_iff_algebraMap_injective,
-    IsScalarTower.algebraMap_eq R F (HilbertClassField F)]
-  exact
-    (Function.Injective.comp (FaithfulSMul.algebraMap_injective F (HilbertClassField F))
-      (IsFractionRing.injective R F) :)
-
-instance isSeparable : Algebra.IsSeparable F (HilbertClassField F) :=
-  inferInstanceAs (Algebra.IsSeparable F (maximalUnramifiedAbelianExtension ..))
-
-/-- The Hilbert class field `H_F` is a finite extension of `F`. -/
-instance finiteDimensional [NumberField F] : FiniteDimensional F (HilbertClassField F) :=
-  inferInstanceAs (FiniteDimensional F (maximalUnramifiedAbelianExtension ..))
-
-/-- The Hilbert class field `H_F` is an abelian extension of `F`. -/
-instance isAbelianGalois : IsAbelianGalois F (HilbertClassField F) :=
-  inferInstanceAs (IsAbelianGalois F (maximalUnramifiedAbelianExtension ..))
-
-/-- The Hilbert class field `H_F` is unramified everywhere over `F`. -/
-instance isUnramifiedEverywhere : IsUnramifiedEverywhere F (HilbertClassField F) :=
-  inferInstanceAs (IsUnramifiedEverywhere F (maximalUnramifiedAbelianExtension ..))
-
-/-- The Hilbert class field `H_F` is a number field. -/
-instance numberField [NumberField F] : NumberField (HilbertClassField F) :=
-  inferInstanceAs (NumberField (maximalUnramifiedAbelianExtension ..))
-
-/-- If `K / F` is a Galois extension, then `H_K / F` is also Galois,
-where `H_K` is the Hilbert class field of `K`. -/
-theorem isGalois_of_isGalois [IsGalois F K] :
-    IsGalois F (HilbertClassField K) := by
-  have : IsSepClosure F (SeparableClosure K) := .mk inferInstance (.trans F K _)
-  exact isGalois_maximalUnramifiedAbelianExtension_of_isGalois F K _
-
-/-- The Artin map `Cl(F) → Gal(H_F / F)` is bijective. -/
-theorem bijective_artinMap [NumberField F] :
-    Function.Bijective (IsUnramifiedEverywhere.artinMap F (HilbertClassField F)) :=
+/-- The Artin map `Cl(F) → Gal(H / F)` is bijective, if `H` is the maximal unramified abelian
+subextension of `K / F` and `K` is separably closed. -/
+theorem bijective_artinMap_of_isSepClosed [NumberField F] [IsSepClosed K] :
+    Function.Bijective (artinMap F (maximalUnramifiedAbelianExtension F K)) :=
   sorry
 
-/-- The natural isomorphism `Cl(F) ≃ Gal(H_F / F)` given by Artin map. -/
-noncomputable def artinEquiv [NumberField F] :
-    ClassGroup (𝓞 F) ≃* Gal(HilbertClassField F/F) :=
-  .ofBijective (IsUnramifiedEverywhere.artinMap F _) (bijective_artinMap F)
+/-- The natural isomorphism `Cl(F) ≃ Gal(H / F)` given by Artin map, where `H` is the maximal
+unramified abelian subextension of `K / F` and `K` is separably closed. -/
+noncomputable def artinEquivOfIsSepClosed [NumberField F] [IsSepClosed K] :
+    ClassGroup (𝓞 F) ≃* Gal(maximalUnramifiedAbelianExtension F K/F) :=
+  .ofBijective (artinMap F _) (bijective_artinMap_of_isSepClosed F K)
 
-theorem artinEquiv_apply [NumberField F] (p) :
-    artinEquiv F p = IsUnramifiedEverywhere.artinMap F _ p := rfl
+theorem artinEquivOfIsSepClosed_apply [NumberField F] [IsSepClosed K] (p) :
+    artinEquivOfIsSepClosed F K p = artinMap F _ p := rfl
 
-theorem finrank_eq_classNumber [NumberField F] :
-    Module.finrank F (HilbertClassField F) = classNumber F := by
+theorem finrank_eq_classNumber_of_isSepClosed [NumberField F] [IsSepClosed K] :
+    Module.finrank F (maximalUnramifiedAbelianExtension F K) = classNumber F := by
   rw [classNumber, Fintype.card_eq_nat_card, ← IsGalois.card_aut_eq_finrank]
-  exact Nat.card_congr (artinEquiv F).symm.toEquiv
+  exact Nat.card_congr (artinEquivOfIsSepClosed F K).symm.toEquiv
 
 /-- Any unramified abelian extension is a subfield of Hilbert class field. -/
-noncomputable def lift
-    [NumberField F] [IsUnramifiedEverywhere F K] [IsAbelianGalois F K] :
-    K →ₐ[F] HilbertClassField F :=
+noncomputable def liftOfIsSepClosed
+    [NumberField F] [IsAbelianGalois F K] [IsUnramifiedEverywhere F K]
+    (L : Type*) [Field L] [Algebra F L] [IsSepClosed L] :
+    K →ₐ[F] maximalUnramifiedAbelianExtension F L :=
   sorry
 
-end HilbertClassField
+end IsUnramifiedEverywhere
 
 end NumberField

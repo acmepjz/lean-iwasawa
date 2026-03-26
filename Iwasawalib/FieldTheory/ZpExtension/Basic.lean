@@ -18,15 +18,16 @@ public import Iwasawalib.Topology.Algebra.Group.Basic
 
 # `ℤₚ`-extension of fields
 
-## Main definitions
+In this file, when `Kinf / K` is a Galois extension of fields, we define `MvZpExtension p ι K Kinf`,
+which is an isomorphism of `Gal(Kinf / K)` and `Multiplicative (ι → ℤ_[p])` as topological groups.
 
-- `MvZpExtension`: a Galois extension with a fixed isomorphism of its Galois group
-  to `ℤₚᵈ` as topological groups.
-
-- `IsMvZpExtension`: a `Prop` which asserts that a Galois extension is with Galois group
-  isomorphic to `ℤₚᵈ` as a topological group.
+To state that `Gal(Kinf / K)` is isomorphic to `Multiplicative (ι → ℤ_[p])` as topological groups,
+use `Nonempty (MvZpExtension p ι K Kinf)`. As a special case, to state that `Kinf / K` is
+a `ℤₚᵈ`-extension, use `Nonempty (MvZpExtension p (Fin d) K Kinf)`.
 
 -/
+
+/-! ### Maybe these should be in mathlib -/
 
 theorem AlgEquiv.continuous_autCongr
     {R A₁ A₂ : Type*} [Field R] [Field A₁] [Field A₂] [Algebra R A₁] [Algebra R A₂]
@@ -58,18 +59,18 @@ def AlgEquiv.continuousAutCongr
 
 /-! ### `ℤₚᵈ`-extension -/
 
-variable (p : ℕ) [Fact p.Prime] (d : ℕ) (ι K Kinf : Type*)
+variable (p : ℕ) [Fact p.Prime] (ι K Kinf : Type*)
 variable [Field K] [Field Kinf] [Algebra K Kinf]
 
 /-- `MvZpExtension` is an isomorphism of the Galois group of a Galois extension `K∞ / K`
 to `ℤₚᵈ` as topological groups. -/
-def MvZpExtension [IsGalois K Kinf] := EquivMvZp (Kinf ≃ₐ[K] Kinf) p ι
+abbrev MvZpExtension [IsGalois K Kinf] := EquivMvZp Gal(Kinf/K) p ι
 
 variable {p ι K Kinf} in
 /-- Transfer `MvZpExtension` along field isomorphisms. -/
 noncomputable def MvZpExtension.congr [IsGalois K Kinf] (H : MvZpExtension p ι K Kinf)
     {ι' : Type*} (e : ι ≃ ι')
-    (Kinf' : Type*) [Field Kinf'] [Algebra K Kinf'] (f : Kinf ≃ₐ[K] Kinf') [IsGalois K Kinf'] :
+    {Kinf' : Type*} [Field Kinf'] [Algebra K Kinf'] (f : Kinf ≃ₐ[K] Kinf') [IsGalois K Kinf'] :
     MvZpExtension p ι' K Kinf' :=
   EquivMvZp.congr H f.continuousAutCongr e
 
@@ -77,8 +78,14 @@ namespace MvZpExtension
 
 section Finite
 
-variable {p d ι K Kinf} [Finite ι] [IsGalois K Kinf] (H : MvZpExtension p ι K Kinf)
+variable {p ι K Kinf} [Finite ι] [IsGalois K Kinf] (H : MvZpExtension p ι K Kinf)
 include H
+
+/-- Version of `MvZpExtension.congr` for finite case. -/
+noncomputable def congrFinOfCardEq {d : ℕ} (h : Nat.card ι = d)
+    {Kinf' : Type*} [Field Kinf'] [Algebra K Kinf'] (f : Kinf ≃ₐ[K] Kinf') [IsGalois K Kinf'] :
+    MvZpExtension p (Fin d) K Kinf' :=
+  H.congr (Finite.equivFinOfCardEq h) f
 
 omit [Finite ι] in
 /-- `K∞ / K` is abelian. -/
@@ -185,6 +192,9 @@ theorem finiteDimensional_iff_isEmpty : FiniteDimensional K Kinf ↔ IsEmpty ι 
       simpa using H.1.toEquiv.lift_cardinal_eq
     exact IsGalois.finiteDimensional_of_finite K Kinf
 
+theorem finiteDimensional_iff_card_eq_zero : FiniteDimensional K Kinf ↔ Nat.card ι = 0 := by
+  rw [H.finiteDimensional_iff_isEmpty, Finite.card_eq_zero_iff]
+
 theorem infinite_dimensional [Nonempty ι] : ¬FiniteDimensional K Kinf := by
   rwa [H.finiteDimensional_iff_isEmpty, not_isEmpty_iff]
 
@@ -192,15 +202,19 @@ end Finite
 
 section Unique
 
-variable {p d ι K Kinf} [Unique ι] [IsGalois K Kinf]
+variable {p ι K Kinf} [Unique ι] [IsGalois K Kinf]
 
 /-! ### `ℤₚ`-extension -/
 
 /-- An isomorphism from `Γ` to `ℤₚ` gives an `MvZpExtension` when `ι` consists of
 exactly one element. -/
-noncomputable def ofContinuousMulEquiv₁ (e : (Kinf ≃ₐ[K] Kinf) ≃ₜ* Multiplicative ℤ_[p]) :
+noncomputable def ofContinuousMulEquiv₁ (e : Gal(Kinf/K) ≃ₜ* Multiplicative ℤ_[p]) :
     MvZpExtension p ι K Kinf :=
   EquivMvZp.ofContinuousMulEquiv₁ e
+
+theorem nonempty_iff_of_unique :
+    Nonempty (MvZpExtension p ι K Kinf) ↔ Nonempty (Gal(Kinf/K) ≃ₜ* Multiplicative ℤ_[p]) :=
+  ⟨fun ⟨f⟩ ↦ ⟨f.continuousMulEquiv₁⟩, fun ⟨f⟩ ↦ ⟨.ofContinuousMulEquiv₁ f⟩⟩
 
 variable (H : MvZpExtension p ι K Kinf)
 include H
@@ -253,141 +267,3 @@ theorem eq_Kn_of_finrank_eq (K' : IntermediateField K Kinf)
 end Unique
 
 end MvZpExtension
-
-/-! ### `Prop` version -/
-
-/-- `IsMvZpExtension` is a `Prop` which asserts that a Galois extension is with Galois group
-isomorphic to `ℤₚᵈ` as a topological group. -/
-def IsMvZpExtension [IsGalois K Kinf] := IsEquivMvZp (Kinf ≃ₐ[K] Kinf) p d
-
-namespace IsMvZpExtension
-
-section Finite
-
-variable {p d ι K Kinf} [IsGalois K Kinf] (H : IsMvZpExtension p d K Kinf)
-include H
-
--- bug
-set_option linter.unusedSectionVars false in
-/-- Transfer `IsMvZpExtension` along field isomorphisms. -/
-theorem congr (Kinf' : Type*) [Field Kinf'] [Algebra K Kinf'] (f : Kinf ≃ₐ[K] Kinf')
-    [IsGalois K Kinf'] : IsMvZpExtension p d K Kinf' :=
-  IsEquivMvZp.congr H f.continuousAutCongr
-
-/-- A random isomorphism from `Γ` to `ℤₚᵈ`. -/
-noncomputable def mvZpExtension : MvZpExtension p (Fin d) K Kinf := H.some
-
-/-- `K∞ / K` is abelian. -/
-theorem isAbelianGalois_Kinf : IsAbelianGalois K Kinf := H.mvZpExtension.isAbelianGalois_Kinf
-
-/-- Any subgroup in `Γ` is a normal subgroup. -/
-instance normal (G : Subgroup H.Γ) : G.Normal := inferInstance
-
-/-- The intermediate field `Kₙ` of `K∞ / K` fixed by `Γ ^ (p ^ n)`. -/
-noncomputable def Kn (n : ℕ) : IntermediateField K Kinf :=
-  H.mvZpExtension.Kn n
-
-/-- `K₀ = K`. -/
-@[simp]
-theorem Kn_zero : H.Kn 0 = ⊥ := H.mvZpExtension.Kn_zero
-
-/-- Any intermediate field of `K∞ / K` is Galois. -/
-theorem isGalois (K' : IntermediateField K Kinf) : IsGalois K K' :=
-  H.mvZpExtension.isGalois K'
-
-/-- Any intermediate field of `K∞ / K` is abelian. -/
-theorem isAbelianGalois (K' : IntermediateField K Kinf) : IsAbelianGalois K K' :=
-  H.mvZpExtension.isAbelianGalois K'
-
-/-- `Kₙ / K` is Galois. -/
-instance isGalois_Kn (n : ℕ) : IsGalois K (H.Kn n) := H.isGalois _
-
-/-- `Kₙ / K` is abelian. -/
-instance isAbelianGalois_Kn (n : ℕ) : IsAbelianGalois K (H.Kn n) := H.isAbelianGalois _
-
-/-- The fixing subgroup of `Kₙ` is `Γ ^ (p ^ n)`. -/
-@[simp]
-theorem fixingSubgroup_Kn (n : ℕ) : (H.Kn n).fixingSubgroup = H.Γpow n :=
-  H.mvZpExtension.fixingSubgroup_Kn n
-
-/-- `Kₙ / K` is a finite extension. -/
-instance finiteDimensional_Kn (n : ℕ) : FiniteDimensional K (H.Kn n) :=
-  H.mvZpExtension.finiteDimensional_Kn n
-
-/-- `Kₙ / K` is of degree `p ^ (n * d)`. -/
-@[simp]
-theorem finrank_Kn (n : ℕ) : Module.finrank K (H.Kn n) = p ^ (n * d) := by
-  convert H.mvZpExtension.finrank_Kn n
-  simp
-
-/-- If `m ≤ n` then `Kₘ ≤ Kₙ`. -/
-theorem monotone_Kn : Monotone H.Kn := H.mvZpExtension.monotone_Kn
-
-/-- If `m < n` then `Kₘ < Kₙ`. -/
-theorem strictMono_Kn [NeZero d] : StrictMono H.Kn := H.mvZpExtension.strictMono_Kn
-
-/-- If `K'` is a finite extension of `K` contained in `K∞`,
-then it's contained in `Kₙ` for some `n`. -/
-theorem le_Kn_of_finiteDimensional (K' : IntermediateField K Kinf) [FiniteDimensional K K'] :
-    ∃ n, K' ≤ H.Kn n :=
-  H.mvZpExtension.le_Kn_of_finiteDimensional K'
-
-/-- If `K'` is a finite extension of `K` contained in `K∞`,
-then `[K' : K] = p ^ n` for some `n`. -/
-theorem finrank_eq_pow_of_finiteDimensional (K' : IntermediateField K Kinf)
-    [FiniteDimensional K K'] : ∃ n, Module.finrank K K' = p ^ n :=
-  H.mvZpExtension.finrank_eq_pow_of_finiteDimensional K'
-
-theorem finiteDimensional_iff_eq_zero : FiniteDimensional K Kinf ↔ d = 0 := by
-  rw [H.mvZpExtension.finiteDimensional_iff_isEmpty, ← not_iff_not, not_isEmpty_iff,
-    ← Fin.pos_iff_nonempty, ← Nat.ne_zero_iff_zero_lt]
-
-theorem infinite_dimensional [NeZero d] : ¬FiniteDimensional K Kinf :=
-  H.mvZpExtension.infinite_dimensional
-
-end Finite
-
-section Unique
-
-variable {p d ι K Kinf} [IsGalois K Kinf]
-
-/-! ### `ℤₚ`-extension -/
-
-theorem _root_.isMvZpExtension₁_iff :
-    IsMvZpExtension p 1 K Kinf ↔ Nonempty ((Kinf ≃ₐ[K] Kinf) ≃ₜ* Multiplicative ℤ_[p]) :=
-  ⟨fun ⟨f⟩ ↦ ⟨f.continuousMulEquiv₁⟩, fun ⟨f⟩ ↦ ⟨.ofContinuousMulEquiv₁ f⟩⟩
-
-variable (H : IsMvZpExtension p 1 K Kinf)
-include H
-
-/-- `Kₙ / K` is of degree `p ^ n`. -/
-theorem finrank_Kn₁ (n : ℕ) : Module.finrank K (H.Kn n) = p ^ n :=
-  H.mvZpExtension.finrank_Kn₁ n
-
-/-- If `K'` is a finite extension of `K` contained in `K∞`,
-then it's equal to `Kₙ` for some `n`. -/
-theorem eq_Kn_of_finiteDimensional (K' : IntermediateField K Kinf) [FiniteDimensional K K'] :
-    ∃ n, K' = H.Kn n :=
-  H.mvZpExtension.eq_Kn_of_finiteDimensional K'
-
-/-- If `K'` is an extension of `K` contained in `K∞`,
-then it's equal to `K∞` or `Kₙ` for some `n`. -/
-theorem eq_top_or_Kn (K' : IntermediateField K Kinf) :
-    K' = ⊤ ∨ ∃ n, K' = H.Kn n :=
-  H.mvZpExtension.eq_top_or_Kn K'
-
-/-- If `K'` is an infinite extension of `K` contained in `K∞`,
-then it's equal to `K∞`. -/
-theorem eq_top_of_infinite_dimensional (K' : IntermediateField K Kinf)
-    (h : ¬FiniteDimensional K K') : K' = ⊤ :=
-  H.mvZpExtension.eq_top_of_infinite_dimensional K' h
-
-/-- If `K'` is an extension of `K` of degree `p ^ n` contained in `K∞`,
-then it's equal to `Kₙ`. -/
-theorem eq_Kn_of_finrank_eq (K' : IntermediateField K Kinf)
-    {n : ℕ} (h : Module.finrank K K' = p ^ n) : K' = H.Kn n :=
-  H.mvZpExtension.eq_Kn_of_finrank_eq K' h
-
-end Unique
-
-end IsMvZpExtension

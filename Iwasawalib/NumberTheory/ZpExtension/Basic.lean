@@ -30,12 +30,3 @@ instance numberField_Kn [NumberField K] (n : ℕ) : NumberField (H.Kn n) where
   to_finiteDimensional := .trans ℚ K _
 
 end MvZpExtension
-
-namespace IsMvZpExtension
-
-variable (H : IsMvZpExtension p d K Kinf)
-
-instance numberField_Kn [NumberField K] (n : ℕ) : NumberField (H.Kn n) where
-  to_finiteDimensional := .trans ℚ K _
-
-end IsMvZpExtension

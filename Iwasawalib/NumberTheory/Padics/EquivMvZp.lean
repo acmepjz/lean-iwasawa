@@ -14,6 +14,13 @@ public import Iwasawalib.Topology.Algebra.OpenSubgroup
 
 # Assertion that a (multiplicative) topological group is isomorphic to `ℤₚᵈ`
 
+In this file we define `EquivMvZp G p ι` which is an isomorphism of `G` and
+`Multiplicative (ι → ℤ_[p])` as topological groups.
+
+To state that `G` is isomorphic to `Multiplicative (ι → ℤ_[p])` as topological groups,
+use `Nonempty (EquivMvZp G p ι)`. As a special case, to state that `G` is isomorphic to `ℤₚᵈ`,
+use `Nonempty (EquivMvZp G p (Fin d))`.
+
 -/
 
 /-! ### Maybe these should be in mathlib -/
@@ -23,9 +30,9 @@ theorem Equiv.arrowCongr_eq_piCongrLeft {M N P : Type*} (f : M ≃ N) :
   ext g n
   simp [Equiv.piCongrLeft_apply_eq_cast]
 
-/-! ### Actual contents -/
+/-! ### `EquivMvZp` -/
 
-variable (G : Type*) [Group G] [TopologicalSpace G] (p : ℕ) [Fact p.Prime] (d : ℕ) (ι : Type*)
+variable (G : Type*) [Group G] [TopologicalSpace G] (p : ℕ) [Fact p.Prime] (ι : Type*)
 
 /-- An `EquivMvZp G p ι` is just an isomorphism of `G` and `Multiplicative (ι → ℤ_[p])`
 as topological groups. -/
@@ -34,7 +41,7 @@ structure EquivMvZp where
 
 namespace EquivMvZp
 
-variable {G p d ι}
+variable {G p ι}
 
 /-- Transfer `EquivMvZp` along isomorphisms. -/
 noncomputable def congr (H : EquivMvZp G p ι) {G' : Type*} [Group G'] [TopologicalSpace G']
@@ -140,6 +147,12 @@ end General
 section Finite
 
 variable [Finite ι]
+
+/-- Version of `EquivMvZp.congr` for finite case. -/
+noncomputable def congrFinOfCardEq (H : EquivMvZp G p ι)
+    {G' : Type*} [Group G'] [TopologicalSpace G'] (f : G ≃ₜ* G')
+    {d : ℕ} (h : Nat.card ι = d) : EquivMvZp G' p (Fin d) :=
+  H.congr f (Finite.equivFinOfCardEq h)
 
 /-- The `Γ ^ (p ^ n)` is open. -/
 theorem isOpen_Γpow' (n : ℕ) : IsOpen (H.Γpow' n : Set H.Γ) :=
@@ -247,6 +260,11 @@ noncomputable def continuousMulEquiv₁ : H.Γ ≃ₜ* Multiplicative ℤ_[p] :=
     Homeomorph.piUnique fun _ ↦ ℤ_[p]
   H.continuousMulEquiv.trans { i1, i2 with }
 
+omit H in
+theorem nonempty_iff_of_unique :
+    Nonempty (EquivMvZp G p ι) ↔ Nonempty (G ≃ₜ* Multiplicative ℤ_[p]) :=
+  ⟨fun ⟨f⟩ ↦ ⟨f.continuousMulEquiv₁⟩, fun ⟨f⟩ ↦ ⟨.ofContinuousMulEquiv₁ f⟩⟩
+
 /-- A random topological generator `γ` of `Γ`. -/
 noncomputable def topologicalGenerator : H.Γ :=
   H.continuousMulEquiv₁.symm (Multiplicative.ofAdd 1)
@@ -332,125 +350,3 @@ theorem eq_bot_or_Γpow_of_isClosed (O : Subgroup H.Γ) (h : IsClosed (O : Set H
 end Unique
 
 end EquivMvZp
-
-/-- `IsEquivMvZp G p d` means there exists an isomorphism of `G` and `ℤₚᵈ`. -/
-def IsEquivMvZp : Prop := Nonempty (EquivMvZp G p (Fin d))
-
-variable {G p ι} in
-theorem EquivMvZp.isEquivMvZp (H : EquivMvZp G p ι) [Finite ι] : IsEquivMvZp G p (Nat.card ι) :=
-  ⟨H.congr (ContinuousMulEquiv.refl G) (Finite.equivFin ι)⟩
-
-namespace IsEquivMvZp
-
-variable {G p d ι}
-
-section General
-
-variable (H : IsEquivMvZp G p d)
-include H
-
-/-- Transfer `IsEquivMvZp` along isomorphisms. -/
-theorem congr {G' : Type*} [Group G'] [TopologicalSpace G'] (f : G ≃ₜ* G') :
-    IsEquivMvZp G' p d :=
-  ⟨H.some.congr f (Equiv.refl _)⟩
-
-/-- The `IsEquivMvZp.Γ` is just the group `G` itself. -/
-abbrev Γ := H.some.Γ
-
-/-- A random isomorphism from `Γ` to `ℤₚᵈ`. -/
-noncomputable def continuousMulEquiv : H.Γ ≃ₜ* Multiplicative (Fin d → ℤ_[p]) :=
-  H.some.continuousMulEquiv'
-
-/-- The `Γ` is commutative. -/
-instance isMulCommutative : IsMulCommutative H.Γ := inferInstance
-
-/-- The open normal subgroup `Γ ^ (p ^ n)` of `Γ`. -/
-noncomputable def Γpow (n : ℕ) : OpenNormalSubgroup H.Γ := H.some.Γpow n
-
-/-- An element is in `Γ ^ (p ^ n)` if and only if it is `p ^ n`-th power of some element. -/
-theorem mem_Γpow_iff (n : ℕ) (σ : H.Γ) : σ ∈ H.Γpow n ↔ ∃ τ, σ = τ ^ p ^ n :=
-  H.some.mem_Γpow_iff n σ
-
-/-- `Γ ^ (p ^ 0) = Γ`. -/
-@[simp]
-theorem Γpow_zero : H.Γpow 0 = ⊤ := H.some.Γpow_zero
-
-/-- `Γ ^ (p ^ n)` is of index `p ^ (n * d)`. -/
-@[simp]
-theorem index_Γpow (n : ℕ) : (H.Γpow n).index = p ^ (n * d) := by
-  convert H.some.index_Γpow n
-  simp
-
-/-- If `m ≤ n` then `Γ ^ (p ^ n) ≤ Γ ^ (p ^ m)`. -/
-theorem antitone_Γpow : Antitone H.Γpow := H.some.antitone_Γpow
-
-/-- If `m < n` then `Γ ^ (p ^ n) < Γ ^ (p ^ m)`. -/
-theorem strictAnti_Γpow [NeZero d] : StrictAnti H.Γpow := H.some.strictAnti_Γpow
-
-/-- If the set `s` topologically generates `Γ`, then the set `s ^ (p ^ n)`
-topologically generates `Γ ^ (p ^ n)`. -/
-theorem closure_eq_Γpow_of_closure_eq
-    {s : Set H.Γ} (h : closure (Subgroup.closure s : Set H.Γ) = Set.univ) (n : ℕ) :
-    closure (Subgroup.closure ((· ^ p ^ n) '' s) : Set H.Γ) = H.Γpow n :=
-  H.some.closure_eq_Γpow_of_closure_eq h n
-
-/-- If `γ` is a topological generator of `Γ`, then `γ ^ (p ^ n)`
-is a topological generator of `Γ ^ (p ^ n)`. -/
-theorem closure_singleton_eq_Γpow_of_closure_singleton_eq
-    {γ : H.Γ} (h : closure (Subgroup.closure {γ} : Set H.Γ) = Set.univ) (n : ℕ) :
-    closure (Subgroup.closure {γ ^ p ^ n} : Set H.Γ) = H.Γpow n :=
-  H.some.closure_singleton_eq_Γpow_of_closure_singleton_eq h n
-
-/-- `Γ ^ (p ^ n)` form a neighborhood basis of `1` in `Γ`. -/
-theorem nhds_one_hasAntitoneBasis : (nhds (1 : H.Γ)).HasAntitoneBasis (fun n ↦ H.Γpow n) :=
-  H.some.nhds_one_hasAntitoneBasis
-
-/-- If `O` is an open subgroup of `Γ`, then it contains `Γ ^ (p ^ n)` for some `n`. -/
-theorem Γpow_le_of_isOpen (O : Subgroup H.Γ) (h : IsOpen (O : Set H.Γ)) :
-    ∃ n, H.Γpow n ≤ O :=
-  H.some.Γpow_le_of_isOpen O h
-
-end General
-
-section Unique
-
-theorem _root_.isEquivMvZp₁_iff : IsEquivMvZp G p 1 ↔ Nonempty (G ≃ₜ* Multiplicative ℤ_[p]) :=
-  ⟨fun ⟨f⟩ ↦ ⟨f.continuousMulEquiv₁⟩, fun ⟨f⟩ ↦ ⟨.ofContinuousMulEquiv₁ f⟩⟩
-
-variable (H : IsEquivMvZp G p 1)
-include H
-
-/-- A random isomorphism from `Γ` to `ℤₚ`. -/
-noncomputable def continuousMulEquiv₁ : H.Γ ≃ₜ* Multiplicative ℤ_[p] :=
-  H.some.continuousMulEquiv₁
-
-/-- A random topological generator `γ` of `Γ`. -/
-noncomputable def topologicalGenerator : H.Γ :=
-  H.some.topologicalGenerator
-
-/-- The `γ` is a topological generator of `Γ`. -/
-theorem topologicalGenerator_spec :
-    closure (Subgroup.closure {H.topologicalGenerator} : Set H.Γ) = ⊤ :=
-  H.some.topologicalGenerator_spec
-
-/-- The `γ ^ (p ^ n)` is a topological generator of `Γ ^ (p ^ n)`. -/
-theorem closure_topologicalGenerator_pow_eq (n : ℕ) :
-    closure (Subgroup.closure {H.topologicalGenerator ^ p ^ n} : Set H.Γ) = H.Γpow n :=
-  H.some.closure_topologicalGenerator_pow_eq n
-
-/-- `Γ ^ (p ^ n)` is of index `p ^ n`. -/
-theorem index_Γpow₁ (n : ℕ) : (H.Γpow n).index = p ^ n := H.some.index_Γpow₁ n
-
-/-- If `O` is an open subgroup of `Γ`, then it is equal to `Γ ^ (p ^ n)` for some `n`. -/
-theorem eq_Γpow_of_isOpen (O : Subgroup H.Γ) (h : IsOpen (O : Set H.Γ)) :
-    ∃ n, O = H.Γpow n :=
-  H.some.eq_Γpow_of_isOpen O h
-
-/-- If `O` is a closed subgroup of `Γ`, then it is equal to `0` or `Γ ^ (p ^ n)` for some `n`. -/
-theorem eq_bot_or_Γpow_of_isClosed (O : Subgroup H.Γ) (h : IsClosed (O : Set H.Γ)) :
-    O = ⊥ ∨ ∃ n, O = H.Γpow n :=
-  H.some.eq_bot_or_Γpow_of_isClosed O h
-
-end Unique
-
-end IsEquivMvZp

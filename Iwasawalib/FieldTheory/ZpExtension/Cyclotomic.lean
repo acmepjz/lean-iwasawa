@@ -285,7 +285,7 @@ end CyclotomicCharacter
 an intermediate field of $K(μ_{p^∞}) / K$. -/
 @[mk_iff]
 structure IsCyclotomicZpExtension [Fact p.Prime] : Prop where
-  isZpExtension : IsMvZpExtension p 1 K Kinf
+  isZpExtension : Nonempty (MvZpExtension p (Fin 1) K Kinf)
   nonempty_algHom_cyclotomicPinfField : Nonempty (Kinf →ₐ[K] CyclotomicPinfField p K)
 
 namespace IsCyclotomicZpExtension
@@ -294,10 +294,10 @@ variable {p K Kinf Kinf'} [Fact p.Prime] (H : IsCyclotomicZpExtension p K Kinf)
 include H
 
 theorem congr (f : Kinf ≃ₐ[K] Kinf') : IsCyclotomicZpExtension p K Kinf' where
-  isZpExtension := H.1.congr _ f
+  isZpExtension := ⟨H.1.some.congr (.refl _) f⟩
   nonempty_algHom_cyclotomicPinfField := ⟨H.2.some.comp f.symm⟩
 
-theorem infinite_dimensional : ¬FiniteDimensional K Kinf := H.1.infinite_dimensional
+theorem infinite_dimensional : ¬FiniteDimensional K Kinf := H.1.some.infinite_dimensional
 
 theorem infinite_dimensional_cyclotomicPinfField :
     ¬FiniteDimensional K (CyclotomicPinfField p K) := fun _ ↦
@@ -336,7 +336,7 @@ theorem fieldRange_eq_cyclotomicZpSubfield (f : Kinf →ₐ[K] CyclotomicPinfFie
     · exact h.of_finite_image
         (continuousCyclotomicCharacter_injective p K (CyclotomicPinfField p K)).injOn
     suffices IsOpen (f.fieldRange.fixingSubgroup : Set Gal(CyclotomicPinfField p K/K)) from
-      H.isZpExtension.infinite_dimensional ((InfiniteGalois.isOpen_iff_finite _).1 this) |>.elim
+      H.infinite_dimensional ((InfiniteGalois.isOpen_iff_finite _).1 this) |>.elim
     simpa [(continuousCyclotomicCharacter_injective p K (CyclotomicPinfField p K)).preimage_image]
       using h.preimage (continuousCyclotomicCharacter p K (CyclotomicPinfField p K)).continuous
   refine le_antisymm (fun g hg ↦ ?_) (fun g hg ↦ ?_)
@@ -348,7 +348,7 @@ theorem fieldRange_eq_cyclotomicZpSubfield (f : Kinf →ₐ[K] CyclotomicPinfFie
     rwa [← CommGroup.mem_torsion, this, Subgroup.mem_bot, ← MonoidHom.mem_ker,
       IntermediateField.restrictNormalHom_ker] at hg
   suffices ht : AddCommGroup.torsion ℤ_[p] = ⊥ from eq_bot_iff.2 fun x hx ↦ by
-    let i := H.isZpExtension.continuousMulEquiv₁
+    let i := H.1.some.continuousMulEquiv₁
     rw [CommGroup.mem_torsion] at hx
     replace hx : IsOfFinAddOrder (i x).toAdd := i.toMonoidHom.isOfFinOrder hx
     rw [← AddCommGroup.mem_torsion, ht, AddSubgroup.mem_bot] at hx
@@ -392,7 +392,7 @@ theorem CyclotomicPinfField.isCyclotomicZpExtension_cyclotomicZpSubfield
     [Fact p.Prime] [NeZero (p : K)] (H : ¬FiniteDimensional K (CyclotomicPinfField p K)) :
     IsCyclotomicZpExtension p K (cyclotomicZpSubfield p K) := by
   refine ⟨?_, ⟨IntermediateField.val _⟩⟩
-  rw [isMvZpExtension₁_iff]
+  rw [MvZpExtension.nonempty_iff_of_unique]
   have h : Nonempty _ := ⟨InfiniteGalois.normalAutContinuousEquivQuotient (torsionGal p K)⟩
   simp only [torsionGal_toSubgroup] at h
   rw [← cyclotomicZpSubfield_eq_fixedField] at h

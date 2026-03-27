@@ -78,9 +78,9 @@ instance instIsScalarTower (R : Type*) [CommRing R] [Algebra R K] :
     IsScalarTower R K (CyclotomicPinfField p K) :=
   inferInstanceAs (IsScalarTower R K (IntermediateField.adjoin K _))
 
-instance instNoZeroSMulDivisors (R : Type*) [CommRing R] [Algebra R K] [IsFractionRing R K] :
-    NoZeroSMulDivisors R (CyclotomicPinfField p K) := by
-  rw [NoZeroSMulDivisors.iff_faithfulSMul, faithfulSMul_iff_algebraMap_injective,
+instance instIsTorsionFree (R : Type*) [CommRing R] [IsDomain R] [Algebra R K]
+    [IsFractionRing R K] : Module.IsTorsionFree R (CyclotomicPinfField p K) := by
+  rw [Module.isTorsionFree_iff_faithfulSMul, faithfulSMul_iff_algebraMap_injective,
     IsScalarTower.algebraMap_eq R K (CyclotomicPinfField p K)]
   exact
     (Function.Injective.comp (FaithfulSMul.algebraMap_injective K (CyclotomicPinfField p K))
@@ -395,7 +395,7 @@ theorem CyclotomicPinfField.isCyclotomicZpExtension_cyclotomicZpSubfield
   rw [MvZpExtension.nonempty_iff_of_unique]
   have h : Nonempty _ := ⟨InfiniteGalois.normalAutContinuousEquivQuotient (torsionGal p K)⟩
   simp only [torsionGal_toSubgroup] at h
-  rw [← cyclotomicZpSubfield_eq_fixedField] at h
+  erw [← cyclotomicZpSubfield_eq_fixedField] at h -- FIXME: somehow `erw` is needed
   obtain ⟨f⟩ := h
   have : Infinite Gal(CyclotomicPinfField p K/K) := by
     contrapose! H

@@ -42,7 +42,7 @@ theorem isUnramifiedOutside_of_isUnramifiedOutside_preimage [Algebra.IsAlgebraic
   rintro v h1 h2 w h3
   have hwv : (w.comp (algebraMap L K).injective).comp (algebraMap L' L).injective = v := by
     ext x
-    simpa [← IsScalarTower.algebraMap_apply] using congr($(h3.comp_eq') x)
+    simpa [← IsScalarTower.algebraMap_apply] using congr($(h3.comp_eq) x)
   refine H (w.comp (algebraMap L K).injective) ?_ (fun u hu ↦ ?_) w inferInstance
   · rw [← hwv] at h1
     exact AbsoluteValue.isNontrivial_of_isNontrivial_comp _ h1
@@ -111,7 +111,7 @@ theorem isUnramifiedOutside_preimage_iff [Algebra.IsAlgebraic F K]
   refine H (v.comp (algebraMap L' L).injective) ?_ (fun u hu h' ↦ ?_) w (.trans w v _)
   · rwa [AbsoluteValue.isNontrivial_iff_of_liesOver _ v]
   · obtain ⟨v', h3, h4⟩ := AbsoluteValue.exists_equiv_and_liesOver_of_comp_equiv _ _ h'
-    exact h2 v' (h4.comp_eq' ▸ hu) h3.symm
+    exact h2 v' (h4.comp_eq ▸ hu) h3.symm
 
 /-- A typeclass asserting that an algebraic extension `K / F` is unramified everywhere. -/
 abbrev IsUnramifiedEverywhere [Algebra.IsAlgebraic F K] : Prop := IsUnramifiedOutside F K K ∅

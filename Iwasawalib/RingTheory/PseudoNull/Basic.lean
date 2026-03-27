@@ -9,6 +9,7 @@ public import Iwasawalib.Algebra.Exact.Basic
 public import Iwasawalib.Algebra.Exact.KerCokerComp
 public import Iwasawalib.Algebra.Module.Torsion
 public import Mathlib.RingTheory.Ideal.Quotient.Index
+public import Mathlib.RingTheory.Ideal.Quotient.Noetherian
 public import Mathlib.RingTheory.LocalRing.Quotient
 
 @[expose] public section
@@ -331,23 +332,23 @@ variable {A M} in
 of `A` containing `a`, `Mₚ = 0`, then `M → M, m ↦ a • m` is a pseudo-isomorphism. -/
 theorem Module.IsTorsion.isPseudoIsomorphism_smul (H : Module.IsTorsion A M) (a : A)
     (h : ∀ p ∈ Module.support A M, a ∈ p.1 → p.1.primeHeight ≠ 1) :
-    (DistribMulAction.toLinearMap A M a).IsPseudoIsomorphism := by
+    (DistribSMul.toLinearMap A M a).IsPseudoIsomorphism := by
   rw [LinearMap.isPseudoIsomorphism_iff_primeHeight_le_one_imp_bijective]
   intro p hp
   by_cases hmem : p ∈ Module.support A M
   · have ha : a ∈ p.1.primeCompl := imp_not_comm.1 (h p hmem) <|
       hp.antisymm (H.one_le_primeHeight_of_mem_support _ hmem)
-    have h1 : LocalizedModule.map p.1.primeCompl (DistribMulAction.toLinearMap A M a) =
-        DistribMulAction.toLinearMap (Localization p.1.primeCompl)
+    have h1 : LocalizedModule.map p.1.primeCompl (DistribSMul.toLinearMap A M a) =
+        DistribSMul.toLinearMap (Localization p.1.primeCompl)
           (LocalizedModule p.1.primeCompl M) (Localization.mk a (1 : p.1.primeCompl)) := by
       ext x
       induction x with
       | h m s => simp [LocalizedModule.mk_smul_mk]
     let e : LocalizedModule p.1.primeCompl M ≃ₗ[Localization p.1.primeCompl]
         LocalizedModule p.1.primeCompl M := LinearEquiv.ofLinear
-      (DistribMulAction.toLinearMap (Localization p.1.primeCompl)
+      (DistribSMul.toLinearMap (Localization p.1.primeCompl)
         (LocalizedModule p.1.primeCompl M) (Localization.mk a (1 : p.1.primeCompl)))
-      (DistribMulAction.toLinearMap (Localization p.1.primeCompl)
+      (DistribSMul.toLinearMap (Localization p.1.primeCompl)
         (LocalizedModule p.1.primeCompl M) (Localization.mk 1 ⟨a, ha⟩))
       (by
         ext x

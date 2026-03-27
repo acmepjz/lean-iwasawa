@@ -7,6 +7,7 @@ module
 
 public import Mathlib.Algebra.Algebra.ZMod
 public import Mathlib.Algebra.CharZero.Infinite
+public import Mathlib.LinearAlgebra.Basis.VectorSpace
 public import Mathlib.LinearAlgebra.Dimension.FreeAndStrongRankCondition
 public import Iwasawalib.NumberTheory.Padics.ForMathlib1
 public import Mathlib.RingTheory.Localization.Cardinality
@@ -69,6 +70,7 @@ theorem Field.isAddCyclic_iff (F : Type*) [Field F] : IsAddCyclic F ↔ (Nat.car
     have := Fact.mk hp
     let _ := ZMod.algebra F p
     have hrank : Module.rank (ZMod p) F = 1 := by
+      let : Field (ZMod p) := inferInstance
       refine le_antisymm (rank_le_one_iff.2 ?_) (Cardinal.one_le_iff_pos.2 Module.rank_pos_of_free)
       obtain ⟨a, hsurj⟩ := exists_zsmul_surjective F
       refine ⟨a, fun v ↦ ?_⟩

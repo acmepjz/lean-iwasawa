@@ -322,7 +322,7 @@ theorem apply_le_one_iff_of_mem_decompositionSubgroup
 under the `v`-adic topology. (Is this correct?) -/
 theorem mem_decompositionSubgroup_iff_continuous
     (F : Type*) {K : Type*} [Field F] [Field K] [Algebra F K] (v : AbsoluteValue K ℝ) (σ) :
-    σ ∈ v.decompositionSubgroup F ↔ Continuous (X := WithAbs v) (Y := WithAbs v) σ := by
+    σ ∈ v.decompositionSubgroup F ↔ Continuous (WithAbs.congr v v σ) := by
   sorry
 
 /-- Our definition is the same as `ValuationSubring.decompositionSubgroup` for finite places. -/

@@ -137,14 +137,14 @@ theorem existsUnique_pow_eq_one_and_unitsMap_toZModPow_torsionfreeUnitsExponent_
     dsimp at x ⊢
     simp_rw [show Nat.totient 4 = 2 by decide, ExistsUnique, hsq]
     rcases ZMod.units_eq_one_or_neg_one_of_eq_four rfl x with rfl | rfl
-    · use 1, by simp
+    · use 1, by erw [map_one]; simp -- FIXME: somehow `erw` is needed
       rintro _ ⟨rfl | rfl, h⟩
       · rfl
       · rw [Units.map_neg, map_one] at h
         contradiction
     · use -1, by simp
       rintro _ ⟨rfl | rfl, h⟩
-      · rw [map_one] at h
+      · erw [map_one] at h -- FIXME: somehow `erw` is needed
         contradiction
       · rfl
   revert x

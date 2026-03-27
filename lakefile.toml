@@ -8,6 +8,9 @@ pp.unicode.fun = true # pretty-prints `fun a ↦ b`
 autoImplicit = false
 experimental.module = true
 
+# temporary workaround, otherwise `erw` is needed extensively
+backward.isDefEq.respectTransparency = false
+
 [[require]]
 name = "checkdecls"
 git = "https://github.com/PatrickMassot/checkdecls.git"

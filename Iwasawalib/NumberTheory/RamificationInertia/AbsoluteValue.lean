@@ -318,12 +318,15 @@ theorem apply_le_one_iff_of_mem_decompositionSubgroup
   refine ⟨fun hx ↦ ?_, fun hx ↦ v.apply_le_one_of_mem_decompositionSubgroup h hx⟩
   simpa using v.apply_le_one_of_mem_decompositionSubgroup (inv_mem h) hx
 
-/-- An element is contained in the decomposition subgroup of `v` if and only if it is continuous
-under the `v`-adic topology. (Is this correct?) -/
+/- An element is contained in the decomposition subgroup of `v` if and only if it is continuous
+under the `v`-adic topology. (Is this correct?)
+
+-- Commented out: `WithAbs.congr` is not defined in the current Mathlib version.
 theorem mem_decompositionSubgroup_iff_continuous
     (F : Type*) {K : Type*} [Field F] [Field K] [Algebra F K] (v : AbsoluteValue K ℝ) (σ) :
     σ ∈ v.decompositionSubgroup F ↔ Continuous (WithAbs.congr v v σ) := by
   sorry
+-/
 
 /-- Our definition is the same as `ValuationSubring.decompositionSubgroup` for finite places. -/
 theorem decompositionSubgroup_eq_of_isNonarchimedean
@@ -334,15 +337,23 @@ theorem decompositionSubgroup_eq_of_isNonarchimedean
   simp only [mem_decompositionSubgroup_iff, MulAction.mem_stabilizer_iff, SetLike.ext'_iff]
   congr!
 
-/-- If `L / K / F` is an extension tower with `L / F` Galois, `v` is a place of `L`, then
-`Dᵥ(L/K) = Dᵥ(L/F) ⊓ Gal(L/K)`. -/
+/-
+PROBLEM
+If `L / K / F` is an extension tower with `L / F` Galois, `v` is a place of `L`, then
+`Dᵥ(L/K) = Dᵥ(L/F) ⊓ Gal(L/K)`.
+
+PROVIDED SOLUTION
+The decomposition subgroup of v for K/F consists of σ ∈ Gal(L/K) that preserve {x | v x ≤ 1}. The comap through restrictRestrictAlgEquivMapHom takes σ ∈ Gal(L/F) to its restriction as Gal(L/K) element. An element of Gal(L/K) (viewed in Gal(L/F)) preserves {x | v x ≤ 1} iff it does so as an element of Gal(L/F). So v.decompositionSubgroup K = (v.decompositionSubgroup F).comap (restrictRestrictAlgEquivMapHom F L K L). Use `ext` and `simp` with the definition `mem_decompositionSubgroup_iff`.
+-/
 theorem decompositionSubgroup_eq_comap
     (F K : Type*) [Field F] [Field K] [Algebra F K]
     {L : Type*} [Field L] [Algebra F L] [Algebra K L] [IsScalarTower F K L] [Normal F L]
     (v : AbsoluteValue L ℝ) :
     v.decompositionSubgroup K = (v.decompositionSubgroup F).comap
       (IntermediateField.restrictRestrictAlgEquivMapHom F L K L) := by
-  sorry
+  ext σ;
+  simp +decide [ mem_decompositionSubgroup_iff ];
+  simp +decide [ Set.ext_iff, IntermediateField.restrictRestrictAlgEquivMapHom ]
 
 /-- If `L / K / F` is an extension tower with `L / F` Galois, `v` is a place of `L`, then
 `Iᵥ(L/K) ≤ Iᵥ(L/F)`. -/
@@ -490,15 +501,26 @@ theorem inertiaSubgroup_eq_of_isNonarchimedean
       rw [← h2]
       exact h1
 
-/-- If `L / K / F` is an extension tower with `L / F` Galois, `v` is a place of `L`, then
-`Iᵥ(L/K) = Iᵥ(L/F) ⊓ Gal(L/K)`. -/
+/-
+PROBLEM
+If `L / K / F` is an extension tower with `L / F` Galois, `v` is a place of `L`, then
+`Iᵥ(L/K) = Iᵥ(L/F) ⊓ Gal(L/K)`.
+
+PROVIDED SOLUTION
+Similar to decompositionSubgroup_eq_comap. The inertia subgroup of v for K/F consists of σ that preserve {x | v x ≤ 1} and additionally satisfy v(σx - x) < 1 for all x with v x ≤ 1. This is exactly the comap condition. Use `ext` and `simp` with `mem_inertiaSubgroup_iff`.
+-/
 theorem inertiaSubgroup_eq_comap
     (F K : Type*) [Field F] [Field K] [Algebra F K]
     {L : Type*} [Field L] [Algebra F L] [Algebra K L] [IsScalarTower F K L] [Normal F L]
     (v : AbsoluteValue L ℝ) :
     v.inertiaSubgroup K = (v.inertiaSubgroup F).comap
       (IntermediateField.restrictRestrictAlgEquivMapHom F L K L) := by
-  sorry
+  ext;
+  simp +decide only [mem_inertiaSubgroup_iff, Subgroup.mem_comap];
+  congr!;
+  · ext;
+    simp +decide [ IntermediateField.restrictRestrictAlgEquivMapHom ];
+  · ext; simp +decide [ IntermediateField.restrictRestrictAlgEquivMapHom ]
 
 /-- If `L / K / F` is an extension tower with `L / F` Galois, `v` is a place of `L`, then
 `Iᵥ(L/K) ≤ Iᵥ(L/F)`. -/

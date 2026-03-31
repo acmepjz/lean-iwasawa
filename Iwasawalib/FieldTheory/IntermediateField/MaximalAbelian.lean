@@ -120,14 +120,148 @@ theorem iSup_le_maximalAbelianExtension {ι : Type*} {E : ι → IntermediateFie
   simp_rw [le_maximalAbelianExtension_iff] at h ⊢
   infer_instance
 
+/-
+PROVIDED SOLUTION
+Strategy: Show maximalAbelianExtension F K = IntermediateField.fixedField (commutator Gal(K/F)), then use IntermediateField.fixingSubgroup_fixedField (since K/F is finite-dimensional) to conclude.
+
+For the equality, show both directions:
+(≤): maximalAbelianExtension is sSup of abelian subextensions. Each abelian subextension E has fixingSubgroup containing the commutator (by Abelianization.commutator_subset_ker applied to the restriction map to Gal(E/F) which is abelian). So E ≤ fixedField(commutator) for each abelian E. Hence sSup ≤ fixedField(commutator).
+
+(≥): fixedField(commutator) is an abelian extension. Its Galois group is Gal(K/F)/commutator ≅ Abelianization, which is abelian. So it's contained in maximalAbelianExtension.
+
+Actually, simpler: just show maximalAbelianExtension = fixedField(commutator) and then apply fixingSubgroup_fixedField.
+
+Or even simpler: show le_antisymm for the fixingSubgroup directly.
+(commutator ≤ fixingSubgroup(maximalAbelianExtension)): Every element of commutatorSet fixes every abelian subextension (since abelian subextensions have abelian Galois group, so commutators act trivially on them). Since maximalAbelianExtension is sSup of abelian subextensions, commutators fix it. Use commutator_eq_normalClosure and Subgroup.closure_le.
+
+(fixingSubgroup(maximalAbelianExtension) ≤ commutator): Consider E = fixedField(commutator). This is an abelian extension (Gal(K/F)/commutator is abelian). So E ≤ maximalAbelianExtension. Hence fixingSubgroup(maximalAbelianExtension) ≤ fixingSubgroup(E) = commutator (by fixingSubgroup_fixedField).
+-/
 theorem fixingSubgroup_maximalAbelianExtension_of_finiteDimensional
     [IsGalois F K] [FiniteDimensional F K] :
     (maximalAbelianExtension F K).fixingSubgroup = commutator Gal(K/F) := by
-  sorry
+  have h_max_abelian : (maximalAbelianExtension F K).fixingSubgroup ≤ commutator Gal(K/F) := by
+    -- Consider the fixed field of the commutator subgroup.
+    set L := IntermediateField.fixedField (commutator Gal(K/F)) with hL_def;
+    -- Since $L$ is abelian, it is contained in the maximal abelian extension.
+    have hL_abelian : IsAbelianGalois F L := by
+      have hL_abelian : IsMulCommutative (Gal(L/F)) := by
+        have hL_abelian : Gal(L/F) ≃* (Gal(K/F) ⧸ commutator Gal(K/F)) := by
+          exact?;
+        have hL_abelian : ∀ x y : Gal(K/F) ⧸ commutator Gal(K/F), x * y = y * x := by
+          intro x y; obtain ⟨ x, rfl ⟩ := QuotientGroup.mk_surjective x; obtain ⟨ y, rfl ⟩ := QuotientGroup.mk_surjective y; simp +decide [ commutator_def ] ;
+          erw [ QuotientGroup.eq ];
+          simp +decide [ Subgroup.commutator_def ];
+          exact Subgroup.subset_closure ⟨ y⁻¹, x⁻¹, by group ⟩;
+        have hL_abelian : ∀ x y : Gal(L/F), x * y = y * x := by
+          exact fun x y => by simpa [ ← ‹Gal(L/F) ≃* Gal(K/F) ⧸ commutator Gal(K/F)›.injective.eq_iff ] using hL_abelian ( ‹Gal(L/F) ≃* Gal(K/F) ⧸ commutator Gal(K/F)› x ) ( ‹Gal(L/F) ≃* Gal(K/F) ⧸ commutator Gal(K/F)› y ) ;
+        constructor ; tauto;
+      constructor
+    have hL_le_max : L ≤ maximalAbelianExtension F K := by
+      exact?;
+    have hL_fixingSubgroup : (maximalAbelianExtension F K).fixingSubgroup ≤ L.fixingSubgroup := by
+      exact?;
+    convert hL_fixingSubgroup using 1;
+    exact?;
+  refine' le_antisymm h_max_abelian _;
+  have h_comm_subgroup : ∀ (E : IntermediateField F K), IsAbelianGalois F E → commutator (Gal(K/F)) ≤ E.fixingSubgroup := by
+    intro E hE
+    have h_comm_subgroup : commutator (Gal(K/F)) ≤ E.fixingSubgroup := by
+      have h_comm_subgroup : ∀ g h : Gal(K/F), g * h * g⁻¹ * h⁻¹ ∈ E.fixingSubgroup := by
+        intro g h
+        have h_comm_subgroup : ∀ x : E, (g * h * g⁻¹ * h⁻¹) (algebraMap E K x) = algebraMap E K x := by
+          intro x
+          have h_comm_subgroup : (g * h * g⁻¹ * h⁻¹) (algebraMap E K x) = algebraMap E K ((AlgEquiv.restrictNormalHom E g) ((AlgEquiv.restrictNormalHom E h) ((AlgEquiv.restrictNormalHom E g⁻¹) ((AlgEquiv.restrictNormalHom E h⁻¹) x))) ) := by
+            simp +decide [ AlgEquiv.restrictNormalHom ];
+          have h_comm_subgroup : ∀ g h : Gal(E/F), g * h = h * g := by
+            exact?;
+          specialize h_comm_subgroup (AlgEquiv.restrictNormalHom E g) (AlgEquiv.restrictNormalHom E h);
+          replace h_comm_subgroup := congr_arg ( fun f => f ( ( AlgEquiv.restrictNormalHom E g⁻¹ ) ( ( AlgEquiv.restrictNormalHom E h⁻¹ ) x ) ) ) h_comm_subgroup ; aesop;
+        exact?
+      rw [ commutator_eq_closure ];
+      rw [ Subgroup.closure_le ];
+      exact fun x hx => by obtain ⟨ g, h, rfl ⟩ := hx; exact h_comm_subgroup g h;
+    exact h_comm_subgroup;
+  exact?
+
+/-
+PROVIDED SOLUTION
+The commutator subgroup of Gal(K/F) fixes maximalAbelianExtension F K. The maximalAbelianExtension is the sSup of all abelian subextensions E. So fixingSubgroup(maximalAbelianExtension) = iInf of fixingSubgroup(E) over all abelian E. It suffices to show commutator Gal(K/F) ≤ fixingSubgroup(E) for each abelian E. This means every commutator element g*h*g⁻¹*h⁻¹ fixes E. Use commutator_eq_normalClosure and Subgroup.closure_le. For each commutator element g*h*g⁻¹*h⁻¹ and x ∈ E, we need (g*h*g⁻¹*h⁻¹)(x) = x. Since E is abelian (IsAbelianGalois F E), use Abelianization.commutator_subset_ker with the restrictNormalHom to Gal(E/F), which gives that the commutator maps to 1 in Gal(E/F), so it fixes E.
+-/
+private theorem commutator_le_fixingSubgroup_maximalAbelianExtension [IsGalois F K] :
+    commutator Gal(K/F) ≤ (maximalAbelianExtension F K).fixingSubgroup := by
+  -- Since the maximal abelian extension is the supremum of all abelian subextensions, its fixing subgroup is the intersection of the fixing subgroups of all abelian subextensions.
+  have h_fixing_subgroup : (maximalAbelianExtension F K).fixingSubgroup = ⨅ (E : IntermediateField F K) (_ : IsAbelianGalois F E), E.fixingSubgroup := by
+    refine' le_antisymm _ _;
+    · refine' le_iInf fun E => le_iInf fun hE => _;
+      have h_le : E ≤ maximalAbelianExtension F K := by
+        exact?;
+      exact?;
+    · refine' iInf₂_le _ _;
+      exact?;
+  -- For any abelian subextension E of K/F, the commutator subgroup of Gal(K/F) is contained in the fixing subgroup of E.
+  have h_comm_subgroup : ∀ E : IntermediateField F K, IsAbelianGalois F E → commutator Gal(K/F) ≤ E.fixingSubgroup := by
+    intro E hE
+    have h_comm_subgroup : commutator Gal(K/F) ≤ (AlgEquiv.restrictNormalHom E).ker := by
+      rw [ commutator_eq_normalClosure ];
+      refine' Subgroup.normalClosure_le_normal _;
+      rintro _ ⟨ g, h, rfl ⟩;
+      simp +decide [ commutatorElement_def ];
+    convert h_comm_subgroup using 1;
+    exact?;
+  exact h_fixing_subgroup.symm ▸ le_iInf₂ fun E hE => h_comm_subgroup E hE
+
+/-
+PROVIDED SOLUTION
+Step 1: fixedField(closure(commutator)) is Galois over F. This follows from IsGalois.of_fixedField_normal_subgroup, using that closure(commutator) is a normal subgroup (use instNormalCommutatorClosure or Subgroup.is_normal_topologicalClosure).
+
+Step 2: The Galois group Gal(fixedField(closure(commutator))/F) is abelian. By the Galois correspondence (AlgEquiv.restrictNormalHom), there is a surjective map Gal(K/F) → Gal(fixedField(N)/F) with kernel = fixingSubgroup(fixedField(N)) = N (for closed N, by InfiniteGalois.fixingSubgroup_fixedField). So Gal(fixedField(N)/F) ≃ Gal(K/F)/N. When N = closure(commutator), commutator ≤ N, so Gal(K/F)/N is a quotient of Gal(K/F)/commutator which is abelian.
+
+For commutativity: let x y ∈ Gal(fixedField(N)/F). Lift to x' y' ∈ Gal(K/F). Then x'*y'*x'⁻¹*y'⁻¹ ∈ commutator ≤ N = ker. So the images commute.
+-/
+private theorem isAbelianGalois_fixedField_topologicalClosure_commutator [IsGalois F K] :
+    IsAbelianGalois F (IntermediateField.fixedField (commutator Gal(K/F)).topologicalClosure) := by
+  have h_normal : Subgroup.Normal (Subgroup.topologicalClosure (commutator (Gal(K/F))) : Subgroup (Gal(K/F))) := by
+    exact?;
+  have h_surjective : Function.Surjective (AlgEquiv.restrictNormalHom (fixedField (Subgroup.topologicalClosure (commutator (Gal(K/F))) : Subgroup (Gal(K/F)))) : Gal(K/F) → Gal(↥(fixedField (Subgroup.topologicalClosure (commutator (Gal(K/F))) : Subgroup (Gal(K/F))))/F)) := by
+    exact?;
+  have h_ker : (AlgEquiv.restrictNormalHom (fixedField (Subgroup.topologicalClosure (commutator (Gal(K/F))) : Subgroup (Gal(K/F))))).ker = Subgroup.topologicalClosure (commutator (Gal(K/F))) := by
+    convert InfiniteGalois.fixingSubgroup_fixedField _;
+    any_goals exact IsGalois.mk;
+    rotate_right;
+    exact ⟨ Subgroup.topologicalClosure ( commutator Gal(K/F) ), isClosed_closure ⟩;
+    · exact?;
+    · rfl;
+  have h_abelian : ∀ x y : Gal(K/F), x * y * x⁻¹ * y⁻¹ ∈ Subgroup.topologicalClosure (commutator (Gal(K/F))) := by
+    exact fun x y => Subgroup.le_topologicalClosure _ ( Subgroup.commutator_mem_commutator ( Subgroup.mem_top x ) ( Subgroup.mem_top y ) );
+  have h_abelian : ∀ x y : Gal(↥(fixedField (Subgroup.topologicalClosure (commutator (Gal(K/F))) : Subgroup (Gal(K/F))))/F), x * y = y * x := by
+    intro x y
+    obtain ⟨x', hx'⟩ := h_surjective x
+    obtain ⟨y', hy'⟩ := h_surjective y
+    have h_comm : x' * y' * x'⁻¹ * y'⁻¹ ∈ Subgroup.topologicalClosure (commutator (Gal(K/F))) := h_abelian x' y';
+    simp_all +decide [ ← h_ker, MonoidHom.mem_ker ];
+    simpa [ mul_inv_eq_iff_eq_mul ] using eq_inv_of_mul_eq_one_left h_comm;
+  have h_abelian : IsMulCommutative (Gal(↥(fixedField (Subgroup.topologicalClosure (commutator (Gal(K/F))) : Subgroup (Gal(K/F))))/F)) := by
+    constructor ; tauto;
+  exact?
 
 theorem fixingSubgroup_maximalAbelianExtension [IsGalois F K] :
     (maximalAbelianExtension F K).fixingSubgroup = (commutator Gal(K/F)).topologicalClosure := by
-  sorry
+  refine le_antisymm ?_ ?_
+  · -- fixingSubgroup(max_ab) ≤ closure(commutator)
+    -- By antitone: suffices to show fixedField(closure(commutator)) ≤ maximalAbelianExtension
+    -- fixedField(closure(commutator)) is abelian, so it's ≤ maximalAbelianExtension
+    have h1 := isAbelianGalois_fixedField_topologicalClosure_commutator F K
+    have h2 := le_maximalAbelianExtension
+      (IntermediateField.fixedField (commutator Gal(K/F)).topologicalClosure)
+    have h3 : (maximalAbelianExtension F K).fixingSubgroup ≤
+        (IntermediateField.fixedField (commutator Gal(K/F)).topologicalClosure).fixingSubgroup :=
+      IntermediateField.fixingSubgroup_antitone h2
+    rw [InfiniteGalois.fixingSubgroup_fixedField
+      ⟨(commutator Gal(K/F)).topologicalClosure, isClosed_closure⟩] at h3
+    exact h3
+  · -- closure(commutator) ≤ fixingSubgroup(max_ab)
+    exact closure_minimal (commutator_le_fixingSubgroup_maximalAbelianExtension F K)
+      (InfiniteGalois.fixingSubgroup_isClosed _)
 
 /-- Suppose `L / K / F` is a field extension tower, such that `L / F` and `K / F` are Galois.
 Let `H / K` be the maximal abelian subextension of `L / K`. Then `H / F` is also Galois. -/

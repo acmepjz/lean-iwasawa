@@ -693,8 +693,8 @@ only need to check $r=1$ case.
 
 \begin{lem}
 \label{pis-iff}
-\uses{char-ideal-preliminary,pseudo-null}
-\lean{LinearMap.isPseudoIsomorphism_iff_bijective_map}
+\uses{char-ideal-preliminary,pseudo-null,pseudo-null-iff-localization-eq-zero}
+\lean{LinearMap.isPseudoIsomorphism_iff_bijective_localizedModuleMap}
 \leanok
 Let $A$ be a Noetherian ring and let
 $M,N$ be finitely generated torsion $A$-modules.
@@ -716,9 +716,24 @@ $S^{-1}\coker(f)=\coker(S^{-1}f)$ (localization is exact),
 we only need to prove that if $M$ is a finitely generated torsion $A$-module
 whose height one support is contained in $\Sigma$,
 then $S^{-1}M=0$ if and only if $M$ is pseudo-null (equivalently, $M_\fq=0$
-for all $\fq\in\Sigma$):
-``$\Rightarrow$'': Clear.
-``$\Leftarrow$'': For all $\fq\in\Sigma$, $M_\fq=0$ means that $\Ann(M)\not\subset\fq$,
+for all $\fq\in\Sigma$), which is Lemma \ref{pseudo-null-iff-localization-eq-zero} below.
+\end{proof}
+
+\begin{lem}
+\label{pseudo-null-iff-localization-eq-zero}
+\uses{pseudo-null}
+\lean{Module.isPseudoNull_iff_subsingleton_of_subset,Module.isPseudoNull_iff_subsingleton_of_subset_of_isTorsion}
+\leanok
+Let $M$ be a finitely generated torsion $A$-module, $\Sigma$ be a finite set of height one ideals of $A$,
+containing height one support of $M$.
+Let $S:=A\setminus\bigcup_{\fq\in\Sigma}\fq$ which is a multiplicative subset of $A$.
+Then $M$ is pseudo-null if and only if $S^{-1}M=0$.
+\end{thm}
+
+\begin{proof}
+\leanok
+``$\Leftarrow$'': Clear.
+``$\Rightarrow$'': For all $\fq\in\Sigma$, $M_\fq=0$ means that $\Ann(M)\not\subset\fq$,
 since $\fq$ are prime ideals, we have $\Ann(M)\not\subset\bigcup_{\fq\in\Sigma}\fq$,
 so $S^{-1}M=0$.
 \end{proof}

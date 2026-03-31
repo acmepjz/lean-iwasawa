@@ -202,6 +202,56 @@ theorem isPseudoNull_of_exact (f : M →ₗ[A] N) (g : N →ₗ[A] P)
   isPseudoNull_of_exact' M'.subtype g.rangeRestrict h.linearMap_rangeRestrict
     M'.injective_subtype g.surjective_rangeRestrict
 
+/-- Let `M` be a finitely generated `A`-module, `s` be a finite set of prime ideals of height ≤ 1
+of `A`, containing height ≤ 1 support of `M`. Let `S = A \ ⋃ p ∈ s, p`. Then `M` is pseudo-null
+if and only if `S⁻¹M = 0`. -/
+theorem isPseudoNull_iff_subsingleton_of_subset [Module.Finite A M]
+    {s : Set (PrimeSpectrum A)} (hs : s.Finite)
+    (h : support A M ∩ {p : PrimeSpectrum A | p.1.primeHeight ≤ 1} ⊆ s)
+    (h1 : s ⊆ {p : PrimeSpectrum A | p.1.primeHeight ≤ 1}) :
+    IsPseudoNull A M ↔ Subsingleton (LocalizedModule (⨅ p ∈ s, p.1.primeCompl) M) := by
+  rcases Set.eq_empty_or_nonempty s with rfl | hn
+  · apply iff_of_true
+    · rw [isPseudoNull_iff]
+      intro p hp
+      by_contra! h'
+      change p.1.primeHeight < 1 + 1 at h'
+      rw [ENat.lt_add_one_iff (by simp)] at h'
+      simpa using h ⟨hp, h'⟩
+    · simp only [Set.mem_empty_iff_false, not_false_eq_true, iInf_neg, iInf_top,
+        LocalizedModule.subsingleton_iff]
+      exact fun _ ↦ ⟨0, by simp⟩
+  rw [isPseudoNull_iff_primeHeight_le_one_imp_subsingleton]
+  refine ⟨fun H ↦ ?_, fun H p hp ↦ ?_⟩
+  · simp only [← notMem_support_iff, mem_support_iff_of_finite] at H
+    have := (Ideal.subset_union_prime_finite hs (f := (·.1)) hn.some hn.some inferInstance
+      (I := annihilator A M)).not
+    simp only [not_exists, not_and] at this
+    have := this.2 fun p hp ↦ H p (h1 hp)
+    obtain ⟨r, hr, hr2⟩ := Set.not_subset.1 this
+    simp only [SetLike.mem_coe, mem_annihilator] at hr
+    rw [LocalizedModule.subsingleton_iff]
+    refine fun m ↦ ⟨r, by simpa using hr2, hr m⟩
+  · by_cases hmem : p ∈ support A M
+    · rw [LocalizedModule.subsingleton_iff] at H ⊢
+      intro m
+      obtain ⟨r, hr, h2⟩ := H m
+      exact ⟨r, biInf_le (fun p : PrimeSpectrum A ↦ p.1.primeCompl) (h ⟨hmem, hp⟩) hr, h2⟩
+    rwa [notMem_support_iff] at hmem
+
+/-- Let `M` be a finitely generated torsion `A`-module, `s` be a finite set of height one ideals
+of `A`, containing height one support of `M`. Let `S = A \ ⋃ p ∈ s, p`. Then `M` is pseudo-null
+if and only if `S⁻¹M = 0`. -/
+theorem isPseudoNull_iff_subsingleton_of_subset_of_isTorsion [Module.Finite A M]
+    {s : Set (PrimeSpectrum A)} (hs : s.Finite)
+    (h : support A M ∩ {p : PrimeSpectrum A | p.1.primeHeight = 1} ⊆ s)
+    (h1 : s ⊆ {p : PrimeSpectrum A | p.1.primeHeight = 1})
+    (hMT : Module.IsTorsion A M) :
+    IsPseudoNull A M ↔ Subsingleton (LocalizedModule (⨅ p ∈ s, p.1.primeCompl) M) := by
+  refine isPseudoNull_iff_subsingleton_of_subset A M hs
+    (HasSubset.Subset.trans (fun p hp ↦ ?_) h) (h1.trans fun _ h ↦ h.le)
+  exact ⟨hp.1, hp.2.antisymm (hMT.one_le_primeHeight_of_mem_support p hp.1)⟩
+
 end Module
 
 /-! ## Pseudo-isomorphisms -/

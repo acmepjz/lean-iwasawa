@@ -137,10 +137,11 @@ variable (M : Type*) [Field M] [Algebra F M] [Algebra K M] [IsScalarTower F K M]
   (L : Type*) [Field L] [Algebra L K] [Algebra L M] [IsScalarTower L K M]
   (S : Set (AbsoluteValue L ℝ))
 
+omit [Algebra L K] [IsScalarTower L K M] in
 theorem IsUnramifiedOutside.tower_top [Algebra.IsAlgebraic F M] [IsUnramifiedOutside F M L S] :
     haveI := Algebra.IsAlgebraic.tower_top (K := F) (L := K) (A := M)
     IsUnramifiedOutside K M L S := by
-  sorry
+  use fun v hv hv' w hw ↦ (IsUnramifiedOutside.isUnramifiedIn F M L S v hv hv' w hw).tower_top K
 
 theorem IsUnramifiedOutside.tower_bot [Algebra.IsAlgebraic F M] [IsUnramifiedOutside F M L S] :
     haveI := Algebra.IsAlgebraic.tower_bot (K := F) (L := K) (A := M)

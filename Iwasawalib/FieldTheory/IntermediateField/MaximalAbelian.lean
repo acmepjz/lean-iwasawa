@@ -120,14 +120,51 @@ theorem iSup_le_maximalAbelianExtension {ι : Type*} {E : ι → IntermediateFie
   simp_rw [le_maximalAbelianExtension_iff] at h ⊢
   infer_instance
 
-theorem fixingSubgroup_maximalAbelianExtension_of_finiteDimensional
-    [IsGalois F K] [FiniteDimensional F K] :
-    (maximalAbelianExtension F K).fixingSubgroup = commutator Gal(K/F) := by
-  sorry
+private theorem commutator_le_fixingSubgroup_maximalAbelianExtension [IsGalois F K] :
+    commutator Gal(K/F) ≤ (maximalAbelianExtension F K).fixingSubgroup := by
+  have h1 : (maximalAbelianExtension F K).fixingSubgroup =
+      ⨅ (E : IntermediateField F K) (_ : IsAbelianGalois F E), E.fixingSubgroup :=
+    le_antisymm (le_iInf₂ fun E _ ↦ (fixingSubgroup_le (le_maximalAbelianExtension E)))
+      (iInf₂_le _ (by exact isAbelianGalois_maximalAbelianExtension F K))
+  have h2 (E : IntermediateField F K) (_ : IsAbelianGalois F E) :
+      commutator Gal(K/F) ≤ E.fixingSubgroup := by
+    rw [← restrictNormalHom_ker, commutator_eq_normalClosure]
+    refine Subgroup.normalClosure_le_normal ?_
+    rintro _ ⟨_, _, rfl⟩
+    simp [commutatorElement_def]
+  simpa only [h1] using le_iInf₂ h2
+
+private theorem isAbelianGalois_fixedField_topologicalClosure_commutator [IsGalois F K] :
+    IsAbelianGalois F (fixedField (commutator Gal(K/F)).topologicalClosure) := by
+  set G := (commutator Gal(K/F)).topologicalClosure
+  have : G.Normal := Subgroup.is_normal_topologicalClosure _
+  have h_surjective := AlgEquiv.restrictNormalHom_surjective (F := F) (K₁ := fixedField G) K
+  have h_ker := (fixedField G).restrictNormalHom_ker
+  simp only [InfiniteGalois.fixingSubgroup_fixedField ⟨G, isClosed_closure⟩] at h_ker
+  have := IsGalois.of_fixedField_normal_subgroup G
+  have : IsMulCommutative Gal(fixedField G/F) := by
+    refine ⟨⟨fun x y ↦ ?_⟩⟩
+    obtain ⟨x', hx'⟩ := h_surjective x
+    obtain ⟨y', hy'⟩ := h_surjective y
+    have : x' * y' * x'⁻¹ * y'⁻¹ ∈ G :=
+      Subgroup.le_topologicalClosure _ (Subgroup.commutator_mem_commutator (by simp) (by simp))
+    simpa [← h_ker, hx', hy', ← commutatorElement_eq_one_iff_mul_comm] using this
+  exact ⟨⟩
 
 theorem fixingSubgroup_maximalAbelianExtension [IsGalois F K] :
     (maximalAbelianExtension F K).fixingSubgroup = (commutator Gal(K/F)).topologicalClosure := by
-  sorry
+  refine le_antisymm ?_ (closure_minimal (commutator_le_fixingSubgroup_maximalAbelianExtension F K)
+    (InfiniteGalois.fixingSubgroup_isClosed _))
+  set G := (commutator Gal(K/F)).topologicalClosure
+  have := isAbelianGalois_fixedField_topologicalClosure_commutator F K
+  simpa only [InfiniteGalois.fixingSubgroup_fixedField ⟨G, isClosed_closure⟩] using
+    fixingSubgroup_antitone (le_maximalAbelianExtension (fixedField G))
+
+theorem fixingSubgroup_maximalAbelianExtension_of_finiteDimensional
+    [IsGalois F K] [FiniteDimensional F K] :
+    (maximalAbelianExtension F K).fixingSubgroup = commutator Gal(K/F) := by
+  rw [fixingSubgroup_maximalAbelianExtension]
+  exact SetLike.coe_injective (by simp)
 
 /-- Suppose `L / K / F` is a field extension tower, such that `L / F` and `K / F` are Galois.
 Let `H / K` be the maximal abelian subextension of `L / K`. Then `H / F` is also Galois. -/

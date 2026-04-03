@@ -137,31 +137,11 @@ variable (M : Type*) [Field M] [Algebra F M] [Algebra K M] [IsScalarTower F K M]
   (L : Type*) [Field L] [Algebra L K] [Algebra L M] [IsScalarTower L K M]
   (S : Set (AbsoluteValue L ℝ))
 
-/-
-PROVIDED SOLUTION
-Unfold the IsUnramifiedOutside definition using isUnramifiedOutside_iff. We need to show that for any v : AbsoluteValue L ℝ that's nontrivial and not equivalent to anything in S, v.IsUnramifiedIn K M. By hypothesis IsUnramifiedOutside F M L S, we know v.IsUnramifiedIn F M. Since IsUnramifiedIn means every place w of M above v is unramified over F, and being unramified over K is weaker than being unramified over F (by tower_top for the inertia subgroup), we get unramified over K. The key is that the inertia subgroup Iw(M/K) ≤ Iw(M/F) by the tower structure (inertiaSubgroup_eq_comap), so if Iw(M/F) ≤ Gal(M/K) (unramified over K) then a fortiori Iw(M/K) ≤ Gal(M/K).
-
-Actually, v.IsUnramifiedIn F M means all places of M above v have ramification index 1 over F. The ramification index of w over K is at most the ramification index over F. So if it's 1 over F, it's 1 over K. Use isUnramified_iff_ramificationIdx_eq_one or similar.
--/
+omit [Algebra L K] [IsScalarTower L K M] in
 theorem IsUnramifiedOutside.tower_top [Algebra.IsAlgebraic F M] [IsUnramifiedOutside F M L S] :
     haveI := Algebra.IsAlgebraic.tower_top (K := F) (L := K) (A := M)
     IsUnramifiedOutside K M L S := by
-  have := ‹IsUnramifiedOutside F M L S›;
-  obtain ⟨ h ⟩ := this;
-  use fun v hv hv' => ?_;
-  intro w hw;
-  specialize h v hv hv' w hw;
-  rw [ AbsoluteValue.isUnramified_iff_ramificationIdx_eq_one ] at *;
-  rw [ AbsoluteValue.ramificationIdx ] at *;
-  rw [ AbsoluteValue.ramificationIdxOfIsScalarTower ] at *;
-  rw [ Subgroup.relIndex_eq_one ] at *;
-  intro σ hσ;
-  convert h _;
-  rotate_left;
-  exact σ.restrictScalars F;
-  · convert hσ using 1;
-  · simp +decide [ Subgroup.mem_map, IntermediateField.restrictRestrictAlgEquivMapHom ];
-    simp +decide [ AlgEquiv.ext_iff, MulSemiringAction.toAlgEquiv ]
+  use fun v hv hv' w hw ↦ (IsUnramifiedOutside.isUnramifiedIn F M L S v hv hv' w hw).tower_top K
 
 theorem IsUnramifiedOutside.tower_bot [Algebra.IsAlgebraic F M] [IsUnramifiedOutside F M L S] :
     haveI := Algebra.IsAlgebraic.tower_bot (K := F) (L := K) (A := M)

@@ -5,6 +5,7 @@ Authors: Jz Pan
 -/
 module
 
+public import Iwasawalib.Analysis.AbsoluteValue.GelfandTornheim
 public import Iwasawalib.FieldTheory.IntermediateField.MaximalAbelian
 public import Mathlib.NumberTheory.NumberField.ClassNumber
 public import Mathlib.NumberTheory.NumberField.Ideal.Basic

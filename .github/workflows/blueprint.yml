@@ -46,7 +46,7 @@ jobs:
           build: true
           lint: false
           mk_all-check: false
-          # use-github-cache: false
+          use-github-cache: false
 
       - name: Compile blueprint and documentation
         uses: leanprover-community/docgen-action@main

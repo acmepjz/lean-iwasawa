@@ -141,6 +141,13 @@ theorem isNonarchimedean_iff_exists_forall_apply_natCast_le
   rw [add_mul, ← mul_assoc, mul_right_comm _ _ C, one_mul, add_le_iff_nonpos_right] at h3
   norm_cast at h3
 
+/-- An absolute value `v` is non-archimedean if and only if `v(ℕ)` is bounded by one. -/
+theorem isNonarchimedean_iff_forall_apply_natCast_le_one
+    {K : Type*} [Field K] (v : AbsoluteValue K ℝ) :
+    IsNonarchimedean v ↔ ∀ n : ℕ, v n ≤ 1 :=
+  ⟨fun h _ ↦ h.apply_natCast_le_one_of_isNonarchimedean, fun h ↦
+    v.isNonarchimedean_iff_exists_forall_apply_natCast_le.2 ⟨1, h⟩⟩
+
 theorem isNonarchimedean_comp_iff
     {K L : Type*} [Field K] [Field L] (v : AbsoluteValue L ℝ) (f : K →+* L) :
     IsNonarchimedean (v.comp f.injective) ↔ IsNonarchimedean v := by

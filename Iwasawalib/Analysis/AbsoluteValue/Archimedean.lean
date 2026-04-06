@@ -6,6 +6,7 @@ Authors: Jz Pan
 module
 
 public import Mathlib.Algebra.Order.Ring.IsNonarchimedean
+public import Mathlib.Analysis.MeanInequalitiesPow
 public import Mathlib.RingTheory.Valuation.Basic
 public import Mathlib.NumberTheory.Ostrowski
 
@@ -257,5 +258,23 @@ def toValuation
   map_one' := by simp
   map_mul' x y := by ext1; simp
   map_add_le_max' x y := h x y
+
+/-- If `v` is an `ℝ`-valued absolute value, `c` is a positive real number,
+either `c ≤ 1` or `v` is non-archimedean, then `v ^ c` is also an absolute value. -/
+@[simps apply]
+noncomputable def rpowOfLeOneOrIsNonarchimedean {R : Type*} [Semiring R]
+    (v : AbsoluteValue R ℝ)
+    (c : ℝ) (h1 : 0 < c) (h2 : c ≤ 1 ∨ IsNonarchimedean v) : AbsoluteValue R ℝ where
+  toFun x := v x ^ c
+  map_mul' x y := by rw [map_mul, Real.mul_rpow (v.nonneg x) (v.nonneg y)]
+  nonneg' x := Real.rpow_nonneg (v.nonneg x) c
+  eq_zero' x := by rw [Real.rpow_eq_zero (v.nonneg x) h1.ne', v.eq_zero]
+  add_le' x y := by
+    rcases h2 with h2 | h2
+    · exact (Real.rpow_le_rpow (v.nonneg _) (v.add_le x y) h1.le).trans
+        (Real.rpow_add_le_add_rpow (v.nonneg x) (v.nonneg y) h1.le h2)
+    · exact (Real.rpow_le_rpow (v.nonneg _) (h2 x y) h1.le).trans_eq
+        (Real.rpow_max (v.nonneg x) (v.nonneg y) h1.le) |>.trans
+        (max_le_add_of_nonneg (by positivity) (by positivity))
 
 end AbsoluteValue

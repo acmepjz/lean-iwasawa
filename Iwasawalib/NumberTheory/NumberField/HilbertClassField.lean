@@ -52,54 +52,6 @@ theorem isUnramifiedOutside_of_isUnramifiedOutside_preimage [Algebra.IsAlgebraic
     contrapose! h2
     simpa only [hwv] using AbsoluteValue.IsEquiv.comp h2 (algebraMap L' L).injective
 
-/-- TODO: ... -/
-@[simps apply]
-noncomputable def _root_.AbsoluteValue.rpowOfLeOneOrIsNonarchimedean {R : Type*} [Semiring R]
-    (v : AbsoluteValue R ℝ)
-    (c : ℝ) (h1 : 0 < c) (h2 : c ≤ 1 ∨ IsNonarchimedean v) : AbsoluteValue R ℝ where
-  toFun x := v x ^ c
-  map_mul' x y := by rw [map_mul, Real.mul_rpow (v.nonneg x) (v.nonneg y)]
-  nonneg' x := Real.rpow_nonneg (v.nonneg x) c
-  eq_zero' x := by rw [Real.rpow_eq_zero (v.nonneg x) h1.ne', v.eq_zero]
-  add_le' x y := by
-    rcases h2 with h2 | h2
-    · exact (Real.rpow_le_rpow (v.nonneg _) (v.add_le x y) h1.le).trans
-        (Real.rpow_add_le_add_rpow (v.nonneg x) (v.nonneg y) h1.le h2)
-    · exact (Real.rpow_le_rpow (v.nonneg _) (h2 x y) h1.le).trans_eq
-        (Real.rpow_max (v.nonneg x) (v.nonneg y) h1.le) |>.trans
-        (max_le_add_of_nonneg (by positivity) (by positivity))
-
-variable {F K} in
-theorem _root_.AbsoluteValue.exists_equiv_and_liesOver_of_comp_equiv (v : AbsoluteValue K ℝ)
-    (w : AbsoluteValue F ℝ) (h : v.comp (algebraMap F K).injective ≈ w) :
-    ∃ v' : AbsoluteValue K ℝ, v' ≈ v ∧ v'.LiesOver w := by
-  by_cases hn : IsNonarchimedean v
-  · obtain ⟨c, hc, h1⟩ := AbsoluteValue.isEquiv_iff_exists_rpow_eq.1 h
-    refine ⟨v.rpowOfLeOneOrIsNonarchimedean c hc (.inr hn),
-      .symm (AbsoluteValue.isEquiv_iff_exists_rpow_eq.2 ⟨c, hc, rfl⟩), ?_⟩
-    rw [AbsoluteValue.liesOver_iff]
-    ext x
-    simpa using congr($h1 x)
-  obtain ⟨φ, hφ⟩ := v.exists_ringHom_complex_of_not_isNonarchimedean hn
-  obtain ⟨c, hc, h1⟩ := AbsoluteValue.isEquiv_iff_exists_rpow_eq.1 hφ
-  have hφ' := (AbsoluteValue.IsEquiv.comp hφ (algebraMap F K).injective).trans h
-  obtain ⟨c', hc', h2⟩ := AbsoluteValue.isEquiv_iff_exists_rpow_eq.1 hφ'
-  have hc'1 : c' ≤ 1 := by
-    have h3 : 2 ^ c' = w 2 := by simpa [map_ofNat] using congr($h2 2)
-    have h4 : w 2 ≤ 2 := by simpa [one_add_one_eq_two] using w.add_le 1 1
-    rw [← h3] at h4
-    contrapose! h4
-    exact Real.self_lt_rpow_of_one_lt one_lt_two h4
-  refine ⟨(place φ).rpowOfLeOneOrIsNonarchimedean c' hc' (.inl hc'1),
-    AbsoluteValue.isEquiv_iff_exists_rpow_eq.2 ?_, ?_⟩
-  · refine ⟨c'⁻¹ * c, by positivity, ?_⟩
-    ext x
-    rw [← h1, AbsoluteValue.rpowOfLeOneOrIsNonarchimedean_apply,
-      ← Real.rpow_mul ((place φ).nonneg x), ← mul_assoc, mul_inv_cancel₀ hc'.ne', one_mul]
-  · rw [AbsoluteValue.liesOver_iff]
-    ext x
-    simpa using congr($h2 x)
-
 theorem isUnramifiedOutside_preimage_iff [Algebra.IsAlgebraic F K]
     (L L' : Type*) [Field L] [Field L'] [Algebra L K] [Algebra L' L] [Algebra.IsAlgebraic L' L]
     [Algebra L' K] [IsScalarTower L' L K] (S : Set (AbsoluteValue L' ℝ)) :

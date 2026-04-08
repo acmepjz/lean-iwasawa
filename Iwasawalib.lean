@@ -10,6 +10,7 @@ public import Iwasawalib.Algebra.InverseLimit.Basic
 public import Iwasawalib.Algebra.Module.Torsion
 public import Iwasawalib.Analysis.AbsoluteValue.Archimedean
 public import Iwasawalib.Analysis.AbsoluteValue.GelfandTornheim
+public import Iwasawalib.Analysis.AbsoluteValue.Normalization
 public import Iwasawalib.FieldTheory.Galois.Abelian
 public import Iwasawalib.FieldTheory.IntermediateField.MaximalAbelian
 public import Iwasawalib.FieldTheory.IntermediateField.MaximalGaloisSExtension

@@ -20,7 +20,28 @@ namespace AlgEquiv
 /-- TODO: go mathlib -/
 theorem continuous_autCongr {R A₁ A₂ : Type*} [Field R] [Field A₁] [Field A₂]
     [Algebra R A₁] [Algebra R A₂] (ϕ : A₁ ≃ₐ[R] A₂) : Continuous (autCongr ϕ) := by
-  sorry
+  apply MonoidHom.continuous_of_continuousAt_one (autCongr ϕ).toMonoidHom
+  rw [Filter.HasBasis.tendsto_iff (galGroupBasis R A₁).nhds_one_hasBasis
+      (galGroupBasis R A₂).nhds_one_hasBasis]
+  intro ⟨K₂, hK₂⟩ _
+  refine ⟨⟨K₂.comap ϕ.toAlgHom, ?_⟩, trivial, ?_⟩
+  · exact Module.Finite.of_injective
+      ((ϕ.toAlgHom.toLinearMap.restrict
+        (p := (K₂.comap ϕ.toAlgHom).toSubalgebra.toSubmodule)).codRestrict
+        K₂.toSubalgebra.toSubmodule (by
+          intro ⟨x, hx⟩
+          simp [IntermediateField.mem_comap] at hx
+          exact hx)) (by
+        intro ⟨a, ha⟩ ⟨b, hb⟩ h
+        simp at h
+        exact Subtype.ext (ϕ.injective h))
+  · intro σ hσ
+    simp only [Set.mem_preimage]
+    intro x hx
+    simp [autCongr]
+    have := hσ (ϕ.symm x) (by simp [IntermediateField.mem_comap]; exact hx)
+    simp at this
+    exact this
 
 /-- Continuous version of `AlgEquiv.autCongr`. TODO: go mathlib -/
 @[simps! apply]

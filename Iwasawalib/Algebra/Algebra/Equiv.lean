@@ -6,6 +6,7 @@ Authors: Jz Pan
 module
 
 public import Mathlib.FieldTheory.Galois.Profinite
+public import Iwasawalib.Topology.Algebra.Group.Basic
 
 @[expose] public section
 
@@ -13,22 +14,39 @@ public import Mathlib.FieldTheory.Galois.Profinite
 
 # Supplementary results for isomorphisms of Galois groups induced by ring isomorphisms
 
+Maybe these should be in mathlib.
+
 -/
 
 namespace AlgEquiv
 
-/-- TODO: go mathlib -/
-theorem continuous_autCongr {R A₁ A₂ : Type*} [Field R] [Field A₁] [Field A₂]
-    [Algebra R A₁] [Algebra R A₂] (ϕ : A₁ ≃ₐ[R] A₂) : Continuous (autCongr ϕ) := by
-  sorry
+theorem continuous_autCongr
+    {R A₁ A₂ : Type*} [Field R] [Field A₁] [Field A₂] [Algebra R A₁] [Algebra R A₂]
+    (ϕ : A₁ ≃ₐ[R] A₂) : Continuous ϕ.autCongr := by
+  refine ϕ.autCongr.toMonoidHom.continuous_iff.2 fun s h1 hs ↦ ?_
+  obtain ⟨L, _, hle⟩ := (krullTopology_mem_nhds_one_iff _ _ s).1 (isOpen_iff_mem_nhds.1 hs _ h1)
+  refine ⟨L.fixingSubgroup.comap ϕ.autCongr.toMonoidHom, one_mem _, ?_, by simpa⟩
+  have := (L.equivMap ϕ.symm.toAlgHom).toLinearEquiv.finiteDimensional
+  convert (L.map ϕ.symm.toAlgHom).fixingSubgroup_isOpen
+  ext f
+  simp only [MulEquiv.toMonoidHom_eq_coe, Subgroup.mem_comap, MonoidHom.coe_coe, autCongr_apply,
+    IntermediateField.mem_fixingSubgroup_iff, trans_apply, toAlgHom_eq_coe]
+  change _ ↔ ∀ x ∈ (L.map _).toSubalgebra, _
+  simp only [IntermediateField.toSubalgebra_map, Subalgebra.mem_map, and_imp, forall_exists_index,
+    IntermediateField.mem_toSubalgebra, AlgHom.coe_coe, forall_apply_eq_imp_iff₂]
+  refine ⟨fun h x hx ↦ ?_, fun h x hx ↦ ?_⟩
+  · apply_fun _ using ϕ.injective
+    simp [h x hx]
+  · simp [h x hx]
 
-/-- Continuous version of `AlgEquiv.autCongr`. TODO: go mathlib -/
-@[simps! apply]
-noncomputable def autContinuousCongr {R A₁ A₂ : Type*} [Field R] [Field A₁] [Field A₂]
-    [Algebra R A₁] [Algebra R A₂] (ϕ : A₁ ≃ₐ[R] A₂) : Gal(A₁/R) ≃ₜ* Gal(A₂/R) where
-  toMulEquiv := autCongr ϕ
-  continuous_toFun := continuous_autCongr ϕ
-  continuous_invFun := continuous_autCongr ϕ.symm
+/-- Continuous version of `AlgEquiv.autCongr`. -/
+@[simps! apply toMulEquiv]
+def continuousAutCongr
+    {R A₁ A₂ : Type*} [Field R] [Field A₁] [Field A₂] [Algebra R A₁] [Algebra R A₂]
+    (ϕ : A₁ ≃ₐ[R] A₂) : (A₁ ≃ₐ[R] A₁) ≃ₜ* A₂ ≃ₐ[R] A₂ where
+  toMulEquiv := ϕ.autCongr
+  continuous_toFun := ϕ.continuous_autCongr
+  continuous_invFun := ϕ.symm.continuous_autCongr
 
 section autCongrOfSurjective
 

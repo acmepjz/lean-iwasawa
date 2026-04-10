@@ -5,12 +5,12 @@ Authors: Jz Pan
 -/
 module
 
+public import Iwasawalib.Algebra.Algebra.Equiv
 public import Mathlib.FieldTheory.Galois.Abelian
 public import Mathlib.FieldTheory.Galois.Infinite
 public import Mathlib.FieldTheory.Galois.Profinite
 public import Iwasawalib.NumberTheory.Padics.EquivMvZp
 public import Mathlib.Topology.Algebra.ClopenNhdofOne
-public import Iwasawalib.Topology.Algebra.Group.Basic
 
 @[expose] public section
 
@@ -26,36 +26,6 @@ use `Nonempty (MvZpExtension p ι K Kinf)`. As a special case, to state that `Ki
 a `ℤₚᵈ`-extension, use `Nonempty (MvZpExtension p (Fin d) K Kinf)`.
 
 -/
-
-/-! ### Maybe these should be in mathlib -/
-
-theorem AlgEquiv.continuous_autCongr
-    {R A₁ A₂ : Type*} [Field R] [Field A₁] [Field A₂] [Algebra R A₁] [Algebra R A₂]
-    (ϕ : A₁ ≃ₐ[R] A₂) : Continuous ϕ.autCongr := by
-  refine ϕ.autCongr.toMonoidHom.continuous_iff.2 fun s h1 hs ↦ ?_
-  obtain ⟨L, _, hle⟩ := (krullTopology_mem_nhds_one_iff _ _ s).1 (isOpen_iff_mem_nhds.1 hs _ h1)
-  refine ⟨L.fixingSubgroup.comap ϕ.autCongr.toMonoidHom, one_mem _, ?_, by simpa⟩
-  have := (L.equivMap ϕ.symm.toAlgHom).toLinearEquiv.finiteDimensional
-  convert (L.map ϕ.symm.toAlgHom).fixingSubgroup_isOpen
-  ext f
-  simp only [MulEquiv.toMonoidHom_eq_coe, Subgroup.mem_comap, MonoidHom.coe_coe, autCongr_apply,
-    IntermediateField.mem_fixingSubgroup_iff, trans_apply, toAlgHom_eq_coe]
-  change _ ↔ ∀ x ∈ (L.map _).toSubalgebra, _
-  simp only [IntermediateField.toSubalgebra_map, Subalgebra.mem_map, and_imp, forall_exists_index,
-    IntermediateField.mem_toSubalgebra, AlgHom.coe_coe, forall_apply_eq_imp_iff₂]
-  refine ⟨fun h x hx ↦ ?_, fun h x hx ↦ ?_⟩
-  · apply_fun _ using ϕ.injective
-    simp [h x hx]
-  · simp [h x hx]
-
-/-- Continuous version of `AlgEquiv.autCongr`. -/
-@[simps! apply toMulEquiv]
-def AlgEquiv.continuousAutCongr
-    {R A₁ A₂ : Type*} [Field R] [Field A₁] [Field A₂] [Algebra R A₁] [Algebra R A₂]
-    (ϕ : A₁ ≃ₐ[R] A₂) : (A₁ ≃ₐ[R] A₁) ≃ₜ* A₂ ≃ₐ[R] A₂ where
-  toMulEquiv := ϕ.autCongr
-  continuous_toFun := ϕ.continuous_autCongr
-  continuous_invFun := ϕ.symm.continuous_autCongr
 
 /-! ### `ℤₚᵈ`-extension -/
 

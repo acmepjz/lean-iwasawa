@@ -15,7 +15,8 @@ public import Mathlib.Topology.Algebra.Group.Basic
 
 -/
 
-@[to_additive]
+/-- See also `MonoidHom.uniformContinuous_of_continuousAt_one` -/
+@[to_additive /-- See also `AddMonoidHom.uniformContinuous_of_continuousAt_zero` -/]
 theorem MonoidHom.continuous_iff {G H : Type*} [Group G] [Monoid H]
     [TopologicalSpace G] [TopologicalSpace H] [ContinuousMul G] [ContinuousMul H] (f : G →* H) :
     Continuous f ↔ ∀ s : Set H, 1 ∈ s → IsOpen s →

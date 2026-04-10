@@ -80,7 +80,7 @@ theorem continuous_piRestrictNormalHom' (E' : IntermediateField F K) (h : ⨆ i,
   have h' (i : ι) : E i ≤ E' := h ▸ le_iSup E i
   have (i : ι) : Normal F (restrict (h' i)) := .of_algEquiv (restrict_algEquiv (h' i))
   let g := Homeomorph.piCongrRight fun i ↦
-    (restrict_algEquiv (h' i)).symm.autContinuousCongr.toHomeomorph
+    (restrict_algEquiv (h' i)).symm.continuousAutCongr.toHomeomorph
   exact g.continuous.comp (continuous_piRestrictNormalHom fun i ↦ restrict (h' i))
 
 theorem injective_piRestrictNormalHom' (E' : IntermediateField F K) (h : ⨆ i, E i = E') :

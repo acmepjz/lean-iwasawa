@@ -50,7 +50,7 @@ jobs:
       - name: Compile blueprint and documentation
         # uses: leanprover-community/docgen-action@dac784713171529c96f6d0470f7af30249a02a5d # 2026-02-08
         # uses: leanprover-community/docgen-action@try-caching-css
-        uses: marcelolynch/docgen-action@marcelo/try-caching-css-2
+        uses: marcelolynch/docgen-action@79882c846b08d86d4d877631198260d3340dc4f5
         with:
           blueprint: true
           homepage: home_page

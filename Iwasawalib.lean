@@ -19,7 +19,8 @@ public import Iwasawalib.NumberTheory.AbsoluteValue.GelfandTornheim
 public import Iwasawalib.NumberTheory.AbsoluteValue.Normalization
 public import Iwasawalib.NumberTheory.AbsoluteValue.RamificationInertia
 public import Iwasawalib.NumberTheory.Cyclotomic.FiniteField
-public import Iwasawalib.NumberTheory.NumberField.HilbertClassField
+public import Iwasawalib.NumberTheory.NumberField.HilbertClassField.Basic
+public import Iwasawalib.NumberTheory.NumberField.HilbertClassField.ClassFieldTheory
 public import Iwasawalib.NumberTheory.Padics.EquivMvZp
 public import Iwasawalib.NumberTheory.Padics.ForMathlib
 public import Iwasawalib.NumberTheory.Padics.ForMathlib1

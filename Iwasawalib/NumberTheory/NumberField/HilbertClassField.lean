@@ -5,11 +5,11 @@ Authors: Jz Pan
 -/
 module
 
-public import Iwasawalib.Analysis.AbsoluteValue.GelfandTornheim
 public import Iwasawalib.FieldTheory.IntermediateField.MaximalAbelian
+public import Iwasawalib.NumberTheory.AbsoluteValue.GelfandTornheim
+public import Iwasawalib.NumberTheory.AbsoluteValue.RamificationInertia
 public import Mathlib.NumberTheory.NumberField.ClassNumber
 public import Mathlib.NumberTheory.NumberField.Ideal.Basic
-public import Iwasawalib.NumberTheory.RamificationInertia.AbsoluteValue
 public import Mathlib.RingTheory.Frobenius
 
 @[expose] public section

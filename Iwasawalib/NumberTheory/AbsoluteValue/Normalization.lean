@@ -5,7 +5,7 @@ Authors: Jz Pan
 -/
 module
 
-public import Iwasawalib.Analysis.AbsoluteValue.Archimedean
+public import Iwasawalib.NumberTheory.AbsoluteValue.Archimedean
 
 @[expose] public section
 

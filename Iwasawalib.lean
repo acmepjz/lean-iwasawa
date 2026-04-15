@@ -8,15 +8,16 @@ public import Iwasawalib.Algebra.Exact.Basic
 public import Iwasawalib.Algebra.Exact.KerCokerComp
 public import Iwasawalib.Algebra.InverseLimit.Basic
 public import Iwasawalib.Algebra.Module.Torsion
-public import Iwasawalib.Analysis.AbsoluteValue.Archimedean
-public import Iwasawalib.Analysis.AbsoluteValue.GelfandTornheim
-public import Iwasawalib.Analysis.AbsoluteValue.Normalization
 public import Iwasawalib.FieldTheory.Galois.Abelian
 public import Iwasawalib.FieldTheory.IntermediateField.MaximalAbelian
 public import Iwasawalib.FieldTheory.IntermediateField.MaximalGaloisSExtension
 public import Iwasawalib.FieldTheory.ZpExtension.Basic
 public import Iwasawalib.FieldTheory.ZpExtension.Cyclotomic
 public import Iwasawalib.GroupTheory.Torsion
+public import Iwasawalib.NumberTheory.AbsoluteValue.Archimedean
+public import Iwasawalib.NumberTheory.AbsoluteValue.GelfandTornheim
+public import Iwasawalib.NumberTheory.AbsoluteValue.Normalization
+public import Iwasawalib.NumberTheory.AbsoluteValue.RamificationInertia
 public import Iwasawalib.NumberTheory.Cyclotomic.FiniteField
 public import Iwasawalib.NumberTheory.NumberField.HilbertClassField
 public import Iwasawalib.NumberTheory.Padics.EquivMvZp
@@ -24,7 +25,6 @@ public import Iwasawalib.NumberTheory.Padics.ForMathlib
 public import Iwasawalib.NumberTheory.Padics.ForMathlib1
 public import Iwasawalib.NumberTheory.Padics.HasBasis
 public import Iwasawalib.NumberTheory.Padics.Units
-public import Iwasawalib.NumberTheory.RamificationInertia.AbsoluteValue
 public import Iwasawalib.NumberTheory.ZpExtension.Basic
 public import Iwasawalib.NumberTheory.ZpExtension.ClassGroup
 public import Iwasawalib.NumberTheory.ZpExtension.Ln

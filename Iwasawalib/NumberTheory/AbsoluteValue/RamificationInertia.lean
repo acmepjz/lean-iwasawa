@@ -5,8 +5,8 @@ Authors: Jz Pan
 -/
 module
 
-public import Iwasawalib.Analysis.AbsoluteValue.Archimedean
 public import Mathlib.RingTheory.Valuation.RamificationGroup
+public import Iwasawalib.NumberTheory.AbsoluteValue.Archimedean
 public import Mathlib.NumberTheory.NumberField.InfinitePlace.Basic
 
 @[expose] public section

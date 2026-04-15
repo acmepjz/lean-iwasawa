@@ -72,6 +72,82 @@ theorem apply_le_one_iff_of_mem_decompositionSubgroup
   refine ⟨fun hx ↦ ?_, fun hx ↦ v.apply_le_one_of_mem_decompositionSubgroup h hx⟩
   simpa using v.apply_le_one_of_mem_decompositionSubgroup (inv_mem h) hx
 
+/-- If `a < b`, `b, c` are positive and `c ≠ 1`, then there are `m : ℕ` and `n : ℤ`
+such that the power `c ^ n` is strictly between `a ^ m` and `b ^ m`.
+
+TODO: go mathlib and add `exists_pow_btwn_pow_of_lt` -/
+theorem _root_.exists_zpow_btwn_pow_of_lt {K : Type*} [Semifield K] [LinearOrder K]
+    [IsStrictOrderedRing K] [Archimedean K] [ExistsAddOfLE K] {a b c : K}
+    (h : a < b) (hb₀ : 0 < b) (hc₀ : 0 < c) (hc₁ : c ≠ 1) :
+    ∃ (m : ℕ) (n : ℤ), a ^ m < c ^ n ∧ c ^ n < b ^ m := by
+  wlog hc' : c < 1 generalizing c
+  · obtain ⟨m, n, h⟩ := this (inv_pos.2 hc₀) (by simpa)
+      (inv_lt_one_of_one_lt₀ ((not_lt.1 hc').lt_of_ne' hc₁))
+    use m, -n
+    simpa using h
+  rw [← div_lt_one hb₀] at h
+  obtain ⟨m, hm⟩ := exists_pow_lt_of_lt_one hc₀ h
+  use m
+  rw [div_pow, div_lt_iff₀' (pow_pos hb₀ m)] at hm
+  exact exists_zpow_btwn_of_lt_mul hm (pow_pos hb₀ m) hc₀ hc'
+
+/-- If `a < b`, `b, c` are positive and `c ≠ 1`, then there are `m : ℕ` and `n : ℤ`
+such that `1` is strictly between `a ^ m * c ^ n` and `b ^ m * c ^ n`.
+
+TODO: go mathlib -/
+theorem _root_.exists_one_btwn_pow_mul_zpow_of_lt {K : Type*} [Semifield K] [LinearOrder K]
+    [IsStrictOrderedRing K] [Archimedean K] [ExistsAddOfLE K] {a b c : K}
+    (h : a < b) (hb₀ : 0 < b) (hc₀ : 0 < c) (hc₁ : c ≠ 1) :
+    ∃ (m : ℕ) (n : ℤ), a ^ m * c ^ n < 1 ∧ 1 < b ^ m * c ^ n := by
+  obtain ⟨m, n, h⟩ := exists_zpow_btwn_pow_of_lt h hb₀ hc₀ hc₁
+  use m, -n
+  simpa [← GroupWithZero.div_eq_mul_inv, div_lt_one, one_lt_div, zpow_pos hc₀ n]
+
+/-- If `K / F` is algebraic, then the decomposition subgroup `Dᵥ(K/F)` is also the subgroup
+consists of all `σ` such that `v ∘ σ = v`.
+
+NOTE: This is not true if `K / F` is not algebraic, for example, when `K` is the fraction field of
+the valuation ring $\bigcup_{n=1}^\infty F((X^{1/n}))$, `k` is a fixed positive integer, `σ` is
+$X^{1/n} \mapsto X^{k/n}$, then it preserves the valuation ring but doesn't preserve the valuation.
+-/
+theorem mem_decompositionSubgroup_iff_comp_eq_self
+    (F : Type*) {K : Type*} [Field F] [Field K] [Algebra F K] [Algebra.IsAlgebraic F K]
+    (v : AbsoluteValue K ℝ) (σ) :
+    σ ∈ v.decompositionSubgroup F ↔ v.comp (f := σ) σ.injective = v := by
+  refine ⟨fun h ↦ ?_, fun h ↦ Set.ext fun x ↦ ?_⟩
+  · ext x
+    rcases eq_or_ne x 0 with rfl | hx
+    · simp
+    by_cases htriv : v.IsNontrivial
+    · by_contra! H
+      wlog H2 : v x < v (σ x) generalizing x
+      · have H3 := H.lt_or_gt.resolve_right H2
+        refine this x⁻¹ (by simp [hx]) (fun h' ↦ H (by simpa using h')) ?_
+        simpa [inv_lt_inv₀ (v.pos _) (v.pos _), hx] using H3
+      rw [← isNontrivial_iff_of_liesOver (v.comp (algebraMap F K).injective) v] at htriv
+      obtain ⟨y, hy⟩ := htriv.exists_abv_gt_one
+      obtain ⟨m, n, h1, h2⟩ := exists_one_btwn_pow_mul_zpow_of_lt H2 ((v.pos hx).trans H2)
+        (zero_lt_one.trans hy) hy.ne'
+      replace h1 := h1.le
+      simp only [comp_apply, ← map_zpow₀, ← map_pow, ← map_mul] at h1 h2
+      rw [← apply_le_one_iff_of_mem_decompositionSubgroup v h, map_mul, AlgEquiv.commutes] at h1
+      exact h1.not_gt h2
+    simp [not_isNontrivial_apply htriv, hx]
+  · obtain ⟨y, rfl⟩ := σ.surjective x
+    replace h := congr($h y)
+    simp_all
+
+theorem mem_decompositionSubgroup_iff_forall_apply_eq
+    (F : Type*) {K : Type*} [Field F] [Field K] [Algebra F K] [Algebra.IsAlgebraic F K]
+    (v : AbsoluteValue K ℝ) (σ) :
+    σ ∈ v.decompositionSubgroup F ↔ ∀ x, v (σ x) = v x := by
+  simp [mem_decompositionSubgroup_iff_comp_eq_self, AbsoluteValue.ext_iff]
+
+theorem apply_eq_of_mem_decompositionSubgroup
+    {F : Type*} {K : Type*} [Field F] [Field K] [Algebra F K] [Algebra.IsAlgebraic F K]
+    (v : AbsoluteValue K ℝ) {σ} (h : σ ∈ v.decompositionSubgroup F) (x) : v (σ x) = v x :=
+  (v.mem_decompositionSubgroup_iff_forall_apply_eq F σ).1 h x
+
 /-- An element is contained in the decomposition subgroup of `v` if and only if it is continuous
 under the `v`-adic topology. (Is this correct?) -/
 theorem mem_decompositionSubgroup_iff_continuous

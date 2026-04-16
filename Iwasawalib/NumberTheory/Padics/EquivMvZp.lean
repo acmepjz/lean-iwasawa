@@ -195,7 +195,7 @@ theorem closure_eq_Γpow_of_closure_eq
   let f : H.Γ →* H.Γ := {
     toFun := (· ^ p ^ n)
     map_one' := by simp
-    map_mul' := fun _ _ ↦ by rw [mul_pow]
+    map_mul' _ _ := by open scoped IsMulCommutative in rw [mul_pow]
   }
   have := H.continuousMulEquiv.isHomeomorph.isInducing.continuousMul H.continuousMulEquiv
   have h1 := closure_image_closure (s := (Subgroup.closure s : Set H.Γ))

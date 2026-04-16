@@ -288,9 +288,9 @@ def toValuation
     {R : Type*} [Ring R] [Nontrivial R] (v : AbsoluteValue R ℝ) (h : IsNonarchimedean v) :
     Valuation R NNReal where
   toFun x := ⟨v x, v.nonneg' x⟩
-  map_zero' := by simp
-  map_one' := by simp
-  map_mul' x y := by ext1; simp
+  map_zero' := by simp only [AbsoluteValue.map_zero]; rfl
+  map_one' := by simp only [AbsoluteValue.map_one]; rfl
+  map_mul' x y := by simp only [AbsoluteValue.map_mul]; rfl
   map_add_le_max' x y := h x y
 
 /-- If `v` is an `ℝ`-valued absolute value, `c` is a positive real number,

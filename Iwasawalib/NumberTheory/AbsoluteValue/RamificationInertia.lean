@@ -8,6 +8,7 @@ module
 public import Mathlib.RingTheory.Valuation.RamificationGroup
 public import Iwasawalib.NumberTheory.AbsoluteValue.Archimedean
 public import Mathlib.NumberTheory.NumberField.InfinitePlace.Basic
+public import Iwasawalib.Topology.Algebra.Group.Basic
 
 @[expose] public section
 
@@ -19,64 +20,17 @@ public import Mathlib.NumberTheory.NumberField.InfinitePlace.Basic
 
 References:
 
-- J. W. S. Cassels. *Global Fields*. Chapter II in J. W. S. Cassels,
-  A. Frohlich, editors, *Algebraic Number Theory*.
+- [J. W. S. Cassels, A. Frohlich, editors, *Algebraic Number Theory*][cassels1967algebraic]
 
 -/
 
-namespace AbsoluteValue
-
-/-! ### Decomposition subgroup for a place -/
-
-/-- The decomposition subgroup `Dᵥ(K/F)` in `Gal(K/F)` for a place `v` of `K` consists of all `σ`
-preserving the set `{x | v x ≤ 1}`. This definition also works for infinite places. -/
-def decompositionSubgroup
-    (F : Type*) {K : Type*} [Field F] [Field K] [Algebra F K] (v : AbsoluteValue K ℝ) :
-    Subgroup Gal(K/F) where
-  carrier := {σ | σ '' {x | v x ≤ 1} = {x | v x ≤ 1}}
-  one_mem' := by simp
-  mul_mem' {f} {g} hf hg := by
-    change (f ∘ g) '' _ = _
-    rw [Set.image_comp]
-    simp_all
-  inv_mem' {f} hf := by
-    simp only [Set.mem_setOf_eq] at hf ⊢
-    apply_fun ((f⁻¹ :) '' ·) at hf
-    rw [← Set.image_comp, eq_comm] at hf
-    change _ = (f⁻¹ * f) '' _ at hf
-    simpa only [inv_mul_cancel, AlgEquiv.one_apply, Set.image_id'] using hf
-
-theorem mem_decompositionSubgroup_iff
-    (F : Type*) {K : Type*} [Field F] [Field K] [Algebra F K] (v : AbsoluteValue K ℝ) (σ) :
-    σ ∈ v.decompositionSubgroup F ↔ σ '' {x | v x ≤ 1} = {x | v x ≤ 1} := Iff.rfl
-
-theorem decompositionSubgroup_eq_top_of_not_isNontrivial
-    (F : Type*) {K : Type*} [Field F] [Field K] [Algebra F K] (v : AbsoluteValue K ℝ)
-    (h : ¬v.IsNontrivial) : v.decompositionSubgroup F = ⊤ := by
-  rw [eq_top_iff]
-  rintro σ -
-  have (x : K) : v x ≤ 1 := by
-    rcases eq_or_ne x 0 with rfl | hx
-    · simp
-    · exact (not_isNontrivial_apply h hx).le
-  simp [mem_decompositionSubgroup_iff, this]
-
-theorem apply_le_one_of_mem_decompositionSubgroup
-    {F : Type*} {K : Type*} [Field F] [Field K] [Algebra F K] (v : AbsoluteValue K ℝ) {σ}
-    (h : σ ∈ v.decompositionSubgroup F) {x} (hx : v x ≤ 1) : v (σ x) ≤ 1 :=
-  h.le ⟨x, hx, rfl⟩
-
-theorem apply_le_one_iff_of_mem_decompositionSubgroup
-    {F : Type*} {K : Type*} [Field F] [Field K] [Algebra F K] (v : AbsoluteValue K ℝ) {σ}
-    (h : σ ∈ v.decompositionSubgroup F) {x} : v (σ x) ≤ 1 ↔ v x ≤ 1 := by
-  refine ⟨fun hx ↦ ?_, fun hx ↦ v.apply_le_one_of_mem_decompositionSubgroup h hx⟩
-  simpa using v.apply_le_one_of_mem_decompositionSubgroup (inv_mem h) hx
+/-! ### Lemmas should go mathlib -/
 
 /-- If `a < b`, `b, c` are positive and `c ≠ 1`, then there are `m : ℕ` and `n : ℤ`
 such that the power `c ^ n` is strictly between `a ^ m` and `b ^ m`.
 
 TODO: go mathlib and add `exists_pow_btwn_pow_of_lt` -/
-theorem _root_.exists_zpow_btwn_pow_of_lt {K : Type*} [Semifield K] [LinearOrder K]
+theorem exists_zpow_btwn_pow_of_lt {K : Type*} [Semifield K] [LinearOrder K]
     [IsStrictOrderedRing K] [Archimedean K] [ExistsAddOfLE K] {a b c : K}
     (h : a < b) (hb₀ : 0 < b) (hc₀ : 0 < c) (hc₁ : c ≠ 1) :
     ∃ (m : ℕ) (n : ℤ), a ^ m < c ^ n ∧ c ^ n < b ^ m := by
@@ -95,7 +49,7 @@ theorem _root_.exists_zpow_btwn_pow_of_lt {K : Type*} [Semifield K] [LinearOrder
 such that `1` is strictly between `a ^ m * c ^ n` and `b ^ m * c ^ n`.
 
 TODO: go mathlib -/
-theorem _root_.exists_one_btwn_pow_mul_zpow_of_lt {K : Type*} [Semifield K] [LinearOrder K]
+theorem exists_one_btwn_pow_mul_zpow_of_lt {K : Type*} [Semifield K] [LinearOrder K]
     [IsStrictOrderedRing K] [Archimedean K] [ExistsAddOfLE K] {a b c : K}
     (h : a < b) (hb₀ : 0 < b) (hc₀ : 0 < c) (hc₁ : c ≠ 1) :
     ∃ (m : ℕ) (n : ℤ), a ^ m * c ^ n < 1 ∧ 1 < b ^ m * c ^ n := by
@@ -103,57 +57,188 @@ theorem _root_.exists_one_btwn_pow_mul_zpow_of_lt {K : Type*} [Semifield K] [Lin
   use m, -n
   simpa [← GroupWithZero.div_eq_mul_inv, div_lt_one, one_lt_div, zpow_pos hc₀ n]
 
-/-- If `K / F` is algebraic, then the decomposition subgroup `Dᵥ(K/F)` is also the subgroup
-consists of all `σ` such that `v ∘ σ = v`.
+/-- TEST
 
-NOTE: This is not true if `K / F` is not algebraic, for example, when `K` is the fraction field of
-the valuation ring $\bigcup_{n=1}^\infty F((X^{1/n}))$, `k` is a fixed positive integer, `σ` is
-$X^{1/n} \mapsto X^{k/n}$, then it preserves the valuation ring but doesn't preserve the valuation.
--/
-theorem mem_decompositionSubgroup_iff_comp_eq_self
-    (F : Type*) {K : Type*} [Field F] [Field K] [Algebra F K] [Algebra.IsAlgebraic F K]
-    (v : AbsoluteValue K ℝ) (σ) :
+TODO: go mathlib -/
+theorem exists_pow_mul_zpow_lt_and_lt_pow_mul_zpow_of_lt {K : Type*} [Semifield K] [LinearOrder K]
+    [IsStrictOrderedRing K] [Archimedean K] [ExistsAddOfLE K] {a b c d : K} (e : K)
+    (h : a < b) (hb₀ : 0 < b) (hc₀ : 0 < c) (hc₁ : c ≠ 1) (hd₀ : 0 < d) :
+    ∃ (m : ℕ) (n : ℤ), a ^ m * c ^ n < d ∧ e < b ^ m * c ^ n := by
+  sorry
+
+namespace AbsoluteValue
+
+/-! ### Action on absolute values -/
+
+section MulAction
+
+variable (F K S : Type*) [CommSemiring F] [Semiring K] [Algebra F K] [Semiring S] [PartialOrder S]
+
+/-- Ring isomorphisms act on the left on the absolute values by `σ • v := v ∘ σ⁻¹`. -/
+instance instMulActionRingEquiv : MulAction (K ≃+* K) (AbsoluteValue K S) where
+  smul σ v := v.comp (f := σ.symm) σ.symm.injective
+  mul_smul σ τ v := by ext; simp [HSMul.hSMul, show σ * τ = τ.trans σ from rfl]
+  one_smul v := by ext; simp [HSMul.hSMul]
+
+/-- Algebra isomorphisms act on the left on the absolute values by `σ • v := v ∘ σ⁻¹`. -/
+instance instMulActionAlgEquiv : MulAction (K ≃ₐ[F] K) (AbsoluteValue K S) where
+  smul σ v := v.comp (f := σ.symm) σ.symm.injective
+  mul_smul σ τ v := by ext; simp [HSMul.hSMul, show σ * τ = τ.trans σ from rfl]
+  one_smul v := by ext; simp [HSMul.hSMul]
+
+variable {F K S}
+
+theorem ringEquiv_smul_def (v : AbsoluteValue K S) (σ : K ≃+* K) :
+    σ • v = v.comp (f := σ.symm) σ.symm.injective := rfl
+
+@[simp]
+theorem ringEquiv_smul_apply (v : AbsoluteValue K S) (σ : K ≃+* K) (x) :
+    (σ • v) x = v (σ.symm x) := rfl
+
+theorem algEquiv_smul_def (v : AbsoluteValue K S) (σ : K ≃ₐ[F] K) :
+    σ • v = v.comp (f := σ.symm) σ.symm.injective := rfl
+
+@[simp]
+theorem algEquiv_smul_apply (v : AbsoluteValue K S) (σ : K ≃ₐ[F] K) (x) :
+    (σ • v) x = v (σ.symm x) := rfl
+
+theorem coe_algEquiv_smul_eq (v : AbsoluteValue K S) (σ : K ≃ₐ[F] K) :
+    (σ : K ≃+* K) • v = σ • v := rfl
+
+end MulAction
+
+/-! ### Decomposition subgroup for a place -/
+
+section General
+
+variable (F K S : Type*) [CommSemiring F] [Semiring K] [Algebra F K] [Semiring S] [PartialOrder S]
+  (v : AbsoluteValue K S) (σ : K ≃ₐ[F] K)
+
+variable {K S}
+
+/-- The decomposition subgroup `Dᵥ(K/F)` in `Gal(K/F)` for a place `v` of `K` consists of all `σ`
+such that `v ∘ σ = v`. See [cassels1967algebraic], Chapter VII, §1.
+This definition also works for infinite places.
+
+Note: Here we use `def` but not `abbrev` because sometimes simp lemmas for `MulAction.stabilizer`
+are not desired (will introduce `σ⁻¹`). -/
+def decompositionSubgroup := MulAction.stabilizer (K ≃ₐ[F] K) v
+
+theorem mem_decompositionSubgroup_iff :
     σ ∈ v.decompositionSubgroup F ↔ v.comp (f := σ) σ.injective = v := by
-  refine ⟨fun h ↦ ?_, fun h ↦ Set.ext fun x ↦ ?_⟩
-  · ext x
-    rcases eq_or_ne x 0 with rfl | hx
-    · simp
-    by_cases htriv : v.IsNontrivial
-    · by_contra! H
-      wlog H2 : v x < v (σ x) generalizing x
-      · have H3 := H.lt_or_gt.resolve_right H2
-        refine this x⁻¹ (by simp [hx]) (fun h' ↦ H (by simpa using h')) ?_
-        simpa [inv_lt_inv₀ (v.pos _) (v.pos _), hx] using H3
-      rw [← isNontrivial_iff_of_liesOver (v.comp (algebraMap F K).injective) v] at htriv
-      obtain ⟨y, hy⟩ := htriv.exists_abv_gt_one
-      obtain ⟨m, n, h1, h2⟩ := exists_one_btwn_pow_mul_zpow_of_lt H2 ((v.pos hx).trans H2)
-        (zero_lt_one.trans hy) hy.ne'
-      replace h1 := h1.le
-      simp only [comp_apply, ← map_zpow₀, ← map_pow, ← map_mul] at h1 h2
-      rw [← apply_le_one_iff_of_mem_decompositionSubgroup v h, map_mul, AlgEquiv.commutes] at h1
-      exact h1.not_gt h2
-    simp [not_isNontrivial_apply htriv, hx]
-  · obtain ⟨y, rfl⟩ := σ.surjective x
-    replace h := congr($h y)
-    simp_all
+  rw [← inv_mem_iff, decompositionSubgroup, MulAction.mem_stabilizer_iff, algEquiv_smul_def]
 
-theorem mem_decompositionSubgroup_iff_forall_apply_eq
-    (F : Type*) {K : Type*} [Field F] [Field K] [Algebra F K] [Algebra.IsAlgebraic F K]
-    (v : AbsoluteValue K ℝ) (σ) :
+theorem mem_decompositionSubgroup_iff_forall_apply_eq :
     σ ∈ v.decompositionSubgroup F ↔ ∀ x, v (σ x) = v x := by
-  simp [mem_decompositionSubgroup_iff_comp_eq_self, AbsoluteValue.ext_iff]
+  simp [mem_decompositionSubgroup_iff, AbsoluteValue.ext_iff]
+
+theorem decompositionSubgroup_eq_top_of_not_isNontrivial (h : ¬v.IsNontrivial) :
+    v.decompositionSubgroup F = ⊤ := by
+  rw [eq_top_iff]
+  rintro σ -
+  rw [mem_decompositionSubgroup_iff]
+  ext x
+  rcases eq_or_ne x 0 with rfl | hx
+  · simp
+  · simp [not_isNontrivial_apply h, hx]
+
+variable {σ}
 
 theorem apply_eq_of_mem_decompositionSubgroup
-    {F : Type*} {K : Type*} [Field F] [Field K] [Algebra F K] [Algebra.IsAlgebraic F K]
-    (v : AbsoluteValue K ℝ) {σ} (h : σ ∈ v.decompositionSubgroup F) (x) : v (σ x) = v x :=
+    (h : σ ∈ v.decompositionSubgroup F) (x) : v (σ x) = v x :=
   (v.mem_decompositionSubgroup_iff_forall_apply_eq F σ).1 h x
 
-/-- An element is contained in the decomposition subgroup of `v` if and only if it is continuous
-under the `v`-adic topology. (Is this correct?) -/
-theorem mem_decompositionSubgroup_iff_continuous
-    (F : Type*) {K : Type*} [Field F] [Field K] [Algebra F K] (v : AbsoluteValue K ℝ) (σ) :
+/-- The elements in decomposition subgroup preserve the set `{x | v x ≤ y}` for all `y`. -/
+theorem image_setOf_eq_of_mem_decompositionSubgroup
+    (h : σ ∈ v.decompositionSubgroup F) (y) : σ '' {x | v x ≤ y} = {x | v x ≤ y} := by
+  ext x
+  obtain ⟨x', rfl⟩ := σ.surjective x
+  simp [(mem_decompositionSubgroup_iff_forall_apply_eq ..).1 h x']
+
+end General
+
+section IsAlgebraic
+
+variable (F K : Type*) [Field F] [Field K] [Algebra F K] [Algebra.IsAlgebraic F K]
+  (v : AbsoluteValue K ℝ) (σ : Gal(K/F))
+
+variable {K}
+
+/-- If `K / F` is algebraic, then the decomposition subgroup `Dᵥ(K/F)` is also the subgroup
+consists of all `σ` preserving the set `{x | v x ≤ 1}`.
+
+NOTE: This is not true if `K / F` is not algebraic, for example, when `K` is the fraction field of
+the valuation ring $\bigcup_{n=1}^\infty F⟦X^{1/n}⟧$, `k ≥ 2` is a fixed positive integer, `σ` is
+$X^{1/n} \mapsto X^{k/n}$, then it preserves the valuation ring but doesn't preserve the valuation.
+-/
+theorem mem_decompositionSubgroup_iff_image_setOf_eq :
+    σ ∈ v.decompositionSubgroup F ↔ σ '' {x | v x ≤ 1} = {x | v x ≤ 1} := by
+  refine ⟨fun h ↦ v.image_setOf_eq_of_mem_decompositionSubgroup F h 1, fun h ↦ ?_⟩
+  replace h (x) (hx : x ∈ {x | v x ≤ 1}) : v (σ x) ≤ 1 := by
+    simpa [h] using Set.mem_image_of_mem σ hx
+  rw [mem_decompositionSubgroup_iff_forall_apply_eq]
+  intro x
+  rcases eq_or_ne x 0 with rfl | hx
+  · simp
+  by_cases htriv : v.IsNontrivial
+  · by_contra! H
+    wlog H2 : v x < v (σ x) generalizing x
+    · have H3 := H.lt_or_gt.resolve_right H2
+      refine this x⁻¹ (by simp [hx]) (fun h' ↦ H (by simpa using h')) ?_
+      simpa [inv_lt_inv₀ (v.pos _) (v.pos _), hx] using H3
+    rw [← isNontrivial_iff_of_liesOver (v.comp (algebraMap F K).injective) v] at htriv
+    obtain ⟨y, hy⟩ := htriv.exists_abv_gt_one
+    obtain ⟨m, n, h1, h2⟩ := exists_one_btwn_pow_mul_zpow_of_lt H2 ((v.pos hx).trans H2)
+      (zero_lt_one.trans hy) hy.ne'
+    replace h1 := h1.le
+    simp only [comp_apply, ← map_zpow₀, ← map_pow, ← map_mul] at h1 h2
+    exact h2.not_ge (by simpa using h _ h1)
+  simp [not_isNontrivial_apply htriv, hx]
+
+omit [Algebra.IsAlgebraic F K] in
+variable {σ} in
+/-- The elements in decomposition subgroup are continuous in `v`-adic topology. -/
+theorem continuous_of_mem_decompositionSubgroup
+    (h : σ ∈ v.decompositionSubgroup F) : Continuous (WithAbs.congr v v σ) := by
+  rw [mem_decompositionSubgroup_iff_forall_apply_eq] at h
+  refine (AddMonoidHom.continuous_iff (WithAbs.congr v v σ).toAddMonoidHom).2 fun s h1 hs ↦ ?_
+  obtain ⟨ε, hε1, hε2⟩ := Metric.isOpen_iff.1 hs _ h1
+  refine ⟨Metric.ball 0 ε, Metric.mem_ball_self hε1, Metric.isOpen_ball, fun x hx ↦ ?_⟩
+  apply Set.preimage_mono hε2
+  simpa [WithAbs.norm_eq_apply_ofAbs, h x.ofAbs] using hx
+
+/-- If `K / F` is algebraic, then an element is contained in the decomposition subgroup of `v`
+if and only if it is continuous under the `v`-adic topology. -/
+theorem mem_decompositionSubgroup_iff_continuous :
     σ ∈ v.decompositionSubgroup F ↔ Continuous (WithAbs.congr v v σ) := by
-  sorry
+  refine ⟨fun h ↦ v.continuous_of_mem_decompositionSubgroup F h, fun h ↦ ?_⟩
+  replace h (ε : ℝ) (hε : 0 < ε) : ∃ δ : ℝ, 0 < δ ∧ ∀ x, v x < δ → v (σ x) < ε := by
+    obtain ⟨s, h1, hs, hs2⟩ := (AddMonoidHom.continuous_iff (WithAbs.congr v v σ).toAddMonoidHom).1
+      h (Metric.ball 0 ε) (Metric.mem_ball_self hε) Metric.isOpen_ball
+    obtain ⟨δ, hδ1, hδ2⟩ := Metric.isOpen_iff.1 hs _ h1
+    refine ⟨δ, hδ1, fun x hx ↦ ?_⟩
+    replace hx : WithAbs.toAbs v x ∈ Metric.ball 0 δ := by simpa [WithAbs.norm_eq_apply_ofAbs]
+    simpa [WithAbs.norm_eq_apply_ofAbs] using (hδ2.trans hs2) hx
+  rw [mem_decompositionSubgroup_iff_forall_apply_eq]
+  intro x
+  rcases eq_or_ne x 0 with rfl | hx
+  · simp
+  by_cases htriv : v.IsNontrivial
+  · by_contra! H
+    wlog H2 : v x < v (σ x) generalizing x
+    · have H3 := H.lt_or_gt.resolve_right H2
+      refine this x⁻¹ (by simp [hx]) (fun h' ↦ H (by simpa using h')) ?_
+      simpa [inv_lt_inv₀ (v.pos _) (v.pos _), hx] using H3
+    rw [← isNontrivial_iff_of_liesOver (v.comp (algebraMap F K).injective) v] at htriv
+    obtain ⟨y, hy⟩ := htriv.exists_abv_gt_one
+    obtain ⟨δ, hδ1, hδ2⟩ := h 1 one_pos
+    obtain ⟨m, n, h1, h2⟩ := exists_pow_mul_zpow_lt_and_lt_pow_mul_zpow_of_lt 1 H2
+      ((v.pos hx).trans H2) (zero_lt_one.trans hy) hy.ne' hδ1
+    simp only [comp_apply, ← map_zpow₀, ← map_pow, ← map_mul] at h1 h2
+    exact h2.not_gt (by simpa using hδ2 _ h1)
+  simp [not_isNontrivial_apply htriv, hx]
+
+#exit
 
 /-- Our definition is the same as `ValuationSubring.decompositionSubgroup` for finite places. -/
 theorem decompositionSubgroup_eq_of_isNonarchimedean

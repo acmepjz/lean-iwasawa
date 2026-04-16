@@ -108,7 +108,7 @@ instance isAbelianGalois_iSup [∀ i, IsAbelianGalois F (E i)] :
     exact ⟨⟩
   refine ⟨⟨fun x y ↦ ?_⟩⟩
   apply_fun _ using injective_piRestrictNormalHom' E _ rfl
-  simp only [map_mul, mul_comm]
+  open scoped IsMulCommutative in simp only [map_mul, mul_comm]
 
 instance isAbelianGalois_sup (E1 E2 : IntermediateField F K) [IsAbelianGalois F E1]
     [IsAbelianGalois F E2] : IsAbelianGalois F (E1 ⊔ E2 : IntermediateField F K) := by
@@ -131,7 +131,7 @@ theorem _root_.IsAbelianGalois.of_algEquiv
   have : IsMulCommutative Gal(E'/F) := by
     refine ⟨⟨fun x y ↦ ?_⟩⟩
     apply_fun _ using (AlgEquiv.autCongr f).symm.injective
-    simp only [map_mul, mul_comm]
+    open scoped IsMulCommutative in simp only [map_mul, mul_comm]
   exact ⟨⟩
 
 /-- TODO: go mathlib -/
@@ -145,7 +145,7 @@ theorem _root_.IsAbelianGalois.of_equiv_equiv
   have : IsMulCommutative Gal(N/M) := by
     refine ⟨⟨fun x y ↦ ?_⟩⟩
     apply_fun _ using (AlgEquiv.autCongrOfSurjective f.surjective hcomp).symm.injective
-    simp only [map_mul, mul_comm]
+    open scoped IsMulCommutative in simp only [map_mul, mul_comm]
   exact ⟨⟩
 
 end IntermediateField

@@ -126,6 +126,7 @@ private theorem commutator_le_fixingSubgroup_maximalAbelianExtension [IsGalois F
       ⨅ (E : IntermediateField F K) (_ : IsAbelianGalois F E), E.fixingSubgroup :=
     le_antisymm (le_iInf₂ fun E _ ↦ (fixingSubgroup_le (le_maximalAbelianExtension E)))
       (iInf₂_le _ (by exact isAbelianGalois_maximalAbelianExtension F K))
+  open scoped IsMulCommutative in
   have h2 (E : IntermediateField F K) (_ : IsAbelianGalois F E) :
       commutator Gal(K/F) ≤ E.fixingSubgroup := by
     rw [← restrictNormalHom_ker, commutator_eq_normalClosure]
@@ -191,7 +192,7 @@ theorem isGalois_maximalAbelianExtension_of_isGalois
   let g : H ≃+* σH := ((restrictScalars F H).equivMap (AlgHomClass.toAlgHom σ)).toRingEquiv
   have hcomp : (algebraMap K σH).comp f = RingHom.comp g (algebraMap K H) := by
     ext x
-    simp only [AlgEquiv.toRingEquiv_eq_coe, AlgEquiv.toRingEquiv_toRingHom, RingHom.coe_comp,
+    simp only [AlgEquiv.toRingEquiv_toRingHom, RingHom.coe_comp,
       RingHom.coe_coe, Function.comp_apply, SubalgebraClass.coe_algebraMap,
       AlgEquiv.restrictNormal_commutes, f, g]
     rfl

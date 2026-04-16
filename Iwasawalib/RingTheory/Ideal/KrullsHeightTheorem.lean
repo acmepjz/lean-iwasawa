@@ -61,7 +61,7 @@ theorem UniqueFactorizationMonoid.of_primeHeight_eq_one_imp_isPrincipal
     have := Ideal.minimalPrimes_isPrime hp
     obtain ⟨b, hb⟩ : p.IsPrincipal := by
       have : p.height ≤ 1 := by
-        refine (Ideal.height_le_spanRank_toENat_of_mem_minimal_primes _ _ hp).trans ?_
+        refine (Ideal.height_le_spanRank_toENat_of_mem_minimalPrimes _ _ hp).trans ?_
         rw [← Ideal.submodule_span_eq]
         grw [Submodule.spanRank_span_le_card]
         simp

@@ -10,7 +10,6 @@ public import Mathlib.FieldTheory.PolynomialGaloisGroup
 public import Iwasawalib.FieldTheory.ZpExtension.Basic
 public import Mathlib.NumberTheory.Cyclotomic.CyclotomicCharacter
 public import Mathlib.NumberTheory.Cyclotomic.Gal
--- public import Mathlib.NumberTheory.LocalField.Basic
 public import Iwasawalib.NumberTheory.Padics.Units
 public import Mathlib.RingTheory.RootsOfUnity.AlgebraicallyClosed
 
@@ -153,9 +152,11 @@ of $K(μ_{p^∞}) / K$. `CyclotomicPinfField.isCyclotomicZpExtension_cyclotomicZ
 if $K(μ_{p^∞}) / K$ is an infinite extension,
 then this field over `K` is a cyclotomic `ℤₚ`-extension. -/
 noncomputable def cyclotomicZpSubfield : IntermediateField K (CyclotomicPinfField p K) :=
+  open scoped IsMulCommutative in
   if h : p ≠ 0 then haveI := NeZero.mk h; .fixedField (CommGroup.torsion _) else ⊥
 
 theorem cyclotomicZpSubfield_eq_fixedField [NeZero p] :
+    open scoped IsMulCommutative in
     cyclotomicZpSubfield p K = .fixedField (CommGroup.torsion _) := by
   rw [cyclotomicZpSubfield, dif_pos NeZero.out]
 
@@ -251,9 +252,11 @@ theorem continuousCyclotomicCharacter_injective [IsCyclotomicPinfExtension p K L
   simp [‹Fact p.Prime›.out.ne_zero]
 
 theorem IsCyclotomicPinfExtension.finite_torsion_gal [IsCyclotomicPinfExtension p K L] :
+    open scoped IsMulCommutative in
     haveI := IsCyclotomicExtension.isAbelianGalois (Set.range (p ^ ·)) K L
     Finite (CommGroup.torsion Gal(L/K)) := by
   have := IsCyclotomicExtension.isAbelianGalois (Set.range (p ^ ·)) K L
+  open scoped IsMulCommutative in
   refine Set.Finite.subset ?_ <| CommGroup.torsion_le_comap_torsion <| MonoidHomClass.toMonoidHom
     <| continuousCyclotomicCharacter p K L
   refine Set.Finite.preimage (s := (CommGroup.torsion ℤ_[p]ˣ : Set ℤ_[p]ˣ))
@@ -265,11 +268,12 @@ theorem IsCyclotomicPinfExtension.finite_torsion_gal [IsCyclotomicPinfExtension 
 @[simps toSubgroup]
 noncomputable def CyclotomicPinfField.torsionGal [NeZero (p : K)] :
     ClosedSubgroup Gal(CyclotomicPinfField p K/K) where
-  toSubgroup := CommGroup.torsion Gal(CyclotomicPinfField p K/K)
+  toSubgroup := open scoped IsMulCommutative in CommGroup.torsion Gal(CyclotomicPinfField p K/K)
   isClosed' := Set.Finite.isClosed
     (IsCyclotomicPinfExtension.finite_torsion_gal p K (CyclotomicPinfField p K))
 
 theorem CyclotomicPinfField.fixingSubgroup_cyclotomicZpSubfield [NeZero (p : K)] :
+    open scoped IsMulCommutative in
     (cyclotomicZpSubfield p K).fixingSubgroup = CommGroup.torsion _ := by
   simpa only [cyclotomicZpSubfield_eq_fixedField] using
     InfiniteGalois.fixingSubgroup_fixedField (torsionGal p K)
@@ -323,6 +327,7 @@ theorem fieldRange_eq_cyclotomicZpSubfield (f : Kinf →ₐ[K] CyclotomicPinfFie
     f.fieldRange = CyclotomicPinfField.cyclotomicZpSubfield p K := by
   have := H.neZero
   replace H : IsCyclotomicZpExtension p K f.fieldRange := H.congr (AlgEquiv.ofInjectiveField f)
+  open scoped IsMulCommutative in
   suffices f.fieldRange.fixingSubgroup = CommGroup.torsion _ by
     simpa only [InfiniteGalois.fixedField_fixingSubgroup,
       CyclotomicPinfField.cyclotomicZpSubfield_eq_fixedField] using
@@ -400,6 +405,7 @@ theorem CyclotomicPinfField.isCyclotomicZpExtension_cyclotomicZpSubfield
   have : Infinite Gal(CyclotomicPinfField p K/K) := by
     contrapose! H
     exact IsGalois.finiteDimensional_of_finite ..
+  open scoped IsMulCommutative in
   obtain ⟨g⟩ := PadicInt.nonempty_continuousMulEquiv_of_continuousMonoidHom_units_of_injective p
     Gal(CyclotomicPinfField p K/K) _ (continuousCyclotomicCharacter_injective ..)
   exact ⟨f.symm.trans g⟩

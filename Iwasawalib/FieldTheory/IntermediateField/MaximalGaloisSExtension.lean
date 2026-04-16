@@ -157,7 +157,7 @@ theorem isSExtension_iff_primeFactors_adjoin_simple_subset :
     simpa
   rw [← isSeparable_iff_finInsepDegree_eq_one, ← IntermediateField.adjoin_self F E,
     IntermediateField.isSeparable_adjoin_iff_isSeparable] at hsep
-  push_neg at hsep
+  push Not at hsep
   obtain ⟨y, hy, hnsep⟩ := hsep
   rw [← IntermediateField.isSeparable_adjoin_simple_iff_isSeparable,
     isSeparable_iff_finInsepDegree_eq_one] at hnsep
@@ -549,7 +549,7 @@ theorem isGalois_maximalGaloisSExtension_of_isGalois
   let g : H ≃+* σH := ((restrictScalars F H).equivMap (AlgHomClass.toAlgHom σ)).toRingEquiv
   have hcomp : (algebraMap K σH).comp f = RingHom.comp g (algebraMap K H) := by
     ext x
-    simp only [AlgEquiv.toRingEquiv_eq_coe, AlgEquiv.toRingEquiv_toRingHom, RingHom.coe_comp,
+    simp only [AlgEquiv.toRingEquiv_toRingHom, RingHom.coe_comp,
       RingHom.coe_coe, Function.comp_apply, SubalgebraClass.coe_algebraMap,
       AlgEquiv.restrictNormal_commutes, f, g]
     rfl
@@ -572,12 +572,14 @@ section FiniteAbelian
 variable [FiniteDimensional F K] [IsAbelianGalois F K]
 
 theorem fixingSubgroup_maximalGaloisSExtension_singleton :
+    open scoped IsMulCommutative in
     (maximalGaloisSExtension F K {p}).fixingSubgroup = CommGroup.primeToComponent Gal(K/F) p := by
   sorry
 
 theorem finrank_maximalGaloisSExtension_singleton_top :
     Module.finrank (maximalGaloisSExtension F K {p}) K =
     Module.finrank F K / p ^ (Module.finrank F K).factorization p := by
+  open scoped IsMulCommutative in
   simp_rw [← IsGalois.card_fixingSubgroup_eq_finrank,
     fixingSubgroup_maximalGaloisSExtension_singleton,
     CommGroup.card_primeToComponent, IsGalois.card_aut_eq_finrank]

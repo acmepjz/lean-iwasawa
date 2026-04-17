@@ -57,14 +57,43 @@ theorem exists_one_btwn_pow_mul_zpow_of_lt {K : Type*} [Semifield K] [LinearOrde
   use m, -n
   simpa [← GroupWithZero.div_eq_mul_inv, div_lt_one, one_lt_div, zpow_pos hc₀ n]
 
-/-- TEST
+/-- TODO: go mathlib -/
+theorem zpow_unbounded_of_ne_one {K : Type*} [Semifield K] [LinearOrder K]
+    [IsStrictOrderedRing K] [Archimedean K] [ExistsAddOfLE K] (x : K) {y : K}
+    (hy0 : 0 < y) (hy1 : y ≠ 1) : ∃ (n : ℤ), x < y ^ n := by
+  rcases hy1.lt_or_gt with hy1' | hy1'
+  · obtain ⟨n, hn⟩ := pow_unbounded_of_one_lt x (one_lt_inv_iff₀.2 ⟨hy0, hy1'⟩)
+    exact ⟨-n, by simpa using hn⟩
+  · obtain ⟨n, hn⟩ := pow_unbounded_of_one_lt x hy1'
+    exact ⟨n, by simpa⟩
+
+-- proof partially provided by AI
+/-- If `a < b`, `b, c, d` are positive and `c ≠ 1`, `e` is any element, then there are
+`m : ℕ` and `n : ℤ` such that `a ^ m * c ^ n < d` and `e < b ^ m * c ^ n`.
 
 TODO: go mathlib -/
 theorem exists_pow_mul_zpow_lt_and_lt_pow_mul_zpow_of_lt {K : Type*} [Semifield K] [LinearOrder K]
     [IsStrictOrderedRing K] [Archimedean K] [ExistsAddOfLE K] {a b c d : K} (e : K)
     (h : a < b) (hb₀ : 0 < b) (hc₀ : 0 < c) (hc₁ : c ≠ 1) (hd₀ : 0 < d) :
     ∃ (m : ℕ) (n : ℤ), a ^ m * c ^ n < d ∧ e < b ^ m * c ^ n := by
-  sorry
+  rcases le_or_gt a 0 with ha | ha
+  · obtain ⟨n, hn⟩ := zpow_unbounded_of_ne_one (e / b) hc₀ hc₁
+    rw [div_lt_iff₀' hb₀] at hn
+    use 1, n
+    simp only [pow_one]
+    exact ⟨(mul_nonpos_of_nonpos_of_nonneg ha (zpow_pos hc₀ n).le).trans_lt hd₀, hn⟩
+  · obtain ⟨m₀, n₀, hα, hβ⟩ := exists_one_btwn_pow_mul_zpow_of_lt h hb₀ hc₀ hc₁
+    let α := a ^ m₀ * c ^ n₀
+    let β := b ^ m₀ * c ^ n₀
+    obtain ⟨k, hk₁, hk₂⟩ : ∃ k, α ^ k < d ∧ e < β ^ k := by
+      obtain ⟨k₁, hk₁⟩ := exists_pow_lt_of_lt_one hd₀ hα
+      obtain ⟨k₂, hk₂⟩ := pow_unbounded_of_one_lt e hβ
+      exact ⟨max k₁ k₂, (pow_le_pow_of_le_one (by positivity) hα.le (by simp)).trans_lt hk₁,
+        hk₂.trans_le (pow_le_pow_right₀ hβ.le (by simp))⟩
+    use m₀ * k, n₀ * k
+    simpa only [pow_mul, zpow_mul, zpow_natCast, ← mul_pow] using ⟨hk₁, hk₂⟩
+
+#exit
 
 namespace AbsoluteValue
 

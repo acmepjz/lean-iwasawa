@@ -6,7 +6,7 @@ Authors: Jz Pan
 module
 
 public import Iwasawalib.FieldTheory.IntermediateField.MaximalAbelian
-public import Iwasawalib.NumberTheory.NumberField.HilbertClassField
+public import Iwasawalib.NumberTheory.NumberField.HilbertClassField.ClassFieldTheory
 public import Iwasawalib.NumberTheory.ZpExtension.Basic
 
 @[expose] public section

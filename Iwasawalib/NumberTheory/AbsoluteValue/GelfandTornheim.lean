@@ -5,9 +5,9 @@ Authors: Jz Pan
 -/
 module
 
-public import Iwasawalib.Analysis.AbsoluteValue.Normalization
 public import Mathlib.Analysis.Normed.Algebra.GelfandMazur
 public import Mathlib.Analysis.Normed.Field.Instances
+public import Iwasawalib.NumberTheory.AbsoluteValue.Normalization
 public import Mathlib.NumberTheory.NumberField.InfinitePlace.Basic
 
 @[expose] public section

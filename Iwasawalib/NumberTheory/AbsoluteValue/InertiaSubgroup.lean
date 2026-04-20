@@ -169,6 +169,54 @@ theorem inertiaSubgroup_eq_of_isNonarchimedean
         ← NNReal.coe_lt_coe, NNReal.coe_one] at h1
       rwa [← h2]
 
+theorem inertiaSubgroup_comp_algEquiv_eq_comap {K' : Type*} [Ring K'] [Algebra F K']
+    (f : K' ≃ₐ[F] K) :
+    (v.comp (f := (f : K' →+* K)) f.injective).inertiaSubgroup F =
+      (v.inertiaSubgroup F).comap f.autCongr := by
+  ext σ
+  simp only [mem_inertiaSubgroup_iff, decompositionSubgroup_comp_algEquiv_eq_comap,
+    Subgroup.mem_comap, and_congr_right_iff]
+  refine fun _ ↦ or_congr ?_ ?_
+  · simp only [IsNonarchimedean, comp_apply, RingHom.coe_coe, map_add, le_sup_iff, not_forall,
+      not_or, not_le]
+    refine ⟨fun ⟨x, y, H⟩ ↦ ⟨f x, f y, ?_⟩, fun ⟨x, y, H⟩ ↦ ⟨f.symm x, f.symm y, ?_⟩⟩ <;> simpa
+  · simp only [comp_apply, RingHom.coe_coe, map_sub, MonoidHom.coe_coe, AlgEquiv.autCongr_apply,
+      AlgEquiv.trans_apply]
+    refine ⟨fun H x hx ↦ ?_, fun H x hx ↦ ?_⟩
+    · simpa using H (f.symm x) (by simpa)
+    · simpa using H (f x) hx
+
+theorem inertiaSubgroup_comp_ringEquiv_eq_comap
+    {F E : Type*} [CommSemiring F] [Ring E] [Algebra F E]
+    {M N : Type*} [CommSemiring M] [Ring N] [Algebra M N]
+    {f : F →+* M} {g : E ≃+* N} (v : AbsoluteValue N S)
+    (hsurj : Function.Surjective f)
+    (hcomp : (algebraMap M N).comp f = RingHom.comp g (algebraMap F E)) :
+    (v.comp (f := (g : E →+* N)) g.injective).inertiaSubgroup F =
+      (v.inertiaSubgroup M).comap (AlgEquiv.autCongrOfSurjective hsurj hcomp) := by
+  ext σ
+  simp only [mem_inertiaSubgroup_iff, v.decompositionSubgroup_comp_ringEquiv_eq_comap hsurj hcomp,
+    Subgroup.mem_comap, and_congr_right_iff]
+  refine fun _ ↦ or_congr ?_ ?_
+  · simp only [IsNonarchimedean, comp_apply, RingHom.coe_coe, map_add, le_sup_iff, not_forall,
+      not_or, not_le]
+    refine ⟨fun ⟨x, y, H⟩ ↦ ⟨g x, g y, ?_⟩, fun ⟨x, y, H⟩ ↦ ⟨g.symm x, g.symm y, ?_⟩⟩ <;> simpa
+  · simp only [comp_apply, RingHom.coe_coe, map_sub, MonoidHom.coe_coe,
+      AlgEquiv.autCongrOfSurjective_apply_apply]
+    refine ⟨fun H x hx ↦ ?_, fun H x hx ↦ ?_⟩
+    · simpa using H (g.symm x) (by simpa)
+    · simpa using H (g x) hx
+
+open scoped Pointwise in
+theorem inertiaSubgroup_comp_algEquiv_eq_smul (f : K ≃ₐ[F] K) :
+    (v.comp (f := (f : K →+* K)) f.injective).inertiaSubgroup F =
+      (MulAut.conj f)⁻¹ • v.inertiaSubgroup F := by
+  rw [inertiaSubgroup_comp_algEquiv_eq_comap]
+  ext σ
+  simp only [Subgroup.mem_comap, MonoidHom.coe_coe, AlgEquiv.autCongr_apply,
+    Subgroup.mem_pointwise_smul_iff_inv_smul_mem, inv_inv, MulAut.smul_def, MulAut.conj_apply]
+  rfl
+
 end General
 
 section IsScalarTower

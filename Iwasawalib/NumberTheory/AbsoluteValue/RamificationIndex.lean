@@ -89,6 +89,37 @@ noncomputable def ramificationIdxOfIsScalarTower
     ((v.inertiaSubgroup K).map
       (IntermediateField.restrictRestrictAlgEquivMapHom F L K L)).relIndex (v.inertiaSubgroup F)
 
+/-- The ramification index of `v` for `K / F` is equal to `[Iᵥ(L/F) ⊓ Gal(L/K) : Iᵥ(L/F)]`,
+since `Iᵥ(L/K) = Iᵥ(L/F) ⊓ Gal(L/K)`. -/
+theorem ramificationIdxOfIsScalarTower_eq_range_relIndex
+    (F K : Type*) [Field F] [Field K] [Algebra F K]
+    {L : Type*} [Field L] [Algebra F L] [Algebra K L] [IsScalarTower F K L] [Normal F L]
+    (v : AbsoluteValue L ℝ) :
+    v.ramificationIdxOfIsScalarTower F K =
+      (IntermediateField.restrictRestrictAlgEquivMapHom F L K L).range.relIndex
+        (v.inertiaSubgroup F) := by
+  rw [ramificationIdxOfIsScalarTower, v.inertiaSubgroup_eq_comap F K, Subgroup.map_comap_eq,
+    Subgroup.inf_relIndex_right]
+
+/-- Any two places of `L` conjugate by an element of `Gal(L/K)` have the same ramification index
+for `K / F`. -/
+theorem ramificationIdxOfIsScalarTower_comp_algEquiv_eq
+    (F K : Type*) [Field F] [Field K] [Algebra F K]
+    {L : Type*} [Field L] [Algebra F L] [Algebra K L] [IsScalarTower F K L] [Normal F L]
+    (v : AbsoluteValue L ℝ) (σ : Gal(L/K)) :
+    (v.comp (f := (σ : L →+* L)) σ.injective).ramificationIdxOfIsScalarTower F K =
+      v.ramificationIdxOfIsScalarTower F K := by
+  simp only [ramificationIdxOfIsScalarTower_eq_range_relIndex]
+  rw [v.inertiaSubgroup_comp_algEquiv_eq_comap (σ.restrictScalars F),
+    Subgroup.comap_equiv_eq_map_symm]
+  convert Subgroup.relIndex_map_map_of_injective
+    (f := ((σ.restrictScalars F).autCongr.symm : Gal(L/F) →* Gal(L/F))) _ _ (MulEquiv.injective _)
+  rw [← Subgroup.comap_equiv_eq_map_symm]
+  ext τ
+  simp only [MonoidHom.mem_range, Subgroup.mem_comap, MonoidHom.coe_coe, AlgEquiv.autCongr_apply]
+  refine ⟨fun ⟨x, hx⟩ ↦ ⟨σ * x * σ⁻¹, ?_⟩, fun ⟨x, hx⟩ ↦ ⟨σ⁻¹ * x * σ, ?_⟩⟩ <;>
+    (simp only [map_mul, hx]; ext; simp [IntermediateField.restrictRestrictAlgEquivMapHom])
+
 open IntermediateField in
 theorem ramificationIdxOfIsScalarTower_mul_ramificationIdxOfIsScalarTower
     (F K M : Type*) [Field F] [Field K] [Field M]
@@ -115,6 +146,15 @@ theorem exists_liesOver
     (v : AbsoluteValue F ℝ) : ∃ w : AbsoluteValue K ℝ, w.LiesOver v := by
   sorry
 
+/-- If `K / F` is a normal extension, then any two places of `K` which coincide when
+restrict to `F` are conjugate by an element of `Gal(K/F)`. (Is this correct?) -/
+theorem exists_algEquiv_comp_eq_of_comp_eq
+    {F K : Type*} [Field F] [Field K] [Algebra F K] [Normal F K]
+    {v w : AbsoluteValue K ℝ}
+    (h : v.comp (algebraMap F K).injective = w.comp (algebraMap F K).injective) :
+    ∃ σ : Gal(K/F), v.comp (f := σ) σ.injective = w := by
+  sorry
+
 /-- If `K / F` is an algebraic extension, `v` is a place of `K`, then the
 ramification index of `v` for `K / F` is defined to be the ramification index of `w`
 for `K / F`, where `w` is any extension of `v` to the algebraic closure of `K`. -/
@@ -123,14 +163,34 @@ noncomputable def ramificationIdx
     (v : AbsoluteValue K ℝ) : ℕ :=
   (v.exists_liesOver (AlgebraicClosure K)).choose.ramificationIdxOfIsScalarTower F K
 
-/-- (Is this correct?) -/
+/-- The ramification index is well-defined. (???) -/
 theorem ramificationIdx_spec
     (F : Type*) {K : Type*} [Field F] [Field K] [Algebra F K]
     {L : Type*} [Field L] [Algebra F L] [Algebra K L] [IsScalarTower F K L] [Normal F L]
     (v : AbsoluteValue K ℝ) (w : AbsoluteValue L ℝ) [w.LiesOver v] :
     haveI := Algebra.IsAlgebraic.tower_bot F K L
     v.ramificationIdx F = w.ramificationIdxOfIsScalarTower F K := by
+  have := Algebra.IsAlgebraic.tower_bot F K L
+  rw [ramificationIdx]
+  set v' := (v.exists_liesOver (AlgebraicClosure K)).choose
+  have : v'.LiesOver v := (v.exists_liesOver (AlgebraicClosure K)).choose_spec
+  have := Algebra.IsAlgebraic.tower_top (K := F) K (A := L)
+  let i : L →ₐ[K] (AlgebraicClosure K) := IsAlgClosed.lift
+  let := i.toAlgebra
+  have := IsScalarTower.of_algHom i
+  have := Algebra.IsAlgebraic.tower_top (K := K) L (A := AlgebraicClosure K)
+  obtain ⟨w', _⟩ := w.exists_liesOver (AlgebraicClosure K)
+  have : v'.comp (algebraMap K _).injective = w'.comp (algebraMap K _).injective := by
+    have := LiesOver.trans w' w v
+    rw [LiesOver.comp_eq v' v, LiesOver.comp_eq w' v]
+  obtain ⟨σ, hσ⟩ := exists_algEquiv_comp_eq_of_comp_eq this
+  have := IsAlgClosure.ofAlgebraic F K (AlgebraicClosure K)
+  rw [← v'.ramificationIdxOfIsScalarTower_comp_algEquiv_eq F K σ, hσ]
+  -- ???
+  simp only [ramificationIdxOfIsScalarTower]
   sorry
+
+#exit
 
 theorem ramificationIdx_mul_ramificationIdx
     (F K : Type*) {M : Type*} [Field F] [Field K] [Field M]

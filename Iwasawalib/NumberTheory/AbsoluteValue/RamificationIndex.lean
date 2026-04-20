@@ -1,0 +1,254 @@
+/-
+Copyright (c) 2026 Jz Pan. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Jz Pan
+-/
+module
+
+public import Iwasawalib.Algebra.Algebra.Equiv
+public import Mathlib.RingTheory.Valuation.RamificationGroup
+public import Iwasawalib.NumberTheory.AbsoluteValue.GelfandTornheim
+public import Iwasawalib.NumberTheory.AbsoluteValue.InertiaSubgroup
+public import Mathlib.NumberTheory.NumberField.InfinitePlace.Basic
+public import Iwasawalib.Topology.Algebra.Group.Basic
+
+@[expose] public section
+
+/-!
+
+# Ramification index for a place (`AbsoluteValue`)
+
+(To be written)
+
+References:
+
+- [J. W. S. Cassels, A. Frohlich, editors, *Algebraic Number Theory*][cassels1967algebraic]
+
+-/
+
+namespace AbsoluteValue
+
+/-! ### TODO: go mathlib -/
+
+/-- TODO: go mathlib -/
+theorem _root_.IntermediateField.restrictRestrictAlgEquivMapHom_injective_of_tower_top
+    (F K L : Type*) [Field F] [Field K] [Field L] [Algebra F K] [Algebra F L] [Algebra K L]
+    [IsScalarTower F K L] [Normal F L] :
+    Function.Injective (IntermediateField.restrictRestrictAlgEquivMapHom F L K L) := by
+  rw [injective_iff_map_eq_one]
+  intro a ha
+  ext x
+  replace ha := congr($(ha) x)
+  simpa [IntermediateField.restrictRestrictAlgEquivMapHom] using ha
+
+/-- TODO: go mathlib -/
+@[simp]
+theorem _root_.AlgEquiv.algebraMap_restrictNormalHom_apply
+    {F : Type*} [Field F] {K₁ : Type*} [Field K₁] [Algebra F K₁] (E : Type*) [Field E] [Algebra F E]
+    [Algebra E K₁] [IsScalarTower F E K₁] [Normal F E] (φ : Gal(K₁/F)) (x : E) :
+    algebraMap E K₁ (AlgEquiv.restrictNormalHom E φ x) = φ (algebraMap E K₁ x) := by
+  simp [AlgEquiv.restrictNormalHom]
+
+/-- TODO: go mathlib -/
+@[simp]
+theorem _root_.IntermediateField.alrebraMap_restrictRestrictAlgEquivMapHom_apply
+    (F K L E : Type*) [Field F] [Field K] [Field L] [Field E] [Algebra F K] [Algebra F L]
+    [Algebra F E] [Algebra K E] [Algebra L E] [IsScalarTower F K E] [IsScalarTower F L E]
+    [Normal F K] (φ : Gal(E/L)) (x : K) :
+    algebraMap K E (IntermediateField.restrictRestrictAlgEquivMapHom F K L E φ x) =
+      φ (algebraMap K E x) := by
+  simp [IntermediateField.restrictRestrictAlgEquivMapHom]
+
+/-- TODO: go mathlib -/
+theorem _root_.IntermediateField.restrictRestrictAlgEquivMapHom_comp_restrictRestrictAlgEquivMapHom
+    (F K F' K' F'' K'' : Type*) [Field F] [Field K] [Field F'] [Field K'] [Field F''] [Field K'']
+    [Algebra F K] [Algebra F' K'] [Algebra F'' K''] [Algebra F F'] [Algebra F' F''] [Algebra F F'']
+    [Algebra F K'] [Algebra F' K''] [Algebra F K''] [Algebra K K'] [Algebra K' K''] [Algebra K K'']
+    [IsScalarTower F K K'] [IsScalarTower F' K' K''] [IsScalarTower F F' K'] [IsScalarTower F K K'']
+    [IsScalarTower F F'' K''] [IsScalarTower F' F'' K''] [IsScalarTower K K' K'']
+    [Normal F K] [Normal F' K'] :
+    (IntermediateField.restrictRestrictAlgEquivMapHom F K F' K').comp
+      (IntermediateField.restrictRestrictAlgEquivMapHom F' K' F'' K'') =
+        IntermediateField.restrictRestrictAlgEquivMapHom F K F'' K'' := by
+  ext a x
+  apply_fun _ using (algebraMap K K'').injective
+  convert Eq.refl (a (algebraMap K K'' x))
+  · simp [IsScalarTower.algebraMap_apply K K' K'']
+  · simp
+
+/-! ### Ramification index of a place for an extension -/
+
+/-- If `L / K / F` is an extension tower with `L / F` Galois, `v` is a place of `L`, then the
+ramification index of `v` for `K / F` is defined to be the index of `Iᵥ(L/K)` in `Iᵥ(L/F)`
+(`0` means infinite). Later we will show that this depends only on the place of `K` below `v`,
+and is independent of the choice of `L` (`AbsoluteValue.ramificationIdx_spec`). -/
+noncomputable def ramificationIdxOfIsScalarTower
+    (F K : Type*) [Field F] [Field K] [Algebra F K]
+    {L : Type*} [Field L] [Algebra F L] [Algebra K L] [IsScalarTower F K L] [Normal F L]
+    (v : AbsoluteValue L ℝ) : ℕ :=
+    ((v.inertiaSubgroup K).map
+      (IntermediateField.restrictRestrictAlgEquivMapHom F L K L)).relIndex (v.inertiaSubgroup F)
+
+open IntermediateField in
+theorem ramificationIdxOfIsScalarTower_mul_ramificationIdxOfIsScalarTower
+    (F K M : Type*) [Field F] [Field K] [Field M]
+    [Algebra F K] [Algebra F M] [Algebra K M] [IsScalarTower F K M]
+    {L : Type*} [Field L] [Algebra F L] [Algebra K L] [Algebra M L]
+    [IsScalarTower F M L] [IsScalarTower K M L] [IsScalarTower F K L] [Normal F L] [Normal K L]
+    (v : AbsoluteValue L ℝ) :
+    v.ramificationIdxOfIsScalarTower F K * v.ramificationIdxOfIsScalarTower K M =
+      v.ramificationIdxOfIsScalarTower F M := by
+  simp only [ramificationIdxOfIsScalarTower]
+  rw [mul_comm, ← Subgroup.relIndex_map_map_of_injective _ _
+      (restrictRestrictAlgEquivMapHom_injective_of_tower_top F K L), Subgroup.map_map,
+    restrictRestrictAlgEquivMapHom_comp_restrictRestrictAlgEquivMapHom]
+  apply Subgroup.relIndex_mul_relIndex
+  · rw [← restrictRestrictAlgEquivMapHom_comp_restrictRestrictAlgEquivMapHom F L K L M L,
+      ← Subgroup.map_map]
+    exact Subgroup.map_mono (v.map_inertiaSubgroup_le K M)
+  · exact v.map_inertiaSubgroup_le F K
+
+/-- If `K / F` is an algebraic extension, then any place `v` of `F` can be extended to `K`.
+(Is this correct?) -/
+theorem exists_liesOver
+    {F : Type*} (K : Type*) [Field F] [Field K] [Algebra F K] [Algebra.IsAlgebraic F K]
+    (v : AbsoluteValue F ℝ) : ∃ w : AbsoluteValue K ℝ, w.LiesOver v := by
+  sorry
+
+/-- If `K / F` is an algebraic extension, `v` is a place of `K`, then the
+ramification index of `v` for `K / F` is defined to be the ramification index of `w`
+for `K / F`, where `w` is any extension of `v` to the algebraic closure of `K`. -/
+noncomputable def ramificationIdx
+    (F : Type*) {K : Type*} [Field F] [Field K] [Algebra F K] [Algebra.IsAlgebraic F K]
+    (v : AbsoluteValue K ℝ) : ℕ :=
+  (v.exists_liesOver (AlgebraicClosure K)).choose.ramificationIdxOfIsScalarTower F K
+
+/-- (Is this correct?) -/
+theorem ramificationIdx_spec
+    (F : Type*) {K : Type*} [Field F] [Field K] [Algebra F K]
+    {L : Type*} [Field L] [Algebra F L] [Algebra K L] [IsScalarTower F K L] [Normal F L]
+    (v : AbsoluteValue K ℝ) (w : AbsoluteValue L ℝ) [w.LiesOver v] :
+    haveI := Algebra.IsAlgebraic.tower_bot F K L
+    v.ramificationIdx F = w.ramificationIdxOfIsScalarTower F K := by
+  sorry
+
+theorem ramificationIdx_mul_ramificationIdx
+    (F K : Type*) {M : Type*} [Field F] [Field K] [Field M]
+    [Algebra F K] [Algebra F M] [Algebra K M] [IsScalarTower F K M] [Algebra.IsAlgebraic F M]
+    (v : AbsoluteValue M ℝ) (w : AbsoluteValue K ℝ) [v.LiesOver w] :
+    haveI := Algebra.IsAlgebraic.tower_top (K := F) (L := K) (A := M)
+    haveI := Algebra.IsAlgebraic.tower_bot (K := F) (L := K) (A := M)
+    w.ramificationIdx F * v.ramificationIdx K = v.ramificationIdx F := by
+  have := Algebra.IsAlgebraic.tower_top (K := F) (L := K) (A := M)
+  have := Algebra.IsAlgebraic.tower_bot (K := F) (L := K) (A := M)
+  obtain ⟨v', _⟩ := v.exists_liesOver (AlgebraicClosure M)
+  have := LiesOver.trans v' v w
+  rw [ramificationIdx_spec F w v', ramificationIdx_spec K v v', ramificationIdx_spec F v v',
+    ramificationIdxOfIsScalarTower_mul_ramificationIdxOfIsScalarTower]
+
+/-! ### Assertion that a place is unramified for an extension -/
+
+/-- If `L / K / F` is an extension tower with `L / F` Galois, `v` is a place of `L`, then `v` is
+called unramified for `K / F`, if `Iᵥ(L/F) ≤ Gal(L/K)`, or equivalently `Iᵥ(L/K) = Iᵥ(L/F)`
+(`AbsoluteValue.isUnramifiedOfIsScalarTower_iff_map_inertiaSubgroup_eq`).
+Later we will show that this depends only on the place of `K` below `v`, and is independent of the
+choice of `L` (`AbsoluteValue.isUnramified_spec`). -/
+def IsUnramifiedOfIsScalarTower
+    (F K : Type*) [Field F] [Field K] [Algebra F K]
+    {L : Type*} [Field L] [Algebra F L] [Algebra K L] [IsScalarTower F K L] [Normal F L]
+    (v : AbsoluteValue L ℝ) : Prop :=
+    v.inertiaSubgroup F ≤ (IntermediateField.restrictRestrictAlgEquivMapHom F L K L).range
+
+theorem isUnramifiedOfIsScalarTower_iff_map_inertiaSubgroup_eq
+    (F K : Type*) [Field F] [Field K] [Algebra F K]
+    {L : Type*} [Field L] [Algebra F L] [Algebra K L] [IsScalarTower F K L] [Normal F L]
+    (v : AbsoluteValue L ℝ) :
+    v.IsUnramifiedOfIsScalarTower F K ↔ (v.inertiaSubgroup K).map
+      (IntermediateField.restrictRestrictAlgEquivMapHom F L K L) = v.inertiaSubgroup F := by
+  have h := congr($(v.inertiaSubgroup_eq_comap F K).map
+    (IntermediateField.restrictRestrictAlgEquivMapHom F L K L))
+  rw [Subgroup.map_comap_eq] at h
+  rw [h, inf_eq_right, IsUnramifiedOfIsScalarTower]
+
+theorem isUnramifiedOfIsScalarTower_iff_ramificationIdxOfIsScalarTower_eq_one
+    (F K : Type*) [Field F] [Field K] [Algebra F K]
+    {L : Type*} [Field L] [Algebra F L] [Algebra K L] [IsScalarTower F K L] [Normal F L]
+    (v : AbsoluteValue L ℝ) :
+    v.IsUnramifiedOfIsScalarTower F K ↔ v.ramificationIdxOfIsScalarTower F K = 1 := by
+  rw [isUnramifiedOfIsScalarTower_iff_map_inertiaSubgroup_eq, le_antisymm_iff]
+  simp [ramificationIdxOfIsScalarTower, v.map_inertiaSubgroup_le F K]
+
+/-- If `K / F` is an algebraic extension, `v` is a place of `K`, then `v` is called
+unramified for `K / F`, if `w` is unramified for `K / F`, where `w` is any extension of `v` to the
+algebraic closure of `K`. -/
+def IsUnramified
+    (F : Type*) {K : Type*} [Field F] [Field K] [Algebra F K] [Algebra.IsAlgebraic F K]
+    (v : AbsoluteValue K ℝ) : Prop :=
+  (v.exists_liesOver (AlgebraicClosure K)).choose.IsUnramifiedOfIsScalarTower F K
+
+theorem isUnramified_iff_ramificationIdx_eq_one
+    (F : Type*) {K : Type*} [Field F] [Field K] [Algebra F K] [Algebra.IsAlgebraic F K]
+    (v : AbsoluteValue K ℝ) :
+    v.IsUnramified F ↔ v.ramificationIdx F = 1 :=
+  isUnramifiedOfIsScalarTower_iff_ramificationIdxOfIsScalarTower_eq_one ..
+
+theorem isUnramified_spec
+    (F : Type*) {K : Type*} [Field F] [Field K] [Algebra F K]
+    {L : Type*} [Field L] [Algebra F L] [Algebra K L] [IsScalarTower F K L] [Normal F L]
+    (v : AbsoluteValue K ℝ) (w : AbsoluteValue L ℝ) [w.LiesOver v] :
+    haveI := Algebra.IsAlgebraic.tower_bot F K L
+    v.IsUnramified F ↔ w.IsUnramifiedOfIsScalarTower F K := by
+  rw [isUnramified_iff_ramificationIdx_eq_one, v.ramificationIdx_spec F w,
+    isUnramifiedOfIsScalarTower_iff_ramificationIdxOfIsScalarTower_eq_one]
+
+namespace IsUnramified
+
+theorem tower_top
+    {F : Type*} (K : Type*) {M : Type*} [Field F] [Field K] [Field M]
+    [Algebra F K] [Algebra F M] [Algebra K M] [IsScalarTower F K M] [Algebra.IsAlgebraic F M]
+    {v : AbsoluteValue M ℝ} (H : v.IsUnramified F) :
+    haveI := Algebra.IsAlgebraic.tower_top (K := F) (L := K) (A := M); v.IsUnramified K := by
+  simp only [isUnramified_iff_ramificationIdx_eq_one] at H ⊢
+  rw [← v.ramificationIdx_mul_ramificationIdx F K (v.comp (algebraMap K M).injective),
+    mul_eq_one] at H
+  exact H.2
+
+theorem tower_bot
+    {F K M : Type*} [Field F] [Field K] [Field M]
+    [Algebra F K] [Algebra F M] [Algebra K M] [IsScalarTower F K M] [Algebra.IsAlgebraic F M]
+    {v : AbsoluteValue M ℝ} (H : v.IsUnramified F) (w : AbsoluteValue K ℝ) [v.LiesOver w] :
+    haveI := Algebra.IsAlgebraic.tower_bot (K := F) (L := K) (A := M); w.IsUnramified F := by
+  simp only [isUnramified_iff_ramificationIdx_eq_one] at H ⊢
+  rw [← v.ramificationIdx_mul_ramificationIdx F K w, mul_eq_one] at H
+  exact H.1
+
+theorem trans
+    {F K M : Type*} [Field F] [Field K] [Field M]
+    [Algebra F K] [Algebra F M] [Algebra K M] [IsScalarTower F K M]
+    [Algebra.IsAlgebraic F K] [Algebra.IsAlgebraic K M]
+    {v : AbsoluteValue M ℝ} {w : AbsoluteValue K ℝ} (H1 : w.IsUnramified F)
+    (H2 : v.IsUnramified K) [v.LiesOver w] :
+    haveI := Algebra.IsAlgebraic.trans F K M; v.IsUnramified F := by
+  have := Algebra.IsAlgebraic.trans F K M
+  simp only [isUnramified_iff_ramificationIdx_eq_one] at H1 H2 ⊢
+  rw [← v.ramificationIdx_mul_ramificationIdx F K w, H1, H2, one_mul]
+
+end IsUnramified
+
+/-- If `L / K` is an algebraic extension, `L / F` is a field extension, `v` is a place of `F`, then
+`v` is called unramified for `L / K`, if all place `w` of `L` above `v` is
+unramified for `L / K`. -/
+def IsUnramifiedIn
+    {F : Type*} (K L : Type*) [Field F] [Field K] [Field L]
+    [Algebra F L] [Algebra K L] [Algebra.IsAlgebraic K L]
+    (v : AbsoluteValue F ℝ) : Prop :=
+    ∀ w : AbsoluteValue L ℝ, w.LiesOver v → w.IsUnramified K
+
+@[simp]
+theorem isUnramifiedIn_self_iff
+    (F : Type*) {K : Type*} [Field F] [Field K] [Algebra F K] [Algebra.IsAlgebraic F K]
+    (v : AbsoluteValue K ℝ) :
+    v.IsUnramifiedIn F K ↔ v.IsUnramified F := by
+  simp [IsUnramifiedIn, liesOver_self_iff]
+
+end AbsoluteValue

@@ -5,8 +5,9 @@ Authors: Jz Pan
 -/
 module
 
+public import Iwasawalib.Algebra.Algebra.Equiv
 public import Mathlib.RingTheory.Valuation.RamificationGroup
-public import Iwasawalib.NumberTheory.AbsoluteValue.Archimedean
+public import Iwasawalib.NumberTheory.AbsoluteValue.GelfandTornheim
 public import Mathlib.NumberTheory.NumberField.InfinitePlace.Basic
 public import Iwasawalib.Topology.Algebra.Group.Basic
 
@@ -93,8 +94,6 @@ theorem exists_pow_mul_zpow_lt_and_lt_pow_mul_zpow_of_lt {K : Type*} [Semifield 
     use m₀ * k, n₀ * k
     simpa only [pow_mul, zpow_mul, zpow_natCast, ← mul_pow] using ⟨hk₁, hk₂⟩
 
-#exit
-
 namespace AbsoluteValue
 
 /-! ### Action on absolute values -/
@@ -161,6 +160,12 @@ theorem mem_decompositionSubgroup_iff_forall_apply_eq :
     σ ∈ v.decompositionSubgroup F ↔ ∀ x, v (σ x) = v x := by
   simp [mem_decompositionSubgroup_iff, AbsoluteValue.ext_iff]
 
+variable {v} in
+theorem decompositionSubgroup_eq_of_equiv {w : AbsoluteValue K S} (h : v ≈ w) :
+    v.decompositionSubgroup F = w.decompositionSubgroup F := by
+  ext σ
+  simp [mem_decompositionSubgroup_iff_forall_apply_eq, AbsoluteValue.IsEquiv.eq_iff_eq h]
+
 theorem decompositionSubgroup_eq_top_of_not_isNontrivial (h : ¬v.IsNontrivial) :
     v.decompositionSubgroup F = ⊤ := by
   rw [eq_top_iff]
@@ -183,6 +188,42 @@ theorem image_setOf_eq_of_mem_decompositionSubgroup
   ext x
   obtain ⟨x', rfl⟩ := σ.surjective x
   simp [(mem_decompositionSubgroup_iff_forall_apply_eq ..).1 h x']
+
+theorem decompositionSubgroup_comp_algEquiv_eq_comap {K' : Type*} [Semiring K'] [Algebra F K']
+    (f : K' ≃ₐ[F] K) :
+    (v.comp (f := (f : K' →+* K)) f.injective).decompositionSubgroup F =
+      (v.decompositionSubgroup F).comap f.autCongr := by
+  ext σ
+  simp only [mem_decompositionSubgroup_iff_forall_apply_eq, comp_apply, RingHom.coe_coe,
+    Subgroup.mem_comap, MonoidHom.coe_coe, AlgEquiv.autCongr_apply, AlgEquiv.trans_apply]
+  refine ⟨fun h ↦ by simp [h], fun h x ↦ ?_⟩
+  obtain ⟨y, rfl⟩ := f.symm.surjective x
+  simp [h]
+
+theorem decompositionSubgroup_comp_ringEquiv_eq_comap
+    {F E : Type*} [CommSemiring F] [Semiring E] [Algebra F E]
+    {M N : Type*} [CommSemiring M] [Semiring N] [Algebra M N]
+    {f : F →+* M} {g : E ≃+* N} (v : AbsoluteValue N S)
+    (hsurj : Function.Surjective f)
+    (hcomp : (algebraMap M N).comp f = RingHom.comp g (algebraMap F E)) :
+    (v.comp (f := (g : E →+* N)) g.injective).decompositionSubgroup F =
+      (v.decompositionSubgroup M).comap (AlgEquiv.autCongrOfSurjective hsurj hcomp) := by
+  ext σ
+  simp only [mem_decompositionSubgroup_iff_forall_apply_eq, comp_apply, RingHom.coe_coe,
+    Subgroup.mem_comap, MonoidHom.coe_coe, AlgEquiv.autCongrOfSurjective_apply_apply]
+  refine ⟨fun h ↦ by simp [h], fun h x ↦ ?_⟩
+  obtain ⟨y, rfl⟩ := g.symm.surjective x
+  simp [h]
+
+open scoped Pointwise in
+theorem decompositionSubgroup_comp_algEquiv_eq_smul (f : K ≃ₐ[F] K) :
+    (v.comp (f := (f : K →+* K)) f.injective).decompositionSubgroup F =
+      (MulAut.conj f)⁻¹ • v.decompositionSubgroup F := by
+  rw [decompositionSubgroup_comp_algEquiv_eq_comap]
+  ext σ
+  simp only [Subgroup.mem_comap, MonoidHom.coe_coe, AlgEquiv.autCongr_apply,
+    Subgroup.mem_pointwise_smul_iff_inv_smul_mem, inv_inv, MulAut.smul_def, MulAut.conj_apply]
+  rfl
 
 end General
 
@@ -267,50 +308,54 @@ theorem mem_decompositionSubgroup_iff_continuous :
     exact h2.not_gt (by simpa using hδ2 _ h1)
   simp [not_isNontrivial_apply htriv, hx]
 
-#exit
-
 /-- Our definition is the same as `ValuationSubring.decompositionSubgroup` for finite places. -/
-theorem decompositionSubgroup_eq_of_isNonarchimedean
-    (F : Type*) {K : Type*} [Field F] [Field K] [Algebra F K] (v : AbsoluteValue K ℝ)
-    (h : IsNonarchimedean v) :
+theorem decompositionSubgroup_eq_of_isNonarchimedean (h : IsNonarchimedean v) :
     v.decompositionSubgroup F = (v.toValuation h).valuationSubring.decompositionSubgroup F := by
   ext g
-  simp only [mem_decompositionSubgroup_iff, MulAction.mem_stabilizer_iff, SetLike.ext'_iff]
+  simp only [mem_decompositionSubgroup_iff_image_setOf_eq, MulAction.mem_stabilizer_iff,
+    SetLike.ext'_iff]
   congr!
+
+end IsAlgebraic
+
+section IsScalarTower
+
+variable (F K : Type*) [Field F] [Field K] [Algebra F K]
+  {L : Type*} [Field L] [Algebra F L] [Algebra K L] [IsScalarTower F K L] [Normal F L]
+  {S : Type*} [Semiring S] [PartialOrder S] (v : AbsoluteValue L S)
 
 /-- If `L / K / F` is an extension tower with `L / F` Galois, `v` is a place of `L`, then
 `Dᵥ(L/K) = Dᵥ(L/F) ⊓ Gal(L/K)`. -/
-theorem decompositionSubgroup_eq_comap
-    (F K : Type*) [Field F] [Field K] [Algebra F K]
-    {L : Type*} [Field L] [Algebra F L] [Algebra K L] [IsScalarTower F K L] [Normal F L]
-    (v : AbsoluteValue L ℝ) :
+theorem decompositionSubgroup_eq_comap :
     v.decompositionSubgroup K = (v.decompositionSubgroup F).comap
       (IntermediateField.restrictRestrictAlgEquivMapHom F L K L) := by
   ext
-  simp [mem_decompositionSubgroup_iff, Set.ext_iff,
-    IntermediateField.restrictRestrictAlgEquivMapHom]
+  simp [mem_decompositionSubgroup_iff, IntermediateField.restrictRestrictAlgEquivMapHom]
 
 /-- If `L / K / F` is an extension tower with `L / F` Galois, `v` is a place of `L`, then
 `Iᵥ(L/K) ≤ Iᵥ(L/F)`. -/
-theorem map_decompositionSubgroup_le
-    (F K : Type*) [Field F] [Field K] [Algebra F K]
-    {L : Type*} [Field L] [Algebra F L] [Algebra K L] [IsScalarTower F K L] [Normal F L]
-    (v : AbsoluteValue L ℝ) :
+theorem map_decompositionSubgroup_le :
     (v.decompositionSubgroup K).map
       (IntermediateField.restrictRestrictAlgEquivMapHom F L K L) ≤ v.decompositionSubgroup F := by
   simpa only [Subgroup.map_le_iff_le_comap] using (v.decompositionSubgroup_eq_comap F K).le
 
-/-- Decomposition subgroup for an infinite place is either trivial or `ℤ/2ℤ`. (Is this correct?) -/
+end IsScalarTower
+
+/-- Decomposition subgroup for an infinite place is either trivial or `ℤ/2ℤ`. This is because the
+decomposition subgroup can be viewed as Galois group of completions of fields with respect to
+valuations (didn't formalized yet), in the archimedean case they must be `ℝ` or `ℂ`. -/
 theorem card_decompositionSubgroup_dvd_two_of_not_isNonarchimedean
     (F : Type*) {K : Type*} [Field F] [Field K] [Algebra F K] (v : AbsoluteValue K ℝ)
     (h : ¬IsNonarchimedean v) :
     Nat.card (v.decompositionSubgroup F) ∣ 2 := by
   sorry
 
+#exit
+
 /-! ### Inertia subgroup for a place -/
 
 /-- The inertia subgroup `Iᵥ(K/F)` in `Gal(K/F)` for a finite place `v` of `K` consists of all `σ`
-preserving the set `{x | v x ≤ 1}` and such that for all such `x`, `v (σ x - x) < 1`.
+preserving the valuation `v` and such that for all such `x`, `v (σ x - x) < 1`.
 For infinite places `Iᵥ(K/F)` is just defined to be the decomposition subgroup `Dᵥ(K/F)`. -/
 def inertiaSubgroup
     (F : Type*) {K : Type*} [Field F] [Field K] [Algebra F K] (v : AbsoluteValue K ℝ) :

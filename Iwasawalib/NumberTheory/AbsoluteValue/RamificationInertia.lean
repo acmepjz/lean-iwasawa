@@ -152,10 +152,12 @@ Note: Here we use `def` but not `abbrev` because sometimes simp lemmas for `MulA
 are not desired (will introduce `σ⁻¹`). -/
 def decompositionSubgroup := MulAction.stabilizer (K ≃ₐ[F] K) v
 
+variable {F} in
 theorem mem_decompositionSubgroup_iff :
     σ ∈ v.decompositionSubgroup F ↔ v.comp (f := σ) σ.injective = v := by
   rw [← inv_mem_iff, decompositionSubgroup, MulAction.mem_stabilizer_iff, algEquiv_smul_def]
 
+variable {F} in
 theorem mem_decompositionSubgroup_iff_forall_apply_eq :
     σ ∈ v.decompositionSubgroup F ↔ ∀ x, v (σ x) = v x := by
   simp [mem_decompositionSubgroup_iff, AbsoluteValue.ext_iff]
@@ -176,11 +178,11 @@ theorem decompositionSubgroup_eq_top_of_not_isNontrivial (h : ¬v.IsNontrivial) 
   · simp
   · simp [not_isNontrivial_apply h, hx]
 
-variable {σ}
+variable {F σ}
 
 theorem apply_eq_of_mem_decompositionSubgroup
     (h : σ ∈ v.decompositionSubgroup F) (x) : v (σ x) = v x :=
-  (v.mem_decompositionSubgroup_iff_forall_apply_eq F σ).1 h x
+  (v.mem_decompositionSubgroup_iff_forall_apply_eq σ).1 h x
 
 /-- The elements in decomposition subgroup preserve the set `{x | v x ≤ y}` for all `y`. -/
 theorem image_setOf_eq_of_mem_decompositionSubgroup
@@ -232,7 +234,7 @@ section IsAlgebraic
 variable (F K : Type*) [Field F] [Field K] [Algebra F K] [Algebra.IsAlgebraic F K]
   (v : AbsoluteValue K ℝ) (σ : Gal(K/F))
 
-variable {K}
+variable {F K}
 
 /-- If `K / F` is algebraic, then the decomposition subgroup `Dᵥ(K/F)` is also the subgroup
 consists of all `σ` preserving the set `{x | v x ≤ 1}`.
@@ -243,7 +245,7 @@ $X^{1/n} \mapsto X^{k/n}$, then it preserves the valuation ring but doesn't pres
 -/
 theorem mem_decompositionSubgroup_iff_image_setOf_eq :
     σ ∈ v.decompositionSubgroup F ↔ σ '' {x | v x ≤ 1} = {x | v x ≤ 1} := by
-  refine ⟨fun h ↦ v.image_setOf_eq_of_mem_decompositionSubgroup F h 1, fun h ↦ ?_⟩
+  refine ⟨fun h ↦ v.image_setOf_eq_of_mem_decompositionSubgroup h 1, fun h ↦ ?_⟩
   replace h (x) (hx : x ∈ {x | v x ≤ 1}) : v (σ x) ≤ 1 := by
     simpa [h] using Set.mem_image_of_mem σ hx
   rw [mem_decompositionSubgroup_iff_forall_apply_eq]
@@ -281,7 +283,7 @@ theorem continuous_of_mem_decompositionSubgroup
 if and only if it is continuous under the `v`-adic topology. -/
 theorem mem_decompositionSubgroup_iff_continuous :
     σ ∈ v.decompositionSubgroup F ↔ Continuous (WithAbs.congr v v σ) := by
-  refine ⟨fun h ↦ v.continuous_of_mem_decompositionSubgroup F h, fun h ↦ ?_⟩
+  refine ⟨fun h ↦ v.continuous_of_mem_decompositionSubgroup h, fun h ↦ ?_⟩
   replace h (ε : ℝ) (hε : 0 < ε) : ∃ δ : ℝ, 0 < δ ∧ ∀ x, v x < δ → v (σ x) < ε := by
     obtain ⟨s, h1, hs, hs2⟩ := (AddMonoidHom.continuous_iff (WithAbs.congr v v σ).toAddMonoidHom).1
       h (Metric.ball 0 ε) (Metric.mem_ball_self hε) Metric.isOpen_ball
@@ -307,6 +309,8 @@ theorem mem_decompositionSubgroup_iff_continuous :
     simp only [comp_apply, ← map_zpow₀, ← map_pow, ← map_mul] at h1 h2
     exact h2.not_gt (by simpa using hδ2 _ h1)
   simp [not_isNontrivial_apply htriv, hx]
+
+variable (F)
 
 /-- Our definition is the same as `ValuationSubring.decompositionSubgroup` for finite places. -/
 theorem decompositionSubgroup_eq_of_isNonarchimedean (h : IsNonarchimedean v) :
@@ -350,57 +354,75 @@ theorem card_decompositionSubgroup_dvd_two_of_not_isNonarchimedean
     Nat.card (v.decompositionSubgroup F) ∣ 2 := by
   sorry
 
-#exit
-
 /-! ### Inertia subgroup for a place -/
 
+section General
+
+variable (F K S : Type*) [CommSemiring F] [Ring K] [Algebra F K] [Semiring S] [Nontrivial S]
+  [LinearOrder S] [ZeroLEOneClass S] [MulPosMono S] (v : AbsoluteValue K S) (σ : K ≃ₐ[F] K)
+
+variable {K S}
+
+/-- Another version of `AbsoluteValue.map_neg` with slightly different assumptions.
+
+TODO: go mathlib -/
+theorem map_neg' {R S : Type*} [Semiring S] [LinearOrder S] [MulPosMono S] [Ring R]
+    (abv : AbsoluteValue R S) (a : R) : abv (-a) = abv a := by
+  by_contra! H
+  wlog H' : abv (-a) < abv a generalizing a
+  · specialize this (-a)
+    simp only [neg_neg] at this
+    exact this H.symm (H.lt_or_gt.resolve_left H')
+  have h1 : abv (-1) < 1 := by
+    by_contra! h1
+    have := le_mul_of_one_le_left (abv.nonneg a) h1
+    rw [← map_mul, neg_one_mul] at this
+    exact this.not_gt H'
+  have := mul_le_of_le_one_left (abv.nonneg (-a)) h1.le
+  rw [← map_mul, neg_one_mul, neg_neg] at this
+  exact this.not_gt H'
+
 /-- The inertia subgroup `Iᵥ(K/F)` in `Gal(K/F)` for a finite place `v` of `K` consists of all `σ`
-preserving the valuation `v` and such that for all such `x`, `v (σ x - x) < 1`.
+in the decomposition subgroup `Dᵥ(K/F)` such that for all `x` with `v x ≤ 1`, `v (σ x - x) < 1`.
 For infinite places `Iᵥ(K/F)` is just defined to be the decomposition subgroup `Dᵥ(K/F)`. -/
-def inertiaSubgroup
-    (F : Type*) {K : Type*} [Field F] [Field K] [Algebra F K] (v : AbsoluteValue K ℝ) :
-    Subgroup Gal(K/F) where
-  carrier := {σ | σ '' {x | v x ≤ 1} = {x | v x ≤ 1} ∧
+def inertiaSubgroup : Subgroup (K ≃ₐ[F] K) where
+  carrier := {σ | σ ∈ v.decompositionSubgroup F ∧
     (¬IsNonarchimedean v ∨ ∀ x, v x ≤ 1 → v (σ x - x) < 1)}
   one_mem' := by simp
   mul_mem' {f} {g} hf hg := by
     by_cases h : IsNonarchimedean v
-    · simp only [h, not_true_eq_false, false_or] at hf hg ⊢
-      use (v.decompositionSubgroup F).mul_mem hf.1 hg.1
+    · simp only [h, not_true_eq_false, false_or, Set.mem_setOf] at hf hg ⊢
+      obtain ⟨hf1, hf2⟩ := hf
+      obtain ⟨hg1, hg2⟩ := hg
+      use mul_mem hf1 hg1
       intro x hx
-      rw [AlgEquiv.mul_apply]
-      replace hf := hf.2 _ (v.apply_le_one_of_mem_decompositionSubgroup hg.1 hx)
-      replace hg := hg.2 _ hx
-      simpa using (h (f (g x) - g x) (g x - x)).trans_lt (max_lt hf hg)
-    simp only [h, not_false_eq_true, true_or, and_true] at hf hg ⊢
-    exact (v.decompositionSubgroup F).mul_mem hf hg
+      simpa using (h (f (g x) - g x) (g x - x)).trans_lt <| max_lt
+        (hf2 (g x) (by rwa [v.apply_eq_of_mem_decompositionSubgroup hg1])) (hg2 _ hx)
+    simp only [h, not_false_eq_true, true_or, and_true, Set.mem_setOf] at hf hg ⊢
+    exact mul_mem hf hg
   inv_mem' {f} hf := by
     by_cases h : IsNonarchimedean v
-    · simp only [h, not_true_eq_false, false_or] at hf ⊢
-      have h1 := (v.decompositionSubgroup F).inv_mem hf.1
+    · simp only [h, not_true_eq_false, false_or, Set.mem_setOf] at hf ⊢
+      have h1 := inv_mem hf.1
       refine ⟨h1, fun x hx ↦ ?_⟩
-      rw [← AbsoluteValue.map_neg]
-      convert hf.2 _ (v.apply_le_one_of_mem_decompositionSubgroup h1 hx) using 2
+      rw [← v.map_neg']
+      convert hf.2 _ (v.apply_eq_of_mem_decompositionSubgroup h1 x ▸ hx) using 2
       simp
-    simp only [h, not_false_eq_true, true_or, and_true] at hf ⊢
-    exact (v.decompositionSubgroup F).inv_mem hf
+    simpa [h] using hf
 
-theorem mem_inertiaSubgroup_iff
-    (F : Type*) {K : Type*} [Field F] [Field K] [Algebra F K] (v : AbsoluteValue K ℝ) (σ) :
-    σ ∈ v.inertiaSubgroup F ↔ σ '' {x | v x ≤ 1} = {x | v x ≤ 1} ∧
+variable {F}
+
+theorem mem_inertiaSubgroup_iff :
+    σ ∈ v.inertiaSubgroup F ↔ σ ∈ v.decompositionSubgroup F ∧
       (¬IsNonarchimedean v ∨ ∀ x, v x ≤ 1 → v (σ x - x) < 1) := Iff.rfl
 
-theorem mem_inertiaSubgroup_iff_of_isNonarchimedean
-    (F : Type*) {K : Type*} [Field F] [Field K] [Algebra F K] (v : AbsoluteValue K ℝ)
-    (h : IsNonarchimedean v) (σ) :
-    σ ∈ v.inertiaSubgroup F ↔ σ '' {x | v x ≤ 1} = {x | v x ≤ 1} ∧
+theorem mem_inertiaSubgroup_iff_of_isNonarchimedean (h : IsNonarchimedean v) (σ) :
+    σ ∈ v.inertiaSubgroup F ↔ σ ∈ v.decompositionSubgroup F ∧
       ∀ x, v x ≤ 1 → v (σ x - x) < 1 := by
   simp [mem_inertiaSubgroup_iff, h]
 
-theorem mem_inertiaSubgroup_iff_of_not_isNonarchimedean
-    (F : Type*) {K : Type*} [Field F] [Field K] [Algebra F K] (v : AbsoluteValue K ℝ)
-    (h : ¬IsNonarchimedean v) (σ) :
-    σ ∈ v.inertiaSubgroup F ↔ σ '' {x | v x ≤ 1} = {x | v x ≤ 1} := by
+theorem mem_inertiaSubgroup_iff_of_not_isNonarchimedean (h : ¬IsNonarchimedean v) (σ) :
+    σ ∈ v.inertiaSubgroup F ↔ σ ∈ v.decompositionSubgroup F := by
   simp [mem_inertiaSubgroup_iff, h]
 
 theorem inertiaSubgroup_eq_bot_of_not_isNontrivial
@@ -410,7 +432,7 @@ theorem inertiaSubgroup_eq_bot_of_not_isNontrivial
   rintro σ hσ
   rw [Subgroup.mem_bot]
   ext x
-  rw [v.mem_inertiaSubgroup_iff_of_isNonarchimedean F (by
+  rw [v.mem_inertiaSubgroup_iff_of_isNonarchimedean (by
     contrapose! h; exact isNontrivial_of_not_isNonarchimedean _ h)] at hσ
   replace hσ := hσ.2 x <| by
     rcases eq_or_ne x 0 with rfl | hx
@@ -421,37 +443,31 @@ theorem inertiaSubgroup_eq_bot_of_not_isNontrivial
     exact (not_isNontrivial_apply h hσ).ge
   simpa [sub_eq_zero] using hσ
 
-theorem inertiaSubgroup_le_decompositionSubgroup
-    (F : Type*) {K : Type*} [Field F] [Field K] [Algebra F K] (v : AbsoluteValue K ℝ) :
-    v.inertiaSubgroup F ≤ v.decompositionSubgroup F := fun _ ↦ by
-  simpa only [mem_inertiaSubgroup_iff, mem_decompositionSubgroup_iff] using And.left
+variable (F)
 
-theorem inertiaSubgroup_eq_decompositionSubgroup_of_not_isNonarchimedean
-    (F : Type*) {K : Type*} [Field F] [Field K] [Algebra F K] (v : AbsoluteValue K ℝ)
-    (h : ¬IsNonarchimedean v) :
+theorem inertiaSubgroup_le_decompositionSubgroup :
+    v.inertiaSubgroup F ≤ v.decompositionSubgroup F := fun _ ↦ by
+  simpa only [mem_inertiaSubgroup_iff] using And.left
+
+theorem inertiaSubgroup_eq_decompositionSubgroup_of_not_isNonarchimedean (h : ¬IsNonarchimedean v) :
     v.inertiaSubgroup F = v.decompositionSubgroup F := by
   ext
-  simp only [v.mem_inertiaSubgroup_iff_of_not_isNonarchimedean F h, mem_decompositionSubgroup_iff]
+  simp only [v.mem_inertiaSubgroup_iff_of_not_isNonarchimedean h]
 
-theorem apply_le_one_of_mem_inertiaSubgroup
-    {F : Type*} {K : Type*} [Field F] [Field K] [Algebra F K] (v : AbsoluteValue K ℝ) {σ}
-    (h : σ ∈ v.inertiaSubgroup F) {x} (hx : v x ≤ 1) : v (σ x) ≤ 1 :=
-  v.apply_le_one_of_mem_decompositionSubgroup (v.inertiaSubgroup_le_decompositionSubgroup F h) hx
+variable {F σ}
 
-theorem apply_le_one_iff_of_mem_inertiaSubgroup
-    {F : Type*} {K : Type*} [Field F] [Field K] [Algebra F K] (v : AbsoluteValue K ℝ) {σ}
-    (h : σ ∈ v.inertiaSubgroup F) {x} : v (σ x) ≤ 1 ↔ v x ≤ 1 :=
-  v.apply_le_one_iff_of_mem_decompositionSubgroup (v.inertiaSubgroup_le_decompositionSubgroup F h)
+theorem apply_eq_of_mem_inertiaSubgroup
+    (h : σ ∈ v.inertiaSubgroup F) (x) : v (σ x) = v x :=
+  v.apply_eq_of_mem_decompositionSubgroup (v.inertiaSubgroup_le_decompositionSubgroup F h) x
 
 theorem apply_sub_lt_one_of_mem_inertiaSubgroup_of_isNonarchimedean
-    {F : Type*} {K : Type*} [Field F] [Field K] [Algebra F K] (v : AbsoluteValue K ℝ) {σ}
     (h : σ ∈ v.inertiaSubgroup F) (h2 : IsNonarchimedean v) {x} (hx : v x ≤ 1) : v (σ x - x) < 1 :=
-  ((v.mem_inertiaSubgroup_iff_of_isNonarchimedean F h2 σ).1 h).2 x hx
+  ((v.mem_inertiaSubgroup_iff_of_isNonarchimedean h2 σ).1 h).2 x hx
 
 /-- Our definition is the same as `ValuationSubring.inertiaSubgroup` for finite places. -/
 theorem inertiaSubgroup_eq_of_isNonarchimedean
-    (F : Type*) {K : Type*} [Field F] [Field K] [Algebra F K] (v : AbsoluteValue K ℝ)
-    (h : IsNonarchimedean v) :
+    (F : Type*) {K : Type*} [Field F] [Field K] [Algebra F K] [Algebra.IsAlgebraic F K]
+    (v : AbsoluteValue K ℝ) (h : IsNonarchimedean v) :
     v.inertiaSubgroup F =
       ((v.toValuation h).valuationSubring.inertiaSubgroup F).map (Subgroup.subtype _) := by
   ext g
@@ -468,40 +484,45 @@ theorem inertiaSubgroup_eq_of_isNonarchimedean
       ← NNReal.coe_lt_coe, NNReal.coe_one]
     convert v.apply_sub_lt_one_of_mem_inertiaSubgroup_of_isNonarchimedean hg h y.2
   · rintro ⟨f, h1, h2⟩
-    rw [v.mem_inertiaSubgroup_iff_of_isNonarchimedean F h]
+    rw [v.mem_inertiaSubgroup_iff_of_isNonarchimedean h]
     refine ⟨?_, fun x hx ↦ ?_⟩
-    · rw [← v.mem_decompositionSubgroup_iff F, ← h2]
-      have := v.decompositionSubgroup_eq_of_isNonarchimedean F h
+    · rw [v.decompositionSubgroup_eq_of_isNonarchimedean _ h, ← h2]
       convert f.2
     · rw [ValuationSubring.inertiaSubgroup, MonoidHom.mem_ker] at h1
       replace h1 := congr($(h1) (IsLocalRing.residue _ ⟨x, hx⟩))
       change IsLocalRing.residue _ _ = IsLocalRing.residue _ _ at h1
       rw [← sub_eq_zero, ← map_sub, IsLocalRing.residue_eq_zero_iff, Valuation.mem_maximalIdeal_iff,
         ← NNReal.coe_lt_coe, NNReal.coe_one] at h1
-      rw [← h2]
-      exact h1
+      rwa [← h2]
+
+end General
+
+section IsScalarTower
+
+variable (F K : Type*) [Field F] [Field K] [Algebra F K]
+  {L : Type*} [Field L] [Algebra F L] [Algebra K L] [IsScalarTower F K L] [Normal F L]
+  {S : Type*} [Semiring S] [Nontrivial S] [LinearOrder S] [ZeroLEOneClass S] [MulPosMono S]
+  (v : AbsoluteValue L S)
 
 /-- If `L / K / F` is an extension tower with `L / F` Galois, `v` is a place of `L`, then
 `Iᵥ(L/K) = Iᵥ(L/F) ⊓ Gal(L/K)`. -/
-theorem inertiaSubgroup_eq_comap
-    (F K : Type*) [Field F] [Field K] [Algebra F K]
-    {L : Type*} [Field L] [Algebra F L] [Algebra K L] [IsScalarTower F K L] [Normal F L]
-    (v : AbsoluteValue L ℝ) :
+theorem inertiaSubgroup_eq_comap :
     v.inertiaSubgroup K = (v.inertiaSubgroup F).comap
       (IntermediateField.restrictRestrictAlgEquivMapHom F L K L) := by
   ext
-  simp only [mem_inertiaSubgroup_iff, Subgroup.mem_comap]
-  congr! <;> (ext; simp [IntermediateField.restrictRestrictAlgEquivMapHom])
+  simp only [mem_inertiaSubgroup_iff, Subgroup.mem_comap, v.decompositionSubgroup_eq_comap F K]
+  congr!
+  ext
+  simp [IntermediateField.restrictRestrictAlgEquivMapHom]
 
 /-- If `L / K / F` is an extension tower with `L / F` Galois, `v` is a place of `L`, then
 `Iᵥ(L/K) ≤ Iᵥ(L/F)`. -/
-theorem map_inertiaSubgroup_le
-    (F K : Type*) [Field F] [Field K] [Algebra F K]
-    {L : Type*} [Field L] [Algebra F L] [Algebra K L] [IsScalarTower F K L] [Normal F L]
-    (v : AbsoluteValue L ℝ) :
+theorem map_inertiaSubgroup_le :
     (v.inertiaSubgroup K).map
       (IntermediateField.restrictRestrictAlgEquivMapHom F L K L) ≤ v.inertiaSubgroup F := by
   simpa only [Subgroup.map_le_iff_le_comap] using (v.inertiaSubgroup_eq_comap F K).le
+
+end IsScalarTower
 
 /-! ### TODO: go mathlib -/
 

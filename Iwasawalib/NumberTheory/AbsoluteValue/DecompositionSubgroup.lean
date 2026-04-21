@@ -338,7 +338,7 @@ theorem decompositionSubgroup_eq_comap :
   simp [mem_decompositionSubgroup_iff, IntermediateField.restrictRestrictAlgEquivMapHom]
 
 /-- If `L / K / F` is an extension tower with `L / F` Galois, `v` is a place of `L`, then
-`Iᵥ(L/K) ≤ Iᵥ(L/F)`. -/
+`Dᵥ(L/K) ≤ Dᵥ(L/F)`. -/
 theorem map_decompositionSubgroup_le :
     (v.decompositionSubgroup K).map
       (IntermediateField.restrictRestrictAlgEquivMapHom F L K L) ≤ v.decompositionSubgroup F := by
@@ -355,27 +355,9 @@ theorem card_decompositionSubgroup_dvd_two_of_not_isNonarchimedean
     Nat.card (v.decompositionSubgroup F) ∣ 2 := by
   sorry
 
-/-- If `K / F` is an algebraic extension, then any place `v` of `F` can be extended to `K`.
-(Is this correct?) -/
-theorem exists_liesOver
-    {F : Type*} (K : Type*) [Field F] [Field K] [Algebra F K] [Algebra.IsAlgebraic F K]
-    (v : AbsoluteValue F ℝ) : ∃ w : AbsoluteValue K ℝ, w.LiesOver v := by
-  sorry
-
-/-- If `K / F` is a normal extension, then any two places of `K` which coincide when
-restrict to `F` are conjugate by an element of `Gal(K/F)`.
-See [Neukirch1992], II.9.1. -/
-theorem exists_algEquiv_comp_eq_of_comp_eq
-    {F K : Type*} [Field F] [Field K] [Algebra F K] [Normal F K]
-    {v w : AbsoluteValue K ℝ}
-    (h : v.comp (algebraMap F K).injective = w.comp (algebraMap F K).injective) :
-    ∃ σ : Gal(K/F), v.comp (f := σ) σ.injective = w := by
-  sorry
-
-/-- If `v : ι → AbsoluteValue R S` is a finite collection
-of non-trivial and pairwise inequivalent absolute values, then for any `ε > 0` and any `i` there
-is some `z : R` such that `v i (z - 1) < ε` for all `i` and `v j z < ε` for all `j ≠ i`.
-TODO: go mathlib -/
+/-- If `v : ι → AbsoluteValue R S` is a finite collection of non-trivial and pairwise inequivalent
+absolute values, then for any `ε > 0` and any `i : ι` there is some `z : R` such that
+`v i (z - 1) < ε` and `v j z < ε` for all `j ≠ i`. TODO: go mathlib -/
 theorem exists_sub_one_lt_and_lt_of_not_isEquiv
     {R S : Type*} [Field R] [Field S] [LinearOrder S] [TopologicalSpace S] [IsStrictOrderedRing S]
     [Archimedean S] [OrderTopology S] {ι : Type*} [Finite ι]
@@ -395,7 +377,7 @@ theorem exists_sub_one_lt_and_lt_of_not_isEquiv
     have hv1am : (v i (1 + a ^ m))⁻¹ < ε := by
       apply inv_lt_of_inv_lt₀ hε
       rw [add_comm]
-      refine ((v i).le_add _ _).trans_lt' ?_
+      refine ((v i).le_add ..).trans_lt' ?_
       rw [map_one, lt_sub_iff_add_lt', map_pow]
       exact hN.trans (pow_lt_pow_right₀ ha1 hm)
     simpa [div_sub_one (h1am m (by linarith))]
@@ -408,19 +390,14 @@ theorem exists_sub_one_lt_and_lt_of_not_isEquiv
     trans ε * 2⁻¹
     · simpa [← div_eq_mul_inv] using this.trans_le (min_le_left ..)
     · rw [mul_lt_mul_iff_right₀ hε]
-      refine ((v j).le_add _ _).trans_lt' ?_
+      refine ((v j).le_add ..).trans_lt' ?_
       rw [lt_sub_comm, map_one, map_pow]
       refine (this.trans_le (min_le_right ..)).trans_eq ?_
       norm_num
-  -- choose N2 hN2 using h2
-  -- let N := max N1 (⨆ j, N2 j)
-  sorry
-
-#check lt_sub_comm
-#check div_eq_mul_inv
-#check div_lt_iff₀
-
-#exit
+  choose N2 hN2 using h2
+  let N := max N1 (⨆ j, N2 j)
+  exact ⟨a ^ N / (1 + a ^ N), hN1 _ (le_max_left ..),
+    fun j hj ↦ hN2 ⟨j, hj⟩ _ ((le_max_right ..).trans' (Finite.le_ciSup ..))⟩
 
 /-- A version of **Approximation Theorem**: if `v : ι → AbsoluteValue R S` is a finite collection
 of non-trivial and pairwise inequivalent absolute values, `a : ι → R` is a sequence of elements
@@ -432,8 +409,88 @@ theorem exists_sub_lt_of_not_isEquiv
     {v : ι → AbsoluteValue R S} (h : ∀ i, (v i).IsNontrivial)
     (hv : Pairwise fun i j ↦ ¬(v i).IsEquiv (v j)) (a : ι → R) {ε : S} (hε : 0 < ε) :
     ∃ x, ∀ i, v i (x - a i) < ε := by
-  choose z hz using exists_one_lt_lt_one_pi_of_not_isEquiv h hv
-  let δ := ε / 37
+  classical
+  let := Fintype.ofFinite ι
+  rcases isEmpty_or_nonempty ι with _ | hnonempty
+  · exact ⟨0, by simp⟩
+  let M := (Finset.image (fun i : ι × ι ↦ v i.1 (a i.2)) .univ).max' (by simp)
+  have hM (i j : ι) : v i (a j) ≤ M := Finset.le_max' _ _ (by simp)
+  have hMnonneg : 0 ≤ M := ((v _).nonneg _).trans (hM hnonempty.some hnonempty.some)
+  have hcard : 0 < Nat.card ι := Nat.card_pos
+  have hε' : 0 < ε / (1 + M) / Nat.card ι := by positivity
+  choose z hz using exists_sub_one_lt_and_lt_of_not_isEquiv h hv hε'
+  use ∑ j, a j * z j
+  intro i
+  rw [← Finset.sum_compl_add_sum {i}, Finset.sum_singleton, add_sub_assoc, ← mul_sub_one]
+  grw [(v i).add_le, (v i).sum_le]
+  simp_rw [map_mul]
+  calc
+  _ ≤ ∑ x ∈ {i}ᶜ, M * (ε / (1 + M) / Nat.card ι) + M * (ε / (1 + M) / Nat.card ι) := by
+    refine add_le_add ?_ (mul_le_mul_of_nonneg (hM i i) (hz i).1.le ((v i).nonneg _) hε'.le)
+    gcongr 1 with x hx
+    refine mul_le_mul_of_nonneg (hM i x) ((hz x).2 i (Ne.symm ?_)).le ((v i).nonneg _) hε'.le
+    simpa using hx
+  _ < _ := by
+    rw [Finset.sum_const, nsmul_eq_mul, ← add_one_mul]
+    norm_cast
+    rw [← Finset.card_singleton i, Finset.card_compl_add_card, ← Nat.card_eq_fintype_card,
+      ← mul_div_assoc, ← mul_div_assoc, mul_div_cancel_left₀ _ (by simp), ← mul_div_assoc,
+      mul_div_right_comm]
+    nth_rw 2 [← one_mul ε]
+    refine mul_lt_mul ?_ le_rfl hε zero_le_one
+    simp [div_lt_one₀ (show 0 < 1 + M by positivity)]
+
+/-- If `K / F` is an algebraic extension, then any place `v` of `F` can be extended to `K`.
+(Is this correct?) -/
+theorem exists_liesOver
+    {F : Type*} (K : Type*) [Field F] [Field K] [Algebra F K] [Algebra.IsAlgebraic F K]
+    (v : AbsoluteValue F ℝ) : ∃ w : AbsoluteValue K ℝ, w.LiesOver v := by
   sorry
+
+/-- If `K / F` is a normal extension, then any two places of `K` which coincide when
+restrict to `F` are conjugate by an element of `Gal(K/F)`.
+See [Neukirch1992], II.9.1. -/
+theorem exists_algEquiv_comp_eq_of_comp_eq
+    {F K : Type*} [Field F] [Field K] [Algebra F K] [Normal F K]
+    {v w : AbsoluteValue K ℝ}
+    (h : v.comp (algebraMap F K).injective = w.comp (algebraMap F K).injective) :
+    ∃ σ : Gal(K/F), v.comp (f := σ) σ.injective = w := by
+  -- proof uses the above `exists_sub_lt_of_not_isEquiv`
+  sorry
+
+/-- If `L / K / F` is an extension tower, `L / F` and `K / F` are Galois, `v` and `w` are places of
+`K` and `L`, respectively, such that `w` lies over `v`, then the image of `D_w(L/F)` in `Gal(K/F)`
+is equal to `Dᵥ(K/F)`. -/
+theorem map_decompositionSubgroup_eq_of_liesOver
+    (F : Type*) {K L : Type*} [Field F] [Field K] [Algebra F K] [Field L]
+    [Algebra F L] [Algebra K L] [IsScalarTower F K L] [Normal F K] [Normal F L]
+    (v : AbsoluteValue K ℝ) (w : AbsoluteValue L ℝ) [w.LiesOver v] :
+    (w.decompositionSubgroup F).map (AlgEquiv.restrictNormalHom K) =
+      v.decompositionSubgroup F := by
+  ext σ
+  simp only [← LiesOver.comp_eq w v, Subgroup.mem_map]
+  refine ⟨fun ⟨τ, hτ, hτ2⟩ ↦ ?_, fun hσ ↦ ?_⟩
+  · rw [← hτ2]
+    rw [mem_decompositionSubgroup_iff_forall_apply_eq] at hτ ⊢
+    intro x
+    simpa [AlgEquiv.restrictNormalHom] using hτ (algebraMap K L x)
+  · obtain ⟨τ, rfl⟩ := AlgEquiv.restrictNormalHom_surjective L σ
+    have h : (w.comp (f := τ) τ.injective).comp (algebraMap K L).injective =
+        w.comp (algebraMap K L).injective := by
+      ext x
+      rw [mem_decompositionSubgroup_iff_forall_apply_eq] at hσ
+      simpa [AlgEquiv.restrictNormalHom] using hσ x
+    have := Normal.tower_top_of_normal F K L
+    obtain ⟨τ', hτ'⟩ := exists_algEquiv_comp_eq_of_comp_eq h
+    use τ * IntermediateField.restrictRestrictAlgEquivMapHom F L K L τ'
+    constructor
+    · rw [mem_decompositionSubgroup_iff_forall_apply_eq]
+      intro x
+      simpa [IntermediateField.restrictRestrictAlgEquivMapHom] using congr($(hτ') x)
+    · ext x
+      rw [map_mul, AlgEquiv.mul_apply, EmbeddingLike.apply_eq_iff_eq]
+      apply_fun _ using (algebraMap K L).injective
+      simp only [AlgEquiv.restrictNormalHom, MonoidHom.mk'_apply, AlgEquiv.restrictNormal_commutes]
+      simp [IntermediateField.restrictRestrictAlgEquivMapHom]
 
 end AbsoluteValue

@@ -22,6 +22,7 @@ public import Iwasawalib.Topology.Algebra.Group.Basic
 References:
 
 - [J. W. S. Cassels, A. Frohlich, editors, *Algebraic Number Theory*][cassels1967algebraic]
+- [J. Neukirch, *Algebraic Number Theory*][Neukirch1992]
 
 -/
 
@@ -352,6 +353,87 @@ theorem card_decompositionSubgroup_dvd_two_of_not_isNonarchimedean
     (F : Type*) {K : Type*} [Field F] [Field K] [Algebra F K] (v : AbsoluteValue K ℝ)
     (h : ¬IsNonarchimedean v) :
     Nat.card (v.decompositionSubgroup F) ∣ 2 := by
+  sorry
+
+/-- If `K / F` is an algebraic extension, then any place `v` of `F` can be extended to `K`.
+(Is this correct?) -/
+theorem exists_liesOver
+    {F : Type*} (K : Type*) [Field F] [Field K] [Algebra F K] [Algebra.IsAlgebraic F K]
+    (v : AbsoluteValue F ℝ) : ∃ w : AbsoluteValue K ℝ, w.LiesOver v := by
+  sorry
+
+/-- If `K / F` is a normal extension, then any two places of `K` which coincide when
+restrict to `F` are conjugate by an element of `Gal(K/F)`.
+See [Neukirch1992], II.9.1. -/
+theorem exists_algEquiv_comp_eq_of_comp_eq
+    {F K : Type*} [Field F] [Field K] [Algebra F K] [Normal F K]
+    {v w : AbsoluteValue K ℝ}
+    (h : v.comp (algebraMap F K).injective = w.comp (algebraMap F K).injective) :
+    ∃ σ : Gal(K/F), v.comp (f := σ) σ.injective = w := by
+  sorry
+
+/-- If `v : ι → AbsoluteValue R S` is a finite collection
+of non-trivial and pairwise inequivalent absolute values, then for any `ε > 0` and any `i` there
+is some `z : R` such that `v i (z - 1) < ε` for all `i` and `v j z < ε` for all `j ≠ i`.
+TODO: go mathlib -/
+theorem exists_sub_one_lt_and_lt_of_not_isEquiv
+    {R S : Type*} [Field R] [Field S] [LinearOrder S] [TopologicalSpace S] [IsStrictOrderedRing S]
+    [Archimedean S] [OrderTopology S] {ι : Type*} [Finite ι]
+    {v : ι → AbsoluteValue R S} (h : ∀ i, (v i).IsNontrivial)
+    (hv : Pairwise fun i j ↦ ¬(v i).IsEquiv (v j)) {ε : S} (hε : 0 < ε) (i : ι) :
+    ∃ z, v i (z - 1) < ε ∧ ∀ j ≠ i, v j z < ε := by
+  obtain ⟨a, ha1, ha2⟩ := exists_one_lt_lt_one_pi_of_not_isEquiv h hv i
+  have ha : a ≠ 0 := fun H ↦ by simp only [H, map_zero] at ha1; exact ha1.not_ge zero_le_one
+  have h1am (m : ℕ) (hm : m ≠ 0) : 1 + a ^ m ≠ 0 := fun H ↦ by
+    rw [add_eq_zero_iff_eq_neg'] at H
+    apply_fun v i at H
+    simp only [map_pow, AbsoluteValue.map_neg, map_one] at H
+    simpa [H] using one_lt_pow₀ ha1 hm
+  obtain ⟨N1, hN1⟩ : ∃ N : ℕ, ∀ m ≥ N, v i (a ^ m / (1 + a ^ m) - 1) < ε := by
+    obtain ⟨N, hN⟩ := pow_unbounded_of_one_lt (1 + ε⁻¹) ha1
+    refine ⟨N + 1, fun m hm ↦ ?_⟩
+    have hv1am : (v i (1 + a ^ m))⁻¹ < ε := by
+      apply inv_lt_of_inv_lt₀ hε
+      rw [add_comm]
+      refine ((v i).le_add _ _).trans_lt' ?_
+      rw [map_one, lt_sub_iff_add_lt', map_pow]
+      exact hN.trans (pow_lt_pow_right₀ ha1 hm)
+    simpa [div_sub_one (h1am m (by linarith))]
+  have h2 (j : {j : ι // j ≠ i}) : ∃ N : ℕ, ∀ m ≥ N, v j (a ^ m / (1 + a ^ m)) < ε := by
+    have hε' : 0 < min (ε / 2) (1 / 2) := by positivity
+    obtain ⟨N, hN⟩ := exists_pow_lt_of_lt_one hε' (ha2 j j.2)
+    refine ⟨N + 1, fun m hm ↦ ?_⟩
+    rw [map_div₀, div_lt_iff₀ ((v j).pos (h1am m (by linarith)))]
+    have := (pow_lt_pow_right_of_lt_one₀ ((v j).pos ha) (ha2 j j.2) hm).trans hN
+    trans ε * 2⁻¹
+    · simpa [← div_eq_mul_inv] using this.trans_le (min_le_left ..)
+    · rw [mul_lt_mul_iff_right₀ hε]
+      refine ((v j).le_add _ _).trans_lt' ?_
+      rw [lt_sub_comm, map_one, map_pow]
+      refine (this.trans_le (min_le_right ..)).trans_eq ?_
+      norm_num
+  -- choose N2 hN2 using h2
+  -- let N := max N1 (⨆ j, N2 j)
+  sorry
+
+#check lt_sub_comm
+#check div_eq_mul_inv
+#check div_lt_iff₀
+
+#exit
+
+/-- A version of **Approximation Theorem**: if `v : ι → AbsoluteValue R S` is a finite collection
+of non-trivial and pairwise inequivalent absolute values, `a : ι → R` is a sequence of elements
+in `R`, then for any `ε > 0` there is some `x : R` such that `v i (x - a i) < ε` for all `i`.
+See [Neukirch1992], II.3.4. TODO: go mathlib -/
+theorem exists_sub_lt_of_not_isEquiv
+    {R S : Type*} [Field R] [Field S] [LinearOrder S] [TopologicalSpace S] [IsStrictOrderedRing S]
+    [Archimedean S] [OrderTopology S] {ι : Type*} [Finite ι]
+    {v : ι → AbsoluteValue R S} (h : ∀ i, (v i).IsNontrivial)
+    (hv : Pairwise fun i j ↦ ¬(v i).IsEquiv (v j)) (a : ι → R) {ε : S} (hε : 0 < ε) :
+    ∃ x, ∀ i, v i (x - a i) < ε := by
+  choose z hz using exists_one_lt_lt_one_pi_of_not_isEquiv h hv
+  let δ := ε / 37
   sorry
 
 end AbsoluteValue

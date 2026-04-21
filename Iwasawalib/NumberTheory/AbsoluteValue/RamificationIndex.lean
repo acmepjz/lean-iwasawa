@@ -139,22 +139,6 @@ theorem ramificationIdxOfIsScalarTower_mul_ramificationIdxOfIsScalarTower
     exact Subgroup.map_mono (v.map_inertiaSubgroup_le K M)
   · exact v.map_inertiaSubgroup_le F K
 
-/-- If `K / F` is an algebraic extension, then any place `v` of `F` can be extended to `K`.
-(Is this correct?) -/
-theorem exists_liesOver
-    {F : Type*} (K : Type*) [Field F] [Field K] [Algebra F K] [Algebra.IsAlgebraic F K]
-    (v : AbsoluteValue F ℝ) : ∃ w : AbsoluteValue K ℝ, w.LiesOver v := by
-  sorry
-
-/-- If `K / F` is a normal extension, then any two places of `K` which coincide when
-restrict to `F` are conjugate by an element of `Gal(K/F)`. (Is this correct?) -/
-theorem exists_algEquiv_comp_eq_of_comp_eq
-    {F K : Type*} [Field F] [Field K] [Algebra F K] [Normal F K]
-    {v w : AbsoluteValue K ℝ}
-    (h : v.comp (algebraMap F K).injective = w.comp (algebraMap F K).injective) :
-    ∃ σ : Gal(K/F), v.comp (f := σ) σ.injective = w := by
-  sorry
-
 /-- If `K / F` is an algebraic extension, `v` is a place of `K`, then the
 ramification index of `v` for `K / F` is defined to be the ramification index of `w`
 for `K / F`, where `w` is any extension of `v` to the algebraic closure of `K`. -/

@@ -357,7 +357,9 @@ theorem card_decompositionSubgroup_dvd_two_of_not_isNonarchimedean
 
 /-- If `v : ι → AbsoluteValue R S` is a finite collection of non-trivial and pairwise inequivalent
 absolute values, then for any `ε > 0` and any `i : ι` there is some `z : R` such that
-`v i (z - 1) < ε` and `v j z < ε` for all `j ≠ i`. TODO: go mathlib -/
+`v i (z - 1) < ε` and `v j z < ε` for all `j ≠ i`.
+
+TODO: go mathlib -/
 theorem exists_sub_one_lt_and_lt_of_not_isEquiv
     {R S : Type*} [Field R] [Field S] [LinearOrder S] [TopologicalSpace S] [IsStrictOrderedRing S]
     [Archimedean S] [OrderTopology S] {ι : Type*} [Finite ι]
@@ -402,7 +404,9 @@ theorem exists_sub_one_lt_and_lt_of_not_isEquiv
 /-- A version of **Approximation Theorem**: if `v : ι → AbsoluteValue R S` is a finite collection
 of non-trivial and pairwise inequivalent absolute values, `a : ι → R` is a sequence of elements
 in `R`, then for any `ε > 0` there is some `x : R` such that `v i (x - a i) < ε` for all `i`.
-See [Neukirch1992], II.3.4. TODO: go mathlib -/
+See [Neukirch1992], II.3.4.
+
+TODO: go mathlib -/
 theorem exists_sub_lt_of_not_isEquiv
     {R S : Type*} [Field R] [Field S] [LinearOrder S] [TopologicalSpace S] [IsStrictOrderedRing S]
     [Archimedean S] [OrderTopology S] {ι : Type*} [Finite ι]

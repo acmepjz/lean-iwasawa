@@ -246,4 +246,41 @@ theorem map_inertiaSubgroup_le :
 
 end IsScalarTower
 
+/-- If `L / K / F` is an extension tower, `L / F` and `K / F` are Galois, `v` and `w` are places of
+`K` and `L`, respectively, such that `w` lies over `v`, then the image of `I_w(L/F)` in `Gal(K/F)`
+is equal to `Iᵥ(K/F)`. -/
+theorem map_inertiaSubgroup_eq_of_liesOver
+    (F : Type*) {K L : Type*} [Field F] [Field K] [Algebra F K] [Field L]
+    [Algebra F L] [Algebra K L] [IsScalarTower F K L] [Normal F K] [Normal F L]
+    (v : AbsoluteValue K ℝ) (w : AbsoluteValue L ℝ) [w.LiesOver v] :
+    (w.inertiaSubgroup F).map (AlgEquiv.restrictNormalHom K) =
+      v.inertiaSubgroup F := by
+  rw [← LiesOver.comp_eq w v]
+  by_cases hw : IsNonarchimedean w
+  · have hv := (w.isNonarchimedean_comp_iff (algebraMap K L)).2 hw
+    ext σ
+    simp only [Subgroup.mem_map, mem_inertiaSubgroup_iff_of_isNonarchimedean _ hw,
+      mem_inertiaSubgroup_iff_of_isNonarchimedean _ hv]
+    refine ⟨fun ⟨τ, ⟨hτ1, hτ2⟩, hτ3⟩ ↦ ⟨?_, fun x hx ↦ ?_⟩, fun ⟨hσ1, hσ2⟩ ↦ ?_⟩
+    · simpa only [map_decompositionSubgroup_eq_of_liesOver F (w.comp (algebraMap K L).injective) w,
+        hτ3] using Subgroup.mem_map_of_mem (AlgEquiv.restrictNormalHom K) hτ1
+    · simpa [← hτ3, AlgEquiv.restrictNormalHom] using hτ2 (algebraMap K L x) (by simpa using hx)
+    · have := hσ1
+      rw [← map_decompositionSubgroup_eq_of_liesOver F (w.comp (algebraMap K L).injective) w,
+        Subgroup.mem_map] at this
+      obtain ⟨τ, hτ1, hτ2⟩ := this
+      /-
+      Suppose `σ ∈ Iᵥ(K/F)`, now we have found `τ ∈ D_w(L/F)` such that `τ|_K = σ`.
+      Next steps: the image of `τ` in `Gal(k_w/kᵤ)` is contained in `Gal(k_w/kᵥ)` since its
+      image in `Gal(kᵥ/kᵤ)` is trivial (here we denote `u` the restriction of `w` to `F`).
+      We can find a preimage `τ₁ ∈ D_w(L/K)` of it, since the map `D_w(L/K) → Gal(k_w/kᵥ)`
+      is surjective. Then `τ * (τ₁)⁻¹ ∈ I_w(L/F)` whose restriction to `K` is `σ`.
+      A lot of API is still missing.
+      -/
+      sorry
+  have hv := (w.isNonarchimedean_comp_iff (algebraMap K L)).not.2 hw
+  rw [inertiaSubgroup_eq_decompositionSubgroup_of_not_isNonarchimedean _ _ hw,
+    inertiaSubgroup_eq_decompositionSubgroup_of_not_isNonarchimedean _ _ hv]
+  exact map_decompositionSubgroup_eq_of_liesOver ..
+
 end AbsoluteValue

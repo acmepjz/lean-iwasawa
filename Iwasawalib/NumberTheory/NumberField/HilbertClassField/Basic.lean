@@ -7,7 +7,7 @@ module
 
 public import Iwasawalib.FieldTheory.IntermediateField.MaximalAbelian
 public import Iwasawalib.NumberTheory.AbsoluteValue.GelfandTornheim
-public import Iwasawalib.NumberTheory.AbsoluteValue.RamificationInertia
+public import Iwasawalib.NumberTheory.AbsoluteValue.RamificationIndex
 
 @[expose] public section
 

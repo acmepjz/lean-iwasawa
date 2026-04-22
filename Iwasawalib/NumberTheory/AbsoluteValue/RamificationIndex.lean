@@ -80,7 +80,8 @@ theorem _root_.IntermediateField.restrictRestrictAlgEquivMapHom_comp_restrictRes
 
 /-- If `L / K / F` is an extension tower with `L / F` Galois, `v` is a place of `L`, then the
 ramification index of `v` for `K / F` is defined to be the index of `Iᵥ(L/K)` in `Iᵥ(L/F)`
-(`0` means infinite). Later we will show that this depends only on the place of `K` below `v`,
+(`0` means infinite). Later we will show that this depends only on the place of `K` below `v`
+(`AbsoluteValue.ramificationIdxOfIsScalarTower_eq_of_comp_eq`),
 and is independent of the choice of `L` (`AbsoluteValue.ramificationIdx_spec`). -/
 noncomputable def ramificationIdxOfIsScalarTower
     (F K : Type*) [Field F] [Field K] [Algebra F K]
@@ -120,6 +121,103 @@ theorem ramificationIdxOfIsScalarTower_comp_algEquiv_eq
   refine ⟨fun ⟨x, hx⟩ ↦ ⟨σ * x * σ⁻¹, ?_⟩, fun ⟨x, hx⟩ ↦ ⟨σ⁻¹ * x * σ, ?_⟩⟩ <;>
     (simp only [map_mul, hx]; ext; simp [IntermediateField.restrictRestrictAlgEquivMapHom])
 
+/-- Any two places of `L` which are the same when restricted to `K` have the same
+ramification index for `K / F` (since they are conjugate). -/
+theorem ramificationIdxOfIsScalarTower_eq_of_comp_eq
+    (F K : Type*) [Field F] [Field K] [Algebra F K]
+    {L : Type*} [Field L] [Algebra F L] [Algebra K L] [IsScalarTower F K L] [Normal F L]
+    {v w : AbsoluteValue L ℝ}
+    (h : v.comp (algebraMap K L).injective = w.comp (algebraMap K L).injective) :
+    v.ramificationIdxOfIsScalarTower F K = w.ramificationIdxOfIsScalarTower F K := by
+  have := Normal.tower_top_of_normal F K L
+  obtain ⟨σ, h⟩ := exists_algEquiv_comp_eq_of_comp_eq h.symm
+  simpa only [h] using ramificationIdxOfIsScalarTower_comp_algEquiv_eq F K w σ
+
+open Subgroup in
+/-- TODO: go mathlib -/
+@[to_additive]
+theorem _root_.Subgroup.relIndex_map_map_of_ker_inf_le
+    {G G' : Type*} [Group G] [Group G'] {f : G →* G'} (H K : Subgroup G)
+    (hle : H ≤ K) (hf : f.ker ⊓ K ≤ H) :
+    (Subgroup.map f H).relIndex (Subgroup.map f K) = H.relIndex K := by
+  rw [← relIndex_comap, comap_map_eq, ← inf_relIndex_right H K, ← inf_relIndex_right (H ⊔ f.ker) K]
+  congr 1
+  apply le_antisymm
+  · simp only [le_inf_iff, inf_le_right, and_true]
+    intro x h
+    rw [mem_inf, mem_sup_of_normal_right] at h
+    obtain ⟨⟨y, hy, z, hz, rfl⟩, hx⟩ := h
+    have := mul_mem (inv_mem (hle hy)) hx
+    rw [← mul_assoc, inv_mul_cancel, one_mul] at this
+    exact mul_mem hy (hf ⟨hz, this⟩)
+  · simp
+
+open IntermediateField in
+/-- TODO: go mathlib -/
+theorem _root_.AlgEquiv.restrictNormalHom_ker_eq_range
+    {F : Type*} [Field F] {K₁ : Type*} [Field K₁] [Algebra F K₁] (E : Type*)
+    [Field E] [Algebra F E] [Algebra E K₁] [IsScalarTower F E K₁] [Normal F E] [Normal F K₁] :
+    (AlgEquiv.restrictNormalHom (F := F) (K₁ := K₁) E).ker =
+      (restrictRestrictAlgEquivMapHom F K₁ E K₁).range := by
+  ext σ
+  simp only [MonoidHom.mem_ker, MonoidHom.mem_range]
+  refine ⟨fun h ↦ ?_, fun ⟨τ, h⟩ ↦ ?_⟩
+  · let τ : Gal(K₁/E) := {
+      toRingEquiv := σ
+      commutes' r := by simpa using congr(algebraMap E K₁ ($h r))
+    }
+    use τ
+    ext x
+    simp [restrictRestrictAlgEquivMapHom, τ]
+  · rw [← h]
+    ext x
+    apply_fun _ using (algebraMap E K₁).injective
+    simp only [AlgEquiv.restrictNormalHom, MonoidHom.mk'_apply, AlgEquiv.restrictNormal_commutes]
+    simp [IntermediateField.restrictRestrictAlgEquivMapHom]
+
+open AlgEquiv IntermediateField in
+/-- If `M / L / K / F` is an extension tower, `M / F` and `L / F` are Galois, `v` is a place of `L`,
+`w` is a place of `M` above `v`, then `v` and `w` have the same ramification index for `K / F`. -/
+theorem ramificationIdxOfIsScalarTower_eq_of_liesOver
+    (F K : Type*) [Field F] [Field K] [Algebra F K]
+    {L : Type*} [Field L] [Algebra F L] [Algebra K L] [IsScalarTower F K L] [Normal F L]
+    {M : Type*} [Field M] [Algebra F M] [Algebra K M] [Algebra L M]
+    [IsScalarTower F K M] [IsScalarTower F L M] [IsScalarTower K L M] [Normal F M]
+    (v : AbsoluteValue L ℝ) (w : AbsoluteValue M ℝ) [w.LiesOver v] :
+    v.ramificationIdxOfIsScalarTower F K = w.ramificationIdxOfIsScalarTower F K := by
+  simp only [ramificationIdxOfIsScalarTower, inertiaSubgroup_eq_comap F K, Subgroup.map_comap_eq,
+    ← map_inertiaSubgroup_eq_of_liesOver F v w]
+  have h1 : (restrictRestrictAlgEquivMapHom F L K L).range.comap (restrictNormalHom L) =
+      (restrictRestrictAlgEquivMapHom F M K M).range := by
+    ext σ
+    simp only [Subgroup.mem_comap, MonoidHom.mem_range]
+    have := Normal.tower_top_of_normal F K L
+    refine ⟨fun ⟨τ, hτ⟩ ↦ ?_, fun ⟨τ, hτ⟩ ↦ ?_⟩
+    · let τ' : Gal(M/K) := {
+        toRingEquiv := σ
+        commutes' r := by
+          have := congr(algebraMap L M ($(hτ.symm) (algebraMap K L r)))
+          simpa [restrictRestrictAlgEquivMapHom, ← IsScalarTower.algebraMap_apply K L M] using this
+      }
+      use τ'
+      ext x
+      simp [restrictRestrictAlgEquivMapHom, τ']
+    · use τ.restrictNormal L
+      rw [← hτ]
+      ext x
+      apply_fun _ using (algebraMap L M).injective
+      simp [restrictRestrictAlgEquivMapHom]
+  have h2 : (restrictNormalHom L).ker ≤ (restrictRestrictAlgEquivMapHom F M K M).range := by
+    rw [← h1, ← MonoidHom.comap_bot]
+    apply Subgroup.comap_mono
+    simp
+  convert Subgroup.relIndex_map_map_of_ker_inf_le (f := restrictNormalHom L)
+    ((restrictRestrictAlgEquivMapHom F M K M).range ⊓ inertiaSubgroup F w) (inertiaSubgroup F w)
+    inf_le_right (by gcongr)
+  rw [← h1]
+  apply SetLike.coe_injective
+  exact (Set.image_preimage_inter ..).symm
+
 open IntermediateField in
 theorem ramificationIdxOfIsScalarTower_mul_ramificationIdxOfIsScalarTower
     (F K M : Type*) [Field F] [Field K] [Field M]
@@ -147,7 +245,7 @@ noncomputable def ramificationIdx
     (v : AbsoluteValue K ℝ) : ℕ :=
   (v.exists_liesOver (AlgebraicClosure K)).choose.ramificationIdxOfIsScalarTower F K
 
-/-- The ramification index is well-defined. (???) -/
+/-- The ramification index is well-defined. -/
 theorem ramificationIdx_spec
     (F : Type*) {K : Type*} [Field F] [Field K] [Algebra F K]
     {L : Type*} [Field L] [Algebra F L] [Algebra K L] [IsScalarTower F K L] [Normal F L]
@@ -167,14 +265,9 @@ theorem ramificationIdx_spec
   have : v'.comp (algebraMap K _).injective = w'.comp (algebraMap K _).injective := by
     have := LiesOver.trans w' w v
     rw [LiesOver.comp_eq v' v, LiesOver.comp_eq w' v]
-  obtain ⟨σ, hσ⟩ := exists_algEquiv_comp_eq_of_comp_eq this
-  have := IsAlgClosure.ofAlgebraic F K (AlgebraicClosure K)
-  rw [← v'.ramificationIdxOfIsScalarTower_comp_algEquiv_eq F K σ, hσ]
-  -- ???
-  simp only [ramificationIdxOfIsScalarTower]
-  sorry
-
-#exit
+  rw [ramificationIdxOfIsScalarTower_eq_of_comp_eq _ _ this]
+  have := IsScalarTower.of_algHom (i.restrictScalars F)
+  exact (ramificationIdxOfIsScalarTower_eq_of_liesOver ..).symm
 
 theorem ramificationIdx_mul_ramificationIdx
     (F K : Type*) {M : Type*} [Field F] [Field K] [Field M]

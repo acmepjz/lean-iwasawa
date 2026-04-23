@@ -102,24 +102,58 @@ theorem ramificationIdxOfIsScalarTower_eq_range_relIndex
   rw [ramificationIdxOfIsScalarTower, v.inertiaSubgroup_eq_comap F K, Subgroup.map_comap_eq,
     Subgroup.inf_relIndex_right]
 
-/-- Any two places of `L` conjugate by an element of `Gal(L/K)` have the same ramification index
-for `K / F`. -/
+/-- A place of `L` and its restriction to `L'` by an isomorphism `L' ≃ₐ[K] L` have the same
+ramification index for `K / F`. -/
 theorem ramificationIdxOfIsScalarTower_comp_algEquiv_eq
     (F K : Type*) [Field F] [Field K] [Algebra F K]
     {L : Type*} [Field L] [Algebra F L] [Algebra K L] [IsScalarTower F K L] [Normal F L]
-    (v : AbsoluteValue L ℝ) (σ : Gal(L/K)) :
-    (v.comp (f := (σ : L →+* L)) σ.injective).ramificationIdxOfIsScalarTower F K =
+    {L' : Type*} [Field L'] [Algebra F L'] [Algebra K L'] [IsScalarTower F K L'] [Normal F L']
+    (v : AbsoluteValue L ℝ) (σ : L' ≃ₐ[K] L) :
+    (v.comp (f := (σ : L' →+* L)) σ.injective).ramificationIdxOfIsScalarTower F K =
       v.ramificationIdxOfIsScalarTower F K := by
   simp only [ramificationIdxOfIsScalarTower_eq_range_relIndex]
   rw [v.inertiaSubgroup_comp_algEquiv_eq_comap (σ.restrictScalars F),
     Subgroup.comap_equiv_eq_map_symm]
   convert Subgroup.relIndex_map_map_of_injective
-    (f := ((σ.restrictScalars F).autCongr.symm : Gal(L/F) →* Gal(L/F))) _ _ (MulEquiv.injective _)
+    (f := ((σ.restrictScalars F).autCongr.symm : Gal(L/F) →* Gal(L'/F))) _ _ (MulEquiv.injective _)
   rw [← Subgroup.comap_equiv_eq_map_symm]
   ext τ
   simp only [MonoidHom.mem_range, Subgroup.mem_comap, MonoidHom.coe_coe, AlgEquiv.autCongr_apply]
-  refine ⟨fun ⟨x, hx⟩ ↦ ⟨σ * x * σ⁻¹, ?_⟩, fun ⟨x, hx⟩ ↦ ⟨σ⁻¹ * x * σ, ?_⟩⟩ <;>
-    (simp only [map_mul, hx]; ext; simp [IntermediateField.restrictRestrictAlgEquivMapHom])
+  refine ⟨fun ⟨x, h⟩ ↦ ⟨σ.autCongr x, ?_⟩, fun ⟨x, h⟩ ↦ ⟨σ.autCongr.symm x, ?_⟩⟩
+  · ext a
+    simpa [IntermediateField.restrictRestrictAlgEquivMapHom] using congr($h (σ.symm a))
+  · ext a
+    simpa [IntermediateField.restrictRestrictAlgEquivMapHom] using congr(σ.symm ($h (σ a)))
+
+/-- A generalization of `AbsoluteValue.ramificationIdxOfIsScalarTower_comp_algEquiv_eq`. -/
+theorem ramificationIdxOfIsScalarTower_comp_ringEquiv_eq
+    {F K : Type*} [Field F] [Field K] [Algebra F K]
+    {L : Type*} [Field L] [Algebra F L] [Algebra K L] [IsScalarTower F K L] [Normal F L]
+    {F' K' : Type*} [Field F'] [Field K'] [Algebra F' K']
+    {L' : Type*} [Field L'] [Algebra F' L'] [Algebra K' L'] [IsScalarTower F' K' L'] [Normal F' L']
+    (v : AbsoluteValue L ℝ) (e : F' ≃+* F) (f : K' ≃+* K) (g : L' ≃+* L)
+    (hcomp0 : (algebraMap F K).comp e = RingHom.comp f (algebraMap F' K'))
+    (hcomp : (algebraMap K L).comp f = RingHom.comp g (algebraMap K' L')) :
+    (v.comp (f := (g : L' →+* L)) g.injective).ramificationIdxOfIsScalarTower F' K' =
+      v.ramificationIdxOfIsScalarTower F K := by
+  simp only [ramificationIdxOfIsScalarTower_eq_range_relIndex]
+  have hcomp1 : (algebraMap F L).comp e = RingHom.comp g (algebraMap F' L') := by
+    ext x
+    simpa [← IsScalarTower.algebraMap_apply] using congr($(hcomp) (f.symm ($(hcomp0) x)))
+  rw [v.inertiaSubgroup_comp_ringEquiv_eq_comap e.surjective hcomp1,
+    Subgroup.comap_equiv_eq_map_symm]
+  convert Subgroup.relIndex_map_map_of_injective
+    (f := ((AlgEquiv.autCongrOfSurjective e.surjective hcomp1).symm : Gal(L/F) →* Gal(L'/F')))
+    _ _ (MulEquiv.injective _)
+  rw [← Subgroup.comap_equiv_eq_map_symm]
+  ext τ
+  simp only [MonoidHom.mem_range, Subgroup.mem_comap, MonoidHom.coe_coe]
+  refine ⟨fun ⟨x, h⟩ ↦ ⟨AlgEquiv.autCongrOfSurjective f.surjective hcomp x, ?_⟩,
+    fun ⟨x, h⟩ ↦ ⟨(AlgEquiv.autCongrOfSurjective f.surjective hcomp).symm x, ?_⟩⟩
+  · ext a
+    simpa [IntermediateField.restrictRestrictAlgEquivMapHom] using congr($h (g.symm a))
+  · ext a
+    simpa [IntermediateField.restrictRestrictAlgEquivMapHom] using congr(g.symm ($h (g a)))
 
 /-- Any two places of `L` which are the same when restricted to `K` have the same
 ramification index for `K / F` (since they are conjugate). -/
@@ -269,6 +303,68 @@ theorem ramificationIdx_spec
   have := IsScalarTower.of_algHom (i.restrictScalars F)
   exact (ramificationIdxOfIsScalarTower_eq_of_liesOver ..).symm
 
+/-- A place of `K` and its restriction to `K'` by an isomorphism `K' ≃ₐ[F] A` have the same
+ramification index over `F`. -/
+theorem ramificationIdx_comp_algEquiv_eq
+    (F : Type*) {K : Type*} [Field F] [Field K] [Algebra F K] [Algebra.IsAlgebraic F K]
+    {K' : Type*} [Field K'] [Algebra F K'] [Algebra.IsAlgebraic F K']
+    (v : AbsoluteValue K ℝ) (f : K' ≃ₐ[F] K) :
+    (v.comp (f := (f : K' →+* K)) f.injective).ramificationIdx F = v.ramificationIdx F := by
+  set v' := v.comp (f := (f : K' →+* K)) f.injective
+  let i := (IsScalarTower.toAlgHom F K (AlgebraicClosure K)).comp (f : K' →ₐ[F] K)
+  let := i.toAlgebra
+  have := IsScalarTower.of_algHom i
+  obtain ⟨w, _⟩ := v.exists_liesOver (AlgebraicClosure K)
+  have : w.LiesOver v' := by
+    rw [liesOver_iff]
+    ext x
+    simp only [comp_apply, ← LiesOver.comp_eq w v, RingHom.coe_coe, v']
+    rfl
+  rw [ramificationIdx_spec F v w, ramificationIdx_spec F v' w]
+  simpa using ramificationIdxOfIsScalarTower_comp_ringEquiv_eq w (RingEquiv.refl F) (f : K' ≃+* K)
+    (RingEquiv.refl (AlgebraicClosure K)) (by ext; simp) (by ext; rfl)
+
+/-- A generalization of `AbsoluteValue.ramificationIdx_comp_algEquiv_eq`. -/
+theorem ramificationIdx_comp_ringEquiv_eq
+    {F K : Type*} [Field F] [Field K] [Algebra F K] [Algebra.IsAlgebraic F K]
+    {F' K' : Type*} [Field F'] [Field K'] [Algebra F' K'] [Algebra.IsAlgebraic F' K']
+    (v : AbsoluteValue K ℝ) {f : F' →+* F} {g : K' ≃+* K}
+    (hsurj : Function.Surjective f)
+    (hcomp : (algebraMap F K).comp f = RingHom.comp g (algebraMap F' K')) :
+    (v.comp (f := (g : K' →+* K)) g.injective).ramificationIdx F' = v.ramificationIdx F := by
+  set v' := v.comp (f := (g : K' →+* K)) g.injective
+  let f' := RingEquiv.ofBijective f ⟨f.injective, hsurj⟩
+  let := ((algebraMap F (AlgebraicClosure K)).comp f).toAlgebra
+  let := ((algebraMap K (AlgebraicClosure K)).comp (g : K' →+* K)).toAlgebra
+  have : IsScalarTower F' K' (AlgebraicClosure K) := .of_algebraMap_eq fun x ↦
+    congr(algebraMap K (AlgebraicClosure K) ($(hcomp) x))
+  have : Normal F' (AlgebraicClosure K) := .of_equiv_equiv
+      (f := f'.symm) (g := RingEquiv.refl _) <| by
+    ext x
+    obtain ⟨y, rfl⟩ := f'.surjective x
+    simp only [RingHom.coe_comp, RingHom.coe_coe, Function.comp_apply, RingEquiv.symm_apply_apply,
+      RingEquiv.coe_ringHom_refl, RingHomCompTriple.comp_eq]
+    rfl
+  obtain ⟨w, _⟩ := v.exists_liesOver (AlgebraicClosure K)
+  have : w.LiesOver v' := by
+    rw [liesOver_iff]
+    ext x
+    simp only [comp_apply, ← LiesOver.comp_eq w v, RingHom.coe_coe, v']
+    rfl
+  rw [ramificationIdx_spec F v w, ramificationIdx_spec F' v' w]
+  simpa using ramificationIdxOfIsScalarTower_comp_ringEquiv_eq w f' g
+    (RingEquiv.refl (AlgebraicClosure K)) hcomp (by ext; rfl)
+
+/-- If `K / F` is normal, then any two places of `K` which are the same when restricted to `F`
+have the same ramification index over `F` (since they are conjugate). -/
+theorem ramificationIdx_eq_of_comp_eq
+    (F K : Type*) [Field F] [Field K] [Algebra F K] [Normal F K]
+    {v w : AbsoluteValue K ℝ}
+    (h : v.comp (algebraMap F K).injective = w.comp (algebraMap F K).injective) :
+    v.ramificationIdx F = w.ramificationIdx F := by
+  obtain ⟨σ, h⟩ := exists_algEquiv_comp_eq_of_comp_eq h.symm
+  simpa only [h] using ramificationIdx_comp_algEquiv_eq F w σ
+
 theorem ramificationIdx_mul_ramificationIdx
     (F K : Type*) {M : Type*} [Field F] [Field K] [Field M]
     [Algebra F K] [Algebra F M] [Algebra K M] [IsScalarTower F K M] [Algebra.IsAlgebraic F M]
@@ -337,6 +433,30 @@ theorem isUnramified_spec
     v.IsUnramified F ↔ w.IsUnramifiedOfIsScalarTower F K := by
   rw [isUnramified_iff_ramificationIdx_eq_one, v.ramificationIdx_spec F w,
     isUnramifiedOfIsScalarTower_iff_ramificationIdxOfIsScalarTower_eq_one]
+
+theorem isUnramified_comp_algEquiv_iff
+    (F : Type*) {K : Type*} [Field F] [Field K] [Algebra F K] [Algebra.IsAlgebraic F K]
+    {K' : Type*} [Field K'] [Algebra F K'] [Algebra.IsAlgebraic F K']
+    (v : AbsoluteValue K ℝ) (f : K' ≃ₐ[F] K) :
+    (v.comp (f := (f : K' →+* K)) f.injective).IsUnramified F ↔ v.IsUnramified F := by
+  simp only [isUnramified_iff_ramificationIdx_eq_one, ramificationIdx_comp_algEquiv_eq]
+
+theorem isUnramified_comp_ringEquiv_iff
+    {F K : Type*} [Field F] [Field K] [Algebra F K] [Algebra.IsAlgebraic F K]
+    {F' K' : Type*} [Field F'] [Field K'] [Algebra F' K'] [Algebra.IsAlgebraic F' K']
+    (v : AbsoluteValue K ℝ) {f : F' →+* F} {g : K' ≃+* K}
+    (hsurj : Function.Surjective f)
+    (hcomp : (algebraMap F K).comp f = RingHom.comp g (algebraMap F' K')) :
+    (v.comp (f := (g : K' →+* K)) g.injective).IsUnramified F' ↔ v.IsUnramified F := by
+  simp only [isUnramified_iff_ramificationIdx_eq_one,
+    ramificationIdx_comp_ringEquiv_eq v hsurj hcomp]
+
+theorem isUnramified_iff_of_comp_eq
+    (F K : Type*) [Field F] [Field K] [Algebra F K] [Normal F K]
+    {v w : AbsoluteValue K ℝ}
+    (h : v.comp (algebraMap F K).injective = w.comp (algebraMap F K).injective) :
+    v.IsUnramified F ↔ w.IsUnramified F := by
+  simp only [isUnramified_iff_ramificationIdx_eq_one, ramificationIdx_eq_of_comp_eq F K h]
 
 namespace IsUnramified
 

@@ -508,4 +508,40 @@ theorem isUnramifiedIn_self_iff
     v.IsUnramifiedIn F K ↔ v.IsUnramified F := by
   simp [IsUnramifiedIn, liesOver_self_iff]
 
+namespace IsUnramifiedIn
+
+theorem tower_top
+    {F K : Type*} (L : Type*) {M : Type*} [Field F] [Field K] [Field L] [Field M]
+    [Algebra F L] [Algebra F M] [Algebra K L] [Algebra K M] [Algebra L M] [IsScalarTower K L M]
+    [Algebra.IsAlgebraic K M]
+    {v : AbsoluteValue F ℝ} (H : v.IsUnramifiedIn K M) :
+    haveI := Algebra.IsAlgebraic.tower_top (K := K) (L := L) (A := M); v.IsUnramifiedIn L M := by
+  simp only [IsUnramifiedIn] at H ⊢
+  peel H with w _ h
+  exact h.tower_top L
+
+theorem tower_bot
+    {F K : Type*} (L : Type*) {M : Type*} [Field F] [Field K] [Field L] [Field M]
+    [Algebra F L] [Algebra F M] [Algebra K L] [Algebra K M] [Algebra L M] [IsScalarTower K L M]
+    [IsScalarTower F L M] [Algebra.IsAlgebraic K M]
+    {v : AbsoluteValue F ℝ} (H : v.IsUnramifiedIn K M) :
+    haveI := Algebra.IsAlgebraic.tower_bot (K := K) (L := L) (A := M); v.IsUnramifiedIn K L := by
+  simp only [IsUnramifiedIn] at H ⊢
+  intro u _
+  have := Algebra.IsAlgebraic.tower_top (K := K) (L := L) (A := M)
+  obtain ⟨w, _⟩ := u.exists_liesOver M
+  exact (H w (.trans w u v)).tower_bot u
+
+theorem trans
+    {F K L M : Type*} [Field F] [Field K] [Field L] [Field M]
+    [Algebra F L] [Algebra F M] [Algebra K L] [Algebra K M] [Algebra L M] [IsScalarTower K L M]
+    [IsScalarTower F L M] [Algebra.IsAlgebraic K L] [Algebra.IsAlgebraic L M]
+    {v : AbsoluteValue F ℝ} (H1 : v.IsUnramifiedIn K L) (H2 : v.IsUnramifiedIn L M) :
+    haveI := Algebra.IsAlgebraic.trans K L M; v.IsUnramifiedIn K M := by
+  simp only [IsUnramifiedIn] at H1 H2 ⊢
+  peel H2 with w _ h
+  exact (H1 _ (.tower_bot w (w.comp (algebraMap L M).injective) v)).trans h
+
+end IsUnramifiedIn
+
 end AbsoluteValue

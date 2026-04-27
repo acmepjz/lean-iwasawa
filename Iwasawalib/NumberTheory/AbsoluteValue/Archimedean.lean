@@ -84,6 +84,18 @@ theorem LiesOver.trans {K L M S : Type*}
   ext
   simp [← IsScalarTower.algebraMap_apply K L M]
 
+/-- TODO: go mathlib -/
+theorem LiesOver.tower_bot {K L M S : Type*}
+    [CommRing K] [CommRing L] [CommRing M] [Algebra K L] [Algebra K M] [Algebra L M]
+    [IsScalarTower K L M] [IsSimpleRing K] [IsSimpleRing L] [Nontrivial M]
+    [PartialOrder S] [Semiring S]
+    (w : AbsoluteValue M S) (v : AbsoluteValue L S) (u : AbsoluteValue K S)
+    [hwv : w.LiesOver v] [hwu : w.LiesOver u] : v.LiesOver u := by
+  rw [liesOver_iff] at hwv hwu ⊢
+  rw [← hwu, ← hwv]
+  ext
+  simp [← IsScalarTower.algebraMap_apply K L M]
+
 /-! ### Criterion for a place to be non-archimedean -/
 
 /-- An absolute value `v` is archimedean if and only if there exists `x` such that `v x ≤ 1`

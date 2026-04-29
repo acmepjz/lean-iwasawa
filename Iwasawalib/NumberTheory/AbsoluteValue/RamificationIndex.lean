@@ -176,15 +176,14 @@ theorem _root_.Subgroup.relIndex_map_map_of_ker_inf_le
     (Subgroup.map f H).relIndex (Subgroup.map f K) = H.relIndex K := by
   rw [← relIndex_comap, comap_map_eq, ← inf_relIndex_right H K, ← inf_relIndex_right (H ⊔ f.ker) K]
   congr 1
-  apply le_antisymm
-  · simp only [le_inf_iff, inf_le_right, and_true]
-    intro x h
-    rw [mem_inf, mem_sup_of_normal_right] at h
-    obtain ⟨⟨y, hy, z, hz, rfl⟩, hx⟩ := h
-    have := mul_mem (inv_mem (hle hy)) hx
-    rw [← mul_assoc, inv_mul_cancel, one_mul] at this
-    exact mul_mem hy (hf ⟨hz, this⟩)
-  · simp
+  refine le_antisymm ?_ (by simp)
+  simp only [le_inf_iff, inf_le_right, and_true]
+  intro x h
+  rw [mem_inf, mem_sup_of_normal_right] at h
+  obtain ⟨⟨y, hy, z, hz, rfl⟩, hx⟩ := h
+  have := mul_mem (inv_mem (hle hy)) hx
+  rw [← mul_assoc, inv_mul_cancel, one_mul] at this
+  exact mul_mem hy (hf ⟨hz, this⟩)
 
 open IntermediateField in
 /-- TODO: go mathlib -/
@@ -543,5 +542,43 @@ theorem trans
   exact (H1 _ (.tower_bot w (w.comp (algebraMap L M).injective) v)).trans h
 
 end IsUnramifiedIn
+
+theorem isUnramifiedIn_comp_ringEquiv_iff
+    {F K L : Type*} [Field F] [Field K] [Field L] [Algebra F L] [Algebra K L]
+    [Algebra.IsAlgebraic K L] {F' K' L' : Type*} [Field F'] [Field K'] [Field L'] [Algebra F' L']
+    [Algebra K' L'] [Algebra.IsAlgebraic K' L']
+    (v : AbsoluteValue F ℝ) {e : F' ≃+* F} {f : K' ≃+* K} {g : L' ≃+* L}
+    (hcomp0 : (algebraMap F L).comp e = RingHom.comp g (algebraMap F' L'))
+    (hcomp : (algebraMap K L).comp f = RingHom.comp g (algebraMap K' L')) :
+    (v.comp (f := (e : F' →+* F)) e.injective).IsUnramifiedIn K' L' ↔ v.IsUnramifiedIn K L := by
+  simp only [IsUnramifiedIn, liesOver_iff]
+  refine ⟨fun H w h ↦ ?_, fun H w h ↦ ?_⟩
+  · specialize H (w.comp (f := (g : L' →+* L)) g.injective) <| by
+      ext x
+      trans w (algebraMap F L (e x))
+      · simpa using congr(w ($(hcomp0.symm) x))
+      · simpa using congr($h (e x))
+    rwa [w.isUnramified_comp_ringEquiv_iff f.surjective hcomp] at H
+  · specialize H (w.comp (f := (g.symm : L →+* L')) g.symm.injective) <| by
+      ext x
+      trans w (algebraMap F' L' (e.symm x))
+      · simpa using congr(w (g.symm ($(hcomp0) (e.symm x))))
+      · simpa using congr($h (e.symm x))
+    have := w.isUnramified_comp_ringEquiv_iff (f := (f.symm : K →+* K')) (g := g.symm)
+        f.symm.surjective <| by
+      ext x
+      simpa using congr(g.symm ($(hcomp.symm) (f.symm x)))
+    rwa [this] at H
+
+theorem isUnramifiedIn_iff_of_algEquiv
+    {F K L L' : Type*} [Field F] [Field K] [Field L] [Field L'] [Algebra F K] [Algebra F L]
+    [Algebra K L] [Algebra F L'] [Algebra K L'] [IsScalarTower F K L] [IsScalarTower F K L']
+    [Algebra.IsAlgebraic K L] [Algebra.IsAlgebraic K L']
+    (v : AbsoluteValue F ℝ) (f : L ≃ₐ[K] L') :
+    v.IsUnramifiedIn K L ↔ v.IsUnramifiedIn K L' := by
+  simpa using v.isUnramifiedIn_comp_ringEquiv_iff (e := RingEquiv.refl F) (f := RingEquiv.refl K)
+    (g := (f : L ≃+* L'))
+    (by ext; simp [IsScalarTower.algebraMap_apply F K L, IsScalarTower.algebraMap_apply F K L'])
+    (by ext; simp)
 
 end AbsoluteValue

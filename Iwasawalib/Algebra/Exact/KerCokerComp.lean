@@ -5,7 +5,7 @@ Authors: Jz Pan
 -/
 module
 
-public import Mathlib.Algebra.Exact
+public import Mathlib.Algebra.Exact.Basic
 
 @[expose] public section
 

@@ -19,16 +19,6 @@ public import Mathlib.RingTheory.Int.Basic
 
 variable (G : Type*)
 
-/-- TODO: go to mathlib -/
-@[to_additive]
-theorem CommMonoid.mem_primaryComponent [CommMonoid G] (p : ℕ) [Fact p.Prime] (g : G) :
-    g ∈ CommMonoid.primaryComponent G p ↔ ∃ n, orderOf g = p ^ n := Iff.rfl
-
-/-- TODO: go to mathlib -/
-@[to_additive]
-theorem CommGroup.mem_primaryComponent [CommGroup G] (p : ℕ) [Fact p.Prime] (g : G) :
-    g ∈ CommGroup.primaryComponent G p ↔ ∃ n, orderOf g = p ^ n := Iff.rfl
-
 /-- The prime-to-`n` component is the submonoid of elements with order prime to `n`. -/
 @[to_additive (attr := simps)
       /-- The prime-to-`n` component is the submonoid of elements with additive
@@ -37,7 +27,7 @@ def CommMonoid.primeToComponent [CommMonoid G] (n : ℕ) : Submonoid G where
   carrier := { g | (orderOf g).Coprime n }
   one_mem' := by simp
   mul_mem' {x} {y} hx hy := by
-    simp only [Set.mem_setOf_eq] at hx hy ⊢
+    simp only [Set.mem_ofPred_eq] at hx hy ⊢
     exact (hx.mul_left hy).coprime_dvd_left (Commute.all x y).orderOf_mul_dvd_mul_orderOf
 
 /-- The prime-to-`n` component is the subgroup of elements with order prime to `n`. -/
@@ -51,11 +41,11 @@ def CommGroup.primeToComponent [CommGroup G] (n : ℕ) : Subgroup G where
     rwa [orderOf_inv]
 
 @[to_additive]
-theorem CommMonoid.mem_primeToComponent [CommMonoid G] (n : ℕ) (g : G) :
+theorem CommMonoid.mem_primeToComponent_iff_orderOf [CommMonoid G] (n : ℕ) (g : G) :
     g ∈ CommMonoid.primeToComponent G n ↔ (orderOf g).Coprime n := Iff.rfl
 
 @[to_additive]
-theorem CommGroup.mem_primeToComponent [CommGroup G] (n : ℕ) (g : G) :
+theorem CommGroup.mem_primeToComponent_iff_orderOf [CommGroup G] (n : ℕ) (g : G) :
     g ∈ CommGroup.primeToComponent G n ↔ (orderOf g).Coprime n := Iff.rfl
 
 @[to_additive]
@@ -68,7 +58,7 @@ theorem CommGroup.card_primeToComponent_coprime [CommGroup G] [Finite G] (n : �
   obtain ⟨g, hg⟩ := exists_prime_orderOf_dvd_card' p (hdvd.trans (Nat.gcd_dvd_left ..))
   replace hdvd := hdvd.trans (Nat.gcd_dvd_right ..)
   have h := g.2
-  rw [mem_primeToComponent, show orderOf g.1 = _ from
+  rw [mem_primeToComponent_iff_orderOf, show orderOf g.1 = _ from
     orderOf_injective (Subgroup.subtype _) Subtype.val_injective g, hg, hp.coprime_iff_not_dvd] at h
   contradiction
 
@@ -85,9 +75,9 @@ theorem orderOf_zpow_eq_orderOf_pow_natAbs {G} [Group G] {x : G} (n : ℤ) :
 
 /-- A torsion abelian group is canonically isomorphic to the product of its prime-to-`p` component
 and its `p`-primary component. -/
-@[to_additive (attr := simps symm_apply) AddCommGroup.equivPrimeToComponentProdPrimaryComponent
-      /-- A torsion additive abelian group is canonically isomorphic to the product of its
-      prime-to-`p` component and its `p`-primary component. -/]
+-- @[to_additive (attr := simps symm_apply) AddCommGroup.equivPrimeToComponentProdPrimaryComponent
+--       /-- A torsion additive abelian group is canonically isomorphic to the product of its
+--       prime-to-`p` component and its `p`-primary component. -/]
 noncomputable def CommGroup.equivPrimeToComponentProdPrimaryComponent
     [CommGroup G] (p : ℕ) [Fact p.Prime] (ht : Monoid.IsTorsion G) :
     G ≃* CommGroup.primeToComponent G p × CommGroup.primaryComponent G p :=
@@ -98,14 +88,15 @@ noncomputable def CommGroup.equivPrimeToComponentProdPrimaryComponent
     letI u : ℤ := r.gcdA s
     letI v : ℤ := r.gcdB s
     refine (⟨g ^ (r * u), ?_⟩, ⟨g ^ (s * v), ?_⟩)
-    · rw [mem_primeToComponent]
+    · rw [mem_primeToComponent_iff_orderOf]
       suffices (orderOf (g ^ r)).Coprime p by
         rw [zpow_mul, zpow_natCast]
         exact this.coprime_dvd_left (orderOf_zpow_dvd _)
       rw [Nat.coprime_comm, show orderOf (g ^ r) = s from orderOf_pow_of_dvd
         (by simp [r, ‹Fact p.Prime›.out.ne_zero]) (Nat.ordProj_dvd ..)]
       exact Nat.coprime_ordCompl Fact.out (orderOf_ne_zero_iff.2 (ht g))
-    · use n.factorization p
+    · rw [mem_primaryComponent_iff_orderOf]
+      use n.factorization p
       have h1 : orderOf (g ^ s) = r :=
         orderOf_pow_orderOf_div (orderOf_ne_zero_iff.2 (ht g)) (Nat.ordProj_dvd ..)
       have h2 : (orderOf (g ^ s)).Coprime v.natAbs := by
@@ -141,8 +132,8 @@ noncomputable def CommGroup.equivPrimeToComponentProdPrimaryComponent
     dsimp [invFun', invFun] at hg
     rw [← eq_inv_iff_mul_eq_one] at hg
     have h1 := g.1.2
-    obtain ⟨n, h2⟩ := g.2.2
-    rw [mem_primeToComponent, hg, orderOf_inv, h2] at h1
+    obtain ⟨n, h2⟩ := mem_primaryComponent_iff_orderOf.1 g.2.2
+    rw [mem_primeToComponent_iff_orderOf, hg, orderOf_inv, h2] at h1
     rcases eq_or_ne n 0 with rfl | hn
     · rw [pow_zero, orderOf_eq_one_iff] at h2
       ext : 2 <;> simp [hg, h2]

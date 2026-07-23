@@ -31,13 +31,13 @@ theorem Module.IsTorsion.not_disjoint_nonZeroDivisors_of_mem_support
   obtain ⟨t, ht⟩ := @H x
   exact ⟨t.1, h t.2, ht⟩
 
-theorem Module.IsTorsion.one_le_primeHeight_of_mem_support
+theorem Module.IsTorsion.one_le_height_of_mem_support
     {A : Type*} [CommRing A] {M : Type*} [AddCommGroup M] [Module A M]
-    (H : Module.IsTorsion A M) : ∀ p ∈ Module.support A M, 1 ≤ p.1.primeHeight := by
+    (H : Module.IsTorsion A M) : ∀ p ∈ Module.support A M, 1 ≤ p.1.height := by
   intro p hp
   replace H := H.not_disjoint_nonZeroDivisors_of_mem_support p hp
   contrapose! H
-  rw [ENat.lt_one_iff_eq_zero, Ideal.primeHeight_eq_zero_iff] at H
+  rw [Order.lt_one_iff, Ideal.height_eq_zero_iff] at H
   exact Ideal.disjoint_nonZeroDivisors_of_mem_minimalPrimes H
 
 theorem Module.isTorsion_iff_subsingleton_localizedModule_nonZeroDivisors

@@ -48,6 +48,32 @@ theorem CommMonoid.mem_primeToComponent_iff_orderOf [CommMonoid G] (n : ℕ) (g 
 theorem CommGroup.mem_primeToComponent_iff_orderOf [CommGroup G] (n : ℕ) (g : G) :
     g ∈ CommGroup.primeToComponent G n ↔ (orderOf g).Coprime n := Iff.rfl
 
+@[to_additive (attr := simp)]
+theorem CommMonoid.primeToComponent_zero [CommMonoid G] : CommMonoid.primeToComponent G 0 = ⊥ := by
+  ext1
+  simp [mem_primeToComponent_iff_orderOf]
+
+@[to_additive (attr := simp)]
+theorem CommGroup.primeToComponent_zero [CommGroup G] : CommGroup.primeToComponent G 0 = ⊥ := by
+  ext1
+  simp [mem_primeToComponent_iff_orderOf]
+
+-- TODO: go mathlib ???
+@[to_additive (attr := simp)]
+theorem CommMonoid.primaryComponent_zero [CommMonoid G] : CommMonoid.primaryComponent G 0 = ⊤ := by
+  ext1
+  simp only [mem_primaryComponent, Submonoid.mem_top, iff_true]
+  use 1
+  simp
+
+-- TODO: go mathlib ???
+@[to_additive (attr := simp)]
+theorem CommGroup.primaryComponent_zero [CommGroup G] : CommGroup.primaryComponent G 0 = ⊤ := by
+  ext1
+  simp only [mem_primaryComponent, Subgroup.mem_top, iff_true]
+  use 1
+  simp
+
 @[to_additive]
 theorem CommGroup.card_primeToComponent_coprime [CommGroup G] [Finite G] (n : ℕ) :
     (Nat.card (primeToComponent G n)).Coprime n := by

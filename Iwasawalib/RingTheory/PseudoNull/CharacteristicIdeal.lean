@@ -22,7 +22,7 @@ variable (A : Type*) [CommRing A] (M : Type*) [AddCommGroup M] [Module A M]
 theorem Module.charIdeal_eq_one_of_isPseudoNull [IsPseudoNull A M] :
     charIdeal A M = 1 := by
   simp [Module.charIdeal_eq_prod_of_support_subset A M ∅ (by simp) (fun p hp ↦ False.elim <| by
-    have := ENat.coe_le_coe.1 (hp.2 ▸ IsPseudoNull.two_le_primeHeight p hp.1)
+    have := ENat.natCast_le_natCast.1 (hp.2 ▸ IsPseudoNull.two_le_height p hp.1)
     contradiction)]
 
 variable {A M N f}
@@ -31,7 +31,7 @@ theorem LinearMap.IsPseudoIsomorphism.charIdeal_eq (H : f.IsPseudoIsomorphism) :
     Module.charIdeal A M = Module.charIdeal A N := by
   simp_rw [Module.charIdeal]
   congr! 4 with p hp
-  rw [(LinearEquiv.ofBijective _ (H.bijective_of_primeHeight_le_one hp.le)).length_eq]
+  rw [(LinearEquiv.ofBijective _ (H.bijective_of_height_le_one hp.le)).length_eq]
 
 theorem Module.IsPseudoIsomorphic.charIdeal_eq (H : M ∼ₚᵢₛ[A] N) :
     Module.charIdeal A M = Module.charIdeal A N := by

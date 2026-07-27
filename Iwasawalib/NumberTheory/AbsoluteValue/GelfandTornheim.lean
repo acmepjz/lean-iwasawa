@@ -132,6 +132,7 @@ theorem exists_ringHom_complex_of_not_isNonarchimedean
   have := v.normalization.exists_ringHom_complex_of_not_isNonarchimedean_of_isNormalized <| by
     rwa [← isNonarchimedean_iff_of_equiv v.isEquiv_normalization]
   use this.choose
+  change IsEquiv ..
   simpa only [this.choose_spec] using v.isEquiv_normalization.symm
 
 /-- Let `K / F` be a field extension, `v` and `w` are absolute values on `K` and `F`, respectively,

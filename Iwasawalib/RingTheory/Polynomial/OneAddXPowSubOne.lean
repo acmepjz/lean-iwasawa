@@ -54,7 +54,7 @@ theorem commute_oneAddXPowSubOne (p : R[X]) : Commute (oneAddXPowSubOne R n) p :
 
 theorem coeff_oneAddXPowSubOne_eq (i : ℕ) :
     (oneAddXPowSubOne R n).coeff i = if i = 0 then 0 else (n.choose i : R) := by
-  simp_rw [oneAddXPowSubOne, finset_sum_coeff, ← C_eq_natCast, coeff_mul_C, coeff_X_pow,
+  simp_rw [oneAddXPowSubOne, finsetSum_coeff, ← C_eq_natCast, coeff_mul_C, coeff_X_pow,
     ite_mul, one_mul, zero_mul, Finset.sum_ite_eq, Finset.mem_Ico]
   split_ifs with h1 h2 h2
   · linarith only [h1.1, h2]
@@ -169,7 +169,7 @@ theorem oneAddXPowSubOne_mem_span_natCast_X_pow :
     rw [(∑ i ∈ Finset.range p, (1 + X) ^ (p ^ n * i)).as_sum_support_C_mul_X_pow]
     refine Ideal.sum_mem _ fun j _ ↦ ?_
     rcases eq_or_ne j 0 with rfl | hj
-    · simp only [finset_sum_coeff, pow_zero, mul_one, coeff_one_add_X_pow,
+    · simp only [finsetSum_coeff, pow_zero, mul_one, coeff_one_add_X_pow,
         Nat.choose_zero_right, Nat.cast_one, Finset.sum_const, Finset.card_range,
         nsmul_eq_mul, map_natCast, Ideal.mem_span_pair]
       exact ⟨1, 0, by simp⟩

@@ -30,14 +30,15 @@ theorem continuous_autCongr
   convert (L.map ϕ.symm.toAlgHom).fixingSubgroup_isOpen
   ext f
   simp only [MulEquiv.toMonoidHom_eq_coe, Subgroup.mem_comap, MonoidHom.coe_coe, autCongr_apply,
-    IntermediateField.mem_fixingSubgroup_iff, trans_apply, toAlgHom_eq_coe]
+    IntermediateField.mem_fixingSubgroup_iff, trans_apply]
   change _ ↔ ∀ x ∈ (L.map _).toSubalgebra, _
   simp only [IntermediateField.toSubalgebra_map, Subalgebra.mem_map, and_imp, forall_exists_index,
-    IntermediateField.mem_toSubalgebra, AlgHom.coe_coe, forall_apply_eq_imp_iff₂]
+    IntermediateField.mem_toSubalgebra, forall_apply_eq_imp_iff₂]
   refine ⟨fun h x hx ↦ ?_, fun h x hx ↦ ?_⟩
   · apply_fun _ using ϕ.injective
     simp [h x hx]
-  · simp [h x hx]
+  · simp only [coe_toAlgHom] at h
+    simp [h x hx]
 
 /-- Continuous version of `AlgEquiv.autCongr`. -/
 @[simps! apply toMulEquiv]
@@ -121,6 +122,8 @@ theorem continuous_autCongrOfSurjective : Continuous (autCongrOfSurjective hsurj
     have := Algebra.lift_rank_eq_of_equiv_equiv (.ofBijective f ⟨f.injective, hsurj⟩) g'.symm <| by
       ext x
       convert congr($(hcomp) x)
+      simp only [RingEquiv.toRingHom_eq_coe, RingHom.coe_comp, RingHom.coe_coe,
+        RingEquiv.coe_ofBijective, Function.comp_apply, SubalgebraClass.coe_algebraMap]
       simp [hg']
     have := this ▸ (Cardinal.lift_lt_aleph0.2 (Module.rank_lt_aleph0_iff.2 hL))
     simpa using this
@@ -145,8 +148,11 @@ theorem continuous_autCongrOfSurjective_symm :
     ext x
     obtain ⟨y, rfl⟩ := f'.surjective x
     apply_fun _ using g.injective
-    simpa using congr($(hcomp.symm) y)
-  convert this
+    convert congr($(hcomp.symm) y) using 1
+    · simp
+    · simp [f']
+  convert this using 1
+  ext; simp
 
 /-- Continuous version of `AlgEquiv.autCongrOfSurjective`. -/
 @[simps! toMulEquiv]

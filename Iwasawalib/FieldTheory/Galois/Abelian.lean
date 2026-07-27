@@ -18,17 +18,6 @@ public import Mathlib.FieldTheory.Galois.Abelian
 
 /-! ### Product of a family of group homomorphisms (should go mathlib) -/
 
-/-- Combine a family of `MonoidHom`s `f_i : M →* N_i` into `M →* Π i, N i`
-given by `x ↦ (i ↦ f_i x)`. -/
-@[to_additive (attr := simps)
-      /-- Combine a family of `AddMonoidHom`s `f_i : M →+ N_i` into `M →+ Π i, N i`
-      given by `x ↦ (i ↦ f_i x)`. -/]
-protected def MonoidHom.pi {M ι : Type*} {N : ι → Type*} [MulOneClass M] [∀ i, MulOneClass (N i)]
-    (f : (i : ι) → (M →* N i)) : M →* ((i : ι) → N i) where
-  toFun x i := f i x
-  map_one' := by ext; simp
-  map_mul' x y := by ext; simp
-
 @[to_additive]
 theorem MonoidHom.ker_pi {M ι : Type*} {N : ι → Type*} [Group M] [∀ i, MulOneClass (N i)]
     (f : (i : ι) → (M →* N i)) : (MonoidHom.pi f).ker = ⨅ i, (f i).ker := by

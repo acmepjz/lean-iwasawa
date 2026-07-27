@@ -401,7 +401,8 @@ theorem torsionUnits_le_torsion : torsionUnits p ≤ CommGroup.torsion _ := fun 
 
 theorem card_torsionUnits :
     Nat.card (torsionUnits p) = (p ^ torsionfreeUnitsExponent p).totient := by
-  simpa using Nat.card_range_of_injective (teichmuller_injective p)
+  convert! Nat.card_range_of_injective (teichmuller_injective p) using 1
+  simp
 
 instance finite_torsionUnits : Finite (torsionUnits p) := by
   apply Nat.finite_of_card_ne_zero
@@ -605,8 +606,9 @@ noncomputable def toFun (x : ℤ_[p]) : ℤ_[p] :=
 @[simp]
 theorem toZModPow_toFun (x : ℤ_[p]) (i : ℕ) :
     toZModPow i (toFun p x) = (1 + p ^ torsionfreeUnitsExponent p) ^ x.appr i := by
-  simpa using toZModPow_ofIntSeq_of_pow_dvd_sub
-    (fun i ↦ (1 + p ^ torsionfreeUnitsExponent p) ^ (x.appr i)) p (toFun_aux p x) i
+  convert! toZModPow_ofIntSeq_of_pow_dvd_sub
+    (fun i ↦ (1 + p ^ torsionfreeUnitsExponent p) ^ (x.appr i)) p (toFun_aux p x) i using 1
+  simp
 
 @[simp]
 theorem toFun_natCast (x : ℕ) : toFun p x = (1 + p ^ torsionfreeUnitsExponent p) ^ x := by
@@ -663,7 +665,7 @@ theorem toFun_mem_principalUnits_iff (x : ℤ_[p]) :
   exact ⟨fun h ↦ Nat.eq_zero_of_dvd_of_lt h (appr_lt x n), fun h ↦ by simp [h]⟩
 
 theorem toFun_mem_torsionfreeUnits (x : ℤ_[p]) : (isUnit_toFun p x).unit ∈ torsionfreeUnits p := by
-  simpa using toFun_mem_principalUnits_iff p 0 x
+  simpa [torsionfreeUnits] using toFun_mem_principalUnits_iff p 0 x
 
 theorem toFun_injective : Function.Injective (toFun p) := fun x y H ↦ by
   simp only [← ext_of_toZModPow, toZModPow_toFun] at H ⊢
@@ -692,7 +694,7 @@ theorem toFun_surjective (x : torsionfreeUnits p) : ∃ y, toFun p y = x.1.1 := 
   choose s hs using h2
   have h4' (n) : (1 + p ^ torsionfreeUnitsExponent p) ^ s n =
       toZModPow (n + torsionfreeUnitsExponent p) x.1.1 := by
-    simpa using congr($((hs n).2).1.1)
+    simpa [x'] using congr($((hs n).2).1.1)
   have h4 (n) : (1 + p ^ torsionfreeUnitsExponent p) ^ s n = toZModPow n x.1.1 := by
     rw [← zmod_cast_comp_toZModPow _ _ (show n ≤ n + torsionfreeUnitsExponent p by simp),
       RingHom.comp_apply, ← h4', map_pow]
@@ -799,14 +801,13 @@ theorem hasEnoughRootsOfUnity_iff :
       rintro rfl
       rw [rootsOfUnity_zero, Subgroup.topEquiv.isCyclic] at hcyc
       exact not_isCyclic_units p hcyc
-    have h1 := Fintype.card_eq_nat_card ▸ hr.card_rootsOfUnity
     have h2 : rootsOfUnity n ℤ_[p] ≤ torsionUnits p := by
       rw [torsionUnits_eq_torsion]
       intro x hx
       rw [mem_rootsOfUnity] at hx
       rw [CommGroup.mem_torsion, isOfFinOrder_iff_pow_eq_one]
       exact ⟨n, Nat.pos_of_ne_zero NeZero.out, hx⟩
-    simpa only [h1, card_torsionUnits] using Subgroup.card_dvd_of_le h2
+    simpa only [hr.card_rootsOfUnity, card_torsionUnits] using Subgroup.card_dvd_of_le h2
   · intro h
     have : NeZero (p ^ torsionfreeUnitsExponent p).totient := .mk <| by
       have := two_le_totient_p_pow_torsionfreeUnitsExponent p
@@ -909,8 +910,8 @@ theorem nonempty_continuousMulEquiv_of_continuousMonoidHom_units_of_finite_ker
     (unitsContinuousEquivTorsionfreeProdTorsion p : ℤ_[p]ˣ →ₜ* torsionfreeUnits p × torsionUnits p)
   let f1 := f0.comp f
   have hf1ker : f1.ker = (torsionUnits p).comap f := by
-    have : f0.ker = torsionUnits p := by ext; simp [f0]
-    simpa only [← this] using MonoidHom.comap_ker f0.toMonoidHom f.toMonoidHom
+    have : torsionUnits p = f0.ker := by ext; simp [f0]
+    convert! (MonoidHom.comap_ker f0.toMonoidHom f.toMonoidHom).symm using 2
   have : Finite f1.ker := by
     change (f1.ker : Set G).Finite
     rw [hf1ker]

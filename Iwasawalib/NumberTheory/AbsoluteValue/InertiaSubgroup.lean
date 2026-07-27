@@ -65,18 +65,18 @@ def inertiaSubgroup : Subgroup (K ≃ₐ[F] K) where
   one_mem' := by simp
   mul_mem' {f} {g} hf hg := by
     by_cases h : IsNonarchimedean v
-    · simp only [h, not_true_eq_false, false_or, Set.mem_setOf] at hf hg ⊢
+    · simp only [h, not_true_eq_false, false_or, Set.mem_ofPred] at hf hg ⊢
       obtain ⟨hf1, hf2⟩ := hf
       obtain ⟨hg1, hg2⟩ := hg
       use mul_mem hf1 hg1
       intro x hx
       simpa using (h (f (g x) - g x) (g x - x)).trans_lt <| max_lt
         (hf2 (g x) (by rwa [v.apply_eq_of_mem_decompositionSubgroup hg1])) (hg2 _ hx)
-    simp only [h, not_false_eq_true, true_or, and_true, Set.mem_setOf] at hf hg ⊢
+    simp only [h, not_false_eq_true, true_or, and_true, Set.mem_ofPred] at hf hg ⊢
     exact mul_mem hf hg
   inv_mem' {f} hf := by
     by_cases h : IsNonarchimedean v
-    · simp only [h, not_true_eq_false, false_or, Set.mem_setOf] at hf ⊢
+    · simp only [h, not_true_eq_false, false_or, Set.mem_ofPred] at hf ⊢
       have h1 := inv_mem hf.1
       refine ⟨h1, fun x hx ↦ ?_⟩
       rw [← v.map_neg']
@@ -156,12 +156,12 @@ theorem inertiaSubgroup_eq_of_isNonarchimedean
     change IsLocalRing.residue _ _ = IsLocalRing.residue _ _
     rw [← sub_eq_zero, ← map_sub, IsLocalRing.residue_eq_zero_iff, Valuation.mem_maximalIdeal_iff,
       ← NNReal.coe_lt_coe, NNReal.coe_one]
-    convert v.apply_sub_lt_one_of_mem_inertiaSubgroup_of_isNonarchimedean hg h y.2
+    convert! v.apply_sub_lt_one_of_mem_inertiaSubgroup_of_isNonarchimedean hg h y.2
   · rintro ⟨f, h1, h2⟩
     rw [v.mem_inertiaSubgroup_iff_of_isNonarchimedean h]
     refine ⟨?_, fun x hx ↦ ?_⟩
     · rw [v.decompositionSubgroup_eq_of_isNonarchimedean _ h, ← h2]
-      convert f.2
+      convert! f.2
     · rw [ValuationSubring.inertiaSubgroup, MonoidHom.mem_ker] at h1
       replace h1 := congr($(h1) (IsLocalRing.residue _ ⟨x, hx⟩))
       change IsLocalRing.residue _ _ = IsLocalRing.residue _ _ at h1

@@ -7,14 +7,13 @@ module
 
 public import Mathlib.Algebra.Algebra.Pi
 public import Mathlib.Algebra.Algebra.Subalgebra.Basic
--- public import Mathlib.Data.Rel
 public import Mathlib.RingTheory.Ideal.Maps
 
 @[expose] public section
 
 /-!
 
-# Inverse limit of algebras
+# Inverse limit of algebras (experimental)
 
 Let `R` be a commutative semiring, `I` be an index set with `≤` defined,
 `A` be a family of `R`-algebras indexed by `I`, `f` be a family of algebra homomorphisms,
@@ -225,10 +224,10 @@ on `B` are functorial, then their inverse limits are also isomorphic. -/
 noncomputable def congr₂ : InverseLimit g ≃ₐ[R] InverseLimit f :=
   .ofAlgHom (lift₂' f g (fun i ↦ (φ i : B _ →ₐ[R] A _)) fun _ _ h ↦ ⟨e.map_rel_iff.2 h, hφ h⟩)
     (lift₂' g f (ij := e.symm) (fun j ↦ (g (OrderIso.apply_symm_apply e j).ge).comp
-      (AlgHomClass.toAlgHom (φ (e.symm j)).symm)) fun i j h ↦ ⟨e.symm.map_rel_iff.2 h, by
+      (AlgEquiv.toAlgHom (φ (e.symm j)).symm)) fun i j h ↦ ⟨e.symm.map_rel_iff.2 h, by
         replace hφ := congr((g (OrderIso.apply_symm_apply e i).ge).comp
-          (AlgHomClass.toAlgHom (φ (e.symm i)).symm) |>.comp
-          ($(hφ (e.symm.map_rel_iff.2 h)).comp (AlgHomClass.toAlgHom (φ (e.symm j)).symm)))
+          (AlgEquiv.toAlgHom (φ (e.symm i)).symm) |>.comp
+          ($(hφ (e.symm.map_rel_iff.2 h)).comp (AlgEquiv.toAlgHom (φ (e.symm j)).symm)))
         rw [AlgHom.comp_assoc (f _), AlgEquiv.comp_symm, AlgHom.comp_id] at hφ
         simp_rw [AlgHom.comp_assoc] at hφ
         nth_rw 3 [← AlgHom.comp_assoc] at hφ

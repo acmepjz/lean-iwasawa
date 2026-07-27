@@ -26,28 +26,28 @@ theorem Ring.support_quotient {A : Type*} [CommRing A] (I : Ideal A) :
 
 /-- There are only finitely many height one primes contained in the support of a
 finitely generated torsion module over a Noetherian ring. -/
-theorem Module.IsTorsion.finite_primeHeight_one_support
+theorem Module.IsTorsion.finite_height_one_support
     {A : Type*} [CommRing A] [IsNoetherianRing A]
     {M : Type*} [AddCommGroup M] [Module A M] [Module.Finite A M]
     (H : Module.IsTorsion A M) :
-    (Module.support A M ∩ {p : PrimeSpectrum A | p.1.primeHeight = 1}).Finite := by
+    (Module.support A M ∩ {p : PrimeSpectrum A | p.1.height = 1}).Finite := by
   induction ‹Module.Finite A M› using
     IsNoetherianRing.induction_on_isQuotientEquivQuotientPrime A with
   | subsingleton N => simp [Module.support_eq_empty]
   | quotient N p f =>
     rw [f.isTorsion] at H
-    have hp : 1 ≤ p.1.primeHeight := H.one_le_primeHeight_of_mem_support p <| by
+    have hp : 1 ≤ p.1.height := H.one_le_height_of_mem_support p <| by
       simp [Ring.support_quotient]
     rw [f.support_eq, Ring.support_quotient]
     refine (Set.finite_singleton p).subset fun q ⟨h1, h2⟩ ↦ ?_
     simp only [PrimeSpectrum.mem_zeroLocus, SetLike.coe_subset_coe,
       PrimeSpectrum.asIdeal_le_asIdeal] at h1
-    rw [Set.mem_setOf_eq] at h2
+    rw [Set.mem_ofPred_eq] at h2
     rw [Set.mem_singleton_iff]
     ext1
-    have : q.1.FiniteHeight := ⟨.inr (by simp [q.1.height_eq_primeHeight, h2])⟩
-    have := p.1.height_eq_primeHeight ▸ (h2 ▸ hp).antisymm (Ideal.primeHeight_mono h1)
-    have := mem_minimalPrimes_of_primeHeight_eq_height h1 this
+    have : q.1.FiniteHeight := ⟨.inr (by simp [h2])⟩
+    have := (h2 ▸ hp).antisymm (Ideal.height_mono h1)
+    have := Ideal.mem_minimalPrimes_of_height_eq h1 this.le
     simpa [Ideal.minimalPrimes_eq_subsingleton_self] using this
   | exact N₁ N₂ N₃ f g hf hg hfg h₁ h₃ =>
     specialize h₁ (H.injective hf)
@@ -56,25 +56,25 @@ theorem Module.IsTorsion.finite_primeHeight_one_support
     exact h₁.union h₃
 
 open scoped Classical in
-theorem Module.length_localizedModule_primeCompl_quotient_prime_eq_of_primeHeight_le
+theorem Module.length_localizedModule_primeCompl_quotient_prime_eq_of_height_le
     {A : Type*} [CommRing A] {p q : PrimeSpectrum A}
-    (hp : p.1.primeHeight ≠ ⊤) (hq : p.1.primeHeight ≤ q.1.primeHeight) :
+    (hp : p.1.height ≠ ⊤) (hq : p.1.height ≤ q.1.height) :
     Module.length (Localization p.1.primeCompl) (LocalizedModule p.1.primeCompl (A ⧸ q.1)) =
       if p = q then 1 else 0 := by
-  have : p.1.FiniteHeight := ⟨.inr (by simpa only [p.1.height_eq_primeHeight])⟩
+  have : p.1.FiniteHeight := ⟨.inr hp⟩
   by_cases hpq : p ≠ q
   · rw [if_neg hpq, Module.length_eq_zero_iff]
     rw [← Module.notMem_support_iff, Ring.support_quotient,
       PrimeSpectrum.mem_zeroLocus, SetLike.coe_subset_coe, PrimeSpectrum.asIdeal_le_asIdeal]
     intro h
-    simpa using lt_of_le_of_lt hq (Ideal.primeHeight_strict_mono (h.lt_of_ne hpq.symm))
+    simpa using lt_of_le_of_lt hq <|
+      Ideal.height_strict_mono_of_isPrime_of_isPrime (h.lt_of_ne hpq.symm)
   rw [ne_eq, not_not] at hpq
   rw [if_pos hpq, Module.length_eq_one_iff, ← hpq, ← LinearMap.isSimpleModule_iff_of_bijective _
     (localizedQuotientEquiv p.1.primeCompl p.1).bijective, isSimpleModule_iff_quot_maximal]
   refine ⟨_, IsLocalRing.maximalIdeal.isMaximal (Localization p.1.primeCompl),
     ⟨Submodule.Quotient.equiv _ _ (LocalizedModule.equivTensorProduct p.1.primeCompl A ≪≫ₗ
       TensorProduct.AlgebraTensorModule.rid _ _ _) ?_⟩⟩
-  change Submodule.map (LinearEquiv.toLinearMap _) _ = _
   rw [Submodule.map_equiv_eq_comap_symm]
   ext x
   induction x with | H x =>
@@ -91,39 +91,39 @@ theorem Module.length_localizedModule_primeCompl_quotient_prime_eq_of_primeHeigh
   rw [hu] at ha
   exact (p.2.mem_or_mem ha).resolve_left (p.1.primeCompl.mul_mem u.2 hb)
 
-theorem Module.isFiniteLength_localizedModule_primeCompl_quotient_prime_of_primeHeight_le
+theorem Module.isFiniteLength_localizedModule_primeCompl_quotient_prime_of_height_le
     {A : Type*} [CommRing A] {p q : PrimeSpectrum A}
-    (hp : p.1.primeHeight ≠ ⊤) (hq : p.1.primeHeight ≤ q.1.primeHeight) :
+    (hp : p.1.height ≠ ⊤) (hq : p.1.height ≤ q.1.height) :
     IsFiniteLength (Localization p.1.primeCompl) (LocalizedModule p.1.primeCompl (A ⧸ q.1)) := by
   rw [← Module.length_ne_top_iff,
-    Module.length_localizedModule_primeCompl_quotient_prime_eq_of_primeHeight_le hp hq]
+    Module.length_localizedModule_primeCompl_quotient_prime_eq_of_height_le hp hq]
   split_ifs <;> simp
 
 /-- Let `M` be a finitely generated torsion module over a Noetherian ring `A`. For any prime ideal
 `p` of `A` of height `≤ 1`, the `Mₚ` is of finite length over `Aₚ`. -/
-theorem Module.IsTorsion.isFiniteLength_localizedModule_of_primeHeight_le_one
+theorem Module.IsTorsion.isFiniteLength_localizedModule_of_height_le_one
     {A : Type*} [CommRing A] [IsNoetherianRing A]
     {M : Type*} [AddCommGroup M] [Module A M] [Module.Finite A M]
     (H : Module.IsTorsion A M)
-    (p : PrimeSpectrum A) (hp : p.1.primeHeight ≤ 1) :
+    (p : PrimeSpectrum A) (hp : p.1.height ≤ 1) :
     IsFiniteLength (Localization p.1.primeCompl) (LocalizedModule p.1.primeCompl M) := by
   by_cases hmem : p ∉ Module.support A M
   · rw [Module.notMem_support_iff] at hmem
     exact IsFiniteLength.of_subsingleton
   rw [not_not] at hmem
-  replace hp := hp.antisymm (H.one_le_primeHeight_of_mem_support p hmem)
+  replace hp := hp.antisymm (H.one_le_height_of_mem_support p hmem)
   clear hmem
   induction ‹Module.Finite A M› using
     IsNoetherianRing.induction_on_isQuotientEquivQuotientPrime A with
   | subsingleton N => exact IsFiniteLength.of_subsingleton
   | quotient N q f =>
     rw [f.isTorsion] at H
-    have hq : 1 ≤ q.1.primeHeight := H.one_le_primeHeight_of_mem_support q <| by
+    have hq : 1 ≤ q.1.height := H.one_le_height_of_mem_support q <| by
       simp [Ring.support_quotient]
     refine (LinearEquiv.ofBijective (LocalizedModule.map p.1.primeCompl f.toLinearMap)
       ⟨LocalizedModule.map_injective _ _ f.injective,
         LocalizedModule.map_surjective _ _ f.surjective⟩).symm.isFiniteLength ?_
-    exact Module.isFiniteLength_localizedModule_primeCompl_quotient_prime_of_primeHeight_le
+    exact Module.isFiniteLength_localizedModule_primeCompl_quotient_prime_of_height_le
       (by simp [hp]) (hp ▸ hq)
   | exact N₁ N₂ N₃ f g hf hg hfg h₁ h₃ =>
     specialize h₁ (H.injective hf)
@@ -138,15 +138,15 @@ theorem Module.IsTorsion.isFiniteLength_localizedModule_of_primeHeight_le_one
 mathematically correct if the module is finitely generated torsion over a Noetherian ring. -/
 noncomputable def Module.charIdeal
     (A : Type*) [CommRing A] (M : Type*) [AddCommGroup M] [Module A M] : Ideal A :=
-  ∏ᶠ (p : PrimeSpectrum A), if p.1.primeHeight = 1 then
+  ∏ᶠ (p : PrimeSpectrum A), if p.1.height = 1 then
     p.1 ^ (Module.length (Localization p.1.primeCompl) (LocalizedModule p.1.primeCompl M)).toNat
   else
     1
 
 theorem Module.charIdeal_eq_prod_of_support_subset
     (A : Type*) [CommRing A] (M : Type*) [AddCommGroup M] [Module A M]
-    (s : Finset (PrimeSpectrum A)) (hh : ∀ p ∈ s, p.1.primeHeight = 1)
-    (hs : Module.support A M ∩ {p : PrimeSpectrum A | p.1.primeHeight = 1} ⊆ s) :
+    (s : Finset (PrimeSpectrum A)) (hh : ∀ p ∈ s, p.1.height = 1)
+    (hs : Module.support A M ∩ {p : PrimeSpectrum A | p.1.height = 1} ⊆ s) :
     Module.charIdeal A M = ∏ p ∈ s, p.1 ^ (Module.length (Localization p.1.primeCompl)
       (LocalizedModule p.1.primeCompl M)).toNat := by
   rw [charIdeal, finprod_eq_prod_of_mulSupport_subset _ (s := s) ?_]
@@ -176,17 +176,17 @@ theorem Module.IsTorsion.charIdeal_eq_mul_of_exact
   have hPt := H.surjective hg
   have := isNoetherian_of_injective f hf
   have := Module.Finite.of_surjective g hg
-  let s := H.finite_primeHeight_one_support.toFinset
-  have hh : ∀ p ∈ s, p.1.primeHeight = 1 := fun p hp ↦ by
-    simp only [Set.Finite.mem_toFinset, Set.mem_inter_iff, Set.mem_setOf_eq, s] at hp
+  let s := H.finite_height_one_support.toFinset
+  have hh : ∀ p ∈ s, p.1.height = 1 := fun p hp ↦ by
+    simp only [Set.Finite.mem_toFinset, Set.mem_inter_iff, Set.mem_ofPred_eq, s] at hp
     exact hp.2
-  have hNs : Module.support A N ∩ {p : PrimeSpectrum A | p.1.primeHeight = 1} ⊆ s := by
+  have hNs : Module.support A N ∩ {p : PrimeSpectrum A | p.1.height = 1} ⊆ s := by
     simp [s]
-  have hMs : Module.support A M ∩ {p : PrimeSpectrum A | p.1.primeHeight = 1} ⊆ s := by
+  have hMs : Module.support A M ∩ {p : PrimeSpectrum A | p.1.height = 1} ⊆ s := by
     refine subset_trans ?_ hNs
     gcongr
     exact Module.support_subset_of_injective f hf
-  have hPs : Module.support A P ∩ {p : PrimeSpectrum A | p.1.primeHeight = 1} ⊆ s := by
+  have hPs : Module.support A P ∩ {p : PrimeSpectrum A | p.1.height = 1} ⊆ s := by
     refine subset_trans ?_ hNs
     gcongr
     exact Module.support_subset_of_surjective g hg
@@ -199,9 +199,9 @@ theorem Module.IsTorsion.charIdeal_eq_mul_of_exact
   rw [Module.length_eq_add_of_exact (LocalizedModule.map p.1.primeCompl f)
     (LocalizedModule.map p.1.primeCompl g) (LocalizedModule.map_injective _ f hf)
     (LocalizedModule.map_surjective _ g hg) (LocalizedModule.map_exact _ f g hfg)]
-  simp only [Set.Finite.mem_toFinset, Set.mem_inter_iff, Set.mem_setOf_eq, s] at hp
-  have hMl := hMt.isFiniteLength_localizedModule_of_primeHeight_le_one p (by simp [hp.2])
-  have hPl := hPt.isFiniteLength_localizedModule_of_primeHeight_le_one p (by simp [hp.2])
+  simp only [Set.Finite.mem_toFinset, Set.mem_inter_iff, Set.mem_ofPred_eq, s] at hp
+  have hMl := hMt.isFiniteLength_localizedModule_of_height_le_one p (by simp [hp.2])
+  have hPl := hPt.isFiniteLength_localizedModule_of_height_le_one p (by simp [hp.2])
   rw [← Module.length_ne_top_iff] at hMl hPl
   exact ENat.toNat_add hMl hPl
 
@@ -247,31 +247,31 @@ theorem LinearEquiv.charIdeal_eq
     ⟨LocalizedModule.map_injective _ _ f.injective,
       LocalizedModule.map_surjective _ _ f.surjective⟩).length_eq]
 
-theorem Module.charIdeal_quotient_prime_eq_of_one_le_primeHeight
-    {A : Type*} [CommRing A] (p : PrimeSpectrum A) (hp : 1 ≤ p.1.primeHeight) :
-    Module.charIdeal A (A ⧸ p.1) = if p.1.primeHeight = 1 then p.1 else 1 := by
-  have hf : ({p} ∩ {p : PrimeSpectrum A | p.1.primeHeight = 1}).Finite :=
+theorem Module.charIdeal_quotient_prime_eq_of_one_le_height
+    {A : Type*} [CommRing A] (p : PrimeSpectrum A) (hp : 1 ≤ p.1.height) :
+    Module.charIdeal A (A ⧸ p.1) = if p.1.height = 1 then p.1 else 1 := by
+  have hf : ({p} ∩ {p : PrimeSpectrum A | p.1.height = 1}).Finite :=
     Set.Finite.inter_of_left (by simp) _
   have heq := Module.charIdeal_eq_prod_of_support_subset A (A ⧸ p.1) hf.toFinset
     (fun q h ↦ by
-      simp only [Set.toFinite_toFinset, Set.mem_toFinset, Set.mem_inter_iff, Set.mem_setOf_eq] at h
+      simp only [Set.toFinite_toFinset, Set.mem_toFinset, Set.mem_inter_iff, Set.mem_ofPred_eq] at h
       exact h.2)
     (fun q ↦ by
       simp only [Ring.support_quotient p.1, Set.mem_inter_iff, PrimeSpectrum.mem_zeroLocus,
-        SetLike.coe_subset_coe, PrimeSpectrum.asIdeal_le_asIdeal, Set.mem_setOf_eq,
+        SetLike.coe_subset_coe, PrimeSpectrum.asIdeal_le_asIdeal, Set.mem_ofPred_eq,
         Set.toFinite_toFinset, Set.coe_toFinset, Set.mem_singleton_iff, and_imp]
       intro hpq hq
       refine ⟨by_contra fun H ↦ ?_, hq⟩
-      have : q.1.FiniteHeight := ⟨.inr (by simp [q.1.height_eq_primeHeight, hq])⟩
-      replace hpq := Ideal.primeHeight_strict_mono (hpq.lt_of_ne' H)
+      have : q.1.FiniteHeight := ⟨.inr (by simp [hq])⟩
+      replace hpq := Ideal.height_strict_mono_of_isPrime_of_isPrime (hpq.lt_of_ne' H)
       exact hp.not_gt (hq ▸ hpq))
-  have hf' : hf.toFinset = if p.1.primeHeight = 1 then {p} else ∅ := by
+  have hf' : hf.toFinset = if p.1.height = 1 then {p} else ∅ := by
     ext
     split_ifs <;> (simp only [Set.toFinite_toFinset, Set.mem_toFinset, Set.mem_inter_iff,
-      Set.mem_singleton_iff, Set.mem_setOf_eq, Finset.mem_singleton, and_iff_left_iff_imp,
+      Set.mem_singleton_iff, Set.mem_ofPred_eq, Finset.mem_singleton, and_iff_left_iff_imp,
       Finset.notMem_empty, iff_false, not_and]; intro h; rwa [h])
   rw [heq, hf']
   split_ifs with hp'
-  · simp [Module.length_localizedModule_primeCompl_quotient_prime_eq_of_primeHeight_le
+  · simp [Module.length_localizedModule_primeCompl_quotient_prime_eq_of_height_le
       (p := p) (q := p) (by simp [hp']) (by rfl)]
   · simp

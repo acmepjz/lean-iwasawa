@@ -80,7 +80,7 @@ theorem Field.isAddCyclic_iff (F : Type*) [Field F] : IsAddCyclic F ↔ (Nat.car
     have : Module.Finite (ZMod p) F := Module.rank_lt_aleph0_iff.1 (by simp [hrank])
     have := congr(Cardinal.toNat
       $(lift_cardinalMk_eq_lift_cardinalMk_field_pow_lift_rank (ZMod p) F))
-    simpa [hrank] using this
+    simpa [Nat.card, hrank] using this
   · have := Fact.mk h
     exact isAddCyclic_of_prime_card rfl
 

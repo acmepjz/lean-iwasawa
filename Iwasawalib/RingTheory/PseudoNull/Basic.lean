@@ -36,10 +36,10 @@ if every prime ideals in the support of `M` are of height `≥ 2`.
 Equivalently, if `M` localized at `p` equals zero for all prime ideals `p` of height `≤ 1`. -/
 @[mk_iff]
 class IsPseudoNull : Prop where
-  two_le_primeHeight : ∀ p ∈ support A M, 2 ≤ p.1.primeHeight
+  two_le_height : ∀ p ∈ support A M, 2 ≤ p.1.height
 
-theorem isPseudoNull_iff_primeHeight_le_one_imp_subsingleton :
-    IsPseudoNull A M ↔ ∀ p : PrimeSpectrum A, p.1.primeHeight ≤ 1 →
+theorem isPseudoNull_iff_height_le_one_imp_subsingleton :
+    IsPseudoNull A M ↔ ∀ p : PrimeSpectrum A, p.1.height ≤ 1 →
       Subsingleton (LocalizedModule p.1.primeCompl M) := by
   rw [isPseudoNull_iff]
   congr! 1 with p
@@ -48,10 +48,10 @@ theorem isPseudoNull_iff_primeHeight_le_one_imp_subsingleton :
     ← ENat.add_one_le_iff (by simp)]
   rfl
 
-theorem IsPseudoNull.subsingleton_of_primeHeight_le_one [IsPseudoNull A M]
-    {p : PrimeSpectrum A} (hp : p.1.primeHeight ≤ 1) :
+theorem IsPseudoNull.subsingleton_of_height_le_one [IsPseudoNull A M]
+    {p : PrimeSpectrum A} (hp : p.1.height ≤ 1) :
     Subsingleton (LocalizedModule p.1.primeCompl M) :=
-  (isPseudoNull_iff_primeHeight_le_one_imp_subsingleton A M).1 ‹_› p hp
+  (isPseudoNull_iff_height_le_one_imp_subsingleton A M).1 ‹_› p hp
 
 variable {A M N} in
 theorem _root_.LinearEquiv.isPseudoNull_iff (f : M ≃ₗ[A] N) :
@@ -73,10 +73,10 @@ theorem isPseudoNull_iff_subsingleton_of_krullDimLE_one [Ring.KrullDimLE 1 A] :
   ext p
   rw [Set.mem_empty_iff_false, iff_false]
   intro hp
-  have h2 := LE.le.trans p.1.primeHeight_le_ringKrullDim
+  have h2 := LE.le.trans p.1.height_le_ringKrullDim_of_isPrime
     (show ringKrullDim A ≤ 1 from Order.KrullDimLE.krullDim_le)
   rw [WithBot.coe_le_one] at h2
-  simpa only [Nat.not_ofNat_le_one] using (H.two_le_primeHeight p hp).trans h2
+  simpa only [Nat.not_ofNat_le_one] using (H.two_le_height p hp).trans h2
 
 theorem _root_.IsNoetherianRing.exists_nilradical_pow_eq_bot [IsNoetherianRing A] :
     ∃ n, (nilradical A) ^ n = ⊥ := by
@@ -138,11 +138,11 @@ theorem isPseudoNull_iff_support_subset_maximalIdeal_of_ringKrullDim_eq_two
   refine ⟨fun h ↦ ?_, fun h ↦ ?_⟩
   · have : FiniteRingKrullDim A := finiteRingKrullDim_iff_ne_bot_and_top.2
       (by rw [hd]; exact ⟨nofun, nofun⟩)
-    have := (Ideal.primeHeight_le_ringKrullDim (I := p.1)).antisymm
+    have := (Ideal.height_le_ringKrullDim_of_isPrime (I := p.1)).antisymm
       (by simpa [hd] using WithBot.coe_le_coe.2 h)
     ext1
-    rwa [Ideal.primeHeight_eq_ringKrullDim_iff] at this
-  · simp [h, Option.some.inj (hd ▸ IsLocalRing.maximalIdeal_primeHeight_eq_ringKrullDim)]
+    rwa [Ideal.height_eq_ringKrullDim_iff] at this
+  · simp [h, Option.some.inj (hd ▸ IsLocalRing.maximalIdeal_height_eq_ringKrullDim)]
 
 /-- Let `A` be a Noetherian local ring of Krull dimension 2 with finite residue field,
 `M` be a finitely generated `A`-module. Then `M` is pseudo-null if and only if the cardinality
@@ -175,13 +175,13 @@ variable {A M N} in
 /-- Pseudo-null modules are preserved by taking submodules. -/
 theorem isPseudoNull_of_injective (f : M →ₗ[A] N) (h : Function.Injective f) [IsPseudoNull A N] :
     IsPseudoNull A M :=
-  ⟨fun _ hp ↦ IsPseudoNull.two_le_primeHeight _ (support_subset_of_injective f h hp)⟩
+  ⟨fun _ hp ↦ IsPseudoNull.two_le_height _ (support_subset_of_injective f h hp)⟩
 
 variable {A M N} in
 /-- Pseudo-null modules are preserved by taking quotient modules. -/
 theorem isPseudoNull_of_surjective (f : M →ₗ[A] N) (h : Function.Surjective f) [IsPseudoNull A M] :
     IsPseudoNull A N :=
-  ⟨fun _ hp ↦ IsPseudoNull.two_le_primeHeight _ (support_subset_of_surjective f h hp)⟩
+  ⟨fun _ hp ↦ IsPseudoNull.two_le_height _ (support_subset_of_surjective f h hp)⟩
 
 variable {A M N P} in
 private theorem isPseudoNull_of_exact' (f : M →ₗ[A] N) (g : N →ₗ[A] P)
@@ -189,7 +189,7 @@ private theorem isPseudoNull_of_exact' (f : M →ₗ[A] N) (g : N →ₗ[A] P)
     [IsPseudoNull A M] [IsPseudoNull A P] : IsPseudoNull A N := by
   refine ⟨fun _ hp ↦ ?_⟩
   rw [support_of_exact h hf hg, Set.mem_union] at hp
-  rcases hp with hp | hp <;> exact IsPseudoNull.two_le_primeHeight _ hp
+  rcases hp with hp | hp <;> exact IsPseudoNull.two_le_height _ hp
 
 variable {A M N P} in
 /-- If `M`, `P` are pseudo-null, `M → N → P` is exact at `N`, then `N` is also pseudo-null. -/
@@ -207,21 +207,21 @@ of `A`, containing height ≤ 1 support of `M`. Let `S = A \ ⋃ p ∈ s, p`. Th
 if and only if `S⁻¹M = 0`. -/
 theorem isPseudoNull_iff_subsingleton_of_subset [Module.Finite A M]
     {s : Set (PrimeSpectrum A)} (hs : s.Finite)
-    (h : support A M ∩ {p : PrimeSpectrum A | p.1.primeHeight ≤ 1} ⊆ s)
-    (h1 : s ⊆ {p : PrimeSpectrum A | p.1.primeHeight ≤ 1}) :
+    (h : support A M ∩ {p : PrimeSpectrum A | p.1.height ≤ 1} ⊆ s)
+    (h1 : s ⊆ {p : PrimeSpectrum A | p.1.height ≤ 1}) :
     IsPseudoNull A M ↔ Subsingleton (LocalizedModule (⨅ p ∈ s, p.1.primeCompl) M) := by
   rcases Set.eq_empty_or_nonempty s with rfl | hn
   · apply iff_of_true
     · rw [isPseudoNull_iff]
       intro p hp
       by_contra! h'
-      change p.1.primeHeight < 1 + 1 at h'
+      change p.1.height < 1 + 1 at h'
       rw [ENat.lt_add_one_iff (by simp)] at h'
       simpa using h ⟨hp, h'⟩
     · simp only [Set.mem_empty_iff_false, not_false_eq_true, iInf_neg, iInf_top,
         LocalizedModule.subsingleton_iff]
       exact fun _ ↦ ⟨0, by simp⟩
-  rw [isPseudoNull_iff_primeHeight_le_one_imp_subsingleton]
+  rw [isPseudoNull_iff_height_le_one_imp_subsingleton]
   refine ⟨fun H ↦ ?_, fun H p hp ↦ ?_⟩
   · simp only [← notMem_support_iff, mem_support_iff_of_finite] at H
     have := (Ideal.subset_union_prime_finite hs (f := (·.1)) hn.some hn.some inferInstance
@@ -244,13 +244,13 @@ of `A`, containing height one support of `M`. Let `S = A \ ⋃ p ∈ s, p`. Then
 if and only if `S⁻¹M = 0`. -/
 theorem isPseudoNull_iff_subsingleton_of_subset_of_isTorsion [Module.Finite A M]
     {s : Set (PrimeSpectrum A)} (hs : s.Finite)
-    (h : support A M ∩ {p : PrimeSpectrum A | p.1.primeHeight = 1} ⊆ s)
-    (h1 : s ⊆ {p : PrimeSpectrum A | p.1.primeHeight = 1})
+    (h : support A M ∩ {p : PrimeSpectrum A | p.1.height = 1} ⊆ s)
+    (h1 : s ⊆ {p : PrimeSpectrum A | p.1.height = 1})
     (hMT : Module.IsTorsion A M) :
     IsPseudoNull A M ↔ Subsingleton (LocalizedModule (⨅ p ∈ s, p.1.primeCompl) M) := by
   refine isPseudoNull_iff_subsingleton_of_subset A M hs
-    (HasSubset.Subset.trans (fun p hp ↦ ?_) h) (h1.trans fun _ h ↦ h.le)
-  exact ⟨hp.1, hp.2.antisymm (hMT.one_le_primeHeight_of_mem_support p hp.1)⟩
+    (LE.le.trans (fun p hp ↦ ?_) h) (h1.trans fun _ h ↦ h.le)
+  exact ⟨hp.1, hp.2.antisymm (hMT.one_le_height_of_mem_support p hp.1)⟩
 
 end Module
 
@@ -268,10 +268,10 @@ structure IsPseudoIsomorphism : Prop where
   isPseudoNull_ker : Module.IsPseudoNull A (ker f)
   isPseudoNull_coker : Module.IsPseudoNull A (N ⧸ range f)
 
-theorem isPseudoIsomorphism_iff_primeHeight_le_one_imp_bijective :
-    f.IsPseudoIsomorphism ↔ ∀ p : PrimeSpectrum A, p.1.primeHeight ≤ 1 →
+theorem isPseudoIsomorphism_iff_height_le_one_imp_bijective :
+    f.IsPseudoIsomorphism ↔ ∀ p : PrimeSpectrum A, p.1.height ≤ 1 →
       Function.Bijective (LocalizedModule.map p.1.primeCompl f) := by
-  simp_rw [isPseudoIsomorphism_iff, Module.isPseudoNull_iff_primeHeight_le_one_imp_subsingleton,
+  simp_rw [isPseudoIsomorphism_iff, Module.isPseudoNull_iff_height_le_one_imp_subsingleton,
     ← forall_and, Function.Bijective]
   congr! 3 with p hp
   · have H : Function.Exact (LocalizedModule.map p.1.primeCompl (ker f).subtype)
@@ -280,7 +280,7 @@ theorem isPseudoIsomorphism_iff_primeHeight_le_one_imp_bijective :
     rw [← (LocalizedModule.map p.1.primeCompl f).exact_zero_iff_injective
       (LocalizedModule p.asIdeal.primeCompl ↥(ker f))]
     refine ⟨fun h ↦ ?_, fun h ↦ ?_⟩
-    · convert H
+    · convert! H
       exact Subsingleton.elim _ _
     · refine ⟨fun x y ↦ LocalizedModule.map_injective p.1.primeCompl _ (ker f).injective_subtype ?_⟩
       rw [LinearMap.exact_iff] at H h
@@ -295,7 +295,7 @@ theorem isPseudoIsomorphism_iff_primeHeight_le_one_imp_bijective :
     rw [← (LocalizedModule.map p.1.primeCompl f).exact_zero_iff_surjective
       (LocalizedModule p.asIdeal.primeCompl (N ⧸ range f))]
     refine ⟨fun h ↦ ?_, fun h ↦ ?_⟩
-    · convert H
+    · convert! H
     · refine ⟨fun x y ↦ ?_⟩
       have hs := LocalizedModule.map_surjective p.1.primeCompl _ (range f).mkQ_surjective
       obtain ⟨x, rfl⟩ := hs x
@@ -305,10 +305,10 @@ theorem isPseudoIsomorphism_iff_primeHeight_le_one_imp_bijective :
       simp [H]
 
 variable {f} in
-theorem IsPseudoIsomorphism.bijective_of_primeHeight_le_one (H : f.IsPseudoIsomorphism)
-    {p : PrimeSpectrum A} (hp : p.1.primeHeight ≤ 1) :
+theorem IsPseudoIsomorphism.bijective_of_height_le_one (H : f.IsPseudoIsomorphism)
+    {p : PrimeSpectrum A} (hp : p.1.height ≤ 1) :
     Function.Bijective (LocalizedModule.map p.1.primeCompl f) :=
-  f.isPseudoIsomorphism_iff_primeHeight_le_one_imp_bijective.1 H p hp
+  f.isPseudoIsomorphism_iff_height_le_one_imp_bijective.1 H p hp
 
 theorem isPseudoIsomorphism_iff_of_injective (h : Function.Injective f) :
     f.IsPseudoIsomorphism ↔ Module.IsPseudoNull A (N ⧸ range f) := by
@@ -381,13 +381,13 @@ variable {A M} in
 /-- If `M` is a torsion `A`-module, `a` is an element of `A` such that for all height one primes `p`
 of `A` containing `a`, `Mₚ = 0`, then `M → M, m ↦ a • m` is a pseudo-isomorphism. -/
 theorem Module.IsTorsion.isPseudoIsomorphism_smul (H : Module.IsTorsion A M) (a : A)
-    (h : ∀ p ∈ Module.support A M, a ∈ p.1 → p.1.primeHeight ≠ 1) :
+    (h : ∀ p ∈ Module.support A M, a ∈ p.1 → p.1.height ≠ 1) :
     (DistribSMul.toLinearMap A M a).IsPseudoIsomorphism := by
-  rw [LinearMap.isPseudoIsomorphism_iff_primeHeight_le_one_imp_bijective]
+  rw [LinearMap.isPseudoIsomorphism_iff_height_le_one_imp_bijective]
   intro p hp
   by_cases hmem : p ∈ Module.support A M
   · have ha : a ∈ p.1.primeCompl := imp_not_comm.1 (h p hmem) <|
-      hp.antisymm (H.one_le_primeHeight_of_mem_support _ hmem)
+      hp.antisymm (H.one_le_height_of_mem_support _ hmem)
     have h1 : LocalizedModule.map p.1.primeCompl (DistribSMul.toLinearMap A M a) =
         DistribSMul.toLinearMap (Localization p.1.primeCompl)
           (LocalizedModule p.1.primeCompl M) (Localization.mk a (1 : p.1.primeCompl)) := by

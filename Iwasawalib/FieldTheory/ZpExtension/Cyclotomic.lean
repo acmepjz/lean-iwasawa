@@ -97,7 +97,7 @@ theorem isCyclotomicExtension [NeZero (p : K)] (s : Set ℕ) (h1 : s ⊆ {0} ∪
     obtain ⟨x, hx⟩ := HasEnoughRootsOfUnity.exists_primitiveRoot (SeparableClosure K) (p ^ n)
     refine ⟨⟨x, ?_⟩, Subtype.val_injective hx.1, fun l hl ↦ hx.2 l congr($hl.1)⟩
     apply IntermediateField.subset_adjoin
-    rw [Set.mem_setOf_eq]
+    rw [Set.mem_ofPred_eq]
     exact ⟨n, hx.1⟩
   adjoin_roots x := by
     rw [← IntermediateField.adjoin_toSubalgebra_of_isAlgebraic
@@ -248,7 +248,7 @@ theorem continuousCyclotomicCharacter_injective [IsCyclotomicPinfExtension p K L
   rw [IntermediateField.adjoin_toSubalgebra_of_isAlgebraic
       fun x _ ↦ Algebra.IsAlgebraic.isAlgebraic x,
     IntermediateField.top_toSubalgebra]
-  convert (IsCyclotomicExtension.iff_adjoin_eq_top (Set.range (p ^ ·)) K L).1 ‹_› |>.2 using 2
+  convert! (IsCyclotomicExtension.iff_adjoin_eq_top (Set.range (p ^ ·)) K L).1 ‹_› |>.2 using 2
   simp [‹Fact p.Prime›.out.ne_zero]
 
 theorem IsCyclotomicPinfExtension.finite_torsion_gal [IsCyclotomicPinfExtension p K L] :
@@ -275,7 +275,7 @@ noncomputable def CyclotomicPinfField.torsionGal [NeZero (p : K)] :
 theorem CyclotomicPinfField.fixingSubgroup_cyclotomicZpSubfield [NeZero (p : K)] :
     open scoped IsMulCommutative in
     (cyclotomicZpSubfield p K).fixingSubgroup = CommGroup.torsion _ := by
-  simpa only [cyclotomicZpSubfield_eq_fixedField] using
+  simpa [cyclotomicZpSubfield_eq_fixedField] using
     InfiniteGalois.fixingSubgroup_fixedField (torsionGal p K)
 
 instance CyclotomicPinfField.finite_torsionGal [NeZero (p : K)] : Finite (torsionGal p K) :=
@@ -385,8 +385,9 @@ noncomputable def InfiniteGalois.normalAutContinuousEquivQuotient {k K : Type*} 
     [Algebra k K] [IsGalois k K]  (H : ClosedSubgroup Gal(K/k)) [H.Normal] :
     Gal(K/k) ⧸ H.1 ≃ₜ* Gal(IntermediateField.fixedField H.1/k) :=
   letI f : Gal(K/k) ⧸ H.1 ≃* Gal(IntermediateField.fixedField H.1/k) := normalAutEquivQuotient H
-  haveI hc : Continuous f := by simpa only [(QuotientGroup.isQuotientMap_mk H.1).continuous_iff]
-    using InfiniteGalois.restrictNormalHom_continuous (IntermediateField.fixedField H.1)
+  haveI hc : Continuous f := by
+    rw [(QuotientGroup.isQuotientMap_mk H.1).continuous_iff]
+    exact InfiniteGalois.restrictNormalHom_continuous (IntermediateField.fixedField H.1)
   letI f1 : Gal(K/k) ⧸ H.1 ≃ₜ Gal(IntermediateField.fixedField H.1/k) :=
     hc.homeoOfEquivCompactToT2 (f := f)
   { f, f1 with }
@@ -399,8 +400,7 @@ theorem CyclotomicPinfField.isCyclotomicZpExtension_cyclotomicZpSubfield
   refine ⟨?_, ⟨IntermediateField.val _⟩⟩
   rw [MvZpExtension.nonempty_iff_of_unique]
   have h : Nonempty _ := ⟨InfiniteGalois.normalAutContinuousEquivQuotient (torsionGal p K)⟩
-  simp only [torsionGal_toSubgroup] at h
-  erw [← cyclotomicZpSubfield_eq_fixedField] at h -- FIXME: somehow `erw` is needed
+  rw [torsionGal_toSubgroup, ← cyclotomicZpSubfield_eq_fixedField] at h
   obtain ⟨f⟩ := h
   have : Infinite Gal(CyclotomicPinfField p K/K) := by
     contrapose! H

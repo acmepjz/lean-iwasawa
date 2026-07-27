@@ -19,33 +19,32 @@ public import Iwasawalib.RingTheory.PseudoNull.CharacteristicIdeal
 
 universe u
 
-theorem PrimeSpectrum.localization_comap_range_eq_of_isDomain_of_primeHeight_eq_one
+theorem PrimeSpectrum.localization_comap_range_eq_of_isDomain_of_height_eq_one
     {R : Type*} (S : Type*) [CommRing R] [CommRing S] [IsDomain R] [Algebra R S]
-    (s : Set (PrimeSpectrum R)) (hs : s ⊆ {p : PrimeSpectrum R | p.1.primeHeight = 1})
+    (s : Set (PrimeSpectrum R)) (hs : s ⊆ {p : PrimeSpectrum R | p.1.height = 1})
     (hn : s.Nonempty) (hfin : s.Finite) [IsLocalization (⨅ p ∈ s, p.1.primeCompl) S] :
     Set.range (PrimeSpectrum.comap (algebraMap R S)) = s ∪ {⟨⊥, Ideal.isPrime_bot⟩} := by
   set M := ⨅ p ∈ s, p.1.primeCompl
   rw [PrimeSpectrum.localization_comap_range S M]
   ext p
-  simp_rw [Set.mem_setOf_eq, Set.union_singleton, Set.mem_insert_iff, M, Submonoid.coe_iInf,
-    ← le_compl_iff_disjoint_left, Set.compl_iInter, Set.le_eq_subset]
+  simp_rw [Set.mem_ofPred_eq, Set.union_singleton, Set.mem_insert_iff, M, Submonoid.coe_iInf,
+    ← le_compl_iff_disjoint_left, Set.compl_iInter]
   change _ ⊆ ⋃ p ∈ s, (p.1ᶜᶜ : Set R) ↔ _
   simp_rw [compl_compl]
   rw [← hfin.coe_toFinset, Ideal.subset_union_prime hn.some hn.some fun p _ _ _ ↦ p.2]
   simp_rw [Set.Finite.mem_toFinset, Set.Finite.coe_toFinset]
   refine ⟨fun ⟨q, hq, hle⟩ ↦ ?_, fun h ↦ ?_⟩
   · have : q.1.FiniteHeight := q.1.finiteHeight_iff.2 <| Or.inr <| by
-      rw [Ideal.height_eq_primeHeight, hs hq]; nofun
-    have hle' := hs hq ▸ Ideal.primeHeight_mono hle
-    rcases eq_or_ne p.1.primeHeight 1 with hh | hh
-    · have hmem := mem_minimalPrimes_of_primeHeight_eq_height hle
-        (by rw [Ideal.height_eq_primeHeight, hs hq, hh])
+      rw [hs hq]; nofun
+    have hle' := hs hq ▸ Ideal.height_mono hle
+    rcases eq_or_ne p.1.height 1 with hh | hh
+    · have hmem := Ideal.mem_minimalPrimes_of_height_eq hle <| by
+        rw [hs hq, hh]
       rw [Ideal.minimalPrimes_eq_subsingleton_self, Set.mem_singleton_iff,
         ← PrimeSpectrum.ext_iff] at hmem
       right; rwa [← hmem]
-    replace hh := ENat.lt_one_iff_eq_zero.1 (hle'.lt_of_ne hh)
-    have := Ideal.isPrime_bot (α := R)
-    rw [Ideal.primeHeight_eq_zero_iff, minimalPrimes, Ideal.minimalPrimes_eq_subsingleton_self,
+    replace hh := Order.lt_one_iff.1 (hle'.lt_of_ne hh)
+    rw [Ideal.height_eq_zero_iff, IsDomain.minimalPrimes_eq_singleton_bot,
       Set.mem_singleton_iff] at hh
     left; ext1; exact hh
   · rcases h with h | h
@@ -53,9 +52,9 @@ theorem PrimeSpectrum.localization_comap_range_eq_of_isDomain_of_primeHeight_eq_
       exact ⟨hn.some, hn.some_mem, by simp [h]⟩
     · exact ⟨p, h, le_rfl⟩
 
--- theorem MaximalSpectrum.localization_comap_range_eq_of_primeHeight_eq_one
+-- theorem MaximalSpectrum.localization_comap_range_eq_of_height_eq_one
 --     {R : Type*} (S : Type*) [CommRing R] [CommRing S] [Algebra R S]
---     (s : Set (PrimeSpectrum R)) (hs : s ⊆ {p : PrimeSpectrum R | p.1.primeHeight = 1})
+--     (s : Set (PrimeSpectrum R)) (hs : s ⊆ {p : PrimeSpectrum R | p.1.height = 1})
 --     (hfin : s.Finite) [IsLocalization (⨅ p ∈ s, p.1.primeCompl) S] :
 --     Set.range (PrimeSpectrum.comap (algebraMap R S) ∘ toPrimeSpectrum) = s := by
 --   rcases s.eq_empty_or_nonempty with rfl | hn
@@ -82,11 +81,11 @@ theorem PrimeSpectrum.localization_comap_range_eq_of_isDomain_of_primeHeight_eq_
 See <https://en.wikipedia.org/wiki/Krull_ring>. -/
 class IsKrullDomain (A : Type*) [CommRing A] [IsDomain A] : Prop where
   isDiscreteValuationRing_localization (p : PrimeSpectrum A) :
-    p.1.primeHeight = 1 → IsDiscreteValuationRing (Localization p.1.primeCompl)
-  biInf_eq_bot (A) : ⨅ p ∈ {p : PrimeSpectrum A | p.1.primeHeight = 1},
+    p.1.height = 1 → IsDiscreteValuationRing (Localization p.1.primeCompl)
+  biInf_eq_bot (A) : ⨅ p ∈ {p : PrimeSpectrum A | p.1.height = 1},
     Localization.subalgebra (FractionRing A) p.1.primeCompl p.1.primeCompl_le_nonZeroDivisors = ⊥
   finite (a : A) :
-    a ≠ 0 → {p : PrimeSpectrum A | p.1.primeHeight = 1 ∧ a ∈ p.1}.Finite
+    a ≠ 0 → {p : PrimeSpectrum A | p.1.height = 1 ∧ a ∈ p.1}.Finite
 
 instance (priority := 100) IsKrullDomain.isIntegrallyClosed
     (A : Type*) [CommRing A] [IsDomain A] [IsKrullDomain A] : IsIntegrallyClosed A := by
@@ -117,7 +116,7 @@ instance (priority := 100) UniqueFactorizationMonoid.isKrullDomain
 let `S = A \ ⋃ i, pᵢ`, then `S⁻¹A` is a PID. -/
 class HeightOneLocalizationIsPID (A : Type*) [CommRing A] : Prop where
   isPrincipalIdealRing_localization (s : Set (PrimeSpectrum A)) :
-    s ⊆ {p : PrimeSpectrum A | p.1.primeHeight = 1} → s.Nonempty → s.Finite →
+    s ⊆ {p : PrimeSpectrum A | p.1.height = 1} → s.Nonempty → s.Finite →
     IsDomain (Localization (⨅ p ∈ s, p.1.primeCompl)) ∧
     IsPrincipalIdealRing (Localization (⨅ p ∈ s, p.1.primeCompl))
 
@@ -130,7 +129,7 @@ instance (priority := 100) IsKrullDomain.heightOneLocalizationIsPID
   have : IsDomain (Localization S) := IsLocalization.isDomain_localization hS
   have := Ideal.isPrime_bot (α := A)
   refine ⟨‹_›, ?_⟩
-  have hrange := PrimeSpectrum.localization_comap_range_eq_of_isDomain_of_primeHeight_eq_one
+  have hrange := PrimeSpectrum.localization_comap_range_eq_of_isDomain_of_height_eq_one
     (Localization S) s hs hn hfin
   have : Finite (MaximalSpectrum (Localization S)) := by
     refine @Finite.of_injective _ _ ?_ _ MaximalSpectrum.toPrimeSpectrum_injective
@@ -215,10 +214,10 @@ theorem LinearMap.isPseudoIsomorphism_iff_bijective_localizedModuleMap
     (f : M →ₗ[A] N) :
     f.IsPseudoIsomorphism ↔ Function.Bijective (LocalizedModule.map
       (⨅ p ∈ (Module.support A M ∪ Module.support A N) ∩
-        {p : PrimeSpectrum A | p.1.primeHeight = 1}, p.1.primeCompl) f) := by
-  set s := (Module.support A M ∪ Module.support A N) ∩ {p : PrimeSpectrum A | p.1.primeHeight = 1}
+        {p : PrimeSpectrum A | p.1.height = 1}, p.1.primeCompl) f) := by
+  set s := (Module.support A M ∪ Module.support A N) ∩ {p : PrimeSpectrum A | p.1.height = 1}
   have hs : s.Finite := by simpa only [← Set.union_inter_distrib_right] using
-    hMT.finite_primeHeight_one_support.union hNT.finite_primeHeight_one_support
+    hMT.finite_height_one_support.union hNT.finite_height_one_support
   rw [isPseudoIsomorphism_iff]
   apply and_congr
   · have := Module.isPseudoNull_iff_subsingleton_of_subset_of_isTorsion A f.ker hs
@@ -241,7 +240,7 @@ where the `pᵢ ^ eᵢ` are powers of height one primes of `A`. -/
 theorem Module.IsTorsion.isPseudoIsomorphic_pi
     {A : Type u} [CommRing A] [IsNoetherianRing A] [HeightOneLocalizationIsPID A]
     {M : Type*} [AddCommGroup M] [Module A M] [Module.Finite A M] (hMT : Module.IsTorsion A M) :
-    ∃ (ι : Type u) (_ : Fintype ι) (p : ι → PrimeSpectrum A) (_ : ∀ i, (p i).1.primeHeight = 1)
+    ∃ (ι : Type u) (_ : Fintype ι) (p : ι → PrimeSpectrum A) (_ : ∀ i, (p i).1.height = 1)
       (e : ι → ℕ) (_ : ∀ i, 0 < e i), M ∼ₚᵢₛ[A] ((i : ι) → A ⧸ (p i).1 ^ (e i)) := by
   sorry
 
@@ -252,7 +251,7 @@ theorem Module.IsTorsion.isPseudoIsomorphic_iff_nonempty_linearEquiv_localizedMo
     {A : Type*} [CommRing A] [IsNoetherianRing A] [HeightOneLocalizationIsPID A]
     {M : Type*} [AddCommGroup M] [Module A M] [Module.Finite A M] (hMT : Module.IsTorsion A M)
     {N : Type*} [AddCommGroup N] [Module A N] [Module.Finite A N] (hNT : Module.IsTorsion A N) :
-    M ∼ₚᵢₛ[A] N ↔ ∀ p : PrimeSpectrum A, p.1.primeHeight = 1 →
+    M ∼ₚᵢₛ[A] N ↔ ∀ p : PrimeSpectrum A, p.1.height = 1 →
       Nonempty ((LocalizedModule p.1.primeCompl M) ≃ₗ[Localization p.1.primeCompl]
         (LocalizedModule p.1.primeCompl N)) := by
   sorry

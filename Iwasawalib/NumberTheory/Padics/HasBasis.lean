@@ -75,7 +75,7 @@ theorem PadicInt.index_span_p_pow :
     (Ideal.span {(p ^ n : ℤ_[p])}).toAddSubgroup.index = p ^ n := by
   rw [AddSubgroup.index_eq_card]
   change Nat.card (ℤ_[p] ⧸ Ideal.span {(p ^ n : ℤ_[p])}) = _
-  convert Nat.card_congr (RingHom.quotientKerEquivOfSurjective
+  convert! Nat.card_congr (RingHom.quotientKerEquivOfSurjective
     (toZModPow_surjective p n)).toEquiv <;> simp [ker_toZModPow]
 
 theorem PadicInt.index_pi_span_p_pow :
@@ -85,7 +85,7 @@ theorem PadicInt.index_pi_span_p_pow :
       fun _ ↦ (Ideal.span {(p ^ n : ℤ_[p])}).toAddSubgroup).index = p ^ (n * Nat.card ι) := by
     let _ := Fintype.ofFinite ι
     simp [index_span_p_pow p n, pow_mul]
-  convert h2
+  convert! h2
   ext
   simp [-Ideal.pi_span, Ideal.mem_pi, AddSubgroup.mem_pi]
 
@@ -187,7 +187,7 @@ theorem PadicInt.smul_mem_of_isClosed (G : AddSubsemigroup ℤ_[p])
   have hcont : Continuous fun a : ℤ_[p] ↦ a • x := by fun_prop
   let s := Set.range fun x : ℕ ↦ (1 + x : ℤ_[p])
   have hs : Dense s := by
-    simpa using PadicInt.denseRange_of_not_dvd p 1 1 ‹Fact p.Prime›.out.not_dvd_one
+    simpa [DenseRange] using PadicInt.denseRange_of_not_dvd p 1 1 ‹Fact p.Prime›.out.not_dvd_one
   have hm : s.MapsTo (fun a : ℤ_[p] ↦ a • x) G := fun a ha ↦ by
     obtain ⟨b, rfl⟩ := ha
     dsimp only [smul_eq_mul]

@@ -149,7 +149,8 @@ private theorem isAbelianGalois_fixedField_topologicalClosure_commutator [IsGalo
     obtain ⟨y', hy'⟩ := h_surjective y
     have : x' * y' * x'⁻¹ * y'⁻¹ ∈ G :=
       Subgroup.le_topologicalClosure _ (Subgroup.commutator_mem_commutator (by simp) (by simp))
-    simpa [← h_ker, hx', hy', ← commutatorElement_eq_one_iff_mul_comm] using this
+    simpa [← h_ker, hx', hy', commutatorElement_def,
+      ← commutatorElement_eq_one_iff_mul_comm] using this
   exact ⟨⟩
 
 theorem fixingSubgroup_maximalAbelianExtension [IsGalois F K] :

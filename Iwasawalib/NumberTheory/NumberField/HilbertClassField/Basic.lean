@@ -47,6 +47,7 @@ theorem isUnramifiedOutside_of_isUnramifiedOutside_preimage [Algebra.IsAlgebraic
   · simp only [Set.mem_preimage] at hu
     specialize h2 _ hu
     contrapose! h2
+    change v.IsEquiv _
     simpa only [hwv] using AbsoluteValue.IsEquiv.comp h2 (algebraMap L' L).injective
 
 theorem isUnramifiedOutside_preimage_iff [Algebra.IsAlgebraic F K]

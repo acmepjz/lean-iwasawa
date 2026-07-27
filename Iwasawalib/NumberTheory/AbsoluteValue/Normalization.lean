@@ -173,7 +173,7 @@ private lemma normalization_triangle
         mul_one_div_cancel (by positivity), mul_one]
     have h1 : Filter.Tendsto (fun x : ℝ ↦ x ^ (1 / x)) .atTop (nhds 1) := by
       simpa using tendsto_rpow_div_mul_add 1 1 0
-    convert (h1.comp tendsto_natCast_atTop_atTop).mul
+    convert! (h1.comp tendsto_natCast_atTop_atTop).mul
       ((tendsto_const_nhds.add tendsto_one_div_atTop_nhds_zero_nat).rpow
         tendsto_one_div_atTop_nhds_zero_nat _ ) using 2 <;> norm_num
   have h1 (n : ℕ) : v (x + y) ^ n ≤ (n + 1) * (v x ^ (1 / s) + v y ^ (1 / s)) ^ (n * s) := by

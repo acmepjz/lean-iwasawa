@@ -126,7 +126,7 @@ theorem isNontrivial_of_not_isNonarchimedean
 theorem isNonarchimedean_iff_exists_forall_apply_natCast_le
     {K : Type*} [Field K] (v : AbsoluteValue K ℝ) :
     IsNonarchimedean v ↔ ∃ C : ℝ, ∀ n : ℕ, v n ≤ C := by
-  refine ⟨fun h ↦ ⟨1, fun n ↦ h.apply_natCast_le_one_of_isNonarchimedean⟩, fun ⟨C, h⟩ ↦ ?_⟩
+  refine ⟨fun h ↦ ⟨1, fun n ↦ h.apply_natCast_le_one⟩, fun ⟨C, h⟩ ↦ ?_⟩
   by_contra H
   rw [not_isNonarchimedean_iff_exists_apply_le_one_and_apply_add_one_gt_one] at H
   obtain ⟨x, h1, h2⟩ := H
@@ -158,7 +158,7 @@ theorem isNonarchimedean_iff_exists_forall_apply_natCast_le
 theorem isNonarchimedean_iff_forall_apply_natCast_le_one
     {K : Type*} [Field K] (v : AbsoluteValue K ℝ) :
     IsNonarchimedean v ↔ ∀ n : ℕ, v n ≤ 1 :=
-  ⟨fun h _ ↦ h.apply_natCast_le_one_of_isNonarchimedean, fun h ↦
+  ⟨fun h _ ↦ h.apply_natCast_le_one, fun h ↦
     v.isNonarchimedean_iff_exists_forall_apply_natCast_le.2 ⟨1, h⟩⟩
 
 theorem isNonarchimedean_comp_iff

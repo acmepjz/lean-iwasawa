@@ -478,8 +478,8 @@ Therefore $x=\sum_{i=1}^nxs_it_i=\sum_{i=1}^nr_it_i\in A$.)
 \begin{prop}
 \label{char-ideal-preliminary}
 \uses{noeth-ring-filtration}
-\lean{Module.IsTorsion.finite_primeHeight_one_support,
-Module.IsTorsion.isFiniteLength_localizedModule_of_primeHeight_le_one}
+\lean{Module.IsTorsion.finite_height_one_support,
+Module.IsTorsion.isFiniteLength_localizedModule_of_height_le_one}
 \leanok
 Let $A$ be a Noetherian ring, $M$ be a
 finitely generated torsion $A$-module.
@@ -1957,8 +1957,7 @@ assertion that an ideal is a maximal ideal \docs{Ideal.IsMaximal}
 \end{itemize}
 \end{itemize}
 \item
-Height of an ideal \docs{Ideal.height},
-height of a prime ideal \docs{Ideal.primeHeight}
+Height of a (prime) ideal \docs{Ideal.height}
 \begin{itemize}
 \item
 assertion that an ideal is the whole ring or of finite height \docs{Ideal.FiniteHeight}

@@ -1,6 +1,4 @@
--- This module serves as the root of the `Iwasawalib` library.
--- Import modules here that should be built as part of the library.
-module
+module  -- shake: keep-all --deprecated_module: ignore
 
 public import Iwasawalib.Algebra.Algebra.Equiv
 public import Iwasawalib.Algebra.CompleteGroupAlgebra.Basic

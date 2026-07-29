@@ -581,8 +581,8 @@ theorem finrank_maximalGaloisSExtension_singleton_top :
     Module.finrank F K / p ^ (Module.finrank F K).factorization p := by
   open scoped IsMulCommutative in
   simp_rw [← IsGalois.card_fixingSubgroup_eq_finrank,
-    fixingSubgroup_maximalGaloisSExtension_singleton,
-    CommGroup.card_primeToComponent, IsGalois.card_aut_eq_finrank]
+    fixingSubgroup_maximalGaloisSExtension_singleton, CommGroup.card_primeToComponent,
+    IsGalois.card_aut_eq_finrank, Nat.primeToComponent_eq_of_prime]
 
 theorem finrank_maximalGaloisSExtension_singleton_bot :
     Module.finrank F (maximalGaloisSExtension F K {p}) =

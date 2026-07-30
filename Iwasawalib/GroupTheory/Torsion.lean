@@ -127,8 +127,8 @@ noncomputable def CommGroup.equivPrimeToComponentProdPrimaryComponent
     G ≃* CommGroup.primeToComponent G m × CommGroup.primaryComponent G m :=
   letI toFun (g : G) : CommGroup.primeToComponent G m × CommGroup.primaryComponent G m := by
     letI n : ℕ := orderOf g
-    letI r : ℕ := n.primaryComponent m
-    letI s : ℕ := n.primeToComponent m
+    letI r : ℕ := m.ordProj n
+    letI s : ℕ := m.ordCompl n
     letI u : ℤ := r.gcdA s
     letI v : ℤ := r.gcdB s
     refine (⟨g ^ (r * u), ?_⟩, ⟨g ^ (s * v), ?_⟩)
@@ -137,8 +137,8 @@ noncomputable def CommGroup.equivPrimeToComponentProdPrimaryComponent
         rw [zpow_mul, zpow_natCast]
         exact this.coprime_dvd_left (orderOf_zpow_dvd _)
       rw [Nat.coprime_comm, show orderOf (g ^ r) = s from orderOf_pow_of_dvd
-        (Nat.primaryComponent_pos n m).ne' (Nat.primaryComponent_dvd_self n m)]
-      exact (Nat.coprime_primeToComponent_right m (orderOf_ne_zero_iff.2 (ht g))).symm
+        (by simp [r, n, orderOf_ne_zero_iff.2 (ht g)]) (Nat.ordProj_apply_dvd_self m n)]
+      exact (Nat.coprime_ordCompl_apply m (orderOf_ne_zero_iff.2 (ht g))).symm
     · rw [mem_primaryComponent]
       use n
       rw [← zpow_natCast, ← zpow_mul, ← orderOf_dvd_iff_zpow_eq_one]
@@ -147,16 +147,18 @@ noncomputable def CommGroup.equivPrimeToComponentProdPrimaryComponent
         convert Int.dvd_mul_of_dvd_left this (c := v) using 1
         push_cast
         ring
-      have h1 : r ∣ m ^ n := gcd_dvd_right n (m ^ n)
-      have h2 : n = s * r := (Nat.primeToComponent_mul_primaryComponent n m).symm
+      have h1 : r ∣ m ^ n := by
+        simp only [r, n, Nat.ordProj_apply_eq_gcd _ (orderOf_ne_zero_iff.2 (ht g))]
+        exact gcd_dvd_right n (m ^ n)
+      have h2 : n = s * r := (Nat.ordCompl_apply_mul_ordProj_apply m n).symm
       nth_rw 1 [h2]
       exact Nat.mul_dvd_mul_left _ h1
   letI invFun (g : CommGroup.primeToComponent G m × CommGroup.primaryComponent G m) :=
     g.1.1 * g.2.1
   haveI left_inv : Function.LeftInverse invFun toFun := fun g ↦ by
     simp only [toFun, invFun, ← zpow_add, ← Nat.gcd_eq_gcd_ab]
-    set n : ℕ := orderOf g
-    simp [(n.coprime_primeToComponent_primaryComponent m).symm.gcd_eq_one]
+    simp [(Nat.coprime_ordCompl_apply_ordProj_apply m
+      (orderOf_ne_zero_iff.2 (ht g))).symm.gcd_eq_one]
   haveI map_mul_1 (x) (y) : invFun (x * y) = invFun x * invFun y := by
     simp only [Prod.fst_mul, Prod.snd_mul, Subgroup.coe_mul, invFun, mul_assoc]
     congr 1
@@ -197,26 +199,26 @@ theorem CommGroup.card_primeToComponent_mul_card_primaryComponent
 
 @[to_additive]
 theorem CommGroup.card_primeToComponent [CommGroup G] [Finite G] (m : ℕ) :
-    Nat.card (primeToComponent G m) = (Nat.card G).primeToComponent m := by
+    Nat.card (primeToComponent G m) = m.ordCompl (Nat.card G) := by
   have h1 : Nat.card G ≠ 0 := Nat.card_ne_zero.2 ⟨inferInstance, inferInstance⟩
   have h2 : Nat.card (primaryComponent G m) ≠ 0 :=
     Nat.card_ne_zero.2 ⟨inferInstance, inferInstance⟩
   rcases eq_or_ne m 0 with rfl | hm
-  · simp [Nat.primeToComponent_zero_right h1]
-  refine (Nat.dvd_primeToComponent_iff m h1).2
+  · simp [Nat.ordCompl_zero_apply, h1]
+  refine (Nat.dvd_ordCompl_apply_iff m h1).2
     ⟨Subgroup.card_subgroup_dvd_card _, card_primeToComponent_coprime G m⟩ |>.antisymm ?_
-  rw [Nat.primeToComponent, Nat.eq_div_of_mul_eq_left h2
+  rw [Nat.ordCompl_apply, Nat.eq_div_of_mul_eq_left h2
     (card_primeToComponent_mul_card_primaryComponent G m isTorsion_of_finite)]
-  exact Nat.div_dvd_div_left (Nat.primaryComponent_dvd_self ..) <|
-    (Nat.dvd_primaryComponent_iff h1 hm).2
+  exact Nat.div_dvd_div_left (Nat.ordProj_apply_dvd_self ..) <|
+    (Nat.dvd_ordProj_apply_iff hm h1).2
       ⟨Subgroup.card_subgroup_dvd_card _, primeFactors_card_primaryComponent_subset G hm⟩
 
 @[to_additive]
 theorem CommGroup.card_primaryComponent [CommGroup G] [Finite G] (m : ℕ) :
-    Nat.card (primaryComponent G m) = (Nat.card G).primaryComponent m := by
+    Nat.card (primaryComponent G m) = m.ordProj (Nat.card G) := by
   have h1 : Nat.card G ≠ 0 := Nat.card_ne_zero.2 ⟨inferInstance, inferInstance⟩
   have h2 : Nat.card (primeToComponent G m) ≠ 0 :=
     Nat.card_ne_zero.2 ⟨inferInstance, inferInstance⟩
   rw [Nat.eq_div_of_mul_eq_right h2
     (card_primeToComponent_mul_card_primaryComponent G m isTorsion_of_finite),
-    card_primeToComponent, Nat.primaryComponent_eq_div _ h1]
+    card_primeToComponent, Nat.ordProj_apply_eq_div]

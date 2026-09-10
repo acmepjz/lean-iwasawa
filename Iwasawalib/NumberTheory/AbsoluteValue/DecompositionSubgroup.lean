@@ -8,6 +8,7 @@ module
 public import Iwasawalib.Algebra.Algebra.Equiv
 public import Mathlib.RingTheory.Valuation.RamificationGroup
 public import Iwasawalib.NumberTheory.AbsoluteValue.GelfandTornheim
+public import Mathlib.Analysis.Normed.Unbundled.SpectralNorm
 public import Mathlib.NumberTheory.NumberField.InfinitePlace.Basic
 public import Iwasawalib.Topology.Algebra.Group.Basic
 
@@ -346,89 +347,61 @@ theorem map_decompositionSubgroup_le :
 
 end IsScalarTower
 
-/-- If two complex numbers have the same norm, and their differences with `1` also have the same
-norm, then they are equal or complex conjugate to each other. -/
-private theorem complex_eq_or_eq_conj_of_norm_eq {z w : ℂ}
-    (h0 : ‖z‖ = ‖w‖) (h1 : ‖z - 1‖ = ‖w - 1‖) : z = w ∨ z = (starRingEnd ℂ) w := by
-  have e0 : z.re * z.re + z.im * z.im = w.re * w.re + w.im * w.im := by
-    have h : ‖z‖ ^ 2 = ‖w‖ ^ 2 := by rw [h0]
-    simpa [Complex.sq_norm, Complex.normSq_apply] using h
-  have e1 : (z.re - 1) * (z.re - 1) + z.im * z.im = (w.re - 1) * (w.re - 1) + w.im * w.im := by
-    have h : ‖z - 1‖ ^ 2 = ‖w - 1‖ ^ 2 := by rw [h1]
-    simpa [Complex.sq_norm, Complex.normSq_apply] using h
-  have hre : z.re = w.re := by nlinarith [e0, e1]
-  have him : z.im * z.im = w.im * w.im := by nlinarith [e0, hre]
-  rcases mul_self_eq_mul_self_iff.1 him with him' | him'
-  · exact Or.inl (Complex.ext hre him')
-  · exact Or.inr (Complex.ext (by simpa using hre) (by simpa using him'))
-
-/-- If a ring endomorphism `σ` of `K` preserves the absolute value induced by an embedding
-`φ : K →+* ℂ`, then `φ ∘ σ` agrees with `φ` or with its complex conjugate at each point. -/
-private theorem eq_or_eq_conj_of_norm_comp_eq {K : Type*} [Field K] (φ : K →+* ℂ) (σ : K →+* K)
-    (hσ : ∀ x, ‖φ (σ x)‖ = ‖φ x‖) (x : K) :
-    φ (σ x) = φ x ∨ φ (σ x) = (starRingEnd ℂ) (φ x) := by
-  refine complex_eq_or_eq_conj_of_norm_eq (hσ x) ?_
-  simpa using hσ (x - 1)
-
-/-- If a ring endomorphism `σ` of `K` preserves the absolute value induced by an embedding
-`φ : K →+* ℂ`, and `σ` is not the identity, then `φ ∘ σ` is the complex conjugate of `φ`.
-This is the elementary substitute of the fact that the only continuous field automorphisms
-of `ℂ` are the identity and the complex conjugation. -/
-private theorem eq_conj_of_norm_comp_eq_of_ne {K : Type*} [Field K] (φ : K →+* ℂ) (σ : K →+* K)
-    (hσ : ∀ x, ‖φ (σ x)‖ = ‖φ x‖) {a : K} (ha : φ (σ a) ≠ φ a) (x : K) :
-    φ (σ x) = (starRingEnd ℂ) (φ x) := by
-  have hA : φ (σ a) = (starRingEnd ℂ) (φ a) :=
-    (eq_or_eq_conj_of_norm_comp_eq φ σ hσ a).resolve_left ha
-  rcases eq_or_eq_conj_of_norm_comp_eq φ σ hσ x with hx | hx
-  · have hxa := eq_or_eq_conj_of_norm_comp_eq φ σ hσ (x + a)
-    simp only [map_add, hx, hA] at hxa
-    rcases hxa with hc | hc
-    · exact absurd (hA.trans (add_left_cancel hc)) ha
-    · exact hx.trans (add_right_cancel hc)
-  · exact hx
-
-/-- Decomposition subgroup for an infinite place is either trivial or `ℤ/2ℤ`. This is because the
-decomposition subgroup can be viewed as Galois group of completions of fields with respect to
-valuations (didn't formalized yet), in the archimedean case they must be `ℝ` or `ℂ`. -/
+/-- Decomposition subgroup for an infinite place is either trivial or `ℤ/2ℤ`. By the
+Gelfand-Tornheim theorem the place comes from an embedding `φ : K →+* ℂ`; an element of the
+decomposition subgroup does not change the place, hence composing it with `φ` gives back either
+`φ` or its complex conjugate, and this assignment is injective. -/
 theorem card_decompositionSubgroup_dvd_two_of_not_isNonarchimedean
     (F : Type*) {K : Type*} [Field F] [Field K] [Algebra F K] (v : AbsoluteValue K ℝ)
     (h : ¬IsNonarchimedean v) :
     Nat.card (v.decompositionSubgroup F) ∣ 2 := by
   classical
   obtain ⟨φ, hφ⟩ := v.exists_ringHom_complex_of_not_isNonarchimedean h
-  rw [← decompositionSubgroup_eq_of_equiv (F := F) hφ]
-  set D := (NumberField.place φ).decompositionSubgroup F with hD
-  have hmem (σ : D) : ∀ x, ‖φ ((σ : Gal(K/F)).toAlgHom.toRingHom x)‖ = ‖φ x‖ := fun x ↦ by
-    simpa using (NumberField.place φ).apply_eq_of_mem_decompositionSubgroup σ.2 x
-  have hne (σ : D) (hσ : σ ≠ 1) : ∃ a, φ ((σ : Gal(K/F)) a) ≠ φ a := by
-    by_contra! H
-    refine hσ (Subtype.ext (AlgEquiv.ext fun x ↦ ?_))
-    show (σ : Gal(K/F)) x = x
-    exact φ.injective (H x)
-  have key : ∀ σ τ : D, σ ≠ 1 → τ ≠ 1 → σ = τ := by
-    intro σ τ hσ hτ
-    obtain ⟨a, ha⟩ := hne σ hσ
-    obtain ⟨b, hb⟩ := hne τ hτ
-    refine Subtype.ext (AlgEquiv.ext fun x ↦ φ.injective ?_)
-    rw [show ((σ : Gal(K/F)) x) = (σ : Gal(K/F)).toAlgHom.toRingHom x from rfl,
-      show ((τ : Gal(K/F)) x) = (τ : Gal(K/F)).toAlgHom.toRingHom x from rfl,
-      eq_conj_of_norm_comp_eq_of_ne φ _ (hmem σ) ha x,
-      eq_conj_of_norm_comp_eq_of_ne φ _ (hmem τ) hb x]
-  have hinj : Function.Injective fun σ : D ↦ decide (σ = 1) := by
+  obtain ⟨c, hc, hcv⟩ := isEquiv_iff_exists_rpow_eq.1 hφ
+  -- every element of the decomposition subgroup composes `φ` into `φ` or into its conjugate
+  have hmap : ∀ σ : v.decompositionSubgroup F,
+      φ.comp ((σ : Gal(K/F)) : K →+* K) = φ ∨
+        φ.comp ((σ : Gal(K/F)) : K →+* K) = NumberField.ComplexEmbedding.conjugate φ := by
+    intro σ
+    have hpl : NumberField.place (φ.comp ((σ : Gal(K/F)) : K →+* K)) = NumberField.place φ := by
+      ext x
+      have h1 : v ((σ : Gal(K/F)) x) = v x :=
+        v.apply_eq_of_mem_decompositionSubgroup σ.2 x
+      have h2 := congrFun hcv ((σ : Gal(K/F)) x)
+      have h3 := congrFun hcv x
+      have h4 : NumberField.place φ ((σ : Gal(K/F)) x) ^ c = NumberField.place φ x ^ c := by
+        rw [h2, h3, h1]
+      have h5 := congrArg (fun t : ℝ => t ^ c⁻¹) h4
+      simp only [Real.rpow_rpow_inv ((NumberField.place φ).nonneg _) hc.ne'] at h5
+      show ‖φ ((σ : Gal(K/F)) x)‖ = ‖φ x‖
+      exact h5
+    rcases NumberField.InfinitePlace.mk_eq_iff.1 (Subtype.ext hpl :
+        NumberField.InfinitePlace.mk (φ.comp ((σ : Gal(K/F)) : K →+* K)) =
+          NumberField.InfinitePlace.mk φ) with h1 | h1
+    · exact Or.inl h1
+    · right
+      have h2 := congrArg NumberField.ComplexEmbedding.conjugate h1
+      rwa [NumberField.ComplexEmbedding.involutive_conjugate K _] at h2
+  -- hence the decomposition subgroup injects into a set with two elements
+  have hinj : Function.Injective
+      (fun σ : v.decompositionSubgroup F => decide (φ.comp ((σ : Gal(K/F)) : K →+* K) = φ)) := by
     intro σ τ hst
-    simp only [decide_eq_decide] at hst
-    by_cases h1 : σ = 1
-    · exact h1.trans (hst.1 h1).symm
-    · exact key σ τ h1 fun hc ↦ h1 (hst.2 hc)
-  have : Finite D := Finite.of_injective _ hinj
-  have hle : Nat.card D ≤ Nat.card Bool := Nat.card_le_card_of_injective _ hinj
-  rw [show Nat.card Bool = 2 from (Nat.card_eq_fintype_card).trans Fintype.card_bool] at hle
-  have hpos : 0 < Nat.card D := Nat.card_pos
-  rcases Nat.lt_or_ge (Nat.card D) 2 with hlt | hge
-  · have h1 : Nat.card D = 1 := by omega
-    simp [h1]
-  · have h2 : Nat.card D = 2 := by omega
-    simp [h2]
+    have key : φ.comp ((σ : Gal(K/F)) : K →+* K) = φ.comp ((τ : Gal(K/F)) : K →+* K) := by
+      by_cases hσ : φ.comp ((σ : Gal(K/F)) : K →+* K) = φ
+      · have hτ : φ.comp ((τ : Gal(K/F)) : K →+* K) = φ := by
+          simpa [hσ] using hst.symm
+        rw [hσ, hτ]
+      · have hτ : ¬ φ.comp ((τ : Gal(K/F)) : K →+* K) = φ := by
+          simpa [hσ] using hst.symm
+        rw [(hmap σ).resolve_left hσ, (hmap τ).resolve_left hτ]
+    ext x
+    have h1 := congr($key x)
+    simpa using φ.injective h1
+  have hfin : Finite (v.decompositionSubgroup F) := Finite.of_injective _ hinj
+  have h2 : Nat.card (v.decompositionSubgroup F) ≤ 2 := by
+    simpa using Nat.card_le_card_of_injective _ hinj
+  have h1 : 0 < Nat.card (v.decompositionSubgroup F) := Nat.card_pos
+  interval_cases hcard : Nat.card (v.decompositionSubgroup F) <;> simp
 
 /-- If `v : ι → AbsoluteValue R S` is a finite collection of non-trivial and pairwise inequivalent
 absolute values, then for any `ε > 0` and any `i : ι` there is some `z : R` such that
@@ -519,12 +492,454 @@ theorem exists_sub_lt_of_not_isEquiv
     refine mul_lt_mul ?_ le_rfl hε zero_le_one
     simp [div_lt_one₀ (show 0 < 1 + M by positivity)]
 
-/-- If `K / F` is an algebraic extension, then any place `v` of `F` can be extended to `K`.
-(Is this correct?) -/
+section Extension
+
+open WithAbs
+
+/-- The completion of a field with respect to a nonarchimedean absolute value is
+an ultrametric normed field. -/
+theorem isUltrametricDist_completion {F : Type*} [Field F] {v : AbsoluteValue F ℝ}
+    (h : IsNonarchimedean v) : IsUltrametricDist v.Completion := by
+  refine IsUltrametricDist.isUltrametricDist_of_isNonarchimedean_norm ?_
+  have hcl : IsClosed {p : v.Completion × v.Completion | ‖p.1 + p.2‖ ≤ max ‖p.1‖ ‖p.2‖} :=
+    isClosed_le (by fun_prop) (by fun_prop)
+  have hdense : DenseRange (Prod.map (UniformSpace.Completion.coe' (α := WithAbs v))
+      (UniformSpace.Completion.coe' (α := WithAbs v))) :=
+    UniformSpace.Completion.denseRange_coe.prodMap UniformSpace.Completion.denseRange_coe
+  have hsub : Set.range (Prod.map (UniformSpace.Completion.coe' (α := WithAbs v))
+      (UniformSpace.Completion.coe' (α := WithAbs v))) ⊆
+      {p : v.Completion × v.Completion | ‖p.1 + p.2‖ ≤ max ‖p.1‖ ‖p.2‖} := by
+    rintro p ⟨⟨x, y⟩, hp⟩
+    subst hp
+    simp only [Set.mem_ofPred_eq, Prod.map_apply]
+    rw [← UniformSpace.Completion.coe_add]
+    simp only [UniformSpace.Completion.norm_coe]
+    exact h (ofAbs x) (ofAbs y)
+  intro x y
+  exact (hdense.closure_range ▸ (hcl.closure_subset_iff.2 hsub)) (Set.mem_univ (x, y))
+
+/-- If `K / F` is an algebraic extension, then any nontrivial nonarchimedean place `v` of `F`
+can be extended to `K`. This is proved by taking the spectral norm on an algebraic closure of
+the completion of `F` at `v`. -/
+theorem exists_liesOver_of_isNonarchimedean
+    {F : Type*} (K : Type*) [Field F] [Field K] [Algebra F K] [Algebra.IsAlgebraic F K]
+    (v : AbsoluteValue F ℝ) (hna : IsNonarchimedean v) (hnt : v.IsNontrivial) :
+    ∃ w : AbsoluteValue K ℝ, w.LiesOver v := by
+  have hnorm : ∀ x : F, ‖algebraMap F v.Completion x‖ = v x := fun x =>
+    UniformSpace.Completion.norm_coe (WithAbs.toAbs v x)
+  letI : IsUltrametricDist v.Completion := isUltrametricDist_completion hna
+  letI : NontriviallyNormedField v.Completion :=
+    { (inferInstance : NormedField v.Completion) with
+      non_trivial := by
+        obtain ⟨y, hy⟩ := hnt.exists_abv_gt_one
+        exact ⟨algebraMap F _ y, by rwa [hnorm]⟩ }
+  let Ω := AlgebraicClosure v.Completion
+  let ψ : K →ₐ[F] Ω := IsAlgClosed.lift
+  have h1 : ∀ x : F,
+      ψ (algebraMap F K x) = algebraMap v.Completion Ω (algebraMap F v.Completion x) := by
+    intro x
+    rw [AlgHom.commutes]
+    exact IsScalarTower.algebraMap_apply F v.Completion Ω x
+  letI : NormedField Ω := spectralNorm.normedField v.Completion Ω
+  let W : AbsoluteValue Ω ℝ := NormedField.toAbsoluteValue Ω
+  refine ⟨W.comp (f := (ψ : K →+* Ω)) (ψ : K →+* Ω).injective, ?_⟩
+  rw [liesOver_iff]
+  ext x
+  show W (ψ (algebraMap F K x)) = v x
+  rw [h1 x]
+  show spectralNorm v.Completion Ω _ = v x
+  rw [spectralNorm_extends]
+  exact hnorm x
+
+/-- If `K / F` is an algebraic extension, then any archimedean place `v` of `F`
+can be extended to `K`. This is proved by the Gelfand-Tornheim theorem. -/
+theorem exists_liesOver_of_not_isNonarchimedean
+    {F : Type*} (K : Type*) [Field F] [Field K] [Algebra F K] [Algebra.IsAlgebraic F K]
+    (v : AbsoluteValue F ℝ) (h : ¬ IsNonarchimedean v) :
+    ∃ w : AbsoluteValue K ℝ, w.LiesOver v := by
+  obtain ⟨φ, hφ⟩ := v.exists_ringHom_complex_of_not_isNonarchimedean h
+  letI : Algebra F ℂ := φ.toAlgebra
+  let ψ : K →ₐ[F] ℂ := IsAlgClosed.lift
+  let w₀ : AbsoluteValue K ℝ := NumberField.place (ψ : K →+* ℂ)
+  have hres : w₀.comp (algebraMap F K).injective ≈ v := by
+    refine IsEquiv.trans ?_ hφ
+    have h1 : w₀.comp (algebraMap F K).injective = NumberField.place φ := by
+      ext x
+      show ‖ψ (algebraMap F K x)‖ = ‖φ x‖
+      rw [AlgHom.commutes]
+      rfl
+    rw [h1]
+    exact IsEquiv.rfl
+  obtain ⟨w, -, hw⟩ := exists_equiv_and_liesOver_of_comp_equiv w₀ v hres
+  exact ⟨w, hw⟩
+
+/-- A trivial place of `F` extends to the trivial place of any extension field. -/
+theorem exists_liesOver_of_not_isNontrivial
+    {F : Type*} (K : Type*) [Field F] [Field K] [Algebra F K]
+    (v : AbsoluteValue F ℝ) (h : ¬ v.IsNontrivial) :
+    ∃ w : AbsoluteValue K ℝ, w.LiesOver v := by
+  classical
+  refine ⟨AbsoluteValue.trivial, ?_⟩
+  rw [liesOver_iff]
+  ext x
+  rcases eq_or_ne x 0 with rfl | hx
+  · simp
+  · rw [comp_apply, AbsoluteValue.trivial_apply (by simpa using hx), not_isNontrivial_apply h hx]
+
+/-- If `K / F` is an algebraic extension, then any place `v` of `F` can be extended to `K`. -/
 theorem exists_liesOver
     {F : Type*} (K : Type*) [Field F] [Field K] [Algebra F K] [Algebra.IsAlgebraic F K]
     (v : AbsoluteValue F ℝ) : ∃ w : AbsoluteValue K ℝ, w.LiesOver v := by
-  sorry
+  by_cases hna : IsNonarchimedean v
+  · by_cases hnt : v.IsNontrivial
+    · exact exists_liesOver_of_isNonarchimedean K v hna hnt
+    · exact exists_liesOver_of_not_isNontrivial K v hnt
+  · exact exists_liesOver_of_not_isNonarchimedean K v hna
+
+end Extension
+
+section Conjugate
+
+open Polynomial IntermediateField
+
+/-- If two real absolute values on a field are equivalent and agree at one nonzero element
+whose value is not `1`, then they are equal. -/
+theorem eq_of_isEquiv_of_apply_eq {K : Type*} [Field K] {v w : AbsoluteValue K ℝ}
+    (h : v.IsEquiv w) {t : K} (ht : v t = w t) (ht1 : v t ≠ 1) (ht0 : t ≠ 0) : v = w := by
+  obtain ⟨c, hc, hcw⟩ := isEquiv_iff_exists_rpow_eq.1 h
+  have h1 : v t ^ c = v t := by
+    have h2 := congrFun hcw t
+    rw [← ht] at h2
+    exact h2
+  have hvt : 0 < v t := v.pos ht0
+  have hc1 : c = 1 := by
+    have h2 := congrArg Real.log h1
+    rw [Real.log_rpow hvt] at h2
+    have hlog : Real.log (v t) ≠ 0 := Real.log_ne_zero_of_pos_of_ne_one hvt ht1
+    field_simp at h2
+    tauto
+  ext x
+  have h2 := congrFun hcw x
+  rw [hc1, Real.rpow_one] at h2
+  exact h2
+
+variable {F K : Type*} [Field F] [Field K] [Algebra F K]
+
+theorem isNontrivial_smul {v : AbsoluteValue K ℝ} (σ : Gal(K/F)) (h : v.IsNontrivial) :
+    (σ • v).IsNontrivial := by
+  obtain ⟨x, hx0, hx1⟩ := h
+  exact ⟨σ x, by simpa using hx0, by simpa using hx1⟩
+
+theorem smul_comp_algebraMap (v : AbsoluteValue K ℝ) (σ : Gal(K/F)) :
+    (σ • v).comp (algebraMap F K).injective = v.comp (algebraMap F K).injective := by
+  ext x; simp
+
+/-- Two absolute values of `K` which restrict to the same nontrivial absolute value of `F`
+are equal as soon as they are equivalent. -/
+theorem eq_of_isEquiv_of_comp_eq {v w : AbsoluteValue K ℝ}
+    (hu : (v.comp (algebraMap F K).injective).IsNontrivial)
+    (h : v.comp (algebraMap F K).injective = w.comp (algebraMap F K).injective)
+    (he : v.IsEquiv w) : v = w := by
+  obtain ⟨t, ht0, ht1⟩ := hu
+  exact eq_of_isEquiv_of_apply_eq he (t := algebraMap F K t) (congr($h t)) ht1 (by simpa using ht0)
+
+/-- If `K / F` is a finite normal extension, then any two places of `K` which coincide when
+restricted to `F` are conjugate by an element of `Gal(K/F)`. This is the finite case of
+[Neukirch1992], II.9.1; it is proved by the approximation theorem
+`AbsoluteValue.exists_sub_lt_of_not_isEquiv` together with a comparison of the constant term of
+the minimal polynomial. -/
+theorem exists_smul_eq_of_comp_eq_of_finiteDimensional [Normal F K] [FiniteDimensional F K]
+    {v w : AbsoluteValue K ℝ}
+    (h : v.comp (algebraMap F K).injective = w.comp (algebraMap F K).injective) :
+    ∃ σ : Gal(K/F), σ • v = w := by
+  classical
+  -- elementary facts on products of multisets of real numbers
+  have one_le_prod : ∀ m : Multiset ℝ, (∀ y ∈ m, 1 ≤ y) → 1 ≤ m.prod := by
+    intro m
+    induction m using Multiset.induction_on with
+    | empty => simp
+    | cons a t ih =>
+      intro hm
+      rw [Multiset.prod_cons]
+      have h1 : 1 ≤ a := hm a (Multiset.mem_cons_self a t)
+      have h2 : 1 ≤ t.prod := ih fun y hy => hm y (Multiset.mem_cons_of_mem hy)
+      nlinarith
+  have one_lt_prod : ∀ m : Multiset ℝ, m ≠ 0 → (∀ y ∈ m, 1 < y) → 1 < m.prod := by
+    intro m hm hy
+    obtain ⟨a, ha⟩ := Multiset.exists_mem_of_ne_zero hm
+    obtain ⟨t, rfl⟩ := Multiset.exists_cons_of_mem ha
+    rw [Multiset.prod_cons]
+    have h1 : 1 < a := hy a (Multiset.mem_cons_self a t)
+    have h2 : 1 ≤ t.prod := one_le_prod t fun y hy' => (hy y (Multiset.mem_cons_of_mem hy')).le
+    nlinarith
+  have prod_le_one : ∀ m : Multiset ℝ, (∀ y ∈ m, 0 ≤ y ∧ y ≤ 1) → m.prod ≤ 1 := by
+    intro m
+    induction m using Multiset.induction_on with
+    | empty => simp
+    | cons a t ih =>
+      intro hm
+      rw [Multiset.prod_cons]
+      obtain ⟨ha0, ha1⟩ := hm a (Multiset.mem_cons_self a t)
+      have h2 := ih fun y hy => hm y (Multiset.mem_cons_of_mem hy)
+      have h3 : 0 ≤ t.prod :=
+        Multiset.prod_nonneg fun y hy => (hm y (Multiset.mem_cons_of_mem hy)).1
+      nlinarith
+  by_cases htriv : (v.comp (algebraMap F K).injective).IsNontrivial
+  swap
+  · -- if the restriction to `F` is trivial, then both `v` and `w` are trivial
+    have hv : ¬ v.IsNontrivial := by
+      rwa [← isNontrivial_iff_of_liesOver (v.comp (algebraMap F K).injective) v]
+    have hw : ¬ w.IsNontrivial := by
+      rw [← isNontrivial_iff_of_liesOver (w.comp (algebraMap F K).injective) w, ← h]
+      exact htriv
+    refine ⟨1, ?_⟩
+    ext x
+    rcases eq_or_ne x 0 with rfl | hx
+    · simp
+    · simp [not_isNontrivial_apply hv, not_isNontrivial_apply hw, hx]
+  have hv : v.IsNontrivial :=
+    (isNontrivial_iff_of_liesOver (v.comp (algebraMap F K).injective) v).1 htriv
+  have hw : w.IsNontrivial :=
+    (isNontrivial_iff_of_liesOver (w.comp (algebraMap F K).injective) w).1 (h ▸ htriv)
+  by_contra! H
+  -- the `Gal(K/F)`-orbits of `v` and of `w` are disjoint
+  have hdisj : ∀ σ τ : Gal(K/F), σ • v ≠ τ • w := fun σ τ hst =>
+    H (τ⁻¹ * σ) (by rw [mul_smul, hst, ← mul_smul, inv_mul_cancel, one_smul])
+  set S : Set (AbsoluteValue K ℝ) :=
+    (Set.range fun σ : Gal(K/F) => σ • v) ∪ (Set.range fun σ : Gal(K/F) => σ • w) with hS
+  have hSfin : S.Finite := (Set.finite_range _).union (Set.finite_range _)
+  have : Finite ↥S := hSfin.to_subtype
+  have hnt : ∀ p : ↥S, (p : AbsoluteValue K ℝ).IsNontrivial := by
+    rintro ⟨p, (⟨σ, rfl⟩ | ⟨σ, rfl⟩)⟩
+    · exact isNontrivial_smul σ hv
+    · exact isNontrivial_smul σ hw
+  have hcomp : ∀ p : ↥S, (p : AbsoluteValue K ℝ).comp (algebraMap F K).injective =
+      v.comp (algebraMap F K).injective := by
+    rintro ⟨p, (⟨σ, rfl⟩ | ⟨σ, rfl⟩)⟩
+    · exact smul_comp_algebraMap v σ
+    · rw [smul_comp_algebraMap w σ, h]
+  have hpw : Pairwise fun p q : ↥S =>
+      ¬ (p : AbsoluteValue K ℝ).IsEquiv (q : AbsoluteValue K ℝ) := by
+    intro p q hpq he
+    exact hpq (Subtype.ext (eq_of_isEquiv_of_comp_eq (by rw [hcomp p]; exact htriv)
+      (by rw [hcomp p, hcomp q]) he))
+  -- choose elements of large absolute value
+  have hbig : ∀ p : ↥S, ∃ a : K, 2 < (p : AbsoluteValue K ℝ) a := by
+    intro p
+    obtain ⟨y, hy⟩ := (hnt p).exists_abv_gt_one
+    obtain ⟨n, hn⟩ := pow_unbounded_of_one_lt (2 : ℝ) hy
+    exact ⟨y ^ n, by simpa using hn⟩
+  choose big hbig using hbig
+  obtain ⟨x, hx⟩ := exists_sub_lt_of_not_isEquiv (v := fun p : ↥S => (p : AbsoluteValue K ℝ))
+    hnt hpw (fun p => if (∃ σ : Gal(K/F), (p : AbsoluteValue K ℝ) = σ • v) then big p else 0)
+    one_pos
+  have hA : ∀ σ : Gal(K/F), 1 < v (σ x) := by
+    intro σ
+    set p : ↥S := ⟨σ⁻¹ • v, Or.inl ⟨σ⁻¹, rfl⟩⟩ with hp
+    have hPv : (∃ τ : Gal(K/F), (p : AbsoluteValue K ℝ) = τ • v) := ⟨σ⁻¹, rfl⟩
+    have h1 := hx p
+    rw [if_pos hPv] at h1
+    have h2 : |(p : AbsoluteValue K ℝ) (big p) - (p : AbsoluteValue K ℝ) x| ≤
+        (p : AbsoluteValue K ℝ) (big p - x) := AbsoluteValue.abs_abv_sub_le_abv_sub _ _ _
+    rw [AbsoluteValue.map_sub] at h2
+    have h3 := hbig p
+    have h4 : 1 < (p : AbsoluteValue K ℝ) x := by
+      have h6 := abs_le.1 h2
+      linarith [h6.1, h6.2]
+    have h5 : (p : AbsoluteValue K ℝ) x = v (σ x) := by
+      simp only [hp, algEquiv_smul_apply]
+      congr 1
+    rwa [h5] at h4
+  have hB : ∀ σ : Gal(K/F), w (σ x) < 1 := by
+    intro σ
+    set p : ↥S := ⟨σ⁻¹ • w, Or.inr ⟨σ⁻¹, rfl⟩⟩ with hp
+    have hPv : ¬ (∃ τ : Gal(K/F), (p : AbsoluteValue K ℝ) = τ • v) := by
+      rintro ⟨τ, hτ⟩
+      exact hdisj τ σ⁻¹ hτ.symm
+    have h1 := hx p
+    rw [if_neg hPv] at h1
+    have h5 : (p : AbsoluteValue K ℝ) (x - 0) = w (σ x) := by
+      simp only [hp, algEquiv_smul_apply, sub_zero]
+      congr 1
+    rwa [h5] at h1
+  -- compare the two absolute values on the constant term of the minimal polynomial of `x`
+  have hxne : x ≠ 0 := by
+    intro h0
+    have h1 := hA 1
+    rw [h0] at h1
+    simp at h1
+    linarith
+  have hint : IsIntegral F x := IsIntegral.of_finite F x
+  set q := (minpoly F x).map (algebraMap F K) with hq
+  have hqm : q.Monic := (minpoly.monic hint).map _
+  have hqs : q.Splits := Normal.splits ‹Normal F K› x
+  have hq0 : q ≠ 0 := hqm.ne_zero
+  have hroots : ∀ β ∈ q.roots, 1 < v β ∧ w β < 1 := by
+    intro β hβ
+    have hev : (aeval β) (minpoly F x) = 0 := by
+      have h1 := (mem_roots hq0).1 hβ
+      rw [IsRoot, hq, eval_map, ← aeval_def] at h1
+      exact h1
+    obtain ⟨σ, hσ⟩ := minpoly.exists_algEquiv_of_root (K := F) (L := K)
+      (Algebra.IsAlgebraic.isAlgebraic x) hev
+    have hβ' : β = σ⁻¹ x := by rw [← hσ]; simp
+    rw [hβ']
+    exact ⟨hA σ⁻¹, hB σ⁻¹⟩
+  have hrne : q.roots ≠ 0 := by
+    intro h0
+    have h1 := hqs.natDegree_eq_card_roots
+    rw [h0] at h1
+    simp only [Multiset.card_zero] at h1
+    have hd : 0 < q.natDegree := by
+      rw [hq, natDegree_map]
+      exact minpoly.natDegree_pos hint
+    omega
+  have hc0 : q.coeff 0 = (-1) ^ q.natDegree * q.roots.prod :=
+    hqs.coeff_zero_eq_prod_roots_of_monic hqm
+  have hvq : 1 < v (q.coeff 0) := by
+    rw [hc0, map_mul, map_pow, AbsoluteValue.map_neg, map_one, one_pow, one_mul,
+      map_multiset_prod]
+    refine one_lt_prod _ (by simpa using hrne) ?_
+    intro y hy
+    obtain ⟨β, hβ, rfl⟩ := Multiset.mem_map.1 hy
+    exact (hroots β hβ).1
+  have hwq : w (q.coeff 0) ≤ 1 := by
+    rw [hc0, map_mul, map_pow, AbsoluteValue.map_neg, map_one, one_pow, one_mul,
+      map_multiset_prod]
+    refine prod_le_one _ ?_
+    intro y hy
+    obtain ⟨β, hβ, rfl⟩ := Multiset.mem_map.1 hy
+    exact ⟨w.nonneg _, (hroots β hβ).2.le⟩
+  have hvw : v (q.coeff 0) = w (q.coeff 0) := by
+    have h1 : q.coeff 0 = algebraMap F K ((minpoly F x).coeff 0) := by rw [hq, coeff_map]
+    rw [h1]
+    exact congr($h ((minpoly F x).coeff 0))
+  linarith
+
+/-- If `K / F` is a normal extension, then any two places of `K` which coincide when restricted
+to `F` are conjugate by an `F`-algebra homomorphism of `K`. The general case is deduced from the
+finite case `AbsoluteValue.exists_smul_eq_of_comp_eq_of_finiteDimensional` by Zorn's lemma. -/
+theorem exists_algHom_apply_eq_of_comp_eq [Normal F K] {v w : AbsoluteValue K ℝ}
+    (h : v.comp (algebraMap F K).injective = w.comp (algebraMap F K).injective) :
+    ∃ τ : K →ₐ[F] K, ∀ x, v (τ x) = w x := by
+  classical
+  set P : Set (Lifts F K K) :=
+    {ϕ | Normal F ϕ.carrier ∧ ∀ x : ϕ.carrier, v (ϕ.emb x) = w (x : K)} with hP
+  -- the condition on the embedding is automatic on the bottom field
+  have hcond : ∀ (ϕ : Lifts F K K) (x : ϕ.carrier), (x : K) ∈ (⊥ : IntermediateField F K) →
+      v (ϕ.emb x) = w (x : K) := by
+    intro ϕ x hx
+    obtain ⟨y, hy⟩ := IntermediateField.mem_bot.1 hx
+    have hx' : x = algebraMap F ϕ.carrier y := Subtype.ext hy.symm
+    rw [hx', AlgHom.commutes]
+    exact congr($h y)
+  have hbot : (⊥ : Lifts F K K) ∈ P := by
+    refine ⟨?_, fun x => hcond _ x ?_⟩
+    · show Normal F (⊥ : IntermediateField F K)
+      infer_instance
+    · exact x.2
+  have key : ∀ c ⊆ P, IsChain (· ≤ ·) c → ∃ ub ∈ P, ∀ z ∈ c, z ≤ ub := by
+    intro c hcP hc
+    rcases Set.eq_empty_or_nonempty c with rfl | ⟨ϕ₀, hϕ₀⟩
+    · exact ⟨⊥, hbot, by simp⟩
+    refine ⟨Lifts.union c hc, ⟨?_, ?_⟩, fun z hz => Lifts.le_union c hc hz⟩
+    · rw [Lifts.carrier_union]
+      have : ∀ i : c, Normal F (i : Lifts F K K).carrier := fun i => (hcP i.2).1
+      have : Nonempty c := ⟨⟨ϕ₀, hϕ₀⟩⟩
+      exact IntermediateField.normal_iSup F K _
+    · intro x
+      have hdir : Directed (· ≤ ·) (fun i : c => (i : Lifts F K K).carrier) :=
+        (hc.directedOn.directed_val).mono_comp _ (fun _ _ hxy => hxy.1)
+      have : Nonempty c := ⟨⟨ϕ₀, hϕ₀⟩⟩
+      have hx : (x : K) ∈ ⨆ i : c, (i : Lifts F K K).carrier :=
+        le_of_eq (Lifts.carrier_union c hc) x.2
+      rw [← SetLike.mem_coe, IntermediateField.coe_iSup_of_directed hdir, Set.mem_iUnion] at hx
+      obtain ⟨i, hi⟩ := hx
+      have hle := Lifts.le_union c hc i.2
+      have h2 := hle.2 ⟨(x : K), hi⟩
+      have h3 : (Lifts.union c hc).emb x = (i : Lifts F K K).emb ⟨(x : K), hi⟩ := by
+        rw [← h2]; rfl
+      rw [h3]
+      exact (hcP i.2).2 ⟨(x : K), hi⟩
+  obtain ⟨ϕ, hϕ⟩ := zorn_le₀ P key
+  have hcar : ϕ.carrier = ⊤ := by
+    by_contra hne
+    obtain ⟨α, -, hα⟩ := SetLike.exists_of_lt (lt_top_iff_ne_top.2 hne)
+    haveI hEnormal : Normal F ϕ.carrier := hϕ.1.1
+    set E := ϕ.carrier with hE
+    -- extend the embedding to the whole of `K`
+    set τ₀ : K →ₐ[F] K := ϕ.emb.liftNormal K with hτ₀
+    have hτ₀E : ∀ x : E, τ₀ (x : K) = ϕ.emb x := by
+      intro x
+      have h1 := ϕ.emb.liftNormal_commutes (E := K) x
+      simpa using h1
+    -- `N` is the finite normal extension of `E` generated by the conjugates of `α`
+    set p := minpoly F α with hp
+    have hαint : IsIntegral F α := Algebra.IsIntegral.isIntegral α
+    have hp0 : p ≠ 0 := minpoly.ne_zero hαint
+    have hsplits : (p.map (algebraMap F K)).Splits := Normal.splits ‹Normal F K› α
+    have hrs : (p.map (algebraMap F E)).rootSet K = p.rootSet K := by
+      simp [Polynomial.rootSet, Polynomial.aroots, Polynomial.map_map,
+        ← IsScalarTower.algebraMap_eq]
+    set N : IntermediateField E K := adjoin E (p.rootSet K) with hN
+    have hsp : ((p.map (algebraMap F E)).map (algebraMap E K)).Splits := by
+      rw [Polynomial.map_map, ← IsScalarTower.algebraMap_eq]; exact hsplits
+    haveI hNsf : IsSplittingField E N (p.map (algebraMap F E)) := by
+      have h6 := adjoin_rootSet_isSplittingField (K := E) (L := K) hsp
+      rwa [hrs] at h6
+    haveI hNnormal : Normal E N := Normal.of_isSplittingField (p.map (algebraMap F E))
+    haveI hNfin : FiniteDimensional E N := by
+      refine finiteDimensional_adjoin ?_
+      intro y _
+      exact (Algebra.IsIntegral.isIntegral (R := F) y).tower_top
+    -- apply the finite case to the two absolute values of `N`
+    set a : AbsoluteValue N ℝ := v.comp (f := (τ₀ : K →+* K).comp (algebraMap N K))
+      (((τ₀ : K →+* K).comp (algebraMap N K)).injective) with ha
+    set b : AbsoluteValue N ℝ := w.comp (algebraMap N K).injective with hb
+    have hab : a.comp (algebraMap E N).injective = b.comp (algebraMap E N).injective := by
+      ext y
+      show v (τ₀ ((algebraMap E N y : N) : K)) = w ((algebraMap E N y : N) : K)
+      show v (τ₀ (y : K)) = w (y : K)
+      rw [hτ₀E y]
+      exact hϕ.1.2 y
+    obtain ⟨ρ, hρ⟩ := exists_smul_eq_of_comp_eq_of_finiteDimensional (F := E) (K := N) hab
+    have hρ' : ∀ x : N, v (τ₀ ((ρ.symm x : N) : K)) = w ((x : N) : K) := fun x => congr($hρ x)
+    -- this contradicts the maximality of `ϕ`
+    set ψ : Lifts F K K := ⟨N.restrictScalars F,
+      (τ₀.comp ((IntermediateField.val N).restrictScalars F)).comp
+        ((ρ.symm).restrictScalars F).toAlgHom⟩ with hψ
+    have hcarle : E ≤ N.restrictScalars F := by
+      rw [hN, IntermediateField.restrictScalars_adjoin_eq_sup]
+      exact le_sup_left
+    have hψP : ψ ∈ P := by
+      constructor
+      · show Normal F (N.restrictScalars F)
+        rw [hN, IntermediateField.restrictScalars_adjoin_eq_sup]
+        haveI : Normal F (adjoin F (p.rootSet K)) :=
+          Normal.of_isSplittingField (E := adjoin F (p.rootSet K)) p
+            (hFEp := adjoin_rootSet_isSplittingField hsplits)
+        exact IntermediateField.normal_sup F K _ _
+      · intro x
+        exact hρ' x
+    have hle : ϕ ≤ ψ := by
+      refine ⟨hcarle, fun y => ?_⟩
+      show τ₀ ((ρ.symm (⟨(y : K), hcarle y.2⟩ : N) : N) : K) = ϕ.emb y
+      have h7 : (⟨(y : K), hcarle y.2⟩ : N) = algebraMap E N y := rfl
+      rw [h7, AlgEquiv.commutes]
+      show τ₀ ((y : K)) = ϕ.emb y
+      exact hτ₀E y
+    have hmem : α ∈ ψ.carrier := by
+      show α ∈ N.restrictScalars F
+      show α ∈ N
+      rw [hN]
+      exact subset_adjoin _ _ (mem_rootSet.2 ⟨hp0, minpoly.aeval F α⟩)
+    exact hα ((hϕ.2 hψP hle).1 hmem)
+  refine ⟨ϕ.emb.comp (((IntermediateField.equivOfEq hcar).trans IntermediateField.topEquiv).symm :
+    K →ₐ[F] ϕ.carrier), fun x => ?_⟩
+  have h1 := hϕ.1.2 (((IntermediateField.equivOfEq hcar).trans IntermediateField.topEquiv).symm x)
+  simpa using h1
+
+end Conjugate
 
 /-- If `K / F` is a normal extension, then any two places of `K` which coincide when
 restrict to `F` are conjugate by an element of `Gal(K/F)`.
@@ -534,8 +949,10 @@ theorem exists_algEquiv_comp_eq_of_comp_eq
     {v w : AbsoluteValue K ℝ}
     (h : v.comp (algebraMap F K).injective = w.comp (algebraMap F K).injective) :
     ∃ σ : Gal(K/F), v.comp (f := σ) σ.injective = w := by
-  -- proof uses the above `exists_sub_lt_of_not_isEquiv`
-  sorry
+  obtain ⟨τ, hτ⟩ := exists_algHom_apply_eq_of_comp_eq h
+  refine ⟨AlgEquiv.ofBijective τ (Algebra.IsAlgebraic.algHom_bijective τ), ?_⟩
+  ext x
+  exact hτ x
 
 /-- If `L / K / F` is an extension tower, `L / F` and `K / F` are Galois, `v` and `w` are places of
 `K` and `L`, respectively, such that `w` lies over `v`, then the image of `D_w(L/F)` in `Gal(K/F)`

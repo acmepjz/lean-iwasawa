@@ -346,6 +346,47 @@ theorem map_decompositionSubgroup_le :
 
 end IsScalarTower
 
+/-- If two complex numbers have the same norm, and their differences with `1` also have the same
+norm, then they are equal or complex conjugate to each other. -/
+private theorem complex_eq_or_eq_conj_of_norm_eq {z w : ℂ}
+    (h0 : ‖z‖ = ‖w‖) (h1 : ‖z - 1‖ = ‖w - 1‖) : z = w ∨ z = (starRingEnd ℂ) w := by
+  have e0 : z.re * z.re + z.im * z.im = w.re * w.re + w.im * w.im := by
+    have h : ‖z‖ ^ 2 = ‖w‖ ^ 2 := by rw [h0]
+    simpa [Complex.sq_norm, Complex.normSq_apply] using h
+  have e1 : (z.re - 1) * (z.re - 1) + z.im * z.im = (w.re - 1) * (w.re - 1) + w.im * w.im := by
+    have h : ‖z - 1‖ ^ 2 = ‖w - 1‖ ^ 2 := by rw [h1]
+    simpa [Complex.sq_norm, Complex.normSq_apply] using h
+  have hre : z.re = w.re := by nlinarith [e0, e1]
+  have him : z.im * z.im = w.im * w.im := by nlinarith [e0, hre]
+  rcases mul_self_eq_mul_self_iff.1 him with him' | him'
+  · exact Or.inl (Complex.ext hre him')
+  · exact Or.inr (Complex.ext (by simpa using hre) (by simpa using him'))
+
+/-- If a ring endomorphism `σ` of `K` preserves the absolute value induced by an embedding
+`φ : K →+* ℂ`, then `φ ∘ σ` agrees with `φ` or with its complex conjugate at each point. -/
+private theorem eq_or_eq_conj_of_norm_comp_eq {K : Type*} [Field K] (φ : K →+* ℂ) (σ : K →+* K)
+    (hσ : ∀ x, ‖φ (σ x)‖ = ‖φ x‖) (x : K) :
+    φ (σ x) = φ x ∨ φ (σ x) = (starRingEnd ℂ) (φ x) := by
+  refine complex_eq_or_eq_conj_of_norm_eq (hσ x) ?_
+  simpa using hσ (x - 1)
+
+/-- If a ring endomorphism `σ` of `K` preserves the absolute value induced by an embedding
+`φ : K →+* ℂ`, and `σ` is not the identity, then `φ ∘ σ` is the complex conjugate of `φ`.
+This is the elementary substitute of the fact that the only continuous field automorphisms
+of `ℂ` are the identity and the complex conjugation. -/
+private theorem eq_conj_of_norm_comp_eq_of_ne {K : Type*} [Field K] (φ : K →+* ℂ) (σ : K →+* K)
+    (hσ : ∀ x, ‖φ (σ x)‖ = ‖φ x‖) {a : K} (ha : φ (σ a) ≠ φ a) (x : K) :
+    φ (σ x) = (starRingEnd ℂ) (φ x) := by
+  have hA : φ (σ a) = (starRingEnd ℂ) (φ a) :=
+    (eq_or_eq_conj_of_norm_comp_eq φ σ hσ a).resolve_left ha
+  rcases eq_or_eq_conj_of_norm_comp_eq φ σ hσ x with hx | hx
+  · have hxa := eq_or_eq_conj_of_norm_comp_eq φ σ hσ (x + a)
+    simp only [map_add, hx, hA] at hxa
+    rcases hxa with hc | hc
+    · exact absurd (hA.trans (add_left_cancel hc)) ha
+    · exact hx.trans (add_right_cancel hc)
+  · exact hx
+
 /-- Decomposition subgroup for an infinite place is either trivial or `ℤ/2ℤ`. This is because the
 decomposition subgroup can be viewed as Galois group of completions of fields with respect to
 valuations (didn't formalized yet), in the archimedean case they must be `ℝ` or `ℂ`. -/
@@ -353,7 +394,41 @@ theorem card_decompositionSubgroup_dvd_two_of_not_isNonarchimedean
     (F : Type*) {K : Type*} [Field F] [Field K] [Algebra F K] (v : AbsoluteValue K ℝ)
     (h : ¬IsNonarchimedean v) :
     Nat.card (v.decompositionSubgroup F) ∣ 2 := by
-  sorry
+  classical
+  obtain ⟨φ, hφ⟩ := v.exists_ringHom_complex_of_not_isNonarchimedean h
+  rw [← decompositionSubgroup_eq_of_equiv (F := F) hφ]
+  set D := (NumberField.place φ).decompositionSubgroup F with hD
+  have hmem (σ : D) : ∀ x, ‖φ ((σ : Gal(K/F)).toAlgHom.toRingHom x)‖ = ‖φ x‖ := fun x ↦ by
+    simpa using (NumberField.place φ).apply_eq_of_mem_decompositionSubgroup σ.2 x
+  have hne (σ : D) (hσ : σ ≠ 1) : ∃ a, φ ((σ : Gal(K/F)) a) ≠ φ a := by
+    by_contra! H
+    refine hσ (Subtype.ext (AlgEquiv.ext fun x ↦ ?_))
+    show (σ : Gal(K/F)) x = x
+    exact φ.injective (H x)
+  have key : ∀ σ τ : D, σ ≠ 1 → τ ≠ 1 → σ = τ := by
+    intro σ τ hσ hτ
+    obtain ⟨a, ha⟩ := hne σ hσ
+    obtain ⟨b, hb⟩ := hne τ hτ
+    refine Subtype.ext (AlgEquiv.ext fun x ↦ φ.injective ?_)
+    rw [show ((σ : Gal(K/F)) x) = (σ : Gal(K/F)).toAlgHom.toRingHom x from rfl,
+      show ((τ : Gal(K/F)) x) = (τ : Gal(K/F)).toAlgHom.toRingHom x from rfl,
+      eq_conj_of_norm_comp_eq_of_ne φ _ (hmem σ) ha x,
+      eq_conj_of_norm_comp_eq_of_ne φ _ (hmem τ) hb x]
+  have hinj : Function.Injective fun σ : D ↦ decide (σ = 1) := by
+    intro σ τ hst
+    simp only [decide_eq_decide] at hst
+    by_cases h1 : σ = 1
+    · exact h1.trans (hst.1 h1).symm
+    · exact key σ τ h1 fun hc ↦ h1 (hst.2 hc)
+  have : Finite D := Finite.of_injective _ hinj
+  have hle : Nat.card D ≤ Nat.card Bool := Nat.card_le_card_of_injective _ hinj
+  rw [show Nat.card Bool = 2 from (Nat.card_eq_fintype_card).trans Fintype.card_bool] at hle
+  have hpos : 0 < Nat.card D := Nat.card_pos
+  rcases Nat.lt_or_ge (Nat.card D) 2 with hlt | hge
+  · have h1 : Nat.card D = 1 := by omega
+    simp [h1]
+  · have h2 : Nat.card D = 2 := by omega
+    simp [h2]
 
 /-- If `v : ι → AbsoluteValue R S` is a finite collection of non-trivial and pairwise inequivalent
 absolute values, then for any `ε > 0` and any `i : ι` there is some `z : R` such that

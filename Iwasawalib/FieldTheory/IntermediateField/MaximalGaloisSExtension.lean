@@ -574,7 +574,38 @@ variable [FiniteDimensional F K] [IsAbelianGalois F K]
 theorem fixingSubgroup_maximalGaloisSExtension_singleton :
     open scoped IsMulCommutative in
     (maximalGaloisSExtension F K {p}).fixingSubgroup = CommGroup.primeToComponent Gal(K/F) p := by
-  sorry
+  open scoped IsMulCommutative in
+  set H : Subgroup Gal(K/F) := CommGroup.primeToComponent Gal(K/F) p with hH
+  set E : IntermediateField F K := maximalGaloisSExtension F K {p} with hE
+  have hcardH : Nat.card H = (Module.finrank F K).primeToComponent p := by
+    rw [hH, CommGroup.card_primeToComponent, IsGalois.card_aut_eq_finrank]
+  have hfix : Module.finrank (fixedField H) K = Nat.card H :=
+    IntermediateField.finrank_fixedField_eq_card H
+  have hmul : Module.finrank F (fixedField H) * Module.finrank (fixedField H) K =
+      Module.finrank F K := Module.finrank_mul_finrank F (fixedField H) K
+  have hFF : Module.finrank F (fixedField H) = p ^ (Module.finrank F K).factorization p := by
+    have hn0 : Module.finrank F K ≠ 0 := Module.finrank_pos.ne'
+    have hs : (Module.finrank F K).primeToComponent p ≠ 0 := by
+      simpa [Nat.primeToComponent_eq_zero_iff] using hn0
+    have key1 : Module.finrank F (fixedField H) * (Module.finrank F K).primeToComponent p =
+        Module.finrank F K := by rw [← hcardH, ← hfix]; exact hmul
+    have key2 : (Module.finrank F K).primaryComponent p *
+        (Module.finrank F K).primeToComponent p = Module.finrank F K := by
+      rw [mul_comm]; exact Nat.primeToComponent_mul_primaryComponent _ _
+    have key := key1.trans key2.symm
+    rw [Nat.eq_of_mul_eq_mul_right (Nat.pos_of_ne_zero hs) key,
+      Nat.primaryComponent_eq_of_prime]
+  have hle1 : fixedField H ≤ E := le_maximalGaloisSExtension_singleton _ ⟨_, hFF⟩
+  obtain ⟨n, hn⟩ := exists_finrank_maximalGaloisSExtension_singleton_eq_pow F K p
+  have hdvd : Module.finrank F E ∣ Module.finrank F K :=
+    ⟨_, (Module.finrank_mul_finrank F E K).symm⟩
+  have hnle : n ≤ (Module.finrank F K).factorization p := by
+    rw [← Nat.Prime.pow_dvd_iff_le_factorization Fact.out Module.finrank_pos.ne']
+    exact hn ▸ hdvd
+  have hEeq : fixedField H = E :=
+    IntermediateField.eq_of_le_of_finrank_le hle1 (by
+      rw [hn, hFF]; exact Nat.pow_le_pow_right (Fact.out : p.Prime).one_lt.le hnle)
+  rw [← hEeq, IntermediateField.fixingSubgroup_fixedField]
 
 theorem finrank_maximalGaloisSExtension_singleton_top :
     Module.finrank (maximalGaloisSExtension F K {p}) K =

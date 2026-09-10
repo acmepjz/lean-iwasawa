@@ -35,10 +35,13 @@ noncomputable def Ln (n : ℕ) :=
 instance isAbelianGalois_Ln (n : ℕ) : IsAbelianGalois (H.Kn n) (H.Ln n) :=
   .of_algEquiv (IntermediateField.liftAlgEquiv ..)
 
--- TODO: need IsUnramifiedEverywhere.of_algEquiv, etc.
 instance isUnramifiedEverywhere_Ln (n : ℕ) :
-    NumberField.IsUnramifiedEverywhere (H.Kn n) (H.Ln n) :=
-  sorry
+    NumberField.IsUnramifiedEverywhere (H.Kn n) (H.Ln n) := by
+  have hle : H.Ln n ≤ NumberField.maximalUnramifiedAbelianExtension (H.Kn n)
+      (SeparableClosure Kinf) := IntermediateField.lift_le _
+  obtain ⟨_, h⟩ := (NumberField.le_maximalUnramifiedAbelianExtension_iff (H.Kn n)
+    (SeparableClosure Kinf) (H.Ln n)).1 hle
+  exact h
 
 instance finiteDimensional_Ln (n : ℕ) : FiniteDimensional (H.Kn n) (H.Ln n) :=
   (IntermediateField.liftAlgEquiv <| IntermediateField.maximalGaloisSExtension (H.Kn n)

@@ -112,12 +112,27 @@ theorem finrank_eq_classNumber_of_isSepClosed [NumberField F] [IsSepClosed K] :
   rw [classNumber, Fintype.card_eq_nat_card, ← IsGalois.card_aut_eq_finrank]
   exact Nat.card_congr (artinEquivOfIsSepClosed F K).symm.toEquiv
 
+/-- `IsUnramifiedEverywhere` can be transferred along an `F`-algebra isomorphism. -/
+theorem _root_.NumberField.IsUnramifiedEverywhere.of_algEquiv
+    {F K K' : Type*} [Field F] [Field K] [Field K'] [Algebra F K] [Algebra F K']
+    [Algebra.IsAlgebraic F K] [Algebra.IsAlgebraic F K'] [IsUnramifiedEverywhere F K]
+    (f : K ≃ₐ[F] K') : IsUnramifiedEverywhere F K' := by
+  have H := (isUnramifiedOutside_empty_iff F K F).2 ‹IsUnramifiedEverywhere F K›
+  rw [← isUnramifiedOutside_empty_iff F K' F]
+  rw [isUnramifiedOutside_iff] at H ⊢
+  exact fun v h1 h2 => (AbsoluteValue.isUnramifiedIn_iff_of_algEquiv v f).1 (H v h1 h2)
+
 /-- Any unramified abelian extension is a subfield of Hilbert class field. -/
 noncomputable def liftOfIsSepClosed
     [NumberField F] [IsAbelianGalois F K] [IsUnramifiedEverywhere F K]
     (L : Type*) [Field L] [Algebra F L] [IsSepClosed L] :
     K →ₐ[F] maximalUnramifiedAbelianExtension F L :=
-  sorry
+  letI φ : K →ₐ[F] L := IsSepClosed.lift
+  letI e : K ≃ₐ[F] φ.fieldRange := AlgEquiv.ofInjectiveField φ
+  haveI : IsAbelianGalois F φ.fieldRange := IsAbelianGalois.of_algEquiv e
+  haveI : IsUnramifiedEverywhere F φ.fieldRange := IsUnramifiedEverywhere.of_algEquiv e
+  (IntermediateField.inclusion
+    (le_maximalUnramifiedAbelianExtension F L φ.fieldRange)).comp e.toAlgHom
 
 end IsUnramifiedEverywhere
 

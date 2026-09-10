@@ -8,6 +8,7 @@ module
 public import Iwasawalib.Algebra.Algebra.Equiv
 public import Mathlib.RingTheory.Valuation.RamificationGroup
 public import Iwasawalib.NumberTheory.AbsoluteValue.DecompositionSubgroup
+public import Iwasawalib.NumberTheory.AbsoluteValue.ResidueLift
 public import Iwasawalib.NumberTheory.AbsoluteValue.GelfandTornheim
 public import Mathlib.NumberTheory.NumberField.InfinitePlace.Basic
 public import Iwasawalib.Topology.Algebra.Group.Basic
@@ -265,19 +266,38 @@ theorem map_inertiaSubgroup_eq_of_liesOver
     · simpa only [map_decompositionSubgroup_eq_of_liesOver F (w.comp (algebraMap K L).injective) w,
         hτ3] using Subgroup.mem_map_of_mem (AlgEquiv.restrictNormalHom K) hτ1
     · simpa [← hτ3, AlgEquiv.restrictNormalHom] using hτ2 (algebraMap K L x) (by simpa using hx)
-    · have := hσ1
-      rw [← map_decompositionSubgroup_eq_of_liesOver F (w.comp (algebraMap K L).injective) w,
-        Subgroup.mem_map] at this
-      obtain ⟨τ, hτ1, hτ2⟩ := this
-      /-
-      Suppose `σ ∈ Iᵥ(K/F)`, now we have found `τ ∈ D_w(L/F)` such that `τ|_K = σ`.
-      Next steps: the image of `τ` in `Gal(k_w/kᵤ)` is contained in `Gal(k_w/kᵥ)` since its
-      image in `Gal(kᵥ/kᵤ)` is trivial (here we denote `u` the restriction of `w` to `F`).
-      We can find a preimage `τ₁ ∈ D_w(L/K)` of it, since the map `D_w(L/K) → Gal(k_w/kᵥ)`
-      is surjective. Then `τ * (τ₁)⁻¹ ∈ I_w(L/F)` whose restriction to `K` is `σ`.
-      A lot of API is still missing.
+    · /-
+      Suppose `σ ∈ Iᵥ(K/F)`. The embedding `algebraMap K L ∘ σ : K → L` preserves `w` and is
+      trivial modulo the maximal ideal, so by `AbsoluteValue.exists_algHom_residue` (which is
+      the surjectivity of `D_w(L/K) → Gal(k_w/kᵥ)`, proved by Zorn's lemma from the finite
+      normal case) it extends to an `F`-algebra homomorphism of `L` with the same properties;
+      that extension is the required element of `I_w(L/F)`.
       -/
-      sorry
+      by_cases hnt : (w.comp (algebraMap K L).injective).IsNontrivial
+      · obtain ⟨psi, h1, h2, h3⟩ := exists_algHom_residue (F := F) (K := K) (L := L) hw hnt
+          ((IsScalarTower.toAlgHom F K L).comp (σ : K →ₐ[F] K))
+          (fun x ↦ by
+            simpa using (w.comp (algebraMap K L).injective).apply_eq_of_mem_decompositionSubgroup
+              hσ1 x)
+          (fun x hx ↦ by
+            have := hσ2 x hx
+            simpa using this)
+        refine ⟨AlgEquiv.ofBijective psi (Algebra.IsAlgebraic.algHom_bijective psi),
+          ⟨(w.mem_decompositionSubgroup_iff_forall_apply_eq _).2 (fun x ↦ h1 x), fun y hy ↦
+            h2 y hy⟩, ?_⟩
+        ext x
+        apply_fun _ using (algebraMap K L).injective
+        simp only [AlgEquiv.restrictNormalHom, MonoidHom.mk'_apply, AlgEquiv.restrictNormal_commutes]
+        exact h3 x
+      · have hbot := inertiaSubgroup_eq_bot_of_not_isNontrivial F
+          (w.comp (algebraMap K L).injective) hnt
+        have hσ : σ = 1 := by
+          have : σ ∈ (w.comp (algebraMap K L).injective).inertiaSubgroup F :=
+            ((w.comp (algebraMap K L).injective).mem_inertiaSubgroup_iff_of_isNonarchimedean
+              hv σ).2 ⟨hσ1, hσ2⟩
+          rw [hbot, Subgroup.mem_bot] at this
+          exact this
+        exact ⟨1, ⟨one_mem _, fun y _ ↦ by simp⟩, by rw [map_one, hσ]⟩
   have hv := (w.isNonarchimedean_comp_iff (algebraMap K L)).not.2 hw
   rw [inertiaSubgroup_eq_decompositionSubgroup_of_not_isNonarchimedean _ _ hw,
     inertiaSubgroup_eq_decompositionSubgroup_of_not_isNonarchimedean _ _ hv]

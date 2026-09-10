@@ -20,6 +20,7 @@ public import Iwasawalib.NumberTheory.AbsoluteValue.InertiaSubgroup
 public import Iwasawalib.NumberTheory.AbsoluteValue.Normalization
 public import Iwasawalib.NumberTheory.AbsoluteValue.RamificationIndex
 public import Iwasawalib.NumberTheory.AbsoluteValue.ResidueField
+public import Iwasawalib.NumberTheory.AbsoluteValue.ResidueLift
 public import Iwasawalib.NumberTheory.Cyclotomic.FiniteField
 public import Iwasawalib.NumberTheory.NumberField.HilbertClassField.Basic
 public import Iwasawalib.NumberTheory.NumberField.HilbertClassField.ClassFieldTheory

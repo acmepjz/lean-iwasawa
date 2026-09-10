@@ -35,7 +35,7 @@ theorem mem_valuationSubring_iff {x : K} : x ∈ v.valuationSubring hv ↔ v x �
 /-- The residue field `k_v = O_v / m_v` of a nonarchimedean absolute value `v`. -/
 abbrev ResidueField : Type _ := IsLocalRing.ResidueField (v.valuationSubring hv)
 
-theorem residue_eq_zero_iff (x : v.valuationSubring hv) :
+theorem residue_valuationSubring_eq_zero_iff (x : v.valuationSubring hv) :
     IsLocalRing.residue _ x = (0 : v.ResidueField hv) ↔ v (x : K) < 1 := by
   rw [IsLocalRing.residue_eq_zero_iff, Valuation.mem_maximalIdeal_iff, ← NNReal.coe_lt_coe,
     NNReal.coe_one]
@@ -43,7 +43,7 @@ theorem residue_eq_zero_iff (x : v.valuationSubring hv) :
 
 theorem not_isUnit_iff_apply_lt_one {x : v.valuationSubring hv} :
     ¬IsUnit x ↔ v (x : K) < 1 := by
-  rw [← v.residue_eq_zero_iff hv x, IsLocalRing.residue_eq_zero_iff,
+  rw [← v.residue_valuationSubring_eq_zero_iff hv x, IsLocalRing.residue_eq_zero_iff,
     IsLocalRing.mem_maximalIdeal, mem_nonunits_iff]
 
 end Defs
@@ -227,7 +227,7 @@ theorem splits_map_residue (P : (w.valuationSubring hw)[X])
         exact hsp.of_dvd hmap0 ⟨(X - C β), by rw [← hfac]; ring⟩
       have hind := ih Q hQdeg hQsp
       have hρc : IsLocalRing.residue (w.valuationSubring hw) c = 0 :=
-        (residue_eq_zero_iff w hw c).2 hγ
+        (residue_valuationSubring_eq_zero_iff w hw c).2 hγ
       have hUmap : ((C c * X - 1 : (w.valuationSubring hw)[X]).map
           (IsLocalRing.residue (w.valuationSubring hw))) = C (-1) := by
         rw [Polynomial.map_sub, Polynomial.map_mul, map_C, map_X, Polynomial.map_one, hρc]
@@ -410,12 +410,12 @@ theorem ker_residueAutHom :
   · refine fun h ↦ ⟨σ.2, fun x hx ↦ ?_⟩
     have h2 := congr($h (IsLocalRing.residue _ ⟨x, (mem_valuationSubring_iff w hw).2 hx⟩))
     rw [residueAutHom_residue, RingAut.one_apply, ← sub_eq_zero, ← map_sub,
-      residue_eq_zero_iff] at h2
+      residue_valuationSubring_eq_zero_iff] at h2
     exact h2
   · refine fun h ↦ RingEquiv.ext fun ξ ↦ ?_
     obtain ⟨x, rfl⟩ := IsLocalRing.residue_surjective ξ
     rw [residueAutHom_residue, RingAut.one_apply, ← sub_eq_zero, ← map_sub,
-      residue_eq_zero_iff]
+      residue_valuationSubring_eq_zero_iff]
     exact h.2 (x : L) ((mem_valuationSubring_iff w hw).1 x.2)
 
 end Action
@@ -466,13 +466,13 @@ theorem forall_residueAutHom_algebraMap_eq_iff (hτ : τ ∈ w.decompositionSubg
     have h2 := h (IsLocalRing.residue _ ⟨x, hx'⟩)
     rw [residueAutHom_algebraMap v w hv hw hτ ⟨x, hx'⟩] at h2
     replace h2 := hinj h2
-    rw [← sub_eq_zero, ← map_sub, residue_eq_zero_iff] at h2
+    rw [← sub_eq_zero, ← map_sub, residue_valuationSubring_eq_zero_iff] at h2
     exact h2
   · refine fun h ξ ↦ ?_
     obtain ⟨x, rfl⟩ := IsLocalRing.residue_surjective ξ
     rw [residueAutHom_algebraMap v w hv hw hτ x]
     congr 1
-    rw [← sub_eq_zero, ← map_sub, residue_eq_zero_iff]
+    rw [← sub_eq_zero, ← map_sub, residue_valuationSubring_eq_zero_iff]
     exact h.2 (x : K) ((mem_valuationSubring_iff v hv).1 x.2)
 
 end TowerAction

@@ -51,7 +51,7 @@ open scoped Pointwise
 
 namespace NumberField
 
-variable {K L : Type} [Field K] [NumberField K] [Field L] [NumberField L] [Algebra K L]
+variable {K L : Type*} [Field K] [NumberField K] [Field L] [NumberField L] [Algebra K L]
 
 attribute [local instance] Ideal.Quotient.field IsDedekindDomain.HeightOneSpectrum.isMaximal
 
@@ -90,6 +90,20 @@ theorem exists_globalFrob [IsAbelianGalois K L] :
   exact ⟨fun p ↦ arithFrobAt (𝓞 K) Gal(L/K) (F p).asIdeal, fun p P hP ↦
     arithFrobAt_eq_of_under_eq _ _ ((hF p).trans hP.symm)⟩
 
+section LocalArtinComputation
+
+/-!
+The local-Artin computation below is deliberately restricted to `Type`.  At `Type*` the
+elaborator diverges: the `isDefEq` check inside
+`coe_localArtinAdicCompletionUnits_mk_uniformizer_eq_arithFrobAt` exceeds 200000 heartbeats,
+because the local Artin machinery stacks universe-polymorphic completions.  The three results
+above, which are what a construction of the Artin map has to consume, are stated at `Type*`
+and are unaffected -- `NumberField.IsUnramifiedEverywhere.artinMap` quantifies over `Type*`,
+so a `Type`-only statement would not apply to it at all.
+-/
+
+variable {K L : Type} [Field K] [NumberField K] [Field L] [NumberField L] [Algebra K L]
+
 attribute [local instance] decompositionIntegersMulSemiringAction
   IsLocalRing.residueMulSemiringAction Units.mulDistribMulActionRight
 
@@ -115,5 +129,7 @@ theorem coe_localArtinAdicCompletionUnits_mk_uniformizer_eq_arithFrobAt
   rw [coe_localArtinAdicCompletionUnits_mk_uniformizer_arithFrob v w h hv hu]
   exact arithFrobAt_eq_of_under_eq w P
     (((Ideal.over_def w.asIdeal v.asIdeal).symm).trans hP.symm)
+
+end LocalArtinComputation
 
 end NumberField

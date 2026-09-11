@@ -118,7 +118,9 @@ public import Iwasawalib.NumberTheory.ZpExtension.InertiaQuotient
 public import Iwasawalib.NumberTheory.ZpExtension.Linf
 public import Iwasawalib.NumberTheory.ZpExtension.Ln
 public import Iwasawalib.NumberTheory.ZpExtension.LnTower
+public import Iwasawalib.NumberTheory.ZpExtension.ProPGalois
 public import Iwasawalib.NumberTheory.ZpExtension.TotallyRamified
+public import Iwasawalib.NumberTheory.ZpExtension.XinfModule
 public import Iwasawalib.RingTheory.CharacteristicIdeal.Basic
 public import Iwasawalib.RingTheory.Ideal.KrullsHeightTheorem
 public import Iwasawalib.RingTheory.IwasawaAlgebra.Basic
@@ -145,6 +147,7 @@ public import Iwasawalib.RingTheory.IwasawaAlgebra.PowerSeriesAdic
 public import Iwasawalib.RingTheory.IwasawaAlgebra.ProfiniteLambdaModule
 public import Iwasawalib.RingTheory.IwasawaAlgebra.ProfiniteModule
 public import Iwasawalib.RingTheory.IwasawaAlgebra.ProfiniteNakayama
+public import Iwasawalib.RingTheory.IwasawaAlgebra.ProPModule
 public import Iwasawalib.RingTheory.IwasawaAlgebra.QuotientDistinguished
 public import Iwasawalib.RingTheory.IwasawaAlgebra.QuotientDistinguishedCard
 public import Iwasawalib.RingTheory.IwasawaAlgebra.RankBounded
@@ -159,3 +162,4 @@ public import Iwasawalib.RingTheory.PseudoNull.CharacteristicIdeal
 public import Iwasawalib.RingTheory.PseudoNull.StructureTheorem
 public import Iwasawalib.Topology.Algebra.Group.Basic
 public import Iwasawalib.Topology.Algebra.OpenSubgroup
+public import Iwasawalib.Topology.Algebra.ProP

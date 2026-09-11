@@ -41,6 +41,7 @@ public import Iwasawalib.GroupCohomology.Shapiro
 public import Iwasawalib.GroupCohomology.SubgroupIdele
 public import Iwasawalib.GroupCohomology.TateHexagon
 public import Iwasawalib.GroupCohomology.TraceOne
+public import Iwasawalib.GroupCohomology.UnramifiedIdele
 public import Iwasawalib.GroupTheory.Torsion
 public import Iwasawalib.NumberTheory.AbsoluteValue.Archimedean
 public import Iwasawalib.NumberTheory.AbsoluteValue.DecompositionSubgroup
@@ -77,8 +78,12 @@ public import Iwasawalib.NumberTheory.CFT.LocalGalois
 public import Iwasawalib.NumberTheory.CFT.NoetherDeuring
 public import Iwasawalib.NumberTheory.CFT.PermutationLattice
 public import Iwasawalib.NumberTheory.CFT.PlaceLattice
+public import Iwasawalib.NumberTheory.CFT.RestrictedProductSplit
+public import Iwasawalib.NumberTheory.CFT.SecondInequality
 public import Iwasawalib.NumberTheory.CFT.SIdeleClass
+public import Iwasawalib.NumberTheory.CFT.SIdeleHerbrand
 public import Iwasawalib.NumberTheory.CFT.SIdeles
+public import Iwasawalib.NumberTheory.CFT.SIdeleSemilocal
 public import Iwasawalib.NumberTheory.CFT.SUnitDivisor
 public import Iwasawalib.NumberTheory.CFT.SUnitHerbrand
 public import Iwasawalib.NumberTheory.CFT.SUnitLattice
@@ -86,7 +91,11 @@ public import Iwasawalib.NumberTheory.CFT.SUnitLog
 public import Iwasawalib.NumberTheory.CFT.SUnits
 public import Iwasawalib.NumberTheory.CFT.SUnitSpan
 public import Iwasawalib.NumberTheory.Cyclotomic.FiniteField
+public import Iwasawalib.NumberTheory.LocalCFT.AdicResidueField
+public import Iwasawalib.NumberTheory.LocalCFT.DecompositionAction
 public import Iwasawalib.NumberTheory.LocalCFT.FiniteResidue
+public import Iwasawalib.NumberTheory.LocalCFT.Inertia
+public import Iwasawalib.NumberTheory.LocalCFT.LocalHerbrand
 public import Iwasawalib.NumberTheory.LocalCFT.LocalUnits
 public import Iwasawalib.NumberTheory.LocalCFT.ResidueAction
 public import Iwasawalib.NumberTheory.LocalCFT.UnitCohomology

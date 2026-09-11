@@ -173,6 +173,7 @@ public import Iwasawalib.NumberTheory.ZpExtension.CommutatorEq
 public import Iwasawalib.NumberTheory.ZpExtension.Compositum
 public import Iwasawalib.NumberTheory.ZpExtension.ConjugateAction
 public import Iwasawalib.NumberTheory.ZpExtension.GaloisGroupProP
+public import Iwasawalib.NumberTheory.ZpExtension.InertiaInfSup
 public import Iwasawalib.NumberTheory.ZpExtension.InertiaQuotient
 public import Iwasawalib.NumberTheory.ZpExtension.L0Maximal
 public import Iwasawalib.NumberTheory.ZpExtension.Linf
@@ -192,6 +193,7 @@ public import Iwasawalib.NumberTheory.ZpExtension.XinfLambda
 public import Iwasawalib.NumberTheory.ZpExtension.XinfModule
 public import Iwasawalib.NumberTheory.ZpExtension.XinfStepOne
 public import Iwasawalib.NumberTheory.ZpExtension.XinfSubmodule
+public import Iwasawalib.NumberTheory.ZpExtension.XinfYeGenerators
 public import Iwasawalib.NumberTheory.ZpExtension.XnIsomQuot
 public import Iwasawalib.NumberTheory.ZpExtension.Yn
 public import Iwasawalib.NumberTheory.ZpExtension.YnShift
@@ -217,6 +219,7 @@ public import Iwasawalib.RingTheory.IwasawaAlgebra.LambdaStructure
 public import Iwasawalib.RingTheory.IwasawaAlgebra.LambdaTopology
 public import Iwasawalib.RingTheory.IwasawaAlgebra.ModuleInvariants
 public import Iwasawalib.RingTheory.IwasawaAlgebra.NuSubmodule
+public import Iwasawalib.RingTheory.IwasawaAlgebra.NuZpSpan
 public import Iwasawalib.RingTheory.IwasawaAlgebra.OmegaValGrowth
 public import Iwasawalib.RingTheory.IwasawaAlgebra.PadicAlgClVal
 public import Iwasawalib.RingTheory.IwasawaAlgebra.PowerSeriesAdic

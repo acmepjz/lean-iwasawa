@@ -284,10 +284,18 @@ hypotheses remain:
 * `hY`: `Y_e ⊆ ℤ_p·a + ω_e X∞` — the blueprint's description of `Y_e` as topologically
   generated over `ℤ_p` by `ω_e X∞` and the `s - 1` elements `a₂, …, a_s`, in the only form
   Step 3 uses;
-* `hstep2`: `ν_{n,e} Y_e = Y_n`, which is Step 2 of the node.  Its module-theoretic core is
-  `MvZpExtension.nu_smul_topologicalClosure_sup_span_Xinf` / `IwasawaAlgebra.nu_smul_sup_span`;
-  what is missing to conclude it outright is the same description of `Y_e`, plus the remark
-  that modulo `ν_{n,e} ω_e X∞` the elements `ν_{n,e} a_i` are `γ`-fixed.
+* `hstep2`: `ν_{n,e} Y_e = Y_n`, which is Step 2 of the node.  It is discharged from the same
+  generator description, by `MvZpExtension.hstep2_of_generators`.
+
+  Two claims this docstring previously made about `hstep2` were wrong, and are corrected here.
+  Its core is **not** `MvZpExtension.nu_smul_topologicalClosure_sup_span_Xinf` /
+  `IwasawaAlgebra.nu_smul_sup_span`: those are `Λ`-span statements, whereas `hstep2` is a
+  `ℤ_p`-span statement about `Submodule.map (IwasawaAlgebra.lsmulZp ν)`; the usable partner is
+  `IwasawaAlgebra.map_lsmulZp_span_sup`.  And the remark that modulo `ν_{n,e} ω_e X∞` the
+  elements `ν_{n,e} a_i` are `γ`-fixed is **not needed** for `hstep2` as stated -- that remark
+  is the blueprint's device for matching a closed `Λ`-submodule with a closed subgroup, and at
+  the `ℤ_p` level its role is taken by
+  `IwasawaAlgebra.topologicalClosure_closure_union_eq_span_sup`.
 
 The finiteness of `X∞ / Y_n`, which in the blueprint is `X_n ≅ A_n` finite, is discharged here
 by `MvZpExtension.finite_quotient_YnIn`; it is class field theory, and it is the reason this

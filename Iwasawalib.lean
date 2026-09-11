@@ -179,11 +179,15 @@ public import Iwasawalib.NumberTheory.ZpExtension.XinfInvLimit
 public import Iwasawalib.NumberTheory.ZpExtension.XinfLambda
 public import Iwasawalib.NumberTheory.ZpExtension.XinfModule
 public import Iwasawalib.NumberTheory.ZpExtension.XinfStepOne
+public import Iwasawalib.NumberTheory.ZpExtension.XinfSubmodule
+public import Iwasawalib.NumberTheory.ZpExtension.XnIsomQuot
 public import Iwasawalib.NumberTheory.ZpExtension.Yn
+public import Iwasawalib.NumberTheory.ZpExtension.YnShift
 public import Iwasawalib.RingTheory.CharacteristicIdeal.Basic
 public import Iwasawalib.RingTheory.Ideal.KrullsHeightTheorem
 public import Iwasawalib.RingTheory.IwasawaAlgebra.Basic
 public import Iwasawalib.RingTheory.IwasawaAlgebra.CharacteristicIdealPow
+public import Iwasawalib.RingTheory.IwasawaAlgebra.ClosedSubmodule
 public import Iwasawalib.RingTheory.IwasawaAlgebra.CoinvariantGrowth
 public import Iwasawalib.RingTheory.IwasawaAlgebra.CyclicGroupAlgebra
 public import Iwasawalib.RingTheory.IwasawaAlgebra.DistinguishedRoots

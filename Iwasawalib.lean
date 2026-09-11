@@ -69,6 +69,7 @@ public import Iwasawalib.NumberTheory.CFT.HerbrandLattice
 public import Iwasawalib.NumberTheory.CFT.HerbrandProduct
 public import Iwasawalib.NumberTheory.CFT.HerbrandShapiro
 public import Iwasawalib.NumberTheory.CFT.IdeleClassGroup
+public import Iwasawalib.NumberTheory.CFT.IdeleClassHerbrand
 public import Iwasawalib.NumberTheory.CFT.InfiniteAdeleBaseChange
 public import Iwasawalib.NumberTheory.CFT.InfiniteAdeleCongr
 public import Iwasawalib.NumberTheory.CFT.InfiniteLocalGalois
@@ -79,6 +80,8 @@ public import Iwasawalib.NumberTheory.CFT.PlaceLattice
 public import Iwasawalib.NumberTheory.CFT.SIdeleClass
 public import Iwasawalib.NumberTheory.CFT.SIdeles
 public import Iwasawalib.NumberTheory.CFT.SUnitDivisor
+public import Iwasawalib.NumberTheory.CFT.SUnitHerbrand
+public import Iwasawalib.NumberTheory.CFT.SUnitLattice
 public import Iwasawalib.NumberTheory.CFT.SUnitLog
 public import Iwasawalib.NumberTheory.CFT.SUnits
 public import Iwasawalib.NumberTheory.CFT.SUnitSpan
@@ -117,11 +120,14 @@ public import Iwasawalib.RingTheory.IwasawaAlgebra.GrowthGeneral
 public import Iwasawalib.RingTheory.IwasawaAlgebra.GrowthTransport
 public import Iwasawalib.RingTheory.IwasawaAlgebra.InverseLimitOmega
 public import Iwasawalib.RingTheory.IwasawaAlgebra.KrullDim
+public import Iwasawalib.RingTheory.IwasawaAlgebra.LambdaNakayama
 public import Iwasawalib.RingTheory.IwasawaAlgebra.LambdaStructure
+public import Iwasawalib.RingTheory.IwasawaAlgebra.LambdaTopology
 public import Iwasawalib.RingTheory.IwasawaAlgebra.ModuleInvariants
 public import Iwasawalib.RingTheory.IwasawaAlgebra.OmegaValGrowth
 public import Iwasawalib.RingTheory.IwasawaAlgebra.PadicAlgClVal
 public import Iwasawalib.RingTheory.IwasawaAlgebra.PowerSeriesAdic
+public import Iwasawalib.RingTheory.IwasawaAlgebra.ProfiniteLambdaModule
 public import Iwasawalib.RingTheory.IwasawaAlgebra.ProfiniteModule
 public import Iwasawalib.RingTheory.IwasawaAlgebra.ProfiniteNakayama
 public import Iwasawalib.RingTheory.IwasawaAlgebra.QuotientDistinguished

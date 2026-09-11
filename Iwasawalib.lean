@@ -47,6 +47,13 @@ public import Iwasawalib.NumberTheory.ZpExtension.ClassGroup
 public import Iwasawalib.NumberTheory.ZpExtension.Ln
 public import Iwasawalib.RingTheory.CharacteristicIdeal.Basic
 public import Iwasawalib.RingTheory.Ideal.KrullsHeightTheorem
+public import Iwasawalib.RingTheory.IwasawaAlgebra.Basic
+public import Iwasawalib.RingTheory.IwasawaAlgebra.CyclicGroupAlgebra
+public import Iwasawalib.RingTheory.IwasawaAlgebra.FreeQuotientCard
+public import Iwasawalib.RingTheory.IwasawaAlgebra.InverseLimitOmega
+public import Iwasawalib.RingTheory.IwasawaAlgebra.PowerSeriesAdic
+public import Iwasawalib.RingTheory.IwasawaAlgebra.QuotientDistinguished
+public import Iwasawalib.RingTheory.IwasawaAlgebra.Zp
 public import Iwasawalib.RingTheory.Polynomial.OneAddXPowSubOne
 public import Iwasawalib.RingTheory.PowerSeries.WeierstrassPreparation
 public import Iwasawalib.RingTheory.PseudoNull.Basic

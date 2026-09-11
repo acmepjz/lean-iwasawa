@@ -50,6 +50,7 @@ public import Iwasawalib.NumberTheory.AbsoluteValue.Archimedean
 public import Iwasawalib.NumberTheory.AbsoluteValue.DecompositionSubgroup
 public import Iwasawalib.NumberTheory.AbsoluteValue.GelfandTornheim
 public import Iwasawalib.NumberTheory.AbsoluteValue.InertiaSubgroup
+public import Iwasawalib.NumberTheory.AbsoluteValue.InfiniteInertia
 public import Iwasawalib.NumberTheory.AbsoluteValue.Normalization
 public import Iwasawalib.NumberTheory.AbsoluteValue.RamificationIndex
 public import Iwasawalib.NumberTheory.AbsoluteValue.ResidueField
@@ -140,14 +141,17 @@ public import Iwasawalib.NumberTheory.ZpExtension.ConjugateAction
 public import Iwasawalib.NumberTheory.ZpExtension.GaloisGroupProP
 public import Iwasawalib.NumberTheory.ZpExtension.InertiaQuotient
 public import Iwasawalib.NumberTheory.ZpExtension.Linf
+public import Iwasawalib.NumberTheory.ZpExtension.LinfUnramified
 public import Iwasawalib.NumberTheory.ZpExtension.Ln
 public import Iwasawalib.NumberTheory.ZpExtension.LnTower
 public import Iwasawalib.NumberTheory.ZpExtension.ProPGalois
 public import Iwasawalib.NumberTheory.ZpExtension.TotallyRamified
+public import Iwasawalib.NumberTheory.ZpExtension.TotallyRamifiedLayer
 public import Iwasawalib.NumberTheory.ZpExtension.XinfInertia
 public import Iwasawalib.NumberTheory.ZpExtension.XinfInvLimit
 public import Iwasawalib.NumberTheory.ZpExtension.XinfLambda
 public import Iwasawalib.NumberTheory.ZpExtension.XinfModule
+public import Iwasawalib.NumberTheory.ZpExtension.XinfStepOne
 public import Iwasawalib.RingTheory.CharacteristicIdeal.Basic
 public import Iwasawalib.RingTheory.Ideal.KrullsHeightTheorem
 public import Iwasawalib.RingTheory.IwasawaAlgebra.Basic

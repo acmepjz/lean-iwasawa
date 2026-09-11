@@ -83,6 +83,12 @@ public import Iwasawalib.NumberTheory.CFT.SUnitLog
 public import Iwasawalib.NumberTheory.CFT.SUnits
 public import Iwasawalib.NumberTheory.CFT.SUnitSpan
 public import Iwasawalib.NumberTheory.Cyclotomic.FiniteField
+public import Iwasawalib.NumberTheory.LocalCFT.FiniteResidue
+public import Iwasawalib.NumberTheory.LocalCFT.LocalUnits
+public import Iwasawalib.NumberTheory.LocalCFT.ResidueAction
+public import Iwasawalib.NumberTheory.LocalCFT.UnitCohomology
+public import Iwasawalib.NumberTheory.LocalCFT.UnitFiltration
+public import Iwasawalib.NumberTheory.LocalCFT.Unramified
 public import Iwasawalib.NumberTheory.NumberField.HilbertClassField.Basic
 public import Iwasawalib.NumberTheory.NumberField.HilbertClassField.ClassFieldTheory
 public import Iwasawalib.NumberTheory.Padics.EquivMvZp

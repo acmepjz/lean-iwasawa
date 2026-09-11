@@ -12,6 +12,15 @@ public import Iwasawalib.FieldTheory.IntermediateField.MaximalAbelian
 public import Iwasawalib.FieldTheory.IntermediateField.MaximalGaloisSExtension
 public import Iwasawalib.FieldTheory.ZpExtension.Basic
 public import Iwasawalib.FieldTheory.ZpExtension.Cyclotomic
+public import Iwasawalib.GroupCohomology.EquivariantFamily
+public import Iwasawalib.GroupCohomology.FamilyShapiro
+public import Iwasawalib.GroupCohomology.Hilbert90
+public import Iwasawalib.GroupCohomology.Induced
+public import Iwasawalib.GroupCohomology.InfinitePlaceHilbert90
+public import Iwasawalib.GroupCohomology.InfinitePlaceShapiro
+public import Iwasawalib.GroupCohomology.LocalHilbert90
+public import Iwasawalib.GroupCohomology.LocalShapiro
+public import Iwasawalib.GroupCohomology.Shapiro
 public import Iwasawalib.GroupTheory.Torsion
 public import Iwasawalib.NumberTheory.AbsoluteValue.Archimedean
 public import Iwasawalib.NumberTheory.AbsoluteValue.DecompositionSubgroup

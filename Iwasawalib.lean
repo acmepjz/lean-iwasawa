@@ -112,13 +112,16 @@ public import Iwasawalib.NumberTheory.LocalCFT.CyclicCocycleNorm
 public import Iwasawalib.NumberTheory.LocalCFT.DecompositionAction
 public import Iwasawalib.NumberTheory.LocalCFT.FaithfulHilbert90
 public import Iwasawalib.NumberTheory.LocalCFT.FiniteResidue
+public import Iwasawalib.NumberTheory.LocalCFT.GlobalFrobenius
 public import Iwasawalib.NumberTheory.LocalCFT.HerbrandTransport
 public import Iwasawalib.NumberTheory.LocalCFT.Inertia
+public import Iwasawalib.NumberTheory.LocalCFT.IntegersNormIndex
 public import Iwasawalib.NumberTheory.LocalCFT.InvariantRestriction
 public import Iwasawalib.NumberTheory.LocalCFT.LocalHerbrand
 public import Iwasawalib.NumberTheory.LocalCFT.LocalInvariantMap
 public import Iwasawalib.NumberTheory.LocalCFT.LocalNormIndex
 public import Iwasawalib.NumberTheory.LocalCFT.LocalUnits
+public import Iwasawalib.NumberTheory.LocalCFT.PlaceDedekind
 public import Iwasawalib.NumberTheory.LocalCFT.ResidueAction
 public import Iwasawalib.NumberTheory.LocalCFT.ResidueFrobenius
 public import Iwasawalib.NumberTheory.LocalCFT.SemilocalTate

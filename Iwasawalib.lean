@@ -99,12 +99,15 @@ public import Iwasawalib.NumberTheory.CFT.SUnitSpan
 public import Iwasawalib.NumberTheory.CFT.TateTransport
 public import Iwasawalib.NumberTheory.Cyclotomic.FiniteField
 public import Iwasawalib.NumberTheory.LocalCFT.AdicResidueField
+public import Iwasawalib.NumberTheory.LocalCFT.ArchimedeanHerbrand
 public import Iwasawalib.NumberTheory.LocalCFT.CyclicCocycleNorm
 public import Iwasawalib.NumberTheory.LocalCFT.DecompositionAction
+public import Iwasawalib.NumberTheory.LocalCFT.FaithfulHilbert90
 public import Iwasawalib.NumberTheory.LocalCFT.FiniteResidue
 public import Iwasawalib.NumberTheory.LocalCFT.HerbrandTransport
 public import Iwasawalib.NumberTheory.LocalCFT.Inertia
 public import Iwasawalib.NumberTheory.LocalCFT.LocalHerbrand
+public import Iwasawalib.NumberTheory.LocalCFT.LocalNormIndex
 public import Iwasawalib.NumberTheory.LocalCFT.LocalUnits
 public import Iwasawalib.NumberTheory.LocalCFT.ResidueAction
 public import Iwasawalib.NumberTheory.LocalCFT.SemilocalTate

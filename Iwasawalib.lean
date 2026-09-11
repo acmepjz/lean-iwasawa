@@ -21,10 +21,14 @@ public import Iwasawalib.NumberTheory.AbsoluteValue.Normalization
 public import Iwasawalib.NumberTheory.AbsoluteValue.RamificationIndex
 public import Iwasawalib.NumberTheory.AbsoluteValue.ResidueField
 public import Iwasawalib.NumberTheory.AbsoluteValue.ResidueLift
+public import Iwasawalib.NumberTheory.CFT.AdeleCongr
 public import Iwasawalib.NumberTheory.CFT.AdicCompletionCongr
 public import Iwasawalib.NumberTheory.CFT.FiniteAdeleCongr
+public import Iwasawalib.NumberTheory.CFT.FinitePlaceFibre
 public import Iwasawalib.NumberTheory.CFT.HeightOneSpectrumCongr
 public import Iwasawalib.NumberTheory.CFT.IdeleClassGroup
+public import Iwasawalib.NumberTheory.CFT.InfiniteAdeleBaseChange
+public import Iwasawalib.NumberTheory.CFT.InfiniteAdeleCongr
 public import Iwasawalib.NumberTheory.Cyclotomic.FiniteField
 public import Iwasawalib.NumberTheory.NumberField.HilbertClassField.Basic
 public import Iwasawalib.NumberTheory.NumberField.HilbertClassField.ClassFieldTheory

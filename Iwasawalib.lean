@@ -12,8 +12,11 @@ public import Iwasawalib.Algebra.Module.RankEulerChar
 public import Iwasawalib.Algebra.Module.Torsion
 public import Iwasawalib.Data.Nat.PrimaryComponent
 public import Iwasawalib.FieldTheory.Galois.Abelian
+public import Iwasawalib.FieldTheory.Galois.InverseLimit
+public import Iwasawalib.FieldTheory.IntermediateField.FixingSubgroup
 public import Iwasawalib.FieldTheory.IntermediateField.MaximalAbelian
 public import Iwasawalib.FieldTheory.IntermediateField.MaximalGaloisSExtension
+public import Iwasawalib.FieldTheory.IntermediateField.RestrictScalars
 public import Iwasawalib.FieldTheory.ZpExtension.Basic
 public import Iwasawalib.FieldTheory.ZpExtension.Cyclotomic
 public import Iwasawalib.GroupCohomology.CyclicCocycle
@@ -129,12 +132,16 @@ public import Iwasawalib.NumberTheory.ZpExtension.ClassNumberGrowth
 public import Iwasawalib.NumberTheory.ZpExtension.CommutatorEq
 public import Iwasawalib.NumberTheory.ZpExtension.Compositum
 public import Iwasawalib.NumberTheory.ZpExtension.ConjugateAction
+public import Iwasawalib.NumberTheory.ZpExtension.GaloisGroupProP
 public import Iwasawalib.NumberTheory.ZpExtension.InertiaQuotient
 public import Iwasawalib.NumberTheory.ZpExtension.Linf
 public import Iwasawalib.NumberTheory.ZpExtension.Ln
 public import Iwasawalib.NumberTheory.ZpExtension.LnTower
 public import Iwasawalib.NumberTheory.ZpExtension.ProPGalois
 public import Iwasawalib.NumberTheory.ZpExtension.TotallyRamified
+public import Iwasawalib.NumberTheory.ZpExtension.XinfInertia
+public import Iwasawalib.NumberTheory.ZpExtension.XinfInvLimit
+public import Iwasawalib.NumberTheory.ZpExtension.XinfLambda
 public import Iwasawalib.NumberTheory.ZpExtension.XinfModule
 public import Iwasawalib.RingTheory.CharacteristicIdeal.Basic
 public import Iwasawalib.RingTheory.Ideal.KrullsHeightTheorem
@@ -162,6 +169,7 @@ public import Iwasawalib.RingTheory.IwasawaAlgebra.PowerSeriesAdic
 public import Iwasawalib.RingTheory.IwasawaAlgebra.ProfiniteLambdaModule
 public import Iwasawalib.RingTheory.IwasawaAlgebra.ProfiniteModule
 public import Iwasawalib.RingTheory.IwasawaAlgebra.ProfiniteNakayama
+public import Iwasawalib.RingTheory.IwasawaAlgebra.ProPGammaModule
 public import Iwasawalib.RingTheory.IwasawaAlgebra.ProPModule
 public import Iwasawalib.RingTheory.IwasawaAlgebra.QuotientDistinguished
 public import Iwasawalib.RingTheory.IwasawaAlgebra.QuotientDistinguishedCard

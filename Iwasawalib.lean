@@ -73,6 +73,7 @@ public import Iwasawalib.NumberTheory.CFT.FinitePlaceFibre
 public import Iwasawalib.NumberTheory.CFT.FirstInequality
 public import Iwasawalib.NumberTheory.CFT.FirstInequalityTower
 public import Iwasawalib.NumberTheory.CFT.GenericDeterminant
+public import Iwasawalib.NumberTheory.CFT.GlobalPowerIndex
 public import Iwasawalib.NumberTheory.CFT.HeightOneSpectrumCongr
 public import Iwasawalib.NumberTheory.CFT.HerbrandForm
 public import Iwasawalib.NumberTheory.CFT.HerbrandLattice
@@ -97,6 +98,7 @@ public import Iwasawalib.NumberTheory.CFT.PlaceLattice
 public import Iwasawalib.NumberTheory.CFT.PowerIndex
 public import Iwasawalib.NumberTheory.CFT.RestrictedProductSplit
 public import Iwasawalib.NumberTheory.CFT.SIdeleClass
+public import Iwasawalib.NumberTheory.CFT.SIdeleClassEnlarged
 public import Iwasawalib.NumberTheory.CFT.SIdeleHerbrand
 public import Iwasawalib.NumberTheory.CFT.SIdeleSemilocal
 public import Iwasawalib.NumberTheory.CFT.SIdeles
@@ -183,6 +185,7 @@ public import Iwasawalib.NumberTheory.ZpExtension.ShiftLinf
 public import Iwasawalib.NumberTheory.ZpExtension.ShiftStepOne
 public import Iwasawalib.NumberTheory.ZpExtension.TotallyRamified
 public import Iwasawalib.NumberTheory.ZpExtension.TotallyRamifiedLayer
+public import Iwasawalib.NumberTheory.ZpExtension.XinfFgTorsion
 public import Iwasawalib.NumberTheory.ZpExtension.XinfInertia
 public import Iwasawalib.NumberTheory.ZpExtension.XinfInvLimit
 public import Iwasawalib.NumberTheory.ZpExtension.XinfLambda
@@ -201,6 +204,7 @@ public import Iwasawalib.RingTheory.IwasawaAlgebra.CoinvariantGrowth
 public import Iwasawalib.RingTheory.IwasawaAlgebra.CyclicGroupAlgebra
 public import Iwasawalib.RingTheory.IwasawaAlgebra.DistinguishedRoots
 public import Iwasawalib.RingTheory.IwasawaAlgebra.FgTorsion
+public import Iwasawalib.RingTheory.IwasawaAlgebra.FgTorsionSpan
 public import Iwasawalib.RingTheory.IwasawaAlgebra.FiniteIndexGrowth
 public import Iwasawalib.RingTheory.IwasawaAlgebra.FreeQuotientCard
 public import Iwasawalib.RingTheory.IwasawaAlgebra.GammaModule
@@ -216,6 +220,7 @@ public import Iwasawalib.RingTheory.IwasawaAlgebra.NuSubmodule
 public import Iwasawalib.RingTheory.IwasawaAlgebra.OmegaValGrowth
 public import Iwasawalib.RingTheory.IwasawaAlgebra.PadicAlgClVal
 public import Iwasawalib.RingTheory.IwasawaAlgebra.PowerSeriesAdic
+public import Iwasawalib.RingTheory.IwasawaAlgebra.ProPFgTorsion
 public import Iwasawalib.RingTheory.IwasawaAlgebra.ProPGammaModule
 public import Iwasawalib.RingTheory.IwasawaAlgebra.ProPModule
 public import Iwasawalib.RingTheory.IwasawaAlgebra.ProfiniteLambdaModule

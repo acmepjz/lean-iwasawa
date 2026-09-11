@@ -90,6 +90,7 @@ public import Iwasawalib.NumberTheory.CFT.NoetherDeuring
 public import Iwasawalib.NumberTheory.CFT.PermutationLattice
 public import Iwasawalib.NumberTheory.CFT.PlaceFibreStabilizer
 public import Iwasawalib.NumberTheory.CFT.PlaceLattice
+public import Iwasawalib.NumberTheory.CFT.PowerIndex
 public import Iwasawalib.NumberTheory.CFT.RestrictedProductSplit
 public import Iwasawalib.NumberTheory.CFT.SIdeleClass
 public import Iwasawalib.NumberTheory.CFT.SIdeleHerbrand
@@ -99,6 +100,7 @@ public import Iwasawalib.NumberTheory.CFT.SUnitDivisor
 public import Iwasawalib.NumberTheory.CFT.SUnitHerbrand
 public import Iwasawalib.NumberTheory.CFT.SUnitLattice
 public import Iwasawalib.NumberTheory.CFT.SUnitLog
+public import Iwasawalib.NumberTheory.CFT.SUnitPowerIndex
 public import Iwasawalib.NumberTheory.CFT.SUnitSpan
 public import Iwasawalib.NumberTheory.CFT.SUnits
 public import Iwasawalib.NumberTheory.CFT.SecondInequality
@@ -128,6 +130,7 @@ public import Iwasawalib.NumberTheory.LocalCFT.InvariantRestriction
 public import Iwasawalib.NumberTheory.LocalCFT.LocalHerbrand
 public import Iwasawalib.NumberTheory.LocalCFT.LocalInvariantMap
 public import Iwasawalib.NumberTheory.LocalCFT.LocalNormIndex
+public import Iwasawalib.NumberTheory.LocalCFT.LocalPowerIndex
 public import Iwasawalib.NumberTheory.LocalCFT.LocalUnits
 public import Iwasawalib.NumberTheory.LocalCFT.PlaceDedekind
 public import Iwasawalib.NumberTheory.LocalCFT.ResidueAction
@@ -193,11 +196,11 @@ public import Iwasawalib.RingTheory.IwasawaAlgebra.NuSubmodule
 public import Iwasawalib.RingTheory.IwasawaAlgebra.OmegaValGrowth
 public import Iwasawalib.RingTheory.IwasawaAlgebra.PadicAlgClVal
 public import Iwasawalib.RingTheory.IwasawaAlgebra.PowerSeriesAdic
+public import Iwasawalib.RingTheory.IwasawaAlgebra.ProPGammaModule
+public import Iwasawalib.RingTheory.IwasawaAlgebra.ProPModule
 public import Iwasawalib.RingTheory.IwasawaAlgebra.ProfiniteLambdaModule
 public import Iwasawalib.RingTheory.IwasawaAlgebra.ProfiniteModule
 public import Iwasawalib.RingTheory.IwasawaAlgebra.ProfiniteNakayama
-public import Iwasawalib.RingTheory.IwasawaAlgebra.ProPGammaModule
-public import Iwasawalib.RingTheory.IwasawaAlgebra.ProPModule
 public import Iwasawalib.RingTheory.IwasawaAlgebra.QuotientDistinguished
 public import Iwasawalib.RingTheory.IwasawaAlgebra.QuotientDistinguishedCard
 public import Iwasawalib.RingTheory.IwasawaAlgebra.RankBounded

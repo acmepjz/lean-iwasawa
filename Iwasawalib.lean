@@ -105,6 +105,7 @@ public import Iwasawalib.NumberTheory.CFT.TateTransport
 public import Iwasawalib.NumberTheory.Cyclotomic.FiniteField
 public import Iwasawalib.NumberTheory.LocalCFT.AdicResidueField
 public import Iwasawalib.NumberTheory.LocalCFT.ArchimedeanHerbrand
+public import Iwasawalib.NumberTheory.LocalCFT.ArchimedeanLocalNormIndex
 public import Iwasawalib.NumberTheory.LocalCFT.CyclicCocycleNorm
 public import Iwasawalib.NumberTheory.LocalCFT.DecompositionAction
 public import Iwasawalib.NumberTheory.LocalCFT.FaithfulHilbert90

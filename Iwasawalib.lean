@@ -59,12 +59,14 @@ public import Iwasawalib.NumberTheory.AbsoluteValue.ResidueField
 public import Iwasawalib.NumberTheory.AbsoluteValue.ResidueLift
 public import Iwasawalib.NumberTheory.Analytic.ClassGroupLSeries
 public import Iwasawalib.NumberTheory.CFT.AdeleBaseChange
+public import Iwasawalib.NumberTheory.CFT.AdeleBaseChangeNaturality
 public import Iwasawalib.NumberTheory.CFT.AdeleCongr
 public import Iwasawalib.NumberTheory.CFT.AdeleFixedPoints
 public import Iwasawalib.NumberTheory.CFT.AdicCompletionBaseChange
 public import Iwasawalib.NumberTheory.CFT.AdicCompletionCongr
 public import Iwasawalib.NumberTheory.CFT.AdicCompletionDecomposition
 public import Iwasawalib.NumberTheory.CFT.AdicOrd
+public import Iwasawalib.NumberTheory.CFT.ArchimedeanPowerIndex
 public import Iwasawalib.NumberTheory.CFT.BrauerHassePrinciple
 public import Iwasawalib.NumberTheory.CFT.CyclicTateComparison
 public import Iwasawalib.NumberTheory.CFT.FiniteAdeleBaseChange
@@ -101,6 +103,7 @@ public import Iwasawalib.NumberTheory.CFT.PermutationLattice
 public import Iwasawalib.NumberTheory.CFT.PlaceFibreStabilizer
 public import Iwasawalib.NumberTheory.CFT.PlaceLattice
 public import Iwasawalib.NumberTheory.CFT.PowerIndex
+public import Iwasawalib.NumberTheory.CFT.ProductPowerIndex
 public import Iwasawalib.NumberTheory.CFT.RestrictedProductSplit
 public import Iwasawalib.NumberTheory.CFT.SIdeleClass
 public import Iwasawalib.NumberTheory.CFT.SIdeleClassEnlarged

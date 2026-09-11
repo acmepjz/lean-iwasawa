@@ -92,9 +92,12 @@ public import Iwasawalib.RingTheory.CharacteristicIdeal.Basic
 public import Iwasawalib.RingTheory.Ideal.KrullsHeightTheorem
 public import Iwasawalib.RingTheory.IwasawaAlgebra.Basic
 public import Iwasawalib.RingTheory.IwasawaAlgebra.CharacteristicIdealPow
+public import Iwasawalib.RingTheory.IwasawaAlgebra.CoinvariantGrowth
 public import Iwasawalib.RingTheory.IwasawaAlgebra.CyclicGroupAlgebra
 public import Iwasawalib.RingTheory.IwasawaAlgebra.DistinguishedRoots
+public import Iwasawalib.RingTheory.IwasawaAlgebra.FiniteIndexGrowth
 public import Iwasawalib.RingTheory.IwasawaAlgebra.FreeQuotientCard
+public import Iwasawalib.RingTheory.IwasawaAlgebra.GrowthGeneral
 public import Iwasawalib.RingTheory.IwasawaAlgebra.InverseLimitOmega
 public import Iwasawalib.RingTheory.IwasawaAlgebra.KrullDim
 public import Iwasawalib.RingTheory.IwasawaAlgebra.LambdaStructure

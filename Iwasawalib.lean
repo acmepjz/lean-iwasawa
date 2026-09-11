@@ -34,6 +34,7 @@ public import Iwasawalib.GroupCohomology.Hilbert90
 public import Iwasawalib.GroupCohomology.IdeleShortExact
 public import Iwasawalib.GroupCohomology.IdeleVanishing
 public import Iwasawalib.GroupCohomology.Induced
+public import Iwasawalib.GroupCohomology.InducedTate
 public import Iwasawalib.GroupCohomology.InfinitePlaceHilbert90
 public import Iwasawalib.GroupCohomology.InfinitePlaceShapiro
 public import Iwasawalib.GroupCohomology.LocalHilbert90
@@ -132,6 +133,7 @@ public import Iwasawalib.NumberTheory.GlobalCFT.IdeleFrobeniusNorm
 public import Iwasawalib.NumberTheory.GlobalCFT.IdeleOrd
 public import Iwasawalib.NumberTheory.GlobalCFT.ReciprocityCyclic
 public import Iwasawalib.NumberTheory.GlobalCFT.ReciprocityUnramified
+public import Iwasawalib.NumberTheory.LocalCFT.AdditiveFiltration
 public import Iwasawalib.NumberTheory.LocalCFT.AdicResidueField
 public import Iwasawalib.NumberTheory.LocalCFT.ArchimedeanHerbrand
 public import Iwasawalib.NumberTheory.LocalCFT.ArchimedeanInvariantMap
@@ -145,10 +147,12 @@ public import Iwasawalib.NumberTheory.LocalCFT.GlobalFrobenius
 public import Iwasawalib.NumberTheory.LocalCFT.HerbrandTransport
 public import Iwasawalib.NumberTheory.LocalCFT.Inertia
 public import Iwasawalib.NumberTheory.LocalCFT.IntegersNormIndex
+public import Iwasawalib.NumberTheory.LocalCFT.IntegralNormalBasis
 public import Iwasawalib.NumberTheory.LocalCFT.InvariantRestriction
 public import Iwasawalib.NumberTheory.LocalCFT.LocalHerbrand
 public import Iwasawalib.NumberTheory.LocalCFT.LocalInvariantMap
 public import Iwasawalib.NumberTheory.LocalCFT.LocalNormIndex
+public import Iwasawalib.NumberTheory.LocalCFT.LocalNormalBasis
 public import Iwasawalib.NumberTheory.LocalCFT.LocalPowerIndex
 public import Iwasawalib.NumberTheory.LocalCFT.LocalUnits
 public import Iwasawalib.NumberTheory.LocalCFT.PlaceDedekind
@@ -164,6 +168,7 @@ public import Iwasawalib.NumberTheory.LocalCFT.UnitFiltrationPow
 public import Iwasawalib.NumberTheory.LocalCFT.UnitPowerIndex
 public import Iwasawalib.NumberTheory.LocalCFT.UnitPowerIndexExamples
 public import Iwasawalib.NumberTheory.LocalCFT.Unramified
+public import Iwasawalib.NumberTheory.LocalCFT.WildNormIndex
 public import Iwasawalib.NumberTheory.NumberField.HilbertClassField.Basic
 public import Iwasawalib.NumberTheory.NumberField.HilbertClassField.ClassFieldTheory
 public import Iwasawalib.NumberTheory.Padics.EquivMvZp

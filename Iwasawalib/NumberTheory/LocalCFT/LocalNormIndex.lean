@@ -32,11 +32,27 @@ degree.  It is the order statement underlying the local invariant map
 `inv_w : H²(Gal(L_w/K_v), L_w^×) ≅ (1/n)ℤ / ℤ`, and it is the local input that a global Hasse
 principle argument sums over the places.
 
-**Scope.**  The vanishing of `Ĥ¹` is unconditional.  The order of `Ĥ⁰` is proved in the
-unramified and the tame cases only; the wild case `p ∣ #D_w` is blocked on `h(O_w^×) = 1`,
-which needs the `p`-adic logarithm isomorphism `1 + 𝔪^m ≅ 𝔪^m` that Mathlib does not have for
-a general complete mixed-characteristic discrete valuation ring.  See the scope discussion in
-`Iwasawalib/NumberTheory/LocalCFT/TameRamified.lean`.
+**Scope.**  The vanishing of `Ĥ¹` is unconditional.  The order of `Ĥ⁰` is proved here in the
+unramified and the tame cases only; the wild case `p ∣ #D_w` is blocked on `h(O_w^×) = 1`.
+
+*Correction (2026-09-11).*  This paragraph used to say that `h(O_w^×) = 1` needs only the
+`p`-adic logarithm isomorphism `1 + 𝔪^m ≅ 𝔪^m`.  That was incomplete: the logarithm computes
+`h(O_w^×)` from `h(O_w⁺)`, and the latter is *not* trivial to come by, since no uniformiser of
+a ramified `L_w` is `D_w`-fixed and `O_w` itself is `O_v[D_w]`-free only in the tame case
+(Noether).  What it needs is a `D_w`-stable `O_v`-lattice in `L_w` isomorphic to `O_v[D_w]`
+together with commensurability-invariance of the Herbrand quotient — the local normal basis
+theorem for lattices.
+
+That half is now available, unconditionally and at every finite place:
+`NumberField.herbrand_adicCompletionIntegers_eq_one` in
+`Iwasawalib/NumberTheory/LocalCFT/IntegralNormalBasis.lean` proves `h(D_w, O_w⁺) = 1`, built on
+the normal basis of `L_w / K_v` indexed by the decomposition group
+(`Iwasawalib/NumberTheory/LocalCFT/LocalNormalBasis.lean`) and on the vanishing of the Tate
+cohomology of a regularly induced module
+(`Iwasawalib/GroupCohomology/InducedTate.lean`).  So the remaining obstruction in the wild case
+is *exactly* the multiplicative–additive comparison `U^(m) ≅ 𝔪^m`, and nothing else; the
+reduction is recorded in `Iwasawalib/NumberTheory/LocalCFT/WildNormIndex.lean`.  See also the
+scope discussion in `Iwasawalib/NumberTheory/LocalCFT/TameRamified.lean`.
 
 ## Main statements
 

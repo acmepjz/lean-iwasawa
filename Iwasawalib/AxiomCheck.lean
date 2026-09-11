@@ -6,6 +6,9 @@ public import Iwasawalib.NumberTheory.CFT.SecondInequality
 public import Iwasawalib.NumberTheory.CFT.SIdeleHerbrand
 public import Iwasawalib.NumberTheory.CFT.BrauerHassePrinciple
 public import Iwasawalib.NumberTheory.ZpExtension.ClassGroup
+public import Iwasawalib.NumberTheory.Analytic.ClassGroupLSeries
+public import Iwasawalib.NumberTheory.CFT.IdeleClassFixedPoints
+public import Mathlib.NumberTheory.LSeries.Nonvanishing
 @[expose] public section
 -- FIRING CONTROL: a known-`sorry` declaration must show `sorryAx`.
 -- If this line ever prints an axiom list WITHOUT `sorryAx`, the gate below is dead.
@@ -332,3 +335,52 @@ public import Iwasawalib.NumberTheory.ZpExtension.ClassGroup
 #check @NumberField.repIdeleClass
 #check @NumberField.subgroupIdeleClassIso
 #check @NumberField.subsingleton_groupCohomology_one_ideleClassGroup_iff
+
+-- ===== Analytic: L-series of a class-group character (this round) =====
+#print axioms NumberField.idealDensity
+#print axioms NumberField.idealSetEq
+#print axioms NumberField.idealSetLE
+#print axioms NumberField.finite_of_absNorm_le
+#print axioms NumberField.finite_idealSetEq
+#print axioms NumberField.finite_idealSetLE
+#print axioms NumberField.idealSetLE_zero
+#print axioms NumberField.idealSetLE_succ
+#print axioms NumberField.disjoint_idealSetLE_idealSetEq
+#print axioms NumberField.ncard_idealSetLE_eq_sum
+#print axioms NumberField.tendsto_ncard_idealSetLE
+#print axioms NumberField.classCharCoeff
+#print axioms NumberField.classCharLSeries
+#print axioms NumberField.sum_classCharCoeff
+#print axioms NumberField.tendsto_sum_weighted_real
+#print axioms NumberField.tendsto_sum_classCharCoeff
+#print axioms NumberField.lSeriesSummable_classCharCoeff
+#print axioms NumberField.tendsto_sub_one_mul_classCharLSeries
+#print axioms MonoidHom.sum_eq_zero_of_ne_one
+#print axioms NumberField.tendsto_sub_one_mul_classCharLSeries_of_sum_eq_zero
+#print axioms NumberField.tendsto_sub_one_mul_classCharLSeries_of_ne_one
+#print axioms NumberField.ncard_setOfPred_absNorm_eq₀
+#print axioms NumberField.nonZeroIdealEquivOfNeZero
+#print axioms NumberField.classCharCoeff_one
+#print axioms NumberField.classCharLSeries_one
+#print axioms NumberField.dedekindZeta_residue_eq_classNumber_mul_idealDensity
+#print axioms NumberField.tendsto_sub_one_mul_classCharLSeries_one
+
+-- ===== (C_L)^Gal = C_K (this round) =====
+#print axioms NumberField.IdeleClassGroup.baseChange_injective
+#print axioms NumberField.IdeleClassGroup.mem_range_baseChange_of_fixed
+#print axioms NumberField.IdeleClassGroup.range_baseChange_eq_setOf_fixed
+#print axioms NumberField.IdeleClassGroup.baseChangeEquivRange
+#print axioms NumberField.IdeleClassGroup.mem_range_baseChange_iff
+#print axioms NumberField.IdeleClassGroup.mem_kerSub_iff_mem_range_baseChange
+
+-- ===== docstring forward references of this round =====
+#check @NumberField.Ideal.tendsto_norm_le_and_mk_eq_div_atTop
+#check @NumberField.dedekindZeta
+#check @NumberField.dedekindZeta_residue
+#check @NumberField.tendsto_sub_one_mul_dedekindZeta_nhdsGT
+#check @DirichletCharacter.LFunction_apply_one_ne_zero
+#check @NumberField.IdeleClassGroup.galIdeleClassAut_baseChange
+#check @NumberField.IdeleGroup.range_baseChange_eq_setOf_fixed
+#check @groupCohomology.isMulCoboundary₁_of_isMulCocycle₁_of_faithful
+#check @IsGalois.mem_bot_iff_fixed
+#check @CyclicTate.TateH0

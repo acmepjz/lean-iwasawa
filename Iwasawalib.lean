@@ -54,6 +54,7 @@ public import Iwasawalib.NumberTheory.AbsoluteValue.Normalization
 public import Iwasawalib.NumberTheory.AbsoluteValue.RamificationIndex
 public import Iwasawalib.NumberTheory.AbsoluteValue.ResidueField
 public import Iwasawalib.NumberTheory.AbsoluteValue.ResidueLift
+public import Iwasawalib.NumberTheory.Analytic.ClassGroupLSeries
 public import Iwasawalib.NumberTheory.CFT.AdeleBaseChange
 public import Iwasawalib.NumberTheory.CFT.AdeleCongr
 public import Iwasawalib.NumberTheory.CFT.AdeleFixedPoints
@@ -74,6 +75,7 @@ public import Iwasawalib.NumberTheory.CFT.HerbrandForm
 public import Iwasawalib.NumberTheory.CFT.HerbrandLattice
 public import Iwasawalib.NumberTheory.CFT.HerbrandProduct
 public import Iwasawalib.NumberTheory.CFT.HerbrandShapiro
+public import Iwasawalib.NumberTheory.CFT.IdeleClassFixedPoints
 public import Iwasawalib.NumberTheory.CFT.IdeleClassGroup
 public import Iwasawalib.NumberTheory.CFT.IdeleClassHerbrand
 public import Iwasawalib.NumberTheory.CFT.IdeleClassHerbrandValue

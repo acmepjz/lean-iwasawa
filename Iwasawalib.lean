@@ -147,6 +147,10 @@ public import Iwasawalib.NumberTheory.LocalCFT.TameRamified
 public import Iwasawalib.NumberTheory.LocalCFT.TameUnits
 public import Iwasawalib.NumberTheory.LocalCFT.UnitCohomology
 public import Iwasawalib.NumberTheory.LocalCFT.UnitFiltration
+public import Iwasawalib.NumberTheory.LocalCFT.UnitFiltrationGraded
+public import Iwasawalib.NumberTheory.LocalCFT.UnitFiltrationPow
+public import Iwasawalib.NumberTheory.LocalCFT.UnitPowerIndex
+public import Iwasawalib.NumberTheory.LocalCFT.UnitPowerIndexExamples
 public import Iwasawalib.NumberTheory.LocalCFT.Unramified
 public import Iwasawalib.NumberTheory.NumberField.HilbertClassField.Basic
 public import Iwasawalib.NumberTheory.NumberField.HilbertClassField.ClassFieldTheory

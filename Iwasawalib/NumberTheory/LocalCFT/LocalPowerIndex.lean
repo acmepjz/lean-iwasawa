@@ -32,14 +32,15 @@ is proved here, unconditionally, from the six-term counting identity of
   groups, for a valued field admitting a uniformiser.
 * `LocalCFT.powIndex_units_eq_mul` : **`[F^× : (F^×)^n] = n · [𝒪^× : (𝒪^×)^n]`.**
 
-## What is *not* here
+## The remaining factor
 
-The remaining factor `[𝒪^× : (𝒪^×)^n]` is `#μ_n(F) / |n|_F` for a local field, and proving that
-requires the `p`-adic logarithm isomorphism `1 + 𝔪^m ≅ 𝔪^m` (equivalently, that the `p`-th power
-map `U^{(m)} → U^{(m+e)}` is bijective for `m > e/(p-1)`), which Mathlib does not have for a
-complete mixed-characteristic discrete valuation ring.  See the scope discussion in
-`Iwasawalib/NumberTheory/LocalCFT/LocalNormIndex.lean`.  Everything in the present file is
-independent of that gap.
+The remaining factor `[𝒪^× : (𝒪^×)^n]` is `#μ_n(F) / |n|_F` for a local field, and it is proved
+in `Iwasawalib/NumberTheory/LocalCFT/UnitPowerIndex.lean`
+(`LocalCFT.powIndex_integers_units`, `NumberField.powIndex_adicCompletionIntegers_units`)
+without the `p`-adic logarithm isomorphism `1 + 𝔪^m ≅ 𝔪^m` that Mathlib does not have: instead
+the `p`-th power map `U^{(m)} → U^{(m+e)}` is shown to be bijective for `m (p-1) > e` directly
+(`LocalCFT.isPowData_prime`, `LocalCFT.IsPowData.powEquiv`), with no `p`-adic logarithm and no
+series.  Everything in the present file is independent of that argument.
 -/
 
 noncomputable section
@@ -199,8 +200,9 @@ variable {K : Type*} [Field K] [NumberField K]
 /-- **`[K_v^× : (K_v^×)^n] = n · [O_v^× : (O_v^×)^n]`** at a finite place of a number field.
 
 This is the whole of the valuation half of the local index `[K_v^× : (K_v^×)^n]`.  The
-remaining factor `[O_v^× : (O_v^×)^n]` equals `#μ_n(K_v) / |n|_v`, whose proof needs the
-`p`-adic logarithm and is not available. -/
+remaining factor `[O_v^× : (O_v^×)^n]` equals `#μ_n(K_v) / |n|_v`, and is
+`NumberField.powIndex_adicCompletionIntegers_units`; the two are combined in
+`NumberField.powIndex_adicCompletion_units`. -/
 theorem powIndex_adicCompletion_units_eq_mul (v : HeightOneSpectrum (𝓞 K)) (n : ℕ) (hn : n ≠ 0) :
     PowerIndex.powIndex n (Additive (v.adicCompletion K)ˣ)
       = n * PowerIndex.powIndex n

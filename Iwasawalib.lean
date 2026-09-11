@@ -62,11 +62,15 @@ public import Iwasawalib.NumberTheory.CFT.FiniteAdeleCongr
 public import Iwasawalib.NumberTheory.CFT.FiniteAdeleSemilocal
 public import Iwasawalib.NumberTheory.CFT.FinitePlaceFibre
 public import Iwasawalib.NumberTheory.CFT.HeightOneSpectrumCongr
+public import Iwasawalib.NumberTheory.CFT.HerbrandLattice
+public import Iwasawalib.NumberTheory.CFT.HerbrandProduct
 public import Iwasawalib.NumberTheory.CFT.IdeleClassGroup
 public import Iwasawalib.NumberTheory.CFT.InfiniteAdeleBaseChange
 public import Iwasawalib.NumberTheory.CFT.InfiniteAdeleCongr
 public import Iwasawalib.NumberTheory.CFT.InfiniteLocalGalois
 public import Iwasawalib.NumberTheory.CFT.LocalGalois
+public import Iwasawalib.NumberTheory.CFT.PermutationLattice
+public import Iwasawalib.NumberTheory.CFT.PlaceLattice
 public import Iwasawalib.NumberTheory.CFT.SIdeleClass
 public import Iwasawalib.NumberTheory.CFT.SIdeles
 public import Iwasawalib.NumberTheory.CFT.SUnitDivisor

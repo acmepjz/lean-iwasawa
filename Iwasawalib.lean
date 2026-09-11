@@ -13,9 +13,16 @@ public import Iwasawalib.FieldTheory.IntermediateField.MaximalAbelian
 public import Iwasawalib.FieldTheory.IntermediateField.MaximalGaloisSExtension
 public import Iwasawalib.FieldTheory.ZpExtension.Basic
 public import Iwasawalib.FieldTheory.ZpExtension.Cyclotomic
+public import Iwasawalib.GroupCohomology.CyclicCocycle
+public import Iwasawalib.GroupCohomology.CyclicCocycleAdd
+public import Iwasawalib.GroupCohomology.CyclicLimit
+public import Iwasawalib.GroupCohomology.CyclicTate
 public import Iwasawalib.GroupCohomology.EquivariantFamily
+public import Iwasawalib.GroupCohomology.ExactCount
 public import Iwasawalib.GroupCohomology.FamilyShapiro
+public import Iwasawalib.GroupCohomology.FiniteFieldTate
 public import Iwasawalib.GroupCohomology.FiniteIdeleVanishing
+public import Iwasawalib.GroupCohomology.Herbrand
 public import Iwasawalib.GroupCohomology.Hilbert90
 public import Iwasawalib.GroupCohomology.IdeleShortExact
 public import Iwasawalib.GroupCohomology.IdeleVanishing
@@ -29,6 +36,8 @@ public import Iwasawalib.GroupCohomology.ProductVanishing
 public import Iwasawalib.GroupCohomology.RestrictedProductVanishing
 public import Iwasawalib.GroupCohomology.Shapiro
 public import Iwasawalib.GroupCohomology.SubgroupIdele
+public import Iwasawalib.GroupCohomology.TateHexagon
+public import Iwasawalib.GroupCohomology.TraceOne
 public import Iwasawalib.GroupTheory.Torsion
 public import Iwasawalib.NumberTheory.AbsoluteValue.Archimedean
 public import Iwasawalib.NumberTheory.AbsoluteValue.DecompositionSubgroup

@@ -35,8 +35,8 @@ quotients are `E ˣ` and `E ⁺`.
 * `CyclicTate.exists_smul_div_of_mulNorm_eq_one`: `Ĥ¹(G, Eˣ) = 0` for any finite cyclic Galois
   extension of fields.
 * `CyclicTate.exists_mulNorm_eq_of_smul_eq`: `Ĥ⁰(G, Eˣ) = 0` for a finite field `E`.
-* `CyclicTate.exists_normHom_eq_of_smul_eq_finiteField`,
-  `CyclicTate.exists_smul_sub_eq_of_normHom_eq_zero_finiteField`: the additive counterparts.
+* `CyclicTate.exists_normHom_eq_of_smul_eq_galois`,
+  `CyclicTate.exists_smul_sub_eq_of_normHom_eq_zero_galois`: the additive counterparts.
 -/
 
 noncomputable section

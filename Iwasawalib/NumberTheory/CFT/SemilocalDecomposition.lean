@@ -49,7 +49,7 @@ Two steps, both already available:
 
 * `NumberField.card_tateH0_localProductUnits`, `NumberField.card_tateH1_localProductUnits` :
   the orders agree.
-* `NumberField.card_tateH0_localProductUnits_of_split` : the **anti-vacuity control**.  At a
+* `NumberField.card_tateH0_localProductUnits_eq_card_decompositionGroup` : the **anti-vacuity control**.  At a
   place that splits completely the decomposition group is trivial, so the semilocal `Ĥ⁰`
   vanishes; the isomorphism therefore reproduces `#D_w = 1`-style computations rather than
   being an isomorphism of two copies of the same opaque object.

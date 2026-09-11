@@ -39,8 +39,8 @@ number field this holds exactly when `w` is unramified over `v`, because then a 
 ## Main statements
 
 * `LocalCFT.prod_one_add_sub_le`: `v (∏ (1 + xᵢ) - 1 - ∑ xᵢ) ≤ c²` when all `v xᵢ ≤ c ≤ 1`.
-* `LocalCFT.exists_smul_div_of_mulNorm_eq_one`: `Ĥ¹(G, 𝒪ˣ) = 0`.
-* `LocalCFT.exists_mulNorm_eq_of_smul_eq`: `Ĥ⁰(G, 𝒪ˣ) = 0`.
+* `LocalCFT.IsLocalData.exists_smul_div_of_mulNorm_eq_one`: `Ĥ¹(G, 𝒪ˣ) = 0`.
+* `LocalCFT.IsLocalData.exists_mulNorm_eq_of_smul_eq`: `Ĥ⁰(G, 𝒪ˣ) = 0`.
 -/
 
 noncomputable section

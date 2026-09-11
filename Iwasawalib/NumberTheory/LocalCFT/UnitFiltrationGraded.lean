@@ -33,7 +33,7 @@ where `q = #(𝒪/𝔪)` is the residue cardinality.  Together with
   `ker_gradedHom`.
 * `LocalCFT.relIndex_unitFiltration_succ`: `[U^(k) : U^(k+1)] = q`.
 * `LocalCFT.relIndex_unitFiltration`: `[U^(k) : U^(k+j)] = q^j`.
-* `LocalCFT.index_unitFiltration_finite`: `U^(k)` has finite index in `𝒪^×`.
+* `LocalCFT.index_unitFiltration_one`: `U^(k)` has finite index in `𝒪^×`.
 -/
 
 noncomputable section

@@ -28,7 +28,7 @@ is proved here, unconditionally, from the six-term counting identity of
 * `PowerIndex.powKer_additive_units_eq_card_rootsOfUnity` : `#(F^×)[n] = #μ_n(F)`, and
   `PowerIndex.powKer_additive_units_pos`, `PowerIndex.powKer_additive_units_le` : it is a
   positive number, at most `n`.
-* `LocalCFT.isShortExact_valAdd` : the valuation sequence `0 → 𝒪^× → F^× → ℤ → 0` of abelian
+* `LocalCFT.unitsInclAdd_injective`, `LocalCFT.valAdd_surjective` and `LocalCFT.valAdd_eq_zero_iff` : the valuation sequence `0 → 𝒪^× → F^× → ℤ → 0` of abelian
   groups, for a valued field admitting a uniformiser.
 * `LocalCFT.powIndex_units_eq_mul` : **`[F^× : (F^×)^n] = n · [𝒪^× : (𝒪^×)^n]`.**
 

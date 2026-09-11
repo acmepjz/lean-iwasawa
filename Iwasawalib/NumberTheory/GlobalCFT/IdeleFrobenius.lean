@@ -53,7 +53,7 @@ Nothing here is conditional except where `IsArtinReciprocal` is an explicit argu
 
 ## Main statements
 
-* `NumberField.IdeleGroup.ord_mul`, `NumberField.IdeleGroup.finite_support_ord`.
+* `NumberField.IdeleGroup.ord_mul`, `NumberField.finite_mulSupport_frobAt_zpow_ord`.
 * `NumberField.frobIdeleHom_principalEmbedding`,
   `NumberField.isArtinReciprocal_iff_frobIdeleHom`.
 * `NumberField.artinIdeleClassMap_mk`, `NumberField.surjective_artinIdeleClassMap_iff`.

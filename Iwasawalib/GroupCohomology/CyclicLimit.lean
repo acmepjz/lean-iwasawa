@@ -32,8 +32,8 @@ they come out of the vanishing statements for the graded pieces:
 
 ## Main statements
 
-* `CyclicLimit.exists_smul_div_of_mulNorm_eq_one`: `Ĥ¹(G, M) = 0`.
-* `CyclicLimit.exists_mulNorm_eq_of_smul_eq`: `Ĥ⁰(G, M) = 0`.
+* `CyclicLimit.IsCompleteFiltration.exists_smul_div_of_mulNorm_eq_one`: `Ĥ¹(G, M) = 0`.
+* `CyclicLimit.IsCompleteFiltration.exists_mulNorm_eq_of_smul_eq`: `Ĥ⁰(G, M) = 0`.
 -/
 
 noncomputable section

@@ -36,7 +36,7 @@ the Tate group are matched up in
 * `NumberField.IdeleClassGroup.surjective_toTateH0`, `ker_toTateH0` : it is surjective with
   kernel `N_{L/K} C_L`.
 * `NumberField.IdeleClassGroup.quotientNormEquivTateH0` : the resulting isomorphism.
-* `NumberField.IdeleClassGroup.tateH0_eq_zero_iff` : a class of `C_K` vanishes in `Ĥ⁰` exactly
+* `NumberField.IdeleClassGroup.toTateH0_eq_zero_iff` : a class of `C_K` vanishes in `Ĥ⁰` exactly
   when it is a norm.
 -/
 

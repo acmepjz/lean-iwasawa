@@ -24,8 +24,8 @@ the *unit filtration*, which for a discretely valued field is the classical
 The point of the file is to verify, for a *complete* `F`, the four hypotheses of
 `CyclicLimit.IsCompleteFiltration` — the filtration is decreasing, `G`-stable, separated and
 complete — so that the successive-approximation theorems
-`CyclicLimit.exists_smul_div_of_mulNorm_eq_one` and
-`CyclicLimit.exists_mulNorm_eq_of_smul_eq` can be applied to `𝒪ˣ`.
+`CyclicLimit.IsCompleteFiltration.exists_smul_div_of_mulNorm_eq_one` and
+`CyclicLimit.IsCompleteFiltration.exists_mulNorm_eq_of_smul_eq` can be applied to `𝒪ˣ`.
 
 ## Main definitions
 

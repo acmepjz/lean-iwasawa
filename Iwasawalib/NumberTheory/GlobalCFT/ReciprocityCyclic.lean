@@ -49,7 +49,7 @@ bijective, applied to the norm quotient.  What genuinely remains missing is the 
   `Ĥ⁰(Gal(L/K), C_L) ≃+ Additive Gal(L/K)`.
 * `NumberField.quotientNormEquivGalOfSurjective` : the same isomorphism read as
   `C_K / N_{L/K} C_L ≅ Gal(L/K)`.
-* `NumberField.reciprocityEquivOfSurjectiveOfSubsingleton` : the version whose only analytic
+* `NumberField.reciprocityEquivOfSurjective` : the version whose only analytic
   input is `Ĥ¹(Gal(L/K), C_L) = 0`, packaged against
   `NumberField.card_tateH0_ideleClassGroup_eq_of_subsingleton`.
 -/

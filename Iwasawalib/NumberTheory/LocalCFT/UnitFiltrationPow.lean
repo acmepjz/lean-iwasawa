@@ -40,7 +40,7 @@ the completeness of the filtration (`LocalCFT.unitFiltration_complete`).
   `LocalCFT.IsPowData.image_pow`: injectivity, surjectivity and the image identity
   `(· ^ n) '' U^(k) = U^(k+δ)`.
 * `LocalCFT.isPowData_prime`: the instance at the residue characteristic.
-* `LocalCFT.isPowData_coprime`: the instance at an exponent prime to the residue
+* `LocalCFT.isPowData_of_valued_eq_one`: the instance at an exponent prime to the residue
   characteristic.
 -/
 

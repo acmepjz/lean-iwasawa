@@ -35,8 +35,8 @@ and records the two consequences that are available at this point:
 ## Main statements
 
 * `NumberField.ideleShortComplex_shortExact`: it is short exact.
-* `NumberField.isZero_H1_units`: `H¹(Gal(L/K), Lˣ) = 0` (Hilbert 90).
-* `NumberField.isZero_H1_ideleClass_of`: the criterion for `H¹(Gal(L/K), C_L) = 0`.
+* `NumberField.isZero_H1_repUnits`: `H¹(Gal(L/K), Lˣ) = 0` (Hilbert 90).
+* `NumberField.isZero_H1_repIdeleClass_of`: the criterion for `H¹(Gal(L/K), C_L) = 0`.
 -/
 
 noncomputable section

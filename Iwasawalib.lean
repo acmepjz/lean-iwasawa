@@ -186,6 +186,7 @@ public import Iwasawalib.NumberTheory.ZpExtension.LinfUnramified
 public import Iwasawalib.NumberTheory.ZpExtension.Ln
 public import Iwasawalib.NumberTheory.ZpExtension.LnTower
 public import Iwasawalib.NumberTheory.ZpExtension.ProPGalois
+public import Iwasawalib.NumberTheory.ZpExtension.RamifiedFamily
 public import Iwasawalib.NumberTheory.ZpExtension.Shift
 public import Iwasawalib.NumberTheory.ZpExtension.ShiftLinf
 public import Iwasawalib.NumberTheory.ZpExtension.ShiftStepOne

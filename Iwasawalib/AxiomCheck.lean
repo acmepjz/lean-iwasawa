@@ -4,6 +4,7 @@ public import Iwasawalib.NumberTheory.CFT.FirstInequality
 public import Iwasawalib.NumberTheory.CFT.IdeleClassHerbrand
 public import Iwasawalib.NumberTheory.CFT.SecondInequality
 public import Iwasawalib.NumberTheory.CFT.SIdeleHerbrand
+public import Iwasawalib.NumberTheory.CFT.BrauerHassePrinciple
 public import Iwasawalib.NumberTheory.ZpExtension.ClassGroup
 @[expose] public section
 -- FIRING CONTROL: a known-`sorry` declaration must show `sorryAx`.
@@ -307,3 +308,27 @@ public import Iwasawalib.NumberTheory.ZpExtension.ClassGroup
 #check @NumberField.subsingleton_tateH1_ideleClassGroup_iff
 #check @NumberField.subsingleton_tateH1_localProductIntegerUnits
 #check @NumberField.under_smul_heightOneSpectrum
+
+-- ===== BrauerHassePrinciple (this round) =====
+#print axioms groupCohomology.mono_of_isZero
+#print axioms groupCohomology.mono_iff_isZero
+#print axioms NumberField.BrauerHassePrinciple
+#print axioms NumberField.brauerHassePrinciple_iff_isZero_H1_repIdeleClass
+#print axioms NumberField.isZero_H1_repIdeleClass_of_brauerHassePrinciple
+#print axioms NumberField.brauerHassePrinciple_of_isZero_H1_repIdeleClass
+#print axioms NumberField.brauerHassePrinciple_of_subsingleton
+#print axioms NumberField.brauerHassePrinciple_fixedField_iff_isZero_H1_subgroup
+#print axioms NumberField.isZero_H1_subgroup_repIdeleClass_of_brauerHassePrinciple
+#print axioms NumberField.brauerHassePrinciple_iff_card_le
+#print axioms NumberField.brauerHassePrinciple_iff_card_eq
+#print axioms NumberField.card_groupCohomology_two_ideleClassGroup_eq_of_brauerHassePrinciple
+#print axioms NumberField.subsingleton_groupCohomology_one_ideleClassGroup_of_brauerHassePrinciple
+
+-- ===== docstring forward references of this round =====
+#check @groupCohomology.isZero_of_isZero_of_mono
+#check @NumberField.card_tateH0_ideleClassGroup_ge_everywhere
+#check @NumberField.isZero_H1_repIdele
+#check @NumberField.isZero_H1_repIdeleClass
+#check @NumberField.repIdeleClass
+#check @NumberField.subgroupIdeleClassIso
+#check @NumberField.subsingleton_groupCohomology_one_ideleClassGroup_iff

@@ -58,6 +58,7 @@ public import Iwasawalib.NumberTheory.CFT.AdicCompletionBaseChange
 public import Iwasawalib.NumberTheory.CFT.AdicCompletionCongr
 public import Iwasawalib.NumberTheory.CFT.AdicCompletionDecomposition
 public import Iwasawalib.NumberTheory.CFT.AdicOrd
+public import Iwasawalib.NumberTheory.CFT.BrauerHassePrinciple
 public import Iwasawalib.NumberTheory.CFT.CyclicTateComparison
 public import Iwasawalib.NumberTheory.CFT.FiniteAdeleBaseChange
 public import Iwasawalib.NumberTheory.CFT.FiniteAdeleCongr

@@ -84,9 +84,11 @@ public import Iwasawalib.NumberTheory.CFT.IdeleClassHerbrand
 public import Iwasawalib.NumberTheory.CFT.IdeleClassHerbrandValue
 public import Iwasawalib.NumberTheory.CFT.IdeleClassNormIndex
 public import Iwasawalib.NumberTheory.CFT.IdeleClassNormQuotient
+public import Iwasawalib.NumberTheory.CFT.IdeleTateDecomposition
 public import Iwasawalib.NumberTheory.CFT.InfiniteAdeleBaseChange
 public import Iwasawalib.NumberTheory.CFT.InfiniteAdeleCongr
 public import Iwasawalib.NumberTheory.CFT.InfiniteLocalGalois
+public import Iwasawalib.NumberTheory.CFT.InfiniteSemilocalDecomposition
 public import Iwasawalib.NumberTheory.CFT.LocalGalois
 public import Iwasawalib.NumberTheory.CFT.NoetherDeuring
 public import Iwasawalib.NumberTheory.CFT.PermutationLattice
@@ -106,8 +108,10 @@ public import Iwasawalib.NumberTheory.CFT.SUnitPowerIndex
 public import Iwasawalib.NumberTheory.CFT.SUnitSpan
 public import Iwasawalib.NumberTheory.CFT.SUnits
 public import Iwasawalib.NumberTheory.CFT.SecondInequality
+public import Iwasawalib.NumberTheory.CFT.SemilocalDecomposition
 public import Iwasawalib.NumberTheory.CFT.SemilocalFieldUnits
 public import Iwasawalib.NumberTheory.CFT.SemilocalIntegerUnits
+public import Iwasawalib.NumberTheory.CFT.SemilocalTateIso
 public import Iwasawalib.NumberTheory.CFT.TateTower
 public import Iwasawalib.NumberTheory.CFT.TateTowerIntermediate
 public import Iwasawalib.NumberTheory.CFT.TateTransport
@@ -123,6 +127,7 @@ public import Iwasawalib.NumberTheory.GlobalCFT.ReciprocityCyclic
 public import Iwasawalib.NumberTheory.GlobalCFT.ReciprocityUnramified
 public import Iwasawalib.NumberTheory.LocalCFT.AdicResidueField
 public import Iwasawalib.NumberTheory.LocalCFT.ArchimedeanHerbrand
+public import Iwasawalib.NumberTheory.LocalCFT.ArchimedeanInvariantMap
 public import Iwasawalib.NumberTheory.LocalCFT.ArchimedeanLocalNormIndex
 public import Iwasawalib.NumberTheory.LocalCFT.ArtinFrobenius
 public import Iwasawalib.NumberTheory.LocalCFT.CyclicCocycleNorm

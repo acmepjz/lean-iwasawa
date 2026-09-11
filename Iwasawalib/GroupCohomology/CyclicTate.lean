@@ -21,12 +21,14 @@ two-periodic complex is the Tate cohomology of `G` with coefficients in `M`:
 * `CyclicTate.TateH1 G M σ = ker N / im D` is `Ĥ¹(G, M)`.
 
 These are *definitions as explicit quotient groups*, which is what makes the counting
-arguments behind the Herbrand quotient possible.  NOTE: a comparison with Mathlib's `groupCohomology` / `tateCohomology` in the even and odd
-degrees is NOT provided here. Such a comparison would be built from
-`Rep.FiniteCyclicGroup.groupCohomologyIsoEven` and
-`Rep.FiniteCyclicGroup.groupCohomologyIsoOdd`, but it has not been proved, so results stated
-in terms of `TateH0`/`TateH1` (including `CyclicTate.herbrand`) are statements about this
-explicit model only. The link to `groupCohomology` is supplied separately, in degree 1, by
+arguments behind the Herbrand quotient possible.  The comparison with Mathlib's `groupCohomology` IS available, but it lives downstream in
+`Iwasawalib/NumberTheory/CFT/CyclicTateComparison.lean` (it cannot live here, since it is
+built from `Rep.FiniteCyclicGroup.groupCohomologyπEven`/`πOdd`): see
+`CyclicTate.tateH0EquivGroupCohomology`, `CyclicTate.tateH1EquivGroupCohomology` and
+`CyclicTate.herbrand_eq_card_groupCohomology`, the last of which identifies `herbrand` with
+`#H²/#H¹` of the genuine group cohomology. That comparison requires `[CommGroup G]` with `G`
+in the same universe as `ℤ`, a constraint inherited from `Rep.FiniteCyclicGroup`. In degree 1
+the link is also available directly, without that constraint, via
 `CyclicCocycle.isMulCoboundary₁_of_mulNorm` and `CyclicCocycleAdd.isZero_H1_of_normHom`.
 
 ## Main definitions

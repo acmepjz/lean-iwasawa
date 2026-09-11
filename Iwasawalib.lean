@@ -5,6 +5,7 @@ public import Iwasawalib.Algebra.CompleteGroupAlgebra.Basic
 public import Iwasawalib.Algebra.Exact.Basic
 public import Iwasawalib.Algebra.Exact.KerCokerComp
 public import Iwasawalib.Algebra.InverseLimit.Basic
+public import Iwasawalib.Algebra.Module.EulerChar
 public import Iwasawalib.Algebra.Module.Torsion
 public import Iwasawalib.Data.Nat.PrimaryComponent
 public import Iwasawalib.FieldTheory.Galois.Abelian
@@ -58,11 +59,16 @@ public import Iwasawalib.RingTheory.CharacteristicIdeal.Basic
 public import Iwasawalib.RingTheory.Ideal.KrullsHeightTheorem
 public import Iwasawalib.RingTheory.IwasawaAlgebra.Basic
 public import Iwasawalib.RingTheory.IwasawaAlgebra.CyclicGroupAlgebra
+public import Iwasawalib.RingTheory.IwasawaAlgebra.DistinguishedRoots
 public import Iwasawalib.RingTheory.IwasawaAlgebra.FreeQuotientCard
 public import Iwasawalib.RingTheory.IwasawaAlgebra.InverseLimitOmega
+public import Iwasawalib.RingTheory.IwasawaAlgebra.LambdaStructure
+public import Iwasawalib.RingTheory.IwasawaAlgebra.OmegaValGrowth
 public import Iwasawalib.RingTheory.IwasawaAlgebra.PowerSeriesAdic
 public import Iwasawalib.RingTheory.IwasawaAlgebra.QuotientDistinguished
+public import Iwasawalib.RingTheory.IwasawaAlgebra.UFD
 public import Iwasawalib.RingTheory.IwasawaAlgebra.Zp
+public import Iwasawalib.RingTheory.Polynomial.NuDistinguished
 public import Iwasawalib.RingTheory.Polynomial.OneAddXPowSubOne
 public import Iwasawalib.RingTheory.PowerSeries.WeierstrassPreparation
 public import Iwasawalib.RingTheory.PseudoNull.Basic

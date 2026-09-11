@@ -43,12 +43,14 @@ argument compares with the `S`-unit index `[E_S : E_S^n] = n ^ #S` of
   `#(𝒪_v/𝔪_v) = N(v)`, the bridge between the local residue field and the ideal norm.
 * `NumberField.prod_absNorm_pow_ord_natCast` : **`∏_{v ∈ S} N(v) ^ ord_v(n) = n ^ [K : ℚ]`** for
   every finite `S` containing the places above `n`.
-* `NumberField.powIndex_adicCompletion_units_eq_absNorm_pow_ord` : the local index rewritten
-  with `N(v)` and `ord_v(n)` in place of the residue cardinality and `v_p(n) · e_v`; in
-  particular the right-hand side no longer mentions a choice of residue characteristic.
-* `NumberField.prod_powIndex_adicCompletion_units` : the displayed product formula.
 
 Everything here is unconditional.
+
+This list previously also advertised `NumberField.powIndex_adicCompletion_units_eq_absNorm_pow_ord`
+and `NumberField.prod_powIndex_adicCompletion_units` as main statements of this file, when
+neither declaration existed anywhere in the repository.  They are now proved, in
+`Iwasawalib/NumberTheory/CFT/LocalPowerIndexProduct.lean`, which is where they belong: they
+consume both this file's `ord`/`absNorm` bridges and `LocalCFT/UnitPowerIndex.lean`
 -/
 
 noncomputable section

@@ -71,6 +71,7 @@ public import Iwasawalib.NumberTheory.CFT.FiniteAdeleCongr
 public import Iwasawalib.NumberTheory.CFT.FiniteAdeleSemilocal
 public import Iwasawalib.NumberTheory.CFT.FinitePlaceFibre
 public import Iwasawalib.NumberTheory.CFT.FirstInequality
+public import Iwasawalib.NumberTheory.CFT.FirstInequalityPrime
 public import Iwasawalib.NumberTheory.CFT.FirstInequalityTower
 public import Iwasawalib.NumberTheory.CFT.GenericDeterminant
 public import Iwasawalib.NumberTheory.CFT.GlobalPowerIndex
@@ -91,7 +92,10 @@ public import Iwasawalib.NumberTheory.CFT.InfiniteAdeleCongr
 public import Iwasawalib.NumberTheory.CFT.InfiniteLocalGalois
 public import Iwasawalib.NumberTheory.CFT.InfiniteSemilocalDecomposition
 public import Iwasawalib.NumberTheory.CFT.LocalGalois
+public import Iwasawalib.NumberTheory.CFT.LocalPowerIndexProduct
 public import Iwasawalib.NumberTheory.CFT.NoetherDeuring
+public import Iwasawalib.NumberTheory.CFT.NormIndexIdele
+public import Iwasawalib.NumberTheory.CFT.NormIndexIdeleExamples
 public import Iwasawalib.NumberTheory.CFT.PermutationLattice
 public import Iwasawalib.NumberTheory.CFT.PlaceFibreStabilizer
 public import Iwasawalib.NumberTheory.CFT.PlaceLattice
@@ -107,6 +111,7 @@ public import Iwasawalib.NumberTheory.CFT.SUnitHerbrand
 public import Iwasawalib.NumberTheory.CFT.SUnitLattice
 public import Iwasawalib.NumberTheory.CFT.SUnitLog
 public import Iwasawalib.NumberTheory.CFT.SUnitPowerIndex
+public import Iwasawalib.NumberTheory.CFT.SUnitRootsOfUnity
 public import Iwasawalib.NumberTheory.CFT.SUnitSpan
 public import Iwasawalib.NumberTheory.CFT.SUnits
 public import Iwasawalib.NumberTheory.CFT.SecondInequality

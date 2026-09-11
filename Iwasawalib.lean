@@ -92,7 +92,12 @@ public import Iwasawalib.NumberTheory.Padics.HasBasis
 public import Iwasawalib.NumberTheory.Padics.Units
 public import Iwasawalib.NumberTheory.ZpExtension.Basic
 public import Iwasawalib.NumberTheory.ZpExtension.ClassGroup
+public import Iwasawalib.NumberTheory.ZpExtension.ClassNumberGrowth
+public import Iwasawalib.NumberTheory.ZpExtension.CommutatorEq
+public import Iwasawalib.NumberTheory.ZpExtension.ConjugateAction
+public import Iwasawalib.NumberTheory.ZpExtension.InertiaQuotient
 public import Iwasawalib.NumberTheory.ZpExtension.Ln
+public import Iwasawalib.NumberTheory.ZpExtension.TotallyRamified
 public import Iwasawalib.RingTheory.CharacteristicIdeal.Basic
 public import Iwasawalib.RingTheory.Ideal.KrullsHeightTheorem
 public import Iwasawalib.RingTheory.IwasawaAlgebra.Basic
@@ -103,6 +108,7 @@ public import Iwasawalib.RingTheory.IwasawaAlgebra.DistinguishedRoots
 public import Iwasawalib.RingTheory.IwasawaAlgebra.FiniteIndexGrowth
 public import Iwasawalib.RingTheory.IwasawaAlgebra.FreeQuotientCard
 public import Iwasawalib.RingTheory.IwasawaAlgebra.GrowthGeneral
+public import Iwasawalib.RingTheory.IwasawaAlgebra.GrowthTransport
 public import Iwasawalib.RingTheory.IwasawaAlgebra.InverseLimitOmega
 public import Iwasawalib.RingTheory.IwasawaAlgebra.KrullDim
 public import Iwasawalib.RingTheory.IwasawaAlgebra.LambdaStructure
@@ -110,6 +116,8 @@ public import Iwasawalib.RingTheory.IwasawaAlgebra.ModuleInvariants
 public import Iwasawalib.RingTheory.IwasawaAlgebra.OmegaValGrowth
 public import Iwasawalib.RingTheory.IwasawaAlgebra.PadicAlgClVal
 public import Iwasawalib.RingTheory.IwasawaAlgebra.PowerSeriesAdic
+public import Iwasawalib.RingTheory.IwasawaAlgebra.ProfiniteModule
+public import Iwasawalib.RingTheory.IwasawaAlgebra.ProfiniteNakayama
 public import Iwasawalib.RingTheory.IwasawaAlgebra.QuotientDistinguished
 public import Iwasawalib.RingTheory.IwasawaAlgebra.QuotientDistinguishedCard
 public import Iwasawalib.RingTheory.IwasawaAlgebra.RankBounded

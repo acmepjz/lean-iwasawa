@@ -1,0 +1,197 @@
+/-
+Copyright (c) 2026 The Iwasawalib contributors. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+module
+
+public import Iwasawalib.NumberTheory.GlobalCFT.FrobeniusInfinite
+public import Mathlib.RingTheory.DedekindDomain.Factorization
+public import Mathlib.NumberTheory.NumberField.ClassNumber
+
+@[expose] public section
+
+/-!
+# The Artin map of an unramified abelian extension, granted reciprocity
+
+Let `K / F` be an unramified abelian extension of a number field, of **arbitrary** (possibly
+infinite) degree.  `Iwasawalib/NumberTheory/GlobalCFT/FrobeniusInfinite.lean` provides the
+Frobenius `NumberField.frobAt p ∈ Gal(K/F)` at every prime `p` of `𝓞 F`.  This file extends it
+multiplicatively to the group of nonzero fractional ideals of `F` and descends it to the ideal
+class group.
+
+## What is unconditional
+
+* `NumberField.frobIdealHom : (FractionalIdeal (𝓞 F)⁰ F)ˣ →* Gal(K/F)`, `I ↦ ∏_p Frob_p^{v_p(I)}`,
+  built from `FractionalIdeal.count`;
+* `NumberField.frobIdealHom_mk0` : its value at a prime is `Frob_p`.
+
+## What is conditional, and on what
+
+The descent to `ClassGroup (𝓞 F)` is exactly **Artin reciprocity**, isolated here as
+
+`NumberField.IsArtinReciprocal F K : Prop := ∀ x : Fˣ, frobIdealHom F K (toPrincipalIdeal (𝓞 F) F x) = 1`
+
+Granted it:
+
+* `NumberField.artinMapOfReciprocal F K h : ClassGroup (𝓞 F) →* Gal(K/F)`;
+* `NumberField.artinMapOfReciprocal_mk0_eq_arithFrobAt` is verbatim the conclusion of
+  `NumberField.IsUnramifiedEverywhere.artinMap_spec`;
+* `NumberField.surjective_artinMapOfReciprocal` reduces the surjectivity of the Artin map to the
+  surjectivity of `frobIdealHom`, i.e. to the statement that the Frobenius elements generate
+  `Gal(K/F)`.
+
+So `NumberField.IsUnramifiedEverywhere.artinMap` may be defined as `artinMapOfReciprocal F K h`
+as soon as `h` is available, and `artinMap_spec` and `surjective_artinMap` follow from the two
+theorems above.
+
+## Why neither input is available here
+
+`IsArtinReciprocal` is Artin reciprocity for the unramified case.  The cohomological half of
+global class field theory in this repository computes **orders**: `h(C_L) = [L : K]`
+(`Iwasawalib/NumberTheory/CFT/IdeleClassHerbrandValue.lean`), the second fundamental inequality
+(`Iwasawalib/NumberTheory/CFT/SecondInequality.lean`), and the equivalence of the first
+inequality with `Ĥ¹(C_L) = 0` (`Iwasawalib/NumberTheory/CFT/FirstInequality.lean`).  Even with
+`Ĥ¹(C_L) = 0` in hand one obtains only `#(C_K / N C_L) = [L : K]`, a statement about
+cardinalities; the *canonical* isomorphism `C_K / N C_L ≅ Gal(L/K)` which carries the
+reciprocity law is Tate's theorem, which needs the fundamental class and cup products in group
+cohomology.  Neither exists in this repository, and Mathlib's `groupCohomology` does not supply
+them at this generality.
+
+Surjectivity of `frobIdealHom` is the statement that the Frobenius elements generate the Galois
+group.  Its usual proofs are analytic — Chebotarev, or the Frobenius density theorem — and the
+analytic material available here is `Iwasawalib/NumberTheory/Analytic/ClassGroupLSeries.lean`,
+which is about the class-number formula, not about splitting of primes in an extension.
+-/
+
+noncomputable section
+
+open IsDedekindDomain IsDedekindDomain.HeightOneSpectrum NumberField
+open scoped IsMulCommutative nonZeroDivisors
+
+namespace NumberField
+
+variable (F K : Type*) [Field F] [NumberField F] [Field K] [Algebra F K]
+  [IsAbelianGalois F K] [IsUnramifiedEverywhere F K]
+
+/-! ### The Frobenius homomorphism on fractional ideals -/
+
+open FractionalIdeal in
+theorem finite_mulSupport_frobAt_zpow (I : FractionalIdeal (𝓞 F)⁰ F) :
+    (Function.mulSupport fun p : HeightOneSpectrum (𝓞 F) =>
+      frobAt (K := K) p ^ count F p I).Finite := by
+  refine Set.Finite.subset (Filter.eventually_cofinite.1 (finite_factors I)) ?_
+  intro p hp
+  simp only [Function.mem_mulSupport, Set.mem_setOf_eq] at hp ⊢
+  intro h
+  exact hp (by rw [h, zpow_zero])
+
+open FractionalIdeal in
+/-- **The Frobenius homomorphism on the group of nonzero fractional ideals** of the base field
+of an unramified abelian extension `K / F` of a number field, `I ↦ ∏_p Frob_p ^ v_p(I)`. -/
+def frobIdealHom : (FractionalIdeal (𝓞 F)⁰ F)ˣ →* Gal(K/F) where
+  toFun I := ∏ᶠ p : HeightOneSpectrum (𝓞 F),
+    frobAt (K := K) p ^ count F p (I : FractionalIdeal (𝓞 F)⁰ F)
+  map_one' := by
+    simp only [Units.val_one, count_one, zpow_zero, finprod_one]
+  map_mul' I J := by
+    have hI : (I : FractionalIdeal (𝓞 F)⁰ F) ≠ 0 := I.ne_zero
+    have hJ : (J : FractionalIdeal (𝓞 F)⁰ F) ≠ 0 := J.ne_zero
+    rw [← finprod_mul_distrib (finite_mulSupport_frobAt_zpow F K _)
+      (finite_mulSupport_frobAt_zpow F K _)]
+    refine finprod_congr fun p => ?_
+    rw [Units.val_mul, count_mul F p hI hJ, zpow_add]
+
+open FractionalIdeal in
+/-- **The Frobenius homomorphism sends a prime to the Frobenius at that prime.** -/
+theorem frobIdealHom_mk0 (p : HeightOneSpectrum (𝓞 F)) :
+    frobIdealHom F K (FractionalIdeal.mk0 F ⟨p.asIdeal, mem_nonZeroDivisors_of_ne_zero p.ne_bot⟩)
+      = frobAt (K := K) p := by
+  classical
+  show (∏ᶠ q : HeightOneSpectrum (𝓞 F), frobAt (K := K) q ^
+    count F q (p.asIdeal : FractionalIdeal (𝓞 F)⁰ F)) = _
+  rw [finprod_eq_single _ p fun q hq => ?_]
+  · rw [count_self, zpow_one]
+  · rw [count_maximal_coprime F q (Ne.symm hq), zpow_zero]
+
+open FractionalIdeal in
+/-- **The image of the Frobenius homomorphism is the subgroup generated by the Frobenius
+elements.** -/
+theorem range_frobIdealHom :
+    (frobIdealHom F K).range = Subgroup.closure (Set.range (frobAt (F := F) (K := K))) := by
+  refine le_antisymm ?_ ?_
+  · rintro _ ⟨I, rfl⟩
+    show (∏ᶠ p : HeightOneSpectrum (𝓞 F), frobAt (K := K) p ^
+      count F p (I : FractionalIdeal (𝓞 F)⁰ F)) ∈ _
+    exact finprod_induction _ (Subgroup.one_mem _) (fun _ _ => Subgroup.mul_mem _)
+      fun p => zpow_mem (Subgroup.subset_closure (Set.mem_range_self (f := frobAt (F := F) (K := K)) p)) _
+  · rw [Subgroup.closure_le]
+    rintro _ ⟨p, rfl⟩
+    show frobAt (K := K) p ∈ (frobIdealHom F K).range
+    exact ⟨FractionalIdeal.mk0 F ⟨p.asIdeal, mem_nonZeroDivisors_of_ne_zero p.ne_bot⟩,
+      frobIdealHom_mk0 F K p⟩
+
+/-- **Surjectivity of the Frobenius homomorphism is the statement that the Frobenius elements
+generate the Galois group.**  This is the conclusion of the Chebotarev density theorem, and it
+is the second missing input. -/
+theorem surjective_frobIdealHom_iff :
+    Function.Surjective (frobIdealHom F K) ↔
+      Subgroup.closure (Set.range (frobAt (F := F) (K := K))) = ⊤ := by
+  rw [← MonoidHom.range_eq_top, range_frobIdealHom]
+
+/-! ### The Artin map, granted reciprocity -/
+
+/-- **Artin reciprocity** for an unramified abelian extension `K / F` of a number field: the
+Frobenius homomorphism on fractional ideals kills every principal ideal, equivalently it
+factors through the ideal class group `Cl(F)`.
+
+This is the single missing input.  It is *not* proved in this repository; see the module
+docstring for exactly why it is not reachable from what is here. -/
+def IsArtinReciprocal : Prop :=
+  ∀ x : Fˣ, frobIdealHom F K (toPrincipalIdeal (𝓞 F) F x) = 1
+
+/-- **The Artin map** `Cl(F) → Gal(K/F)`, granted Artin reciprocity. -/
+def artinMapOfReciprocal (h : IsArtinReciprocal F K) : ClassGroup (𝓞 F) →* Gal(K/F) :=
+  (QuotientGroup.lift (toPrincipalIdeal (𝓞 F) F).range (frobIdealHom F K)
+    (by rintro _ ⟨x, rfl⟩; exact h x)).comp (ClassGroup.equiv F).toMonoidHom
+
+theorem artinMapOfReciprocal_mk0 (h : IsArtinReciprocal F K) (p : HeightOneSpectrum (𝓞 F)) :
+    artinMapOfReciprocal F K h
+        (ClassGroup.mk0 ⟨p.asIdeal, mem_nonZeroDivisors_of_ne_zero p.ne_bot⟩)
+      = frobAt (K := K) p := by
+  rw [artinMapOfReciprocal, MonoidHom.comp_apply, MulEquiv.coe_toMonoidHom, ClassGroup.equiv_mk0,
+    QuotientGroup.mk'_apply, QuotientGroup.lift_mk, frobIdealHom_mk0]
+
+/-- **The Artin map satisfies the specification of
+`NumberField.IsUnramifiedEverywhere.artinMap_spec`** : it sends the class of `p` to the
+arithmetic Frobenius at any prime `P` of `𝓞 K` above `p`. -/
+theorem artinMapOfReciprocal_mk0_eq_arithFrobAt [NumberField K] (h : IsArtinReciprocal F K)
+    (p : HeightOneSpectrum (𝓞 F)) (P : HeightOneSpectrum (𝓞 K))
+    (hP : P.asIdeal.under (𝓞 F) = p.asIdeal) :
+    artinMapOfReciprocal F K h
+        (ClassGroup.mk0 ⟨p.asIdeal, mem_nonZeroDivisors_of_ne_zero p.ne_bot⟩)
+      = arithFrobAt (𝓞 F) Gal(K/F) P.asIdeal := by
+  rw [artinMapOfReciprocal_mk0, frobAt_eq_globalFrobAt, globalFrobAt_eq F K p P hP]
+
+/-- Surjectivity of the Artin map is surjectivity of the Frobenius homomorphism on ideals,
+i.e. the statement that the Frobenius elements generate `Gal(K/F)`. -/
+theorem surjective_artinMapOfReciprocal (h : IsArtinReciprocal F K)
+    (hsurj : Function.Surjective (frobIdealHom F K)) :
+    Function.Surjective (artinMapOfReciprocal F K h) := by
+  intro σ
+  obtain ⟨I, hI⟩ := hsurj σ
+  exact ⟨ClassGroup.mk F I, by
+    rw [artinMapOfReciprocal, MonoidHom.comp_apply, MulEquiv.coe_toMonoidHom,
+      ClassGroup.equiv_mk, QuotientGroup.mk'_apply, QuotientGroup.lift_mk]
+    rw [← hI]
+    congr 1
+    exact Units.ext (by simp)⟩
+
+/-! ### A degenerate control -/
+
+/-- Reciprocity holds trivially when the Galois group is trivial.  This is a sanity check that
+`NumberField.IsArtinReciprocal` is a statement about `Gal(K/F)` and not an accidentally empty
+one; the content of the definition is `NumberField.frobIdealHom_mk0`. -/
+theorem isArtinReciprocal_of_subsingleton [Subsingleton Gal(K/F)] : IsArtinReciprocal F K :=
+  fun _ => Subsingleton.elim _ _
+
+end NumberField

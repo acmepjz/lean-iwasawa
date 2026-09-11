@@ -107,6 +107,7 @@ public import Iwasawalib.NumberTheory.Cyclotomic.FiniteField
 public import Iwasawalib.NumberTheory.LocalCFT.AdicResidueField
 public import Iwasawalib.NumberTheory.LocalCFT.ArchimedeanHerbrand
 public import Iwasawalib.NumberTheory.LocalCFT.ArchimedeanLocalNormIndex
+public import Iwasawalib.NumberTheory.LocalCFT.ArtinFrobenius
 public import Iwasawalib.NumberTheory.LocalCFT.CyclicCocycleNorm
 public import Iwasawalib.NumberTheory.LocalCFT.DecompositionAction
 public import Iwasawalib.NumberTheory.LocalCFT.FaithfulHilbert90
@@ -119,6 +120,7 @@ public import Iwasawalib.NumberTheory.LocalCFT.LocalInvariantMap
 public import Iwasawalib.NumberTheory.LocalCFT.LocalNormIndex
 public import Iwasawalib.NumberTheory.LocalCFT.LocalUnits
 public import Iwasawalib.NumberTheory.LocalCFT.ResidueAction
+public import Iwasawalib.NumberTheory.LocalCFT.ResidueFrobenius
 public import Iwasawalib.NumberTheory.LocalCFT.SemilocalTate
 public import Iwasawalib.NumberTheory.LocalCFT.TameRamified
 public import Iwasawalib.NumberTheory.LocalCFT.TameUnits

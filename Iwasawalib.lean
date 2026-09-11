@@ -162,6 +162,9 @@ public import Iwasawalib.NumberTheory.LocalCFT.PlaceDedekind
 public import Iwasawalib.NumberTheory.LocalCFT.ResidueAction
 public import Iwasawalib.NumberTheory.LocalCFT.ResidueFrobenius
 public import Iwasawalib.NumberTheory.LocalCFT.SemilocalTate
+public import Iwasawalib.NumberTheory.LocalCFT.TameCharacter
+public import Iwasawalib.NumberTheory.LocalCFT.TameCharacterExample
+public import Iwasawalib.NumberTheory.LocalCFT.TameInjective
 public import Iwasawalib.NumberTheory.LocalCFT.TameRamified
 public import Iwasawalib.NumberTheory.LocalCFT.TameUnits
 public import Iwasawalib.NumberTheory.LocalCFT.UnitCohomology

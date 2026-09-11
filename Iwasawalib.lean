@@ -112,9 +112,12 @@ public import Iwasawalib.NumberTheory.ZpExtension.Basic
 public import Iwasawalib.NumberTheory.ZpExtension.ClassGroup
 public import Iwasawalib.NumberTheory.ZpExtension.ClassNumberGrowth
 public import Iwasawalib.NumberTheory.ZpExtension.CommutatorEq
+public import Iwasawalib.NumberTheory.ZpExtension.Compositum
 public import Iwasawalib.NumberTheory.ZpExtension.ConjugateAction
 public import Iwasawalib.NumberTheory.ZpExtension.InertiaQuotient
+public import Iwasawalib.NumberTheory.ZpExtension.Linf
 public import Iwasawalib.NumberTheory.ZpExtension.Ln
+public import Iwasawalib.NumberTheory.ZpExtension.LnTower
 public import Iwasawalib.NumberTheory.ZpExtension.TotallyRamified
 public import Iwasawalib.RingTheory.CharacteristicIdeal.Basic
 public import Iwasawalib.RingTheory.Ideal.KrullsHeightTheorem

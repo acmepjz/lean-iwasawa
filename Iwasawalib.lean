@@ -21,9 +21,14 @@ public import Iwasawalib.NumberTheory.AbsoluteValue.Normalization
 public import Iwasawalib.NumberTheory.AbsoluteValue.RamificationIndex
 public import Iwasawalib.NumberTheory.AbsoluteValue.ResidueField
 public import Iwasawalib.NumberTheory.AbsoluteValue.ResidueLift
+public import Iwasawalib.NumberTheory.CFT.AdeleBaseChange
 public import Iwasawalib.NumberTheory.CFT.AdeleCongr
+public import Iwasawalib.NumberTheory.CFT.AdicCompletionBaseChange
 public import Iwasawalib.NumberTheory.CFT.AdicCompletionCongr
+public import Iwasawalib.NumberTheory.CFT.AdicCompletionDecomposition
+public import Iwasawalib.NumberTheory.CFT.FiniteAdeleBaseChange
 public import Iwasawalib.NumberTheory.CFT.FiniteAdeleCongr
+public import Iwasawalib.NumberTheory.CFT.FiniteAdeleSemilocal
 public import Iwasawalib.NumberTheory.CFT.FinitePlaceFibre
 public import Iwasawalib.NumberTheory.CFT.HeightOneSpectrumCongr
 public import Iwasawalib.NumberTheory.CFT.IdeleClassGroup

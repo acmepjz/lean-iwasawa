@@ -43,6 +43,7 @@ the decomposition group of `w`.  This is the shape needed for Shapiro's lemma.
   `Gal(L/K)`-equivariant, each semilocal factor being preserved.
 * `NumberField.InfiniteAdeleRing.Fibre.exists_smul_eq` : transitivity on fibres.
 * `NumberField.InfiniteAdeleRing.stabilizer_eq_decompositionSubgroup`.
+* `NumberField.InfiniteAdeleRing.baseChange_trans` : functoriality in a tower `K ⊆ L ⊆ M`.
 -/
 
 noncomputable section
@@ -390,3 +391,51 @@ theorem equivQuotientStabilizer_symm_apply [IsGalois K L] (w : Fibre L v)
   MulAction.orbitEquivQuotientStabilizer_symm_apply (L ≃ₐ[K] L) w g
 
 end NumberField.InfiniteAdeleRing.Fibre
+
+/-! ## Functoriality of the base change in a tower -/
+
+namespace NumberField.InfiniteAdeleRing
+
+open InfinitePlace
+
+variable {K L M : Type*} [Field K] [Field L] [Field M] [Algebra K L] [Algebra L M]
+  [Algebra K M] [IsScalarTower K L M]
+
+theorem comap_comap_algebraMap (u : InfinitePlace M) :
+    (u.comap (algebraMap L M)).comap (algebraMap K L) = u.comap (algebraMap K M) := by
+  rw [← InfinitePlace.comap_comp, ← IsScalarTower.algebraMap_eq]
+
+/-- The base change maps on infinite adele rings compose in a tower `K ⊆ L ⊆ M`. -/
+theorem baseChange_trans (x : InfiniteAdeleRing K) :
+    baseChange (K := L) (L := M) (baseChange (K := K) (L := L) x) =
+      baseChange (K := K) (L := M) x := by
+  funext u
+  have h2 : ∀ k : K, (u.comap (algebraMap L M)) (algebraMap K L k) =
+      (u.comap (algebraMap K M)) k := by
+    intro k
+    rw [← InfinitePlace.comap_apply, comap_comap_algebraMap]
+  have h3 : ∀ k : K, u (((algebraMap L M) : L →+* M).comp (algebraMap K L) k) =
+      (u.comap (algebraMap K M)) k := by
+    intro k
+    rw [← IsScalarTower.algebraMap_eq]
+    rfl
+  calc baseChange (K := L) (L := M) (baseChange (K := K) (L := L) x) u
+      = Completion.map (algebraMap L M) (u.comap (algebraMap L M)) u (fun _ ↦ rfl)
+          (Completion.map (algebraMap K L)
+            ((u.comap (algebraMap L M)).comap (algebraMap K L))
+            (u.comap (algebraMap L M)) (fun _ ↦ rfl)
+            (x ((u.comap (algebraMap L M)).comap (algebraMap K L)))) := rfl
+    _ = Completion.map (algebraMap L M) (u.comap (algebraMap L M)) u (fun _ ↦ rfl)
+          (Completion.map (algebraMap K L) (u.comap (algebraMap K M))
+            (u.comap (algebraMap L M)) h2 (x (u.comap (algebraMap K M)))) := by
+        rw [Completion.map_index_congr (comap_comap_algebraMap u) (algebraMap K L)
+          (u.comap (algebraMap L M)) (fun _ ↦ rfl) h2 x]
+    _ = Completion.map (((algebraMap L M) : L →+* M).comp (algebraMap K L))
+          (u.comap (algebraMap K M)) u h3 (x (u.comap (algebraMap K M))) :=
+        Completion.map_trans _ _ _ _ _ _ _ _ _
+    _ = Completion.map (algebraMap K M) (u.comap (algebraMap K M)) u (fun _ ↦ rfl)
+          (x (u.comap (algebraMap K M))) :=
+        Completion.map_hom_congr (IsScalarTower.algebraMap_eq K L M).symm _ _ _ _ _
+    _ = baseChange (K := K) (L := M) x u := rfl
+
+end NumberField.InfiniteAdeleRing

@@ -53,6 +53,7 @@ public import Iwasawalib.NumberTheory.CFT.AdeleFixedPoints
 public import Iwasawalib.NumberTheory.CFT.AdicCompletionBaseChange
 public import Iwasawalib.NumberTheory.CFT.AdicCompletionCongr
 public import Iwasawalib.NumberTheory.CFT.AdicCompletionDecomposition
+public import Iwasawalib.NumberTheory.CFT.AdicOrd
 public import Iwasawalib.NumberTheory.CFT.FiniteAdeleBaseChange
 public import Iwasawalib.NumberTheory.CFT.FiniteAdeleCongr
 public import Iwasawalib.NumberTheory.CFT.FiniteAdeleSemilocal
@@ -63,6 +64,12 @@ public import Iwasawalib.NumberTheory.CFT.InfiniteAdeleBaseChange
 public import Iwasawalib.NumberTheory.CFT.InfiniteAdeleCongr
 public import Iwasawalib.NumberTheory.CFT.InfiniteLocalGalois
 public import Iwasawalib.NumberTheory.CFT.LocalGalois
+public import Iwasawalib.NumberTheory.CFT.SIdeleClass
+public import Iwasawalib.NumberTheory.CFT.SIdeles
+public import Iwasawalib.NumberTheory.CFT.SUnitDivisor
+public import Iwasawalib.NumberTheory.CFT.SUnitLog
+public import Iwasawalib.NumberTheory.CFT.SUnits
+public import Iwasawalib.NumberTheory.CFT.SUnitSpan
 public import Iwasawalib.NumberTheory.Cyclotomic.FiniteField
 public import Iwasawalib.NumberTheory.NumberField.HilbertClassField.Basic
 public import Iwasawalib.NumberTheory.NumberField.HilbertClassField.ClassFieldTheory

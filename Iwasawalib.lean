@@ -114,8 +114,10 @@ public import Iwasawalib.RingTheory.IwasawaAlgebra.CharacteristicIdealPow
 public import Iwasawalib.RingTheory.IwasawaAlgebra.CoinvariantGrowth
 public import Iwasawalib.RingTheory.IwasawaAlgebra.CyclicGroupAlgebra
 public import Iwasawalib.RingTheory.IwasawaAlgebra.DistinguishedRoots
+public import Iwasawalib.RingTheory.IwasawaAlgebra.FgTorsion
 public import Iwasawalib.RingTheory.IwasawaAlgebra.FiniteIndexGrowth
 public import Iwasawalib.RingTheory.IwasawaAlgebra.FreeQuotientCard
+public import Iwasawalib.RingTheory.IwasawaAlgebra.GammaModule
 public import Iwasawalib.RingTheory.IwasawaAlgebra.GrowthGeneral
 public import Iwasawalib.RingTheory.IwasawaAlgebra.GrowthTransport
 public import Iwasawalib.RingTheory.IwasawaAlgebra.InverseLimitOmega
@@ -124,6 +126,7 @@ public import Iwasawalib.RingTheory.IwasawaAlgebra.LambdaNakayama
 public import Iwasawalib.RingTheory.IwasawaAlgebra.LambdaStructure
 public import Iwasawalib.RingTheory.IwasawaAlgebra.LambdaTopology
 public import Iwasawalib.RingTheory.IwasawaAlgebra.ModuleInvariants
+public import Iwasawalib.RingTheory.IwasawaAlgebra.NuSubmodule
 public import Iwasawalib.RingTheory.IwasawaAlgebra.OmegaValGrowth
 public import Iwasawalib.RingTheory.IwasawaAlgebra.PadicAlgClVal
 public import Iwasawalib.RingTheory.IwasawaAlgebra.PowerSeriesAdic

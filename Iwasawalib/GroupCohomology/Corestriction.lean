@@ -1,0 +1,282 @@
+module
+
+public import Iwasawalib.GroupCohomology.DimensionShift
+public import Iwasawalib.GroupCohomology.CFTCompat
+
+@[expose] public noncomputable section
+
+open Rep dimensionShift groupCohomology CategoryTheory Limits
+
+variable {R : Type} [CommRing R]
+variable {G : Type} [Group G] {S : Subgroup G}
+
+attribute [local instance] Subgroup.fintypeQuotientOfFiniteIndex
+
+namespace groupCohomology
+
+lemma cores_aux₁ {V : Type} [AddCommMonoid V] [Module R V] (ρ : Representation R G V)
+    (v : V) (hv : ∀ s ∈ S, (ρ s) v = v) (g₁ g₂ : G)
+    (h : (QuotientGroup.mk g₁ : G ⧸ S) = QuotientGroup.mk g₂) : ρ g₁ v = ρ g₂ v := by
+  rw [show g₂ = g₁ * (g₁⁻¹ * g₂) by simp, map_mul, Module.End.mul_apply,
+    hv _ (QuotientGroup.eq.1 h)]
+
+lemma cores_aux₂ {X : Type} {V : Type} [Fintype X] [AddCommGroup V] [Module R V] {s₁ : X → G}
+    {s₂ : X → G} (ρ : Representation R G V) (v : V) (hv : ∀ s ∈ S, (ρ s) v = v)
+    (hs₁ : Function.Bijective (fun x ↦ QuotientGroup.mk (s₁ x) : X → G ⧸ S))
+    (hs₂ : Function.Bijective (fun x ↦ QuotientGroup.mk (s₂ x) : X → G ⧸ S)) :
+    ∑ x : X, ρ (s₁ x) v = ∑ x : X, ρ (s₂ x) v := by
+  let e1 : X ≃ G ⧸ S := Equiv.ofBijective (QuotientGroup.mk ∘ s₁) hs₁
+  let e2 : X ≃ G ⧸ S := Equiv.ofBijective (QuotientGroup.mk ∘ s₂) hs₂
+  exact Finset.sum_equiv (e1.trans e2.symm) (by simp) fun i _ ↦ cores_aux₁ ρ v hv _ _ <| by
+    rw [Equiv.trans_apply]
+    exact (e2.apply_symm_apply _).symm
+
+variable [S.FiniteIndex]
+
+@[simps]
+def _root_.Rep.cores₀_obj (V : Rep R G) :
+    (V ↓ S.subtype).ρ.invariants →ₗ[R] V.ρ.invariants where
+  toFun x := ⟨∑ i : G ⧸ S, V.ρ i.out x.1, fun g ↦ by
+    simp only [map_sum, ← LinearMap.comp_apply, ← Module.End.mul_eq_comp, ← map_mul]
+    letI : Fintype (G ⧸ S) := Subgroup.fintypeQuotientOfFiniteIndex
+    refine (cores_aux₂ V.ρ x.1 (by simpa [-SetLike.coe_mem] using x.2) (by simp) ?_).symm
+    simp_rw [QuotientGroup.mk_mul', QuotientGroup.out_eq', MulAction.bijective]⟩
+  map_add' := by simp [Finset.sum_add_distrib]
+  map_smul' := by simp [Finset.smul_sum]
+
+set_option backward.isDefEq.respectTransparency false in
+@[simps]
+def cores₀ : Rep.resFunctor S.subtype ⋙ functor R S 0 ⟶ functor R G 0 where
+  app M :=
+    (H0Iso (M ↓ S.subtype)).hom ≫ (ModuleCat.ofHom (Rep.cores₀_obj M)) ≫ (H0Iso M).inv
+  naturality := by
+    intro X Y f
+    simp_rw [← Category.assoc]
+    rw [(H0Iso Y).comp_inv_eq]
+    simp_rw [Category.assoc]
+    rw [functor_map, map_id_comp_H0Iso_hom, (H0Iso X).inv_hom_id_assoc, Functor.comp_map,
+      functor_map, map_id_comp_H0Iso_hom_assoc, (H0Iso (X ↓ S.subtype)).cancel_iso_hom_left]
+    ext x
+    simp [Rep.cores₀_obj, hom_comm_apply]
+
+set_option backward.isDefEq.respectTransparency false in
+def cores₁_obj (M : Rep R G) :
+    (functor R S 1).obj (M ↓ S.subtype) ⟶ (functor R G 1).obj M := by
+  have : Epi (mapShortComplex₃ (shortExact_upSES_res M S.subtype) (rfl : 0 + 1 = 1)).g :=
+    epi_δ_up_zero_res (R := R) (φ := S.subtype) M S.subtype_injective
+  refine (mapShortComplex₃_exact (shortExact_upSES_res M S.subtype)
+    (rfl : 0 + 1 = 1)).desc ?_ ?_
+  · exact (cores₀.app _) ≫ (δ (shortExact_upSES M) 0 1 rfl)
+  · rw [← Category.assoc]
+    let bar := cokernel.π (coind₁'_ι.app M)
+    have baz := cores₀.naturality (F := (resFunctor S.subtype ⋙ functor R (↥S) 0)) bar
+    change ((resFunctor S.subtype ⋙ functor R (↥S) 0).map bar ≫
+      (cores₀.app (up.obj M))) ≫ _ = 0
+    change _ ≫ (cores₀.app (up.obj M)) = _ ≫ _ at baz
+    rw [baz, Category.assoc]
+    convert comp_zero
+    exact (mapShortComplex₃ (shortExact_upSES M) (rfl : 0 + 1 = 1)).zero
+
+@[reassoc]
+lemma commSq_cores₁ (M : Rep R G) :
+    δ (shortExact_upSES_res M S.subtype) 0 1 rfl ≫ cores₁_obj (S := S) M =
+    (cores₀ (S := S)).app _ ≫ δ (shortExact_upSES M) 0 1 rfl :=
+  have : Epi (mapShortComplex₃ (shortExact_upSES_res M S.subtype) (rfl : 0 + 1 = 1)).g :=
+    epi_δ_up_zero_res (R := R) (φ := S.subtype) M S.subtype_injective
+  (mapShortComplex₃_exact (shortExact_upSES_res M S.subtype) (rfl : 0 + 1 = 1)).g_desc _ _
+
+theorem cores₁_naturality (X Y : Rep R G) (f : X ⟶ Y) :
+    (resFunctor S.subtype ⋙ functor R (↥S) 1).map f ≫ cores₁_obj Y =
+    cores₁_obj X ≫ (functor R G 1).map f := by
+  haveI : Epi (δ (shortExact_upSES_res X S.subtype) 0 1 rfl) :=
+    epi_δ_up_zero_res (R := R) (φ := S.subtype) X S.subtype_injective
+  symm
+  refine CategoryTheory.cube_lemma_of_epi
+    (δ (shortExact_upSES_res X S.subtype) 0 1 rfl) (δ (shortExact_upSES X) 0 1 rfl)
+    (δ (shortExact_upSES_res Y S.subtype) 0 1 rfl) (δ (shortExact_upSES Y) 0 1 rfl)
+    (cores₀.app (up.obj X)) _ (cores₀.app (up.obj Y)) _
+    (map (.id S) ((resFunctor S.subtype).map (up.map f)) 0) _
+    (map (.id G) (up.map f) 0) _
+    ?_ ?_ ?_ ?_ (by exact (cores₀ (S := S)|>.naturality (X := up.obj X) (up.map f)).symm)
+  all_goals symm
+  · exact commSq_cores₁ X
+  · exact commSq_cores₁ Y
+  · exact δ_naturality (shortExact_upSES_res X S.subtype) (shortExact_upSES_res Y S.subtype)
+      ((upShortComplex ⋙ (resFunctor S.subtype).mapShortComplex).map f) 0 1 rfl
+  · exact δ_naturality (shortExact_upSES X) (shortExact_upSES Y)
+      ⟨f, coind₁'.map f, up.map f, rfl, by aesop_cat⟩ 0 1 rfl
+
+def cores_obj : (M : Rep R G) → (n : ℕ) →
+    (functor R S n).obj (M ↓ S.subtype) ⟶ (functor R G n).obj M
+  | M, 0 => cores₀.app M
+  | M, 1 => cores₁_obj M
+  | M, (d + 2) =>
+    let up_δ_bottom_Iso := Rep.dimensionShift.δUpNatIso (R := R) (G := G) d
+    let upsc_top := (upShortComplex.obj M).map (resFunctor S.subtype)
+    have htopexact : upsc_top.ShortExact := shortExact_upSES_res M S.subtype
+    let up_δ_top_isIso : IsIso (δ htopexact (d + 1) (d + 2) rfl) := by
+      have : upsc_top.X₂.TrivialCohomology :=
+        Rep.TrivialCohomology.res_subtype (coind₁'.obj M)
+      refine isIso_δ_of_isZero (htopexact) (d + 1) ?_ ?_
+      all_goals simpa only [upSES_X₂] using isZero_of_trivialCohomology
+    let ih := cores_obj (up.obj M) (d + 1)
+    (asIso (δ htopexact (d + 1) (d + 2) rfl)).inv ≫ ih ≫ (up_δ_bottom_Iso).hom.app M
+
+set_option backward.defeqAttrib.useBackward true in
+set_option backward.isDefEq.respectTransparency false in
+theorem cores_succ_naturality (n : ℕ) (X Y : Rep R G) (f : X ⟶ Y) :
+    (resFunctor S.subtype ⋙ functor R (↥S) (n + 1)).map f ≫ cores_obj Y (n + 1) =
+    cores_obj X (n + 1) ≫ (functor R G (n + 1)).map f := by
+  revert X Y f
+  induction n with
+  | zero => exact fun _ _ _ ↦ cores₁_naturality ..
+  | succ n ih =>
+    intro X Y f
+    have := δ_naturality (shortExact_upSES_res X S.subtype)
+      (shortExact_upSES_res Y S.subtype)
+      ((upShortComplex ⋙ (resFunctor S.subtype).mapShortComplex).map f) (n + 1) (n + 2) rfl
+    simp only [Functor.comp_obj, functor_obj, Functor.comp_map, functor_map, cores_obj,
+      ShortComplex.map_X₃, ShortComplex.map_X₁, asIso_inv, up_obj, Functor.id_obj, coind₁'_obj,
+      δUpNatIso, δUpIso, NatIso.ofComponents_hom_app, asIso_hom, Category.assoc,
+      IsIso.eq_inv_comp]
+    rw [← Category.assoc]
+    simp only [ShortComplex.map_X₃, upSES_X₃, up_obj, Functor.id_obj, coind₁'_obj,
+      ShortComplex.map_X₁, upSES_X₁, Functor.comp_map, upShortComplex_obj,
+      Functor.mapShortComplex_map_τ₁, upShortComplex_map_τ₁, Functor.mapShortComplex_map_τ₃,
+      upShortComplex_map_τ₃, up_map] at this
+    rw [this, Category.assoc, ← Category.assoc (δ _ _ _ _), IsIso.hom_inv_id,
+      Category.id_comp, δ_naturality (shortExact_upSES X) (shortExact_upSES Y)
+      ⟨f, coind₁'.map f, up.map f, rfl, by aesop_cat⟩ (n + 1) (n + 2) rfl,
+      ← Category.assoc, ← Category.assoc]
+    exact congr((· ≫ δ (shortExact_upSES _) _ _ _) $(ih (up.obj X) (up.obj Y) (up.map f)))
+
+variable (R) (S) in
+def coresNatTrans (n : ℕ) : resFunctor S.subtype ⋙ functor R S n ⟶ functor R G n where
+  app M := groupCohomology.cores_obj M n
+  naturality X Y f := match n with
+    | 0 => cores₀.naturality f
+    | n + 1 => cores_succ_naturality n X Y f
+
+lemma map_H0Iso_hom_f_apply'.{u} {k G H : Type u} [CommRing k] [Group G] [Group H]
+    {A : Rep k H} {B : Rep k G} (f : G →* H) (φ : A ↓ f ⟶ B)
+    (x : groupCohomology A 0) :
+    (H0Iso B).hom.hom ((map f φ 0).hom x) = φ.hom ((H0Iso A).hom.hom x : A) :=
+  map_H0Iso_hom_f_apply ..
+
+set_option backward.defeqAttrib.useBackward true in
+set_option backward.isDefEq.respectTransparency false in
+lemma cores_res₀ : rest (R := R) (S.subtype) 0 ≫ cores₀ = S.index • (.id _) := by
+  ext M v
+  apply (ConcreteCategory.injective_of_mono_of_preservesPullback (H0Iso M).hom)
+  ext
+  simp [rest, Subgroup.index, cores₀_obj, groupCohomology.map_H0Iso_hom_f_apply' _,
+    (M.ρ.mem_invariants ((H0Iso M).hom.hom v)).1 (Subtype.prop _)]
+
+set_option backward.defeqAttrib.useBackward true in
+set_option backward.isDefEq.respectTransparency false in
+lemma commSqₙ (n : ℕ) (M : Rep R G) :
+    (rest S.subtype n ≫ coresNatTrans R S n).app (up.obj M) ≫
+      δ (shortExact_upSES M) n (n + 1) rfl =
+    δ (shortExact_upSES M) n (n + 1) rfl ≫
+      (rest S.subtype (n + 1) ≫ coresNatTrans R S (n + 1)).app M := by
+  rw [NatTrans.comp_app, NatTrans.comp_app]
+  match n with
+  | 0 =>
+    exact comp_commSq _ _ _ _ _ _ _
+      (δ (shortExact_upSES_res M S.subtype) 0 1 rfl)
+      (rest_δ_naturality (shortExact_upSES M) S.subtype 0 1 rfl |>.symm)
+      (commSq_cores₁ ..|>.symm)
+  | n + 1 =>
+    refine comp_commSq _ _ _ _ _ _ _
+      (δ (shortExact_upSES_res M S.subtype) (n + 1) (n + 2) rfl)
+      (rest_δ_naturality (shortExact_upSES M) S.subtype (n + 1) (n + 2) rfl).symm ?_
+    simp [-up_obj, coresNatTrans, cores_obj, δUpNatIso, δUpIso]
+
+set_option backward.isDefEq.respectTransparency false in
+lemma cores_res (n : ℕ) :
+    (rest (R := R) (S.subtype) n ≫ coresNatTrans R S n : functor R G n ⟶ functor R G n) =
+      S.index • (.id _) := by
+  induction n with
+  | zero => exact cores_res₀
+  | succ n ih =>
+    ext M : 2
+    have : Epi (δ (shortExact_upSES M) n (n + 1) rfl) :=
+      match n with
+      | 0 => δ_up_zero_epi ..
+      | m + 1 => δ_up_isIso M m|>.epi_of_iso _
+    rw [← cancel_epi (δ (shortExact_upSES M) n (n + 1) rfl), ← commSqₙ n M, ih]
+    simp
+    rfl
+
+set_option backward.isDefEq.respectTransparency false in
+lemma torsion_of_finite_of_neZero {n : ℕ} [NeZero n] (M : Rep R G)
+    (x : groupCohomology M n) : Nat.card G • x = 0 := by
+  if hG : Infinite G then simp else
+  simp only [not_infinite_iff_finite] at hG
+  have := by simpa using (LinearMap.ext_iff.1 <| ModuleCat.hom_ext_iff.1
+    congr(NatTrans.app $(cores_res (R := R) n (G := G) (S := ⊥)) M)) x
+  simp [← this, rest, IsZero.eq_zero_of_tgt isZero_of_trivialCohomology <|
+    map _ (𝟙 (M ↓ (⊥ : Subgroup G).subtype)) n]
+
+lemma pTorsion_eq_sylowTorsion {n : ℕ} [NeZero n] [Finite G] (M : Rep R G)
+    (p : ℕ) [Fact p.Prime] (P : Sylow p G) (x : groupCohomology M n) :
+    (∃ d, (p ^ d) • x = 0) ↔ x ∈ Submodule.torsionBy R _ (Nat.card P) where
+  mp := by
+    rintro ⟨d, hd⟩
+    obtain ⟨k, hk1, hk2⟩ := Nat.dvd_prime_pow Fact.out|>.1 <|
+      Nat.gcd_dvd_right (Nat.card G) (p ^ d)
+    obtain ⟨m, hm⟩ := P.pow_dvd_card_of_pow_dvd_card
+      (hk2 ▸ Nat.gcd_dvd_left (Nat.card G) (p ^ d))
+    simp [hm, mul_comm _ m, mul_smul, - Nat.cast_pow, Nat.cast_smul_eq_nsmul, ← hk2,
+      smul_comm m]
+    simp [smul_comm _ m, hd, torsion_of_finite_of_neZero]
+  mpr h := ⟨(Nat.card G).factorization p, P.card_eq_multiplicity ▸ by
+    simpa [Nat.cast_smul_eq_nsmul] using h⟩
+
+set_option backward.defeqAttrib.useBackward true in
+set_option backward.isDefEq.respectTransparency false in
+lemma injects_to_sylowCoh {n : ℕ} [NeZero n] [Finite G] (M : Rep R G)
+    (p : ℕ) [Fact p.Prime] (P : Sylow p G) : Function.Injective
+    ((map P.toSubgroup.subtype (𝟙 (_ ↓ _)) n).hom ∘ₗ (Module.IsTorsionBy.coprime_decompose
+    (M := groupCohomology M n) (Subgroup.card_mul_index P.toSubgroup).symm
+    (Sylow.card_coprime_index P) (fun x ↦ Nat.cast_smul_eq_nsmul R (Nat.card G) x ▸
+    torsion_of_finite_of_neZero M x)).symm.toLinearMap ∘ₗ LinearMap.inl _ _ _) :=
+  Function.Injective.of_comp (f := (cores_obj M n).hom) <| by
+  have eq := by simpa [rest_app, coresNatTrans] using
+    ModuleCat.hom_ext_iff.1 congr(NatTrans.app $(cores_res (R := R) (G := G) (S := P) n) M)
+  simp only [functor_obj, LinearMap.coe_comp, LinearMap.coe_inl, ← Function.comp_assoc]
+  simp only [← LinearMap.coe_comp, eq, Module.End.mul_eq_comp, LinearMap.comp_id,
+    LinearEquiv.coe_coe]
+  intro ⟨x1, hx1⟩ ⟨x2, hx2⟩
+  simp only [Function.comp_apply, Module.IsTorsionBy.coprime_decompose_symm_apply,
+    ZeroMemClass.coe_zero, smul_zero, add_zero, map_smul, Module.End.natCast_apply,
+    Subtype.mk.injEq]
+  intro h
+  replace h := by simpa using congr((· + ((Nat.card P).gcdA P.toSubgroup.index : R) • 0) $h)
+  nth_rw 1 [← Submodule.mem_torsionBy_iff _ _|>.1 hx1,
+    ← Submodule.mem_torsionBy_iff _ _|>.1 hx2] at h
+  rw [← Nat.cast_smul_eq_nsmul R P.toSubgroup.index,
+    ← Nat.cast_smul_eq_nsmul R P.toSubgroup.index, ← smul_assoc, ← smul_assoc,
+    ← smul_assoc, ← smul_assoc] at h
+  simp only [← add_smul, smul_eq_mul] at h
+  rw [← Ring.intCast_ofNat, ← Int.cast_mul, ← Ring.intCast_ofNat (Nat.card P),
+    ← Int.cast_mul, ← Int.cast_add, add_comm, mul_comm,
+    mul_comm _ (P.toSubgroup.index : ℤ), ← Nat.gcd_eq_gcd_ab,
+    Nat.coprime_iff_gcd_eq_one.1 (Sylow.card_coprime_index P)] at h
+  simpa using h
+
+set_option backward.defeqAttrib.useBackward true in
+set_option backward.isDefEq.respectTransparency false in
+lemma groupCohomology_Sylow {n : ℕ} (hn : 0 < n) [Finite G] (M : Rep R G)
+    (x : groupCohomology M n) (p : ℕ) [Fact p.Prime] (P : Sylow p G)
+    (hx : ∃ d, (p ^ d) • x = 0) (hx' : x ≠ 0) :
+    ((rest (P.toSubgroup.subtype) n).app M).hom x ≠ 0 := by
+  classical
+  haveI : NeZero n := ⟨ne_of_gt hn⟩
+  simpa [Functor.comp_obj, functor_obj, rest_app, ne_eq] using by_contra fun hx2 ↦ hx' <|
+    @Subtype.ext_iff _ (p := fun x ↦ x ∈ Submodule.torsionBy R
+      (groupCohomology M n) (Nat.card P))
+    ⟨x, pTorsion_eq_sylowTorsion M p P x|>.1 hx⟩ 0|>.1 <|
+      groupCohomology.injects_to_sylowCoh M p P (by simp [not_not.1 hx2])
+
+end groupCohomology

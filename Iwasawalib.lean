@@ -27,6 +27,10 @@ public import Iwasawalib.GroupCohomology.CyclicLimit
 public import Iwasawalib.GroupCohomology.CyclicOrderIso
 public import Iwasawalib.GroupCohomology.CyclicTate
 public import Iwasawalib.GroupCohomology.DimensionShift
+public import Iwasawalib.GroupCohomology.CyclicDimensionShift
+public import Iwasawalib.GroupCohomology.Corestriction
+public import Iwasawalib.GroupCohomology.LeftRegular
+public import Iwasawalib.GroupCohomology.AugmentationModule
 public import Iwasawalib.GroupCohomology.EquivariantFamily
 public import Iwasawalib.GroupCohomology.ExactCount
 public import Iwasawalib.GroupCohomology.FamilyShapiro

@@ -1,0 +1,174 @@
+module
+
+public import Iwasawalib.GroupCohomology.Restriction
+public import Iwasawalib.GroupCohomology.CFTLowDegree
+public import Iwasawalib.GroupCohomology.CFTCompat
+
+/-!
+# Helper lemmas about the left regular representation
+-/
+
+@[expose] public noncomputable section
+
+open
+  Finsupp
+  CategoryTheory
+  ConcreteCategory
+
+namespace Rep.leftRegular
+variable (R G : Type) [Group G] [CommRing R]
+
+/-- `norm' R G` for `G` finite, is the element `∑ g` in the `invariants` submodule of
+`R[G]`, the `leftRegular` representation of `G`. -/
+abbrev norm' [Fintype G] : (leftRegular R G).ρ.invariants :=
+  ⟨∑ g : G, .single g 1, fun g ↦ by
+    simp only [map_sum, Representation.ofMulAction_single, smul_eq_mul]
+    exact Fintype.sum_equiv (Equiv.mulLeft g) _ _ fun x ↦ rfl⟩
+
+/--
+`norm R G` for `G` finite, is the element `∑ g` in `H0 (leftRegular R G)`.
+-/
+def norm [Fintype G] : groupCohomology.H0 (leftRegular R G) :=
+  (groupCohomology.H0Iso (leftRegular R G)).toLinearEquiv.symm (norm' R G)
+
+variable {G} in
+/--
+If `φ : H →* G` is a map between finite groups, and `g ; G`, then
+`res_norm' R g φ` is the element `∑ h*g` in the `H`-invariants of the left regular
+representation `R[G]`, the sum being over `h : H`.
+-/
+abbrev res_norm' {H : Type} [Group H] [Fintype H] (g : G) (φ : H →* G) :
+    (leftRegular R G ↓ φ).ρ.invariants :=
+  ⟨∑ h : H, .single (φ h * g) 1, fun h ↦ by
+    simp only [MonoidHom.comp_apply, map_sum, Representation.ofMulAction_single, smul_eq_mul]
+    exact Fintype.sum_equiv (Equiv.mulLeft h) _ _ fun h' ↦ by simp [mul_assoc]⟩
+
+variable {G} in
+/--
+If `φ : H →* G` is a map between finite groups, and `g ; G`, then
+`res_norm R g φ` is the element `∑ h*g` in `H0(H,R[G])`,
+the sum being over `h : H`.
+-/
+def res_norm {H : Type} [Group H] [Fintype H] (φ : H →* G) (g : G) :
+    groupCohomology.H0 (leftRegular R G ↓ φ) :=
+  (groupCohomology.H0Iso (leftRegular R G ↓ φ)).toLinearEquiv.symm <|
+  leftRegular.res_norm' R g φ
+
+open RepresentationTheory.groupCohomology
+
+lemma zeroι_norm [Fintype G] :
+    (zeroι _).hom (leftRegular.norm R G) = ∑ g : G, .single g 1 := by
+  have := (groupCohomology.H0Iso (leftRegular R G)).toLinearEquiv.apply_symm_apply (norm' R G)
+  exact congr(Subtype.val $this)
+
+lemma H0Iso_res_norm {H : Type} [Group H] [Fintype H] (φ : H →* G) (g : G) :
+    (groupCohomology.H0Iso (leftRegular R G ↓ φ)).hom (res_norm R φ g) = res_norm' R g φ :=
+  (groupCohomology.H0Iso _).toLinearEquiv.apply_symm_apply _
+
+lemma zeroι_res_norm {H : Type} [Group H] [Fintype H] (φ : H →* G) (g : G) :
+    zeroι _ (res_norm R φ g) = ∑ h : H, .single (φ h * g) 1 := by
+  dsimp [zeroι]
+  exact congr(Subtype.val $(leftRegular.H0Iso_res_norm R G φ g))
+
+lemma span_norm' [Fintype G] :
+    Submodule.span R {norm' R G} = ⊤ := by
+  ext ⟨x, hx⟩
+  simp only [Submodule.mem_span_singleton, Subtype.ext_iff, SetLike.val_smul,
+    Submodule.mem_top, iff_true]
+  replace hx : ∃ a : R, ∀ g : G, x.coeff g = a := ⟨x.coeff 1, fun g ↦ by
+    simpa [Representation.coeff_ofMulAction] using congr(($(hx g⁻¹)).coeff 1)⟩
+  exact ⟨hx.choose, MonoidAlgebra.ext <| Finsupp.ext fun g ↦ by
+    simp [← hx.choose_spec g]⟩
+
+variable {G} in
+lemma res_span_norm' [Finite G] {H : Type} [Group H] [Fintype H] (φ : H →* G)
+    (inj : φ.toFun.Injective) : Submodule.span R {res_norm' R g φ | g : G} = ⊤ := by
+  classical
+  cases nonempty_fintype G
+  ext x
+  simp only [res_obj_V, res_obj_ρ, Submodule.mem_top, iff_true]
+  choose σ hσ using Quotient.mk_surjective (s := QuotientGroup.rightRel φ.range)
+  have : x = ∑ i, x.1.coeff (σ i) • res_norm' R (σ i) φ := by
+    ext a
+    simp only [res_obj_V, res_obj_ρ, AddSubmonoidClass.coe_finsetSum, SetLike.val_smul,
+      MonoidAlgebra.coeff_sum, MonoidAlgebra.coeff_smul, MonoidAlgebra.coeff_single,
+      Finsupp.coe_finsetSum, Finset.sum_apply, Finsupp.coe_smul, Pi.smul_apply, single_apply,
+      Finset.sum_boole, smul_eq_mul]
+    rw [Finset.sum_eq_single (Quotient.mk _ a)]
+    · have (i j : G) : QuotientGroup.rightRel φ.range i j → x.1.coeff i =
+        x.1.coeff j := fun hij ↦ by
+        obtain ⟨x, hx⟩ := x
+        obtain ⟨k, hk⟩ := by simpa [QuotientGroup.rightRel_apply] using hij
+        have h2 := congr(($(hx k)).coeff j)
+        simp only [MonoidHom.comp_apply, Representation.coeff_ofMulAction, smul_eq_mul] at h2
+        rw [← h2, hk]
+        simp [mul_assoc]
+      simp only [res_obj_V, res_obj_ρ] at this
+      rw [this a (σ ⟦a⟧) (by rw [← Quotient.eq, hσ])]
+      suffices @Finset.card H {x | φ x * σ ⟦a⟧ = a} = 1 by simp [this]
+      rw [Finset.card_eq_one]
+      obtain ⟨⟨_, ⟨h, rfl⟩⟩, hhh⟩ := Quotient.eq.1 <| hσ ⟦a⟧
+      use h⁻¹
+      ext h'
+      simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_singleton]
+      constructor
+      · intro final
+        simp only [← hhh] at final
+        change _ * (_ * _) = _ at final
+        simp only [← mul_assoc, mul_eq_right] at final
+        rw [← φ.map_mul, ← φ.map_one] at final
+        apply inj at final
+        exact eq_inv_of_mul_eq_one_left final
+      rintro rfl
+      exact hhh.symm ▸ show _ * (_ * _) = _ by simp
+    · intro b _ hab
+      suffices Finset.card {x | φ x * σ b = a} = 0 by simp_all
+      simp only [Finset.card_eq_zero, Finset.filter_eq_empty_iff, Finset.mem_univ, forall_const]
+      intro h eq
+      apply_fun Quotient.mk (QuotientGroup.rightRel φ.range) at eq
+      exact hab <| by nth_rw 1 [← hσ b]; simp [← eq, Quotient.eq, QuotientGroup.rightRel_apply]
+    · simp
+  exact this ▸ sum_mem fun i _ ↦ Submodule.smul_mem _ _ <| Submodule.subset_span ⟨σ i, rfl⟩
+
+lemma span_norm [Fintype G] : Submodule.span R {leftRegular.norm R G} = ⊤ := by
+  rw [leftRegular.norm, ← Set.image_singleton, ← LinearEquiv.coe_toLinearMap,
+    ← Submodule.map_span, leftRegular.span_norm']
+  simp
+
+lemma res_span_norm [Finite G] {H : Type} [Group H] [Fintype H] (φ : H →* G)
+    (inj : φ.toFun.Injective) : Submodule.span R (Set.range (res_norm R φ)) = ⊤ := by
+  change Submodule.span R (Set.range (_ ∘ _)) = _
+  rw [Set.range_comp, ← LinearEquiv.coe_toLinearMap, ← Submodule.map_span]
+  exact Submodule.map_eq_top_iff.2 <| leftRegular.res_span_norm' R φ inj
+
+/-- The 0th group cohomology of the trivial `R[G]`-module `R` is the trivial module. -/
+def _root_.groupCohomology.H0trivial : groupCohomology.H0 (trivial R G R) ≅ ModuleCat.of R R :=
+  LinearEquiv.toModuleIso <| LinearEquiv.symm <| Submodule.topEquiv.symm ≪≫ₗ LinearEquiv.ofEq _ _
+  (by ext; simp) ≪≫ₗ (CategoryTheory.Iso.toLinearEquiv (groupCohomology.H0Iso (trivial R G R))).symm
+
+set_option backward.isDefEq.respectTransparency false in
+@[elementwise]
+lemma _root_.groupCohomology.map_comp_H0trivial {ρ : Rep R G} (f : ρ ⟶ trivial R G R) :
+    groupCohomology.map (.id _) f 0 ≫ (groupCohomology.H0trivial R G).hom = zeroι _ ≫
+      f.toModuleCatHom := by
+  ext x
+  simp only [groupCohomology.H0trivial, LinearEquiv.trans_symm, LinearEquiv.symm_symm,
+    LinearEquiv.ofEq_symm, LinearEquiv.toModuleIso_hom, ModuleCat.hom_comp, ModuleCat.hom_ofHom,
+    LinearMap.coe_comp, LinearEquiv.coe_coe, Function.comp_apply, LinearEquiv.trans_apply,
+    Submodule.topEquiv_apply, LinearEquiv.coe_ofEq_apply,
+    Representation.IntertwiningMap.coe_toLinearMap]
+  rw [Iso.toLinearEquiv_apply, ← LinearMap.comp_apply, ← ModuleCat.hom_comp,
+    groupCohomology.map_id_comp_H0Iso_hom]
+  simp [zeroι]
+
+set_option backward.isDefEq.respectTransparency false in
+lemma groupCoh_map_res_norm {H : Type} [Group H] [Fintype H] (φ : H →* G) (g : G) :
+    groupCohomology.map (.id _) ((resFunctor φ).map (ε R G)) 0 (res_norm R φ g) =
+      (groupCohomology.H0trivial R H).toLinearEquiv.symm (Fintype.card H : R) := by
+  apply (groupCohomology.H0trivial R H).toLinearEquiv.eq_symm_apply.mpr
+  change (groupCohomology.H0trivial R H).hom.hom ((groupCohomology.map _ _ 0).hom _) = _
+  rw [← LinearMap.comp_apply, ← ModuleCat.hom_comp, groupCohomology.map_comp_H0trivial,
+    ModuleCat.hom_comp, LinearMap.comp_apply, leftRegular.zeroι_res_norm]
+  simp
+
+end Rep.leftRegular

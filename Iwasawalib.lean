@@ -124,7 +124,9 @@ public import Iwasawalib.NumberTheory.CFT.SemilocalFieldUnits
 public import Iwasawalib.NumberTheory.CFT.SemilocalIntegerUnits
 public import Iwasawalib.NumberTheory.CFT.SemilocalTateIso
 public import Iwasawalib.NumberTheory.CFT.TateTower
+public import Iwasawalib.NumberTheory.CFT.TateTowerIdele
 public import Iwasawalib.NumberTheory.CFT.TateTowerIntermediate
+public import Iwasawalib.NumberTheory.CFT.TateTowerNormIndex
 public import Iwasawalib.NumberTheory.CFT.TateTransport
 public import Iwasawalib.NumberTheory.Cyclotomic.FiniteField
 public import Iwasawalib.NumberTheory.GlobalCFT.ArtinMap

@@ -224,6 +224,8 @@ public import Iwasawalib.NumberTheory.ZpExtension.XinfSubmodule
 public import Iwasawalib.NumberTheory.ZpExtension.XinfYeGenerators
 public import Iwasawalib.NumberTheory.ZpExtension.XnIsomQuot
 public import Iwasawalib.NumberTheory.ZpExtension.Yn
+public import Iwasawalib.NumberTheory.ZpExtension.YnInertiaPresentation
+public import Iwasawalib.NumberTheory.ZpExtension.YnNuBridge
 public import Iwasawalib.NumberTheory.ZpExtension.YnShift
 public import Iwasawalib.RingTheory.CharacteristicIdeal.Basic
 public import Iwasawalib.RingTheory.Ideal.KrullsHeightTheorem

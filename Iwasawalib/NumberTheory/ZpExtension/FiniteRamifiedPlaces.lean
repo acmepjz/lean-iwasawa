@@ -31,6 +31,8 @@ theorem mem_inertiaSubgroup_Kn_of_mem_inertiaSubgroup
 
 /-- A layerwise exponent bound outside a finite exceptional family makes the full ramified
 family finite. -/
+@[deprecated "conditional raw-place API; do not use for the source-facing finite base-prime route"
+  (since := "2026-09-17")]
 theorem finite_ramified_of_layer_exponent_outside
     {S : Set (AbsoluteValue Kinf ℝ)} (hS : S.Finite)
     (hexp : ∀ w ∉ S, ∃ M : ℕ, M ≠ 0 ∧
@@ -48,6 +50,8 @@ theorem finite_ramified_of_layer_exponent_outside
 
 set_option linter.unusedSectionVars false in
 /-- A concrete finite index set containing precisely all ramified places. -/
+@[deprecated "conditional raw-place API; do not use for the source-facing finite base-prime route"
+  (since := "2026-09-17")]
 theorem exists_ramifiedPlaces_finset
     (hfin : {w : AbsoluteValue Kinf ℝ | w.inertiaSubgroup K ≠ ⊥}.Finite) :
     ∃ ramified : Finset (AbsoluteValue Kinf ℝ),
@@ -58,6 +62,8 @@ theorem exists_ramifiedPlaces_finset
   simp
 
 /-- The finite ramified-place index is nonempty once nonemptiness is supplied explicitly. -/
+@[deprecated "conditional raw-place API; do not use for the source-facing finite base-prime route"
+  (since := "2026-09-17")]
 theorem exists_nonempty_ramifiedPlaces_finset
     (hfin : {w : AbsoluteValue Kinf ℝ | w.inertiaSubgroup K ≠ ⊥}.Finite)
     (hne : ∃ w : AbsoluteValue Kinf ℝ, w.inertiaSubgroup K ≠ ⊥) :
@@ -71,6 +77,8 @@ theorem exists_nonempty_ramifiedPlaces_finset
   exact ⟨ramified, ⟨w, (hramified w).2 hw⟩, hramified⟩
 
 /-- A finite index type for all ramified places, together with a distinguished index. -/
+@[deprecated "conditional raw-place API; do not use for the source-facing finite base-prime route"
+  (since := "2026-09-17")]
 theorem exists_ramifiedPlace_index
     (hfin : {w : AbsoluteValue Kinf ℝ | w.inertiaSubgroup K ≠ ⊥}.Finite)
     (hne : ∃ w : AbsoluteValue Kinf ℝ, w.inertiaSubgroup K ≠ ⊥) :
@@ -91,6 +99,8 @@ theorem exists_ramifiedPlace_index
 
 /-- Local layer exponents give an exact nonempty finite ramified family when nonemptiness is
 also supplied. -/
+@[deprecated "conditional raw-place API; do not use for the source-facing finite base-prime route"
+  (since := "2026-09-17")]
 theorem exists_nonempty_ramifiedPlaces_finset_of_layer_exponent_outside
     {S : Set (AbsoluteValue Kinf ℝ)} (hS : S.Finite)
     (hexp : ∀ w ∉ S, ∃ M : ℕ, M ≠ 0 ∧
@@ -104,6 +114,8 @@ theorem exists_nonempty_ramifiedPlaces_finset_of_layer_exponent_outside
     (H.finite_ramified_of_layer_exponent_outside hS hexp) hne
 
 /-- The final finite-index output from local layer exponent data and explicit nonemptiness. -/
+@[deprecated "conditional raw-place API; do not use for the source-facing finite base-prime route"
+  (since := "2026-09-17")]
 theorem exists_ramifiedPlace_index_of_layer_exponent_outside
     {S : Set (AbsoluteValue Kinf ℝ)} (hS : S.Finite)
     (hexp : ∀ w ∉ S, ∃ M : ℕ, M ≠ 0 ∧

@@ -6,7 +6,7 @@ Authors: Jz Pan
 module
 
 public import Mathlib.NumberTheory.NumberField.ClassNumber
-public import Iwasawalib.NumberTheory.NumberField.HilbertClassField.Basic
+public import Iwasawalib.NumberTheory.NumberField.HilbertClassField.UnramifiedTransport
 public import Mathlib.NumberTheory.NumberField.Ideal.Basic
 public import Mathlib.RingTheory.Frobenius
 
@@ -111,16 +111,6 @@ theorem finrank_eq_classNumber_of_isSepClosed [NumberField F] [IsSepClosed K] :
     Module.finrank F (maximalUnramifiedAbelianExtension F K) = classNumber F := by
   rw [classNumber, Fintype.card_eq_nat_card, ← IsGalois.card_aut_eq_finrank]
   exact Nat.card_congr (artinEquivOfIsSepClosed F K).symm.toEquiv
-
-/-- `IsUnramifiedEverywhere` can be transferred along an `F`-algebra isomorphism. -/
-theorem _root_.NumberField.IsUnramifiedEverywhere.of_algEquiv
-    {F K K' : Type*} [Field F] [Field K] [Field K'] [Algebra F K] [Algebra F K']
-    [Algebra.IsAlgebraic F K] [Algebra.IsAlgebraic F K'] [IsUnramifiedEverywhere F K]
-    (f : K ≃ₐ[F] K') : IsUnramifiedEverywhere F K' := by
-  have H := (isUnramifiedOutside_empty_iff F K F).2 ‹IsUnramifiedEverywhere F K›
-  rw [← isUnramifiedOutside_empty_iff F K' F]
-  rw [isUnramifiedOutside_iff] at H ⊢
-  exact fun v h1 h2 => (AbsoluteValue.isUnramifiedIn_iff_of_algEquiv v f).1 (H v h1 h2)
 
 /-- Any unramified abelian extension is a subfield of Hilbert class field. -/
 noncomputable def liftOfIsSepClosed

@@ -27,8 +27,9 @@ theorem card_classGroup_le_card_gal_maximalUnramifiedAbelianExtension_of_interme
     (AlgEquiv.restrictNormalHom_surjective
       (F := F) (K₁ := E) (E := maximalUnramifiedAbelianExtension F Omega)))
 
-/-- A wiring form of the lower bound suited to the global-CFT dependency graph. -/
-theorem card_classGroup_le_card_gal_maximalUnramifiedAbelianExtension_of_artin_and_hilbert
+/-- A generic lower-bound wiring theorem from a surjection to the maximal Galois group and a
+class-group equivalence with one finite normal intermediate layer. -/
+theorem card_classGroup_le_card_gal_maximalUnramifiedAbelianExtension_of_surjective_and_intermediate_equiv
     (F Omega : Type*) [Field F] [NumberField F] [Field Omega]
     [Algebra F Omega] [IsSepClosed Omega]
     (artin : ClassGroup (𝓞 F) →* Gal(maximalUnramifiedAbelianExtension F Omega/F))
@@ -43,5 +44,21 @@ theorem card_classGroup_le_card_gal_maximalUnramifiedAbelianExtension_of_artin_a
   apply card_classGroup_le_card_gal_maximalUnramifiedAbelianExtension_of_intermediate
     F Omega E
   exact (Nat.card_congr hilbertEquiv.toEquiv).le
+
+@[deprecated
+  card_classGroup_le_card_gal_maximalUnramifiedAbelianExtension_of_surjective_and_intermediate_equiv
+  (since := "2026-09-17")]
+theorem card_classGroup_le_card_gal_maximalUnramifiedAbelianExtension_of_artin_and_hilbert
+    (F Omega : Type*) [Field F] [NumberField F] [Field Omega]
+    [Algebra F Omega] [IsSepClosed Omega]
+    (artin : ClassGroup (𝓞 F) →* Gal(maximalUnramifiedAbelianExtension F Omega/F))
+    (hartin : Function.Surjective artin)
+    (E : IntermediateField F (maximalUnramifiedAbelianExtension F Omega))
+    [Normal F E]
+    (hilbertEquiv : ClassGroup (𝓞 F) ≃* Gal(E/F)) :
+    Nat.card (ClassGroup (𝓞 F)) <=
+      Nat.card Gal(maximalUnramifiedAbelianExtension F Omega/F) :=
+  card_classGroup_le_card_gal_maximalUnramifiedAbelianExtension_of_surjective_and_intermediate_equiv
+    F Omega artin hartin E hilbertEquiv
 
 end NumberField

@@ -28,6 +28,7 @@ public import Iwasawalib.GroupCohomology.EquivariantFamily
 public import Iwasawalib.GroupCohomology.ExactCount
 public import Iwasawalib.GroupCohomology.FamilyShapiro
 public import Iwasawalib.GroupCohomology.FiniteFieldTate
+public import Iwasawalib.GroupCohomology.FiniteClassFormation
 public import Iwasawalib.GroupCohomology.FiniteIdeleVanishing
 public import Iwasawalib.GroupCohomology.Herbrand
 public import Iwasawalib.GroupCohomology.Hilbert90
@@ -185,6 +186,8 @@ public import Iwasawalib.NumberTheory.LocalCFT.WildNormIndex
 public import Iwasawalib.NumberTheory.NumberField.HilbertClassField.Basic
 public import Iwasawalib.NumberTheory.NumberField.HilbertClassField.ClassFieldTheory
 public import Iwasawalib.NumberTheory.NumberField.HilbertClassField.ConditionalLowerBound
+public import Iwasawalib.NumberTheory.NumberField.HilbertClassField.ExistencePlumbing
+public import Iwasawalib.NumberTheory.NumberField.HilbertClassField.UnramifiedTransport
 public import Iwasawalib.NumberTheory.Padics.EquivMvZp
 public import Iwasawalib.NumberTheory.Padics.ForMathlib
 public import Iwasawalib.NumberTheory.Padics.ForMathlib1

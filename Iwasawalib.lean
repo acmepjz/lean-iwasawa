@@ -130,6 +130,7 @@ public import Iwasawalib.NumberTheory.CFT.TateTowerNormIndex
 public import Iwasawalib.NumberTheory.CFT.TateTransport
 public import Iwasawalib.NumberTheory.Cyclotomic.FiniteField
 public import Iwasawalib.NumberTheory.GlobalCFT.ArtinMap
+public import Iwasawalib.NumberTheory.GlobalCFT.ConditionalAdapters
 public import Iwasawalib.NumberTheory.GlobalCFT.FrobeniusFinite
 public import Iwasawalib.NumberTheory.GlobalCFT.FrobeniusInfinite
 public import Iwasawalib.NumberTheory.GlobalCFT.FrobeniusTower
@@ -186,6 +187,7 @@ public import Iwasawalib.NumberTheory.Padics.ForMathlib1
 public import Iwasawalib.NumberTheory.Padics.HasBasis
 public import Iwasawalib.NumberTheory.Padics.Units
 public import Iwasawalib.NumberTheory.ZpExtension.Basic
+public import Iwasawalib.NumberTheory.ZpExtension.BaseChangeLinearDisjoint
 public import Iwasawalib.NumberTheory.ZpExtension.ClassGroup
 public import Iwasawalib.NumberTheory.ZpExtension.ClassNumberGrowth
 public import Iwasawalib.NumberTheory.ZpExtension.CommutatorEq
@@ -194,13 +196,18 @@ public import Iwasawalib.NumberTheory.ZpExtension.ConjugateAction
 public import Iwasawalib.NumberTheory.ZpExtension.GaloisGroupProP
 public import Iwasawalib.NumberTheory.ZpExtension.InertiaInfSup
 public import Iwasawalib.NumberTheory.ZpExtension.InertiaQuotient
+public import Iwasawalib.NumberTheory.ZpExtension.IntermediateUnramifiedEqBase
 public import Iwasawalib.NumberTheory.ZpExtension.L0Maximal
 public import Iwasawalib.NumberTheory.ZpExtension.Linf
+public import Iwasawalib.NumberTheory.ZpExtension.EventualClassNumberBridge
+public import Iwasawalib.NumberTheory.ZpExtension.FiniteLayerCardinality
 public import Iwasawalib.NumberTheory.ZpExtension.LinfUnramified
+public import Iwasawalib.NumberTheory.ZpExtension.LinearDisjoint
 public import Iwasawalib.NumberTheory.ZpExtension.Ln
 public import Iwasawalib.NumberTheory.ZpExtension.LnTower
 public import Iwasawalib.NumberTheory.ZpExtension.ProPGalois
 public import Iwasawalib.NumberTheory.ZpExtension.RamifiedFamily
+public import Iwasawalib.NumberTheory.ZpExtension.RamifiedFamilyEventualLinearDisjoint
 public import Iwasawalib.NumberTheory.ZpExtension.Shift
 public import Iwasawalib.NumberTheory.ZpExtension.ShiftLinf
 public import Iwasawalib.NumberTheory.ZpExtension.ShiftStepOne

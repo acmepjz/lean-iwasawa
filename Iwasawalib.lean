@@ -194,6 +194,7 @@ public import Iwasawalib.NumberTheory.ZpExtension.CommutatorEq
 public import Iwasawalib.NumberTheory.ZpExtension.Compositum
 public import Iwasawalib.NumberTheory.ZpExtension.ConjugateAction
 public import Iwasawalib.NumberTheory.ZpExtension.GaloisGroupProP
+public import Iwasawalib.NumberTheory.ZpExtension.InertiaExponent
 public import Iwasawalib.NumberTheory.ZpExtension.InertiaInfSup
 public import Iwasawalib.NumberTheory.ZpExtension.InertiaQuotient
 public import Iwasawalib.NumberTheory.ZpExtension.IntermediateUnramifiedEqBase

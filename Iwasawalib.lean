@@ -54,6 +54,7 @@ public import Iwasawalib.NumberTheory.AbsoluteValue.DecompositionSubgroup
 public import Iwasawalib.NumberTheory.AbsoluteValue.GelfandTornheim
 public import Iwasawalib.NumberTheory.AbsoluteValue.InertiaSubgroup
 public import Iwasawalib.NumberTheory.AbsoluteValue.InfiniteInertia
+public import Iwasawalib.NumberTheory.AbsoluteValue.FinitePlace
 public import Iwasawalib.NumberTheory.AbsoluteValue.Normalization
 public import Iwasawalib.NumberTheory.AbsoluteValue.RamificationIndex
 public import Iwasawalib.NumberTheory.AbsoluteValue.ResidueField
@@ -195,6 +196,7 @@ public import Iwasawalib.NumberTheory.Padics.HasBasis
 public import Iwasawalib.NumberTheory.Padics.Units
 public import Iwasawalib.NumberTheory.ZpExtension.Basic
 public import Iwasawalib.NumberTheory.ZpExtension.BaseChangeLinearDisjoint
+public import Iwasawalib.NumberTheory.ZpExtension.BasePrimeRamification
 public import Iwasawalib.NumberTheory.ZpExtension.ClassGroup
 public import Iwasawalib.NumberTheory.ZpExtension.ClassNumberGrowth
 public import Iwasawalib.NumberTheory.ZpExtension.CommutatorEq

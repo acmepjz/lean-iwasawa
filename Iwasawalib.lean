@@ -254,6 +254,7 @@ public import Iwasawalib.NumberTheory.ZpExtension.YnFiniteInertiaFamily
 public import Iwasawalib.NumberTheory.ZpExtension.YnInertiaPresentation
 public import Iwasawalib.NumberTheory.ZpExtension.YnNuBridge
 public import Iwasawalib.NumberTheory.ZpExtension.YnShift
+public import Iwasawalib.NumberTheory.ZpExtension.YnStability
 public import Iwasawalib.RingTheory.CharacteristicIdeal.Basic
 public import Iwasawalib.RingTheory.Ideal.KrullsHeightTheorem
 public import Iwasawalib.RingTheory.IwasawaAlgebra.Basic
@@ -299,5 +300,6 @@ public import Iwasawalib.RingTheory.PseudoNull.Basic
 public import Iwasawalib.RingTheory.PseudoNull.CharacteristicIdeal
 public import Iwasawalib.RingTheory.PseudoNull.StructureTheorem
 public import Iwasawalib.Topology.Algebra.Group.Basic
+public import Iwasawalib.Topology.Algebra.Group.ProcyclicClosure
 public import Iwasawalib.Topology.Algebra.OpenSubgroup
 public import Iwasawalib.Topology.Algebra.ProP

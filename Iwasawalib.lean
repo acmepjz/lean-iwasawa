@@ -36,6 +36,7 @@ public import Iwasawalib.GroupCohomology.ExactCount
 public import Iwasawalib.GroupCohomology.FamilyShapiro
 public import Iwasawalib.GroupCohomology.FiniteFieldTate
 public import Iwasawalib.GroupCohomology.FiniteClassFormation
+public import Iwasawalib.GroupCohomology.FiniteClassFormationTransport
 public import Iwasawalib.GroupCohomology.FiniteIdeleVanishing
 public import Iwasawalib.GroupCohomology.Herbrand
 public import Iwasawalib.GroupCohomology.Hilbert90

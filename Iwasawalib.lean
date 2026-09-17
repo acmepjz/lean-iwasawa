@@ -61,6 +61,7 @@ public import Iwasawalib.GroupCohomology.TateCohomology
 public import Iwasawalib.GroupCohomology.TateHexagon
 public import Iwasawalib.GroupCohomology.TraceOne
 public import Iwasawalib.GroupCohomology.TrivialCohomology
+public import Iwasawalib.GroupCohomology.TrivialityCriterion
 public import Iwasawalib.GroupCohomology.UnramifiedIdele
 public import Iwasawalib.GroupTheory.Torsion
 public import Iwasawalib.NumberTheory.AbsoluteValue.Archimedean

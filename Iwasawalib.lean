@@ -179,6 +179,7 @@ public import Iwasawalib.NumberTheory.LocalCFT.IntegralNormalBasis
 public import Iwasawalib.NumberTheory.LocalCFT.InvariantRestriction
 public import Iwasawalib.NumberTheory.LocalCFT.LocalHerbrand
 public import Iwasawalib.NumberTheory.LocalCFT.LocalInvariantMap
+public import Iwasawalib.NumberTheory.LocalCFT.LocalReciprocity
 public import Iwasawalib.NumberTheory.LocalCFT.LocalNormIndex
 public import Iwasawalib.NumberTheory.LocalCFT.LocalNormalBasis
 public import Iwasawalib.NumberTheory.LocalCFT.LocalPowerIndex

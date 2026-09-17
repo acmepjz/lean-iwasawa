@@ -260,6 +260,7 @@ public import Iwasawalib.NumberTheory.ZpExtension.YnFiniteInertiaFamily
 public import Iwasawalib.NumberTheory.ZpExtension.YnInertiaPresentation
 public import Iwasawalib.NumberTheory.ZpExtension.YnNuBridge
 public import Iwasawalib.NumberTheory.ZpExtension.YnShift
+public import Iwasawalib.NumberTheory.ZpExtension.YnShiftTransport
 public import Iwasawalib.NumberTheory.ZpExtension.YnStability
 public import Iwasawalib.RingTheory.CharacteristicIdeal.Basic
 public import Iwasawalib.RingTheory.Ideal.KrullsHeightTheorem

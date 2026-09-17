@@ -1,7 +1,9 @@
 module
 
-import Iwasawalib.NumberTheory.ZpExtension.XnIsomQuot
-import Iwasawalib.NumberTheory.ZpExtension.ClassNumberGrowth
+public import Iwasawalib.NumberTheory.ZpExtension.XinfYeGenerators
+public import Iwasawalib.NumberTheory.ZpExtension.ClassNumberGrowth
+
+@[expose] public section
 
 open Module PowerSeries
 open scoped Pointwise
@@ -34,5 +36,156 @@ theorem multiplicity_classNumber_Kn_eq₁_of_eventual_card_bridge
       multiplicity p (NumberField.classNumber (H.Kn n)) =
         mu * p ^ n + lambda * n + nu := by
   exact H.exists_multiplicity_classNumber_of_card_eq hM Y e hfin hcard
+
+private theorem nu_mul_nu {e e' n : ℕ} (hee' : e ≤ e') (he'n : e' ≤ n) :
+    Polynomial.nu ℤ_[p] p n e' * Polynomial.nu ℤ_[p] p e' e =
+      Polynomial.nu ℤ_[p] p n e := by
+  have hω : Polynomial.oneAddXPowSubOne ℤ_[p] (p ^ e) ≠ 0 :=
+    (Polynomial.monic_oneAddXPowSubOne_of_ne_zero ℤ_[p] (p ^ e)
+      (by simp [(Fact.out : Nat.Prime p).ne_zero])).ne_zero
+  apply mul_left_cancel₀ hω
+  rw [mul_comm (Polynomial.nu ℤ_[p] p n e'), ← mul_assoc,
+    Polynomial.nu_mul_oneAddXPowSubOne ℤ_[p] p hee',
+    Polynomial.nu_mul_oneAddXPowSubOne ℤ_[p] p he'n,
+    Polynomial.nu_mul_oneAddXPowSubOne ℤ_[p] p (hee'.trans he'n)]
+
+
+/-- The `Y_n = nu_(n,e) Y` presentation may be restarted at a later threshold.
+The new submodule is mathematically `nu_(e',e) Y`, so its underlying
+`Z_p`-submodule is `Y_e'`. -/
+theorem reindex_eventual_Yn_lambda_data
+    (γ : H.GG ⧸ H.Xinf) {e e' : ℕ} (hee' : e ≤ e')
+    (Y : letI := H.XinfLambdaModule γ
+      Submodule ℤ_[p]⟦X⟧ (Additive ↑H.Xinf))
+    (hYdata : letI := H.XinfZpModule
+      letI := H.XinfLambdaModule γ
+      haveI := H.isScalarTower_Xinf γ
+      Y.restrictScalars ℤ_[p] =
+          H.xinfZpSubmoduleOfSubgroup (H.YnIn e) (H.isClosed_YnIn e) ∧
+        ∀ n : ℕ, e ≤ n →
+          (((((Polynomial.nu ℤ_[p] p n e : Polynomial ℤ_[p]) : ℤ_[p]⟦X⟧) • Y).restrictScalars
+              ℤ_[p])) =
+            H.xinfZpSubmoduleOfSubgroup (H.YnIn n) (H.isClosed_YnIn n)) :
+    letI := H.XinfZpModule
+    letI := H.XinfLambdaModule γ
+    haveI := H.isScalarTower_Xinf γ
+    ∃ Y' : Submodule ℤ_[p]⟦X⟧ (Additive ↑H.Xinf),
+      Y'.restrictScalars ℤ_[p] =
+          H.xinfZpSubmoduleOfSubgroup (H.YnIn e') (H.isClosed_YnIn e') ∧
+        ∀ n : ℕ, e' ≤ n →
+          (((((Polynomial.nu ℤ_[p] p n e' : Polynomial ℤ_[p]) : ℤ_[p]⟦X⟧) • Y').restrictScalars
+              ℤ_[p])) =
+            H.xinfZpSubmoduleOfSubgroup (H.YnIn n) (H.isClosed_YnIn n) := by
+  letI := H.XinfZpModule
+  letI := H.XinfLambdaModule γ
+  haveI := H.isScalarTower_Xinf γ
+  let νe' : ℤ_[p]⟦X⟧ :=
+    (Polynomial.nu ℤ_[p] p e' e : Polynomial ℤ_[p])
+  refine ⟨νe' • Y, hYdata.2 e' hee', fun n he'n ↦ ?_⟩
+  rw [smul_smul, ← Polynomial.coe_mul, nu_mul_nu hee' he'n]
+  exact hYdata.2 n (hee'.trans he'n)
+
+/-- An eventual class-number cardinality bridge remains valid after increasing
+its threshold. -/
+theorem EventualClassNumberCardinalityBridge.of_le
+    {e e' : ℕ} (hbridge : EventualClassNumberCardinalityBridge H e)
+    (hee' : e ≤ e') : EventualClassNumberCardinalityBridge H e' := by
+  exact ⟨fun n he'n ↦ hbridge.card_gal_Ln'_eq_classNumber_pow n (hee'.trans he'n)⟩
+
+set_option synthInstance.maxHeartbeats 800000 in
+/-- Iwasawa's class-number formula assembled from the source-faithful inertia
+presentation, one honest `Lambda`-submodule `Y`, and the existing eventual
+class-number cardinality bridge.
+
+This is the corrected interface from
+`reviews/statement_iw-class-number-bridges.md`: in particular it has no
+fixed-`gamma` tail hypothesis `(gamma - 1) Xinf <= Y_n`. -/
+theorem multiplicity_classNumber_Kn_eq₁_of_eventual_Yn_data
+    [Unique ι]
+    (γ : H.GG ⧸ H.Xinf)
+    (hγ : Dense (Subgroup.zpowers γ : Set (H.GG ⧸ H.Xinf)))
+    (e : ℕ) (a : Finset (Additive ↑H.Xinf))
+    (hgen : letI := H.XinfZpModule
+      letI := H.XinfLambdaModule γ
+      haveI := H.isScalarTower_Xinf γ
+      ∀ n : ℕ, e ≤ n →
+        H.xinfZpSubmoduleOfSubgroup (H.YnIn n) (H.isClosed_YnIn n) =
+          Submodule.span ℤ_[p]
+              (((Polynomial.nu ℤ_[p] p n e : Polynomial ℤ_[p]) : ℤ_[p]⟦X⟧) •
+                (a : Set (Additive ↑H.Xinf))) ⊔
+            ((Ideal.span
+                {((Polynomial.oneAddXPowSubOne ℤ_[p] (p ^ n) : Polynomial ℤ_[p]) :
+                  ℤ_[p]⟦X⟧)} •
+              (⊤ : Submodule ℤ_[p]⟦X⟧ (Additive ↑H.Xinf))).restrictScalars ℤ_[p]))
+    (hYdata : letI := H.XinfZpModule
+      letI := H.XinfLambdaModule γ
+      haveI := H.isScalarTower_Xinf γ
+      ∃ Y : Submodule ℤ_[p]⟦X⟧ (Additive ↑H.Xinf),
+        Y.restrictScalars ℤ_[p] =
+            H.xinfZpSubmoduleOfSubgroup (H.YnIn e) (H.isClosed_YnIn e) ∧
+          ∀ n : ℕ, e ≤ n →
+            (((((Polynomial.nu ℤ_[p] p n e : Polynomial ℤ_[p]) : ℤ_[p]⟦X⟧) • Y).restrictScalars
+                ℤ_[p])) =
+              H.xinfZpSubmoduleOfSubgroup (H.YnIn n) (H.isClosed_YnIn n))
+    (hbridge : EventualClassNumberCardinalityBridge H e) :
+    ∃ (mu lambda : ℕ) (nu : ℤ) (N : ℕ), ∀ n > N,
+      (multiplicity p (NumberField.classNumber (H.Kn n)) : ℤ) =
+        (mu : ℤ) * (p : ℤ) ^ n + (lambda : ℤ) * n + nu := by
+  letI := H.XinfZpModule
+  letI := H.XinfLambdaModule γ
+  haveI := H.isScalarTower_Xinf γ
+  obtain ⟨Y, hYe, hYn⟩ := hYdata
+  have finiteYnIn (n : ℕ) (hn : e ≤ n) : Finite (↑H.Xinf ⧸ H.YnIn n) := by
+    haveI : Finite Gal(↑(H.Ln' n) / Kinf) := Nat.finite_of_card_ne_zero <| by
+      rw [hbridge.card_gal_Ln'_eq_classNumber_pow n hn]
+      exact pow_ne_zero _ (Nat.Prime.ne_zero (Fact.out : Nat.Prime p))
+    exact Finite.of_equiv _ (H.xinfInQuotientYnMulEquiv n).toEquiv.symm
+  have hmap (n : ℕ) (hn : e ≤ n) : Submodule.map
+      (IwasawaAlgebra.lsmulZp (Additive ↑H.Xinf)
+        ((Polynomial.nu ℤ_[p] p n e : Polynomial ℤ_[p]) : ℤ_[p]⟦X⟧))
+      (H.xinfZpSubmoduleOfSubgroup (H.YnIn e) (H.isClosed_YnIn e)) =
+        H.xinfZpSubmoduleOfSubgroup (H.YnIn n) (H.isClosed_YnIn n) := by
+    rw [← hYe, IwasawaAlgebra.map_lsmulZp_restrictScalars_smul]
+    exact hYn n hn
+  have hfg := H.moduleFinite_and_isTorsion_Xinf γ e (H.YnIn e)
+    (H.isClosed_YnIn e) a (finiteYnIn e le_rfl)
+    (H.hY_of_generators γ e a (hgen e le_rfl)) (fun n hn ↦ by
+      rw [hmap n hn]
+      exact H.finite_quotient_xinfZpSubmoduleOfSubgroup
+        (H.YnIn n) (H.isClosed_YnIn n) (finiteYnIn n hn))
+  letI : Module.Finite ℤ_[p]⟦X⟧ (Additive ↑H.Xinf) := hfg.1
+  have hcarrier (n : ℕ) (hn : e ≤ n) :
+      (((((Polynomial.nu ℤ_[p] p n e : Polynomial ℤ_[p]) : ℤ_[p]⟦X⟧) • Y) :
+          Submodule ℤ_[p]⟦X⟧ (Additive ↑H.Xinf)) : Set (Additive ↑H.Xinf)) =
+        ((Subgroup.toAddSubgroup (H.YnIn n) : AddSubgroup (Additive ↑H.Xinf)) :
+          Set (Additive ↑H.Xinf)) := by
+    exact (congrArg (fun N : Submodule ℤ_[p] (Additive ↑H.Xinf) ↦
+      (N : Set (Additive ↑H.Xinf))) (hYn n hn)).trans
+        (H.coe_xinfZpSubmoduleOfSubgroup (H.YnIn n) (H.isClosed_YnIn n))
+  have finiteNu (n : ℕ) (hn : e ≤ n) : Finite ((Additive ↑H.Xinf) ⧸
+      (((Polynomial.nu ℤ_[p] p n e : Polynomial ℤ_[p]) : ℤ_[p]⟦X⟧) • Y)) := by
+    letI : Finite (↑H.Xinf ⧸ H.YnIn n) := finiteYnIn n hn
+    letI : Finite (Additive ↑H.Xinf ⧸ Subgroup.toAddSubgroup (H.YnIn n)) :=
+      Finite.of_equiv _ (Subgroup.additiveQuotientEquiv (H.YnIn n)).symm
+    exact Finite.of_equiv _
+      (IwasawaAlgebra.quotientEquivQuotientAddSubgroupOfCoe
+        (((Polynomial.nu ℤ_[p] p n e : Polynomial ℤ_[p]) : ℤ_[p]⟦X⟧) • Y)
+        (Subgroup.toAddSubgroup (H.YnIn n)) (hcarrier n hn)).symm
+  letI : Finite ((Additive ↑H.Xinf) ⧸ Y) := by
+    simpa [IwasawaAlgebra.nu_self] using finiteNu e le_rfl
+  refine H.exists_multiplicity_classNumber_of_card_eq hfg.2 Y e finiteNu ?_
+  intro n hn
+  calc
+    Nat.card ((Additive ↑H.Xinf) ⧸
+        (((Polynomial.nu ℤ_[p] p n e : Polynomial ℤ_[p]) : ℤ_[p]⟦X⟧) • Y)) =
+      Nat.card (Additive ↑H.Xinf ⧸ Subgroup.toAddSubgroup (H.YnIn n)) :=
+        Nat.card_congr (IwasawaAlgebra.quotientEquivQuotientAddSubgroupOfCoe
+          (((Polynomial.nu ℤ_[p] p n e : Polynomial ℤ_[p]) : ℤ_[p]⟦X⟧) • Y)
+          (Subgroup.toAddSubgroup (H.YnIn n)) (hcarrier n hn))
+    _ = Nat.card (↑H.Xinf ⧸ H.YnIn n) := Subgroup.card_additiveQuotient (H.YnIn n)
+    _ = Nat.card Gal(↑(H.Ln' n) / Kinf) :=
+      Nat.card_congr (H.xinfInQuotientYnMulEquiv n).toEquiv
+    _ = p ^ multiplicity p (NumberField.classNumber (H.Kn n)) :=
+      hbridge.card_gal_Ln'_eq_classNumber_pow n hn
 
 end MvZpExtension

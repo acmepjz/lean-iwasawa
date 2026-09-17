@@ -130,6 +130,7 @@ public import Iwasawalib.NumberTheory.CFT.TateTowerNormIndex
 public import Iwasawalib.NumberTheory.CFT.TateTransport
 public import Iwasawalib.NumberTheory.Cyclotomic.FiniteField
 public import Iwasawalib.NumberTheory.GlobalCFT.ArtinMap
+public import Iwasawalib.NumberTheory.GlobalCFT.CFTRestrictionPackage
 public import Iwasawalib.NumberTheory.GlobalCFT.ConditionalAdapters
 public import Iwasawalib.NumberTheory.GlobalCFT.FrobeniusFinite
 public import Iwasawalib.NumberTheory.GlobalCFT.FrobeniusIdealTowerCompat
@@ -226,6 +227,7 @@ public import Iwasawalib.NumberTheory.ZpExtension.XinfSubmodule
 public import Iwasawalib.NumberTheory.ZpExtension.XinfYeGenerators
 public import Iwasawalib.NumberTheory.ZpExtension.XnIsomQuot
 public import Iwasawalib.NumberTheory.ZpExtension.Yn
+public import Iwasawalib.NumberTheory.ZpExtension.YnFiniteInertiaFamily
 public import Iwasawalib.NumberTheory.ZpExtension.YnInertiaPresentation
 public import Iwasawalib.NumberTheory.ZpExtension.YnNuBridge
 public import Iwasawalib.NumberTheory.ZpExtension.YnShift

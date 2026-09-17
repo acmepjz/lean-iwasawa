@@ -36,6 +36,9 @@ public import Iwasawalib.GroupCohomology.Herbrand
 public import Iwasawalib.GroupCohomology.Hilbert90
 public import Iwasawalib.GroupCohomology.IdeleShortExact
 public import Iwasawalib.GroupCohomology.IdeleVanishing
+public import Iwasawalib.GroupCohomology.Inflation
+public import Iwasawalib.GroupCohomology.IndCoind.Basic
+public import Iwasawalib.GroupCohomology.IndCoind.TrivialCohomology
 public import Iwasawalib.GroupCohomology.Induced
 public import Iwasawalib.GroupCohomology.InducedTate
 public import Iwasawalib.GroupCohomology.InfinitePlaceHilbert90

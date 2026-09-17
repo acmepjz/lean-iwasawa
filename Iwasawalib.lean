@@ -56,6 +56,7 @@ public import Iwasawalib.GroupCohomology.ProductVanishing
 public import Iwasawalib.GroupCohomology.RestrictedProductVanishing
 public import Iwasawalib.GroupCohomology.Restriction
 public import Iwasawalib.GroupCohomology.Shapiro
+public import Iwasawalib.GroupCohomology.SplittingModule
 public import Iwasawalib.GroupCohomology.SubgroupIdele
 public import Iwasawalib.GroupCohomology.TateCohomology
 public import Iwasawalib.GroupCohomology.TateHexagon

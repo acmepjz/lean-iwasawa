@@ -132,6 +132,7 @@ public import Iwasawalib.NumberTheory.Cyclotomic.FiniteField
 public import Iwasawalib.NumberTheory.GlobalCFT.ArtinMap
 public import Iwasawalib.NumberTheory.GlobalCFT.ConditionalAdapters
 public import Iwasawalib.NumberTheory.GlobalCFT.FrobeniusFinite
+public import Iwasawalib.NumberTheory.GlobalCFT.FrobeniusIdealTowerCompat
 public import Iwasawalib.NumberTheory.GlobalCFT.FrobeniusInfinite
 public import Iwasawalib.NumberTheory.GlobalCFT.FrobeniusTower
 public import Iwasawalib.NumberTheory.GlobalCFT.IdeleFrobenius
@@ -202,6 +203,7 @@ public import Iwasawalib.NumberTheory.ZpExtension.L0Maximal
 public import Iwasawalib.NumberTheory.ZpExtension.Linf
 public import Iwasawalib.NumberTheory.ZpExtension.EventualClassNumberBridge
 public import Iwasawalib.NumberTheory.ZpExtension.FiniteLayerCardinality
+public import Iwasawalib.NumberTheory.ZpExtension.FiniteSubalgebraLinearDisjoint
 public import Iwasawalib.NumberTheory.ZpExtension.LinfUnramified
 public import Iwasawalib.NumberTheory.ZpExtension.LinearDisjoint
 public import Iwasawalib.NumberTheory.ZpExtension.Ln

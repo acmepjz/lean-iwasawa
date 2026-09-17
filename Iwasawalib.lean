@@ -169,6 +169,7 @@ public import Iwasawalib.NumberTheory.LocalCFT.TameRamified
 public import Iwasawalib.NumberTheory.LocalCFT.TameUnits
 public import Iwasawalib.NumberTheory.LocalCFT.UnitCohomology
 public import Iwasawalib.NumberTheory.LocalCFT.UnitFiltration
+public import Iwasawalib.NumberTheory.LocalCFT.UnitFiltrationExp
 public import Iwasawalib.NumberTheory.LocalCFT.UnitFiltrationGraded
 public import Iwasawalib.NumberTheory.LocalCFT.UnitFiltrationPow
 public import Iwasawalib.NumberTheory.LocalCFT.UnitPowerIndex

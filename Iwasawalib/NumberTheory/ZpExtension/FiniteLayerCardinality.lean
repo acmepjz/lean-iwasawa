@@ -1,7 +1,9 @@
 module
 
-import Iwasawalib.NumberTheory.ZpExtension.Ln
-import Iwasawalib.NumberTheory.GlobalCFT.ArtinMap
+public import Iwasawalib.NumberTheory.ZpExtension.Ln
+public import Iwasawalib.NumberTheory.GlobalCFT.ArtinMap
+
+@[expose] public section
 
 variable {p : ℕ} [Fact p.Prime] {ι K Kinf : Type*} [Finite ι]
 variable [Field K] [NumberField K] [Field Kinf] [Algebra K Kinf]

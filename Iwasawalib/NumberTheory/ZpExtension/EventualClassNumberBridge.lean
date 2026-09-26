@@ -37,7 +37,8 @@ theorem multiplicity_classNumber_Kn_eq₁_of_eventual_card_bridge
         mu * p ^ n + lambda * n + nu := by
   exact H.exists_multiplicity_classNumber_of_card_eq hM Y e hfin hcard
 
-private theorem nu_mul_nu {e e' n : ℕ} (hee' : e ≤ e') (he'n : e' ≤ n) :
+/-- `ν_{n,e'} ν_{e',e} = ν_{n,e}`. -/
+theorem nu_mul_nu {e e' n : ℕ} (hee' : e ≤ e') (he'n : e' ≤ n) :
     Polynomial.nu ℤ_[p] p n e' * Polynomial.nu ℤ_[p] p e' e =
       Polynomial.nu ℤ_[p] p n e := by
   have hω : Polynomial.oneAddXPowSubOne ℤ_[p] (p ^ e) ≠ 0 :=

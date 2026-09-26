@@ -1,8 +1,10 @@
 module
 
-import Iwasawalib.NumberTheory.ZpExtension.RamifiedFamily
-import Iwasawalib.NumberTheory.ZpExtension.Ln
-import Iwasawalib.NumberTheory.ZpExtension.LinearDisjoint
+public import Iwasawalib.NumberTheory.ZpExtension.RamifiedFamily
+public import Iwasawalib.NumberTheory.ZpExtension.Ln
+public import Iwasawalib.NumberTheory.ZpExtension.LinearDisjoint
+
+@[expose] public section
 
 open IntermediateField
 

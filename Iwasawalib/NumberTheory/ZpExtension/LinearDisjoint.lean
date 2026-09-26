@@ -1,6 +1,8 @@
 module
 
-import Mathlib.FieldTheory.LinearDisjoint
+public import Mathlib.FieldTheory.LinearDisjoint
+
+@[expose] public section
 
 open IntermediateField
 

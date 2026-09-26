@@ -1,7 +1,8 @@
 module
 
-import Mathlib.FieldTheory.LinearDisjoint
+public import Mathlib.FieldTheory.LinearDisjoint
 
+@[expose] public section
 
 variable {F F' E : Type*} [Field F] [Field F'] [Field E]
 variable [Algebra F F'] [Algebra F E] [Algebra F' E]

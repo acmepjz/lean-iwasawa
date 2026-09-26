@@ -1,9 +1,34 @@
 module
 
-import Iwasawalib.NumberTheory.GlobalCFT.ArtinMap
-import Iwasawalib.NumberTheory.NumberField.HilbertClassField.ClassFieldTheory
-import Iwasawalib.NumberTheory.ZpExtension.ClassNumberGrowth
-import Iwasawalib.NumberTheory.ZpExtension.XinfSubmodule
+public import Iwasawalib.NumberTheory.GlobalCFT.ArtinMap
+public import Iwasawalib.NumberTheory.NumberField.HilbertClassField.ClassFieldTheory
+public import Iwasawalib.NumberTheory.ZpExtension.ClassNumberGrowth
+public import Iwasawalib.NumberTheory.ZpExtension.XinfSubmodule
+
+@[expose] public section
+
+/-!
+# Conditional adapters — **do not build on this file**
+
+**Warning.** The hypotheses packaged here are **false in general**, and nothing downstream
+should depend on them.
+
+* `MvZpExtension.ClassNumberCardinalityBridge` demands
+  `Nat.card Gal(L_n' / K∞) = p ^ multiplicity p (classNumber K_n)` for **all** `n`, including
+  `n = 0`.  This fails whenever `K₁ / K` is unramified: then the Hilbert `p`-class field of `K`
+  meets `K∞` nontrivially and the equality already breaks at `n = 0`.  The correct statement is
+  only *eventual* (for `n ≥ e`, once the relevant places are totally ramified in `K∞ / K_e`).
+* The hypotheses `hTYe` / `hTYn` of
+  `MvZpExtension.card_nu_smul_YnSubmodule_eq_classNumber_pow_of_bridge` say that
+  `γ - 1` kills `X∞` modulo `Y_n`, i.e. that `Γ` acts trivially on `X_n`, i.e. that
+  `Gal(K∞ L_n / K)` is abelian.  This is false in general.
+
+The interface actually used by the class-number formula is
+`MvZpExtension.multiplicity_classNumber_Kn_eq₁_of_eventual_Yn_data` in
+`Iwasawalib/NumberTheory/ZpExtension/EventualClassNumberBridge.lean`, which is formulated with
+an eventual bridge (`MvZpExtension.EventualClassNumberCardinalityBridge`) and the
+`ν_{n,e} Y` presentation.  This file is kept only so that earlier experiments still compile.
+-/
 
 open Module PowerSeries
 open scoped Pointwise

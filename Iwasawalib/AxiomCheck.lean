@@ -34,6 +34,10 @@ public import Iwasawalib.NumberTheory.GlobalCFT.IdeleFrobenius
 public import Iwasawalib.NumberTheory.GlobalCFT.ReciprocityCyclic
 public import Iwasawalib.NumberTheory.LocalCFT.ArtinFrobenius
 public import Iwasawalib.NumberTheory.LocalCFT.UnitFiltrationExp
+public import Iwasawalib.NumberTheory.NumberField.HilbertClassField.DedekindBridge
+public import Iwasawalib.NumberTheory.NumberField.HilbertClassField.Hypothesis
+public import Iwasawalib.NumberTheory.NumberField.HilbertClassField.UniverseTransport
+public import Iwasawalib.NumberTheory.ZpExtension.IwasawaTheoremOfHCF
 
 /-!
 # Axiom audit
@@ -682,3 +686,31 @@ example : @MvZpExtension.multiplicity_classNumber_Kn_eq₁_of_cft = @MvZpExtensi
 #check @Subgroup.isClosed_gammaSubOneG
 #check @arithFrobAt
 #check @hasCyclotomicZpExtension_iff_isCyclotomicZpExtension_cyclotomicZpSubfield
+
+-- ===== CFT integration (branch cft-unconditional): sorry-free route to Iwasawa's theorem =====
+-- Every declaration below must print exactly [propext, Classical.choice, Quot.sound].
+#print axioms NumberField.isUnramifiedAt_of_isUnramifiedEverywhere
+#print axioms NumberField.isUnramifiedAtInfinitePlaces_of_isUnramifiedEverywhere
+#print axioms NumberField.isUnramifiedEverywhere_of_isUnramifiedAt
+#print axioms NumberField.isUnramifiedEverywhere_iff_isUnramifiedAt
+#print axioms NumberField.InfinitePlace.mem_stabilizer_iff_mem_decompositionSubgroup
+#print axioms NumberField.InfinitePlace.not_isNonarchimedean
+#print axioms NumberField.InfinitePlace.stabilizer_eq_inertiaSubgroup
+#print axioms NumberField.apply_le_one_of_isNonarchimedean
+#print axioms NumberField.exists_heightOneSpectrum_inertiaSubgroup_le
+#print axioms NumberField.inertia_eq_bot_of_isUnramifiedAt
+#print axioms NumberField.finiteDimensional_of_hilbertClassFieldUpperBound
+#print axioms NumberField.finrank_le_classNumber_of_hilbertClassFieldUpperBound
+#print axioms NumberField.finiteDimensional_maximalUnramifiedAbelianExtension_of_hcf
+#print axioms NumberField.finrank_maximalUnramifiedAbelianExtension_eq_classNumber_of_hcf
+#print axioms MvZpExtension.finiteDimensional_Ln_of_hcf
+#print axioms MvZpExtension.finrank_Ln_of_hcf
+#print axioms MvZpExtension.finiteDimensional_Ln'_of_hcf
+#print axioms MvZpExtension.exists_inertiaSubgroup_ne_bot_of_hcf
+#print axioms MvZpExtension.card_gal_Ln'_eq_classNumber_pow_of_linearDisjoint_of_hcf
+#print axioms MvZpExtension.exists_eventualClassNumberCardinalityBridge_of_hcf
+#print axioms MvZpExtension.multiplicity_classNumber_Kn_eq₁_of_hcf
+#print axioms NumberField.classNumber_eq_of_ringEquiv
+#print axioms NumberField.IsUnramifiedEverywhere.of_equiv_equiv
+#print axioms NumberField.hilbertClassFieldUpperBound_of_zero
+#print axioms NumberField.hilbertClassFieldExistence_of_zero

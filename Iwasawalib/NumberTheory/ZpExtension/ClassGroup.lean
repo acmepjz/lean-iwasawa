@@ -55,7 +55,16 @@ enters only through the class field theory `sorry`s of
 `NumberField.IsUnramifiedEverywhere.artinMap` (a definition by `sorry`),
 `NumberField.IsUnramifiedEverywhere.surjective_artinMap` and
 `NumberField.IsUnramifiedEverywhere.bijective_artinMap_of_isSepClosed`.  It becomes
-unconditional as soon as those are proved. -/
+unconditional as soon as those are proved.
+
+A `sorry`-free proof of exactly this statement is
+`MvZpExtension.multiplicity_classNumber_Kn_eq₁_unconditional` in the non-module leaf library
+`IwasawalibCFT` (`IwasawalibCFT/Iwasawa.lean`): it is proved from
+`MvZpExtension.multiplicity_classNumber_Kn_eq₁_of_hcf`
+(`Iwasawalib/NumberTheory/ZpExtension/IwasawaTheoremOfHCF.lean`), whose two Hilbert class field
+hypotheses are discharged there by an external `sorry`-free class field theory library.  This
+module library cannot import that library, which is why this theorem keeps its `sorry`-based
+proof. -/
 theorem multiplicity_classNumber_Kn_eq₁ [Unique ι] :
     ∃ (mu lambda : ℕ) (nu : ℤ) (N : ℕ), ∀ n > N,
       multiplicity p (NumberField.classNumber (H.Kn n)) = mu * p ^ n + lambda * n + nu := by

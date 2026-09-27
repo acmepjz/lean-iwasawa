@@ -30,3 +30,7 @@ name = "Iwasawalib"
 name = "ClassFieldTheory"
 git = "https://github.com/n-yamaguchi-0729/ClassFieldTheory.git"
 rev = "2e6280f9d2579705a0cc6c76ec68c2b60f9c601a"
+
+# Non-module leaf library (not a default target): uses the external ClassFieldTheory library.
+[[lean_lib]]
+name = "IwasawalibCFT"

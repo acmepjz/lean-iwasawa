@@ -139,6 +139,17 @@ $n\geq\max(e_1,e_2)$. Class field theory
 enters only through the Artin map of Theorem \ref{artin-map}, used for
 $[L_n:K_n]=p^{\ord_p(h_{K_n})}$ and the finiteness of $L_n/K_n$, and through the
 existence of a ramified place (Lemma \ref{exists-totally-ramified}).
+These class field theory inputs are isolated in Lean as two statements, the
+upper bound $[E:F]\leq h_F$ for finite abelian everywhere unramified $E/F$ and
+the existence of the Hilbert class field of degree $h_F$
+(\texttt{NumberField.HilbertClassFieldUpperBound},
+\texttt{NumberField.HilbertClassFieldExistence}), from which the theorem is
+proved without any \texttt{sorry}
+(\texttt{MvZpExtension.multiplicity\_classNumber\_Kn\_eq\textsubscript{1}\_of\_hcf}).
+The separate leaf library \texttt{IwasawalibCFT} proves both statements from the
+external \texttt{sorry}-free class field theory library
+\texttt{n-yamaguchi-0729/ClassFieldTheory} and obtains the theorem with no
+\texttt{sorry} at all.
 \end{remark}
 
 The first goal of our project is formalize the proof of the above

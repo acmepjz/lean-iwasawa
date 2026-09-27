@@ -209,7 +209,10 @@ public import Iwasawalib.NumberTheory.LocalCFT.WildNormIndex
 public import Iwasawalib.NumberTheory.NumberField.HilbertClassField.Basic
 public import Iwasawalib.NumberTheory.NumberField.HilbertClassField.ClassFieldTheory
 public import Iwasawalib.NumberTheory.NumberField.HilbertClassField.ConditionalLowerBound
+public import Iwasawalib.NumberTheory.NumberField.HilbertClassField.DedekindBridge
 public import Iwasawalib.NumberTheory.NumberField.HilbertClassField.ExistencePlumbing
+public import Iwasawalib.NumberTheory.NumberField.HilbertClassField.Hypothesis
+public import Iwasawalib.NumberTheory.NumberField.HilbertClassField.UniverseTransport
 public import Iwasawalib.NumberTheory.NumberField.HilbertClassField.UnramifiedTransport
 public import Iwasawalib.NumberTheory.Padics.EquivMvZp
 public import Iwasawalib.NumberTheory.Padics.ForMathlib
@@ -237,6 +240,7 @@ public import Iwasawalib.NumberTheory.ZpExtension.InertiaInfSup
 public import Iwasawalib.NumberTheory.ZpExtension.InertiaQuotient
 public import Iwasawalib.NumberTheory.ZpExtension.IntermediateUnramifiedEqBase
 public import Iwasawalib.NumberTheory.ZpExtension.IwasawaTheorem
+public import Iwasawalib.NumberTheory.ZpExtension.IwasawaTheoremOfHCF
 public import Iwasawalib.NumberTheory.ZpExtension.L0Maximal
 public import Iwasawalib.NumberTheory.ZpExtension.LinearDisjoint
 public import Iwasawalib.NumberTheory.ZpExtension.Linf

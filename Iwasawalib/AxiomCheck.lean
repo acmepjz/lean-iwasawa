@@ -8,6 +8,14 @@ public import Iwasawalib.NumberTheory.CFT.BrauerHassePrinciple
 public import Iwasawalib.NumberTheory.ZpExtension.ClassGroup
 public import Iwasawalib.NumberTheory.Analytic.ClassGroupLSeries
 public import Iwasawalib.NumberTheory.CFT.IdeleClassFixedPoints
+public import Iwasawalib.NumberTheory.LocalCFT.TameInertiaOrder
+public import Iwasawalib.NumberTheory.ZpExtension.TameLocalExponent
+public import Iwasawalib.NumberTheory.ZpExtension.EventualClassNumberBridgeOfCFT
+public import Iwasawalib.NumberTheory.ZpExtension.RamifiedPlaceFamily
+public import Iwasawalib.NumberTheory.ZpExtension.YnGeneratorsCore
+public import Iwasawalib.NumberTheory.ZpExtension.ShiftInertiaTransport
+public import Iwasawalib.NumberTheory.ZpExtension.YnGenerators
+public import Iwasawalib.NumberTheory.ZpExtension.IwasawaTheorem
 public import Mathlib.NumberTheory.LSeries.Nonvanishing
 @[expose] public section
 -- FIRING CONTROL: a known-`sorry` declaration must show `sorryAx`.
@@ -384,3 +392,82 @@ public import Mathlib.NumberTheory.LSeries.Nonvanishing
 #check @groupCohomology.isMulCoboundary₁_of_isMulCocycle₁_of_faithful
 #check @IsGalois.mem_bot_iff_fixed
 #check @CyclicTate.TateH0
+
+-- ===== TameInertiaOrder (UNCONDITIONAL: no `sorryAx` is acceptable) =====
+#print axioms NumberField.decompositionIntegersRingAut
+#print axioms NumberField.decomposition_smul_algebraMap_integers
+#print axioms NumberField.residue_decomposition_smul_of_residue_eq
+#print axioms NumberField.decompositionIntegersRingAut_injective
+#print axioms NumberField.decompositionIntegersRingAut_mem_inertiaAut
+#print axioms NumberField.residue_decompositionIntegersRingAut_arithFrobDecomposition
+#print axioms NumberField.isUnit_natCast_integers_of_notMem
+#print axioms NumberField.one_lt_card_quotient
+#print axioms NumberField.pow_card_quotient_sub_one_eq_one_of_mem_inertia
+
+-- ===== TameLocalExponent (UNCONDITIONAL: no `sorryAx` is acceptable) =====
+#print axioms NumberField.exists_heightOneSpectrum_isEquiv_of_liesOver_adicAbv
+#print axioms NumberField.natCast_pow_notMem_of_liesOver
+#print axioms MvZpExtension.restrictNormalHom_mem_inertia_of_mem_inertiaSubgroup
+#print axioms MvZpExtension.restrictNormalHom_pow_finrank_eq_one
+#print axioms MvZpExtension.exists_restrictNormalHom_pow_eq_one_of_liesOver_adicAbv
+#print axioms MvZpExtension.exists_ramifiedBasePlaceData_unconditional
+
+-- ===== EventualClassNumberBridgeOfCFT (CFT-CONDITIONAL: `sorryAx` expected, via finrank_Ln / finiteDimensional_Ln / exists_inertiaSubgroup_ne_bot) =====
+#print axioms MvZpExtension.card_gal_Ln'_eq_classNumber_pow_of_linearDisjoint
+#print axioms MvZpExtension.exists_eventualClassNumberCardinalityBridge
+
+-- ===== RamifiedPlaceFamily (UNCONDITIONAL except nonempty_orbitIndex: no `sorryAx` is acceptable on the first eight) =====
+#print axioms MvZpExtension.inertiaSubgroup_comp_Γ_eq
+#print axioms MvZpExtension.comp_eq_self_of_Γpow_le
+#print axioms MvZpExtension.RamifiedBasePlaceData.orbitPlace
+#print axioms MvZpExtension.RamifiedBasePlaceData.finite_orbitIndex
+#print axioms MvZpExtension.RamifiedBasePlaceData.Γpow_le_inertiaSubgroup_orbitPlace
+#print axioms MvZpExtension.RamifiedBasePlaceData.exists_isEquiv_orbitPlace
+#print axioms MvZpExtension.inertiaSubgroup_Kn_placeBelow_shiftPlaceEquiv_symm_eq_top
+#print axioms MvZpExtension.HH_shift_eq_commutator_sup_iSup
+-- CFT-CONDITIONAL (`sorryAx` expected, via exists_inertiaSubgroup_ne_bot):
+#print axioms MvZpExtension.RamifiedBasePlaceData.nonempty_orbitIndex
+
+-- ===== YnGeneratorsCore (UNCONDITIONAL: no `sorryAx` is acceptable) =====
+#print axioms Subgroup.eq_topologicalClosure_zpowers_of_dense_mk
+#print axioms Subgroup.topologicalClosure_commutator_sup_iSup_subgroupOf_eq
+#print axioms Subgroup.map_topologicalClosure_closure_continuousMulEquiv
+#print axioms Subgroup.toAddSubgroup_topologicalClosure_closure
+#print axioms MvZpExtension.exists_mem_inertiaSubgroup_mk_eq
+#print axioms MvZpExtension.eq_of_mem_inertiaSubgroup_of_mk_eq
+#print axioms MvZpExtension.coe_omega_smul_top_Xinf
+#print axioms MvZpExtension.hgen_of_closure
+
+-- ===== ShiftInertiaTransport (UNCONDITIONAL: no `sorryAx` is acceptable) =====
+#print axioms IntermediateField.Internal.coe_equivOfEq_apply
+#print axioms IntermediateField.Internal.coe_restrictScalarsAutEquiv_autCongr_equivOfEq_apply
+#print axioms Subgroup.dense_zpowers_map_continuousMulEquiv
+#print axioms MvZpExtension.Internal.coe_shiftLinfRingEquiv_apply
+#print axioms MvZpExtension.Internal.coe_ggShiftRestrictHom_apply_shiftLinfRingEquiv
+#print axioms MvZpExtension.mem_inertiaSubgroup_shift_iff
+#print axioms MvZpExtension.restrictScalarsGalHom_toGamma_shift
+#print axioms MvZpExtension.coe_xinfShiftMulEquiv_apply
+#print axioms MvZpExtension.mk_ggShiftRestrictHom_eq_of_mk_eq
+#print axioms MvZpExtension.dense_zpowers_mk_shift_of_mk_eq_pow
+#print axioms MvZpExtension.map_gammaSubOne_xinfShiftMulEquiv
+
+-- ===== YnGenerators (first two UNCONDITIONAL: no `sorryAx` is acceptable) =====
+#print axioms MvZpExtension.pow_mem_GGOverKn
+#print axioms MvZpExtension.YnIn_eq_topologicalClosure_closure_of_lifts
+-- CFT-CONDITIONAL (`sorryAx` expected, via RamifiedBasePlaceData.nonempty_orbitIndex):
+#print axioms MvZpExtension.RamifiedBasePlaceData.exists_eventual_Yn_generators
+#print axioms MvZpExtension.exists_eventual_Yn_generators
+
+-- ===== IwasawaTheorem (first three UNCONDITIONAL: no `sorryAx` is acceptable) =====
+#print axioms MvZpExtension.reindex_eventual_Yn_generators
+#print axioms MvZpExtension.exists_eventual_Yn_lambda_data_of_generators
+#print axioms MvZpExtension.multiplicity_classNumber_Kn_eq₁_of_eventual_Yn_generators
+-- The endpoint used by the assembly (UNCONDITIONAL):
+#print axioms MvZpExtension.multiplicity_classNumber_Kn_eq₁_of_eventual_Yn_data
+-- CFT-CONDITIONAL (`sorryAx` expected; Iwasawa's theorem modulo the class field theory `sorry`s):
+#print axioms MvZpExtension.multiplicity_classNumber_Kn_eq₁_of_cft
+-- REGRESSION GUARD: the types of `multiplicity_classNumber_Kn_eq₁_of_cft` and of the protected
+-- `multiplicity_classNumber_Kn_eq₁` (ClassGroup.lean, still `sorry`) are definitionally equal (same
+-- arguments in the same order, same conclusion); the two proofs are then equal by proof irrelevance.
+-- This does not compare binder names or binder kinds; those agree because the source texts are identical.
+example : @MvZpExtension.multiplicity_classNumber_Kn_eq₁_of_cft = @MvZpExtension.multiplicity_classNumber_Kn_eq₁ := rfl

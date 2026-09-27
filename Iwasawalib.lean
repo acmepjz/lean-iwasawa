@@ -192,6 +192,7 @@ public import Iwasawalib.NumberTheory.LocalCFT.ResidueFrobenius
 public import Iwasawalib.NumberTheory.LocalCFT.SemilocalTate
 public import Iwasawalib.NumberTheory.LocalCFT.TameCharacter
 public import Iwasawalib.NumberTheory.LocalCFT.TameCharacterExample
+public import Iwasawalib.NumberTheory.LocalCFT.TameInertiaOrder
 public import Iwasawalib.NumberTheory.LocalCFT.TameInjective
 public import Iwasawalib.NumberTheory.LocalCFT.TameRamified
 public import Iwasawalib.NumberTheory.LocalCFT.TameUnits
@@ -227,9 +228,11 @@ public import Iwasawalib.NumberTheory.ZpExtension.InertiaExponent
 public import Iwasawalib.NumberTheory.ZpExtension.InertiaInfSup
 public import Iwasawalib.NumberTheory.ZpExtension.InertiaQuotient
 public import Iwasawalib.NumberTheory.ZpExtension.IntermediateUnramifiedEqBase
+public import Iwasawalib.NumberTheory.ZpExtension.IwasawaTheorem
 public import Iwasawalib.NumberTheory.ZpExtension.L0Maximal
 public import Iwasawalib.NumberTheory.ZpExtension.Linf
 public import Iwasawalib.NumberTheory.ZpExtension.EventualClassNumberBridge
+public import Iwasawalib.NumberTheory.ZpExtension.EventualClassNumberBridgeOfCFT
 public import Iwasawalib.NumberTheory.ZpExtension.FiniteLayerCardinality
 public import Iwasawalib.NumberTheory.ZpExtension.FiniteSubalgebraLinearDisjoint
 public import Iwasawalib.NumberTheory.ZpExtension.FiniteRamifiedPlaces
@@ -241,10 +244,13 @@ public import Iwasawalib.NumberTheory.ZpExtension.LnTower
 public import Iwasawalib.NumberTheory.ZpExtension.ProPGalois
 public import Iwasawalib.NumberTheory.ZpExtension.RamifiedFamily
 public import Iwasawalib.NumberTheory.ZpExtension.RamifiedFamilyEventualLinearDisjoint
+public import Iwasawalib.NumberTheory.ZpExtension.RamifiedPlaceFamily
 public import Iwasawalib.NumberTheory.ZpExtension.SelectedInertiaCover
 public import Iwasawalib.NumberTheory.ZpExtension.Shift
+public import Iwasawalib.NumberTheory.ZpExtension.ShiftInertiaTransport
 public import Iwasawalib.NumberTheory.ZpExtension.ShiftLinf
 public import Iwasawalib.NumberTheory.ZpExtension.ShiftStepOne
+public import Iwasawalib.NumberTheory.ZpExtension.TameLocalExponent
 public import Iwasawalib.NumberTheory.ZpExtension.TotallyRamified
 public import Iwasawalib.NumberTheory.ZpExtension.TotallyRamifiedLayer
 public import Iwasawalib.NumberTheory.ZpExtension.XinfFgTorsion
@@ -258,6 +264,8 @@ public import Iwasawalib.NumberTheory.ZpExtension.XinfYeGenerators
 public import Iwasawalib.NumberTheory.ZpExtension.XnIsomQuot
 public import Iwasawalib.NumberTheory.ZpExtension.Yn
 public import Iwasawalib.NumberTheory.ZpExtension.YnFiniteInertiaFamily
+public import Iwasawalib.NumberTheory.ZpExtension.YnGenerators
+public import Iwasawalib.NumberTheory.ZpExtension.YnGeneratorsCore
 public import Iwasawalib.NumberTheory.ZpExtension.YnInertiaPresentation
 public import Iwasawalib.NumberTheory.ZpExtension.YnNuBridge
 public import Iwasawalib.NumberTheory.ZpExtension.YnShift

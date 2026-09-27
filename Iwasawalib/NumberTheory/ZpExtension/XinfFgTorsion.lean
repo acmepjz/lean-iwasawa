@@ -260,16 +260,18 @@ theorem finite_quotient_YnIn (n : ℕ) : Finite (↥H.Xinf ⧸ H.YnIn n) :=
   Finite.of_equiv _ (H.xinfInQuotientYnMulEquiv n).toEquiv.symm
 
 /-- **`Finite (Additive X∞ ⧸ Y_n)`**: the quotient of `Additive X∞` by the closed
-`ℤ_p`-submodule `Y_n` is finite.  Same class field theory warning as
-`MvZpExtension.finite_quotient_YnIn`. -/
+`ℤ_p`-submodule `Y_n` is finite.
+
+**Warning**: not unconditional (depends on `sorryAx`, like `MvZpExtension.finite_quotient_YnIn`). -/
 theorem finite_quotient_YnZpSubmodule (n : ℕ) :
     letI := H.XinfZpModule
     Finite ((Additive ↥H.Xinf) ⧸ H.xinfZpSubmoduleOfSubgroup (H.YnIn n) (H.isClosed_YnIn n)) :=
   H.finite_quotient_xinfZpSubmoduleOfSubgroup (H.YnIn n) (H.isClosed_YnIn n)
     (H.finite_quotient_YnIn n)
 
-/-- **`Finite (Additive X∞ ⧸ Y_n)` for the `Λ`-submodule `Y_n`.**  Same class field theory
-warning as `MvZpExtension.finite_quotient_YnIn`. -/
+/-- **`Finite (Additive X∞ ⧸ Y_n)` for the `Λ`-submodule `Y_n`.**
+
+**Warning**: not unconditional (depends on `sorryAx`, like `MvZpExtension.finite_quotient_YnIn`). -/
 theorem finite_quotient_YnSubmodule (n : ℕ)
     (hTY : Subgroup.gammaSubOne H.Xinf H.mul_comm_Xinf' γ ≤ H.YnIn n) :
     letI := H.XinfLambdaModule γ
@@ -278,8 +280,11 @@ theorem finite_quotient_YnSubmodule (n : ℕ)
     (H.finite_quotient_YnIn n)
 
 set_option synthInstance.maxHeartbeats 800000 in
-/-- **Blueprint node `Xn-isom-qout-of-totally-ramified`, Step 3, with `Y = Y_e`.**  Exactly two
-hypotheses remain:
+/-- **Blueprint node `Xn-isom-qout-of-totally-ramified`, Step 3, with `Y = Y_e`.**
+
+**Warning**: not unconditional (depends on `sorryAx`, like `MvZpExtension.finite_quotient_YnIn`).
+
+Exactly two hypotheses remain:
 
 * `hY`: `Y_e ⊆ ℤ_p·a + ω_e X∞` — the blueprint's description of `Y_e` as topologically
   generated over `ℤ_p` by `ω_e X∞` and the `s - 1` elements `a₂, …, a_s`, in the only form

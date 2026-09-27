@@ -148,6 +148,7 @@ theorem restrictNormalHom_mem_inertia_of_mem_inertiaSubgroup
     NumberField.inertiaSubgroup_eq_inertia] at hmem
   exact hmem
 
+omit [NumberField K] in
 /-- `Gal(Kₙ/K)` has order `p ^ (n · #ι)` (`MvZpExtension.finrank_Kn`), so the restriction of
 any `σ ∈ Γ` to `Kₙ` is killed by that power of `p`. -/
 theorem restrictNormalHom_pow_finrank_eq_one (n : ℕ) (σ : H.Γ) :
@@ -157,7 +158,13 @@ theorem restrictNormalHom_pow_finrank_eq_one (n : ℕ) (σ : H.Γ) :
 
 /-- **Prop. p:unr-outside-p, local form.** At a prime `q ∤ p`, `N(q) - 1` kills the image of the
 inertia subgroup `I_v(K∞/K)` in every layer `Kₙ`, uniformly in `n`: inertia at `q` in the abelian
-`p`-power layer `Kₙ/K` is tame, and `LocalCFT.orderOf_dvd_sub_one` gives `e ∣ N(q) - 1`. -/
+`p`-power layer `Kₙ/K` is tame, and `LocalCFT.orderOf_dvd_sub_one` gives `e ∣ N(q) - 1`.
+
+Equivalently, `I_v(K∞/K) = ⊥` for every prime `q ∤ p` and every place `v` of `K∞` lying over
+the `q`-adic place: for a given `v` the conclusion forces `I_v(K∞/K) = ⊥` by
+`MvZpExtension.inertiaSubgroup_eq_bot_of_fixes_Kn` (this is how
+`MvZpExtension.ramified_place_liesOver_basePrimeAbove_p` uses it), and conversely it holds
+trivially, with `M = 1`, when `I_v(K∞/K) = ⊥`. -/
 theorem exists_restrictNormalHom_pow_eq_one_of_liesOver_adicAbv :
     ∀ (q : HeightOneSpectrum (𝓞 K)),
       (p : 𝓞 K) ∉ q.asIdeal →
@@ -181,7 +188,12 @@ theorem exists_restrictNormalHom_pow_eq_one_of_liesOver_adicAbv :
 
 /-- **The finite base-prime package exists unconditionally.**  This is
 `MvZpExtension.exists_ramifiedBasePlaceData` with its hypothesis `hlocal` discharged by
-`MvZpExtension.exists_restrictNormalHom_pow_eq_one_of_liesOver_adicAbv`. -/
+`MvZpExtension.exists_restrictNormalHom_pow_eq_one_of_liesOver_adicAbv`.
+
+The index `base` of the package produced here may be empty, as the docstring of
+`MvZpExtension.RamifiedBasePlaceData` allows: this theorem does not say that any prime ramifies.
+Nonemptiness is `MvZpExtension.RamifiedBasePlaceData.nonempty_orbitIndex`, which is
+`sorry`-tainted through `MvZpExtension.exists_inertiaSubgroup_ne_bot`. -/
 theorem exists_ramifiedBasePlaceData_unconditional [Unique ι] :
     Nonempty (RamifiedBasePlaceData H) :=
   H.exists_ramifiedBasePlaceData H.exists_restrictNormalHom_pow_eq_one_of_liesOver_adicAbv

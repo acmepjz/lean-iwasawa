@@ -23,9 +23,13 @@ restricted product of the `(∏_{w ∣ v} L_w)^×` with respect to the `(∏_{w 
 
 `Iwasawalib/GroupCohomology/RestrictedProductVanishing.lean` computes `H¹` of such a restricted
 product, and `Iwasawalib/GroupCohomology/LocalHilbert90.lean` supplies the vanishing for every
-individual factor.  What remains — and is *not* proved here — is the statement at almost every
-place: a 1-cocycle with values in `(∏_{w ∣ v} O_w)^×` must be trivialised inside
-`(∏_{w ∣ v} O_w)^×`.  By Shapiro this is `H¹(D_w, O_w^×) = 0` at the unramified places.
+individual factor.  What remains is the statement at almost every place
+(`NumberField.IsUnramifiedAlmostEverywhere`): a 1-cocycle with values in `(∏_{w ∣ v} O_w)^×`
+must be trivialised inside `(∏_{w ∣ v} O_w)^×`.  By Shapiro this is `H¹(D_w, O_w^×) = 0` at the
+unramified places.  This file takes that statement as a hypothesis; it is proved, for every
+finite Galois extension `L / K`, in `Iwasawalib/GroupCohomology/UnramifiedIdele.lean`
+(`NumberField.isUnramifiedAlmostEverywhere`), which also records the resulting unconditional
+`H¹(Gal(L/K), 𝕀_L) = 0` (`NumberField.isZero_H1_repIdele`).
 
 ## Main definitions
 
@@ -136,7 +140,9 @@ multiplicative 1-cocycle `Gal(L/K) → (∏_{w ∣ v} L_w)^×` whose values are 
 By Shapiro's lemma this says `H¹(D_w, O_w^×) = 0` for almost every `w`, which is the standard
 statement that `H¹` of the units of the ring of integers vanishes at the unramified places.
 It is the one arithmetic ingredient of `H¹(Gal(L/K), 𝕀_L) = 0` which is not proved in this
-development. -/
+file.  It is proved, for every finite Galois extension `L / K`, as
+`NumberField.isUnramifiedAlmostEverywhere` in `Iwasawalib/GroupCohomology/UnramifiedIdele.lean`,
+a file which imports this one. -/
 def IsUnramifiedAlmostEverywhere : Prop :=
   ∀ᶠ v in cofinite, ∀ f : (L ≃ₐ[K] L) → (LocalProduct K L v)ˣ,
     groupCohomology.IsMulCocycle₁ f → (∀ g, f g ∈ localProductIntegerUnits K L v) →
@@ -172,10 +178,12 @@ theorem finiteIdeleEquivSemilocal_smul (σ : L ≃ₐ[K] L) (u : (FiniteAdeleRin
 /-- **`H¹` of the finite ideles**, given the local statement at almost every place.  Together
 with `NumberField.isZero_H1_infiniteIdele` this is `H¹(Gal(L/K), 𝕀_L) = 0`.
 
-The hypothesis is the arithmetic input which is not proved here: for almost every finite place
-`v` of `K`, a 1-cocycle with values in the integral units `(∏_{w ∣ v} O_w)^×` is trivialised
-by an integral unit.  By Shapiro's lemma this is `H¹(D_w, O_w^×) = 0`, which holds at the
-unramified places, i.e. at all but finitely many. -/
+The hypothesis is the arithmetic input which is not proved in this file: for almost every
+finite place `v` of `K`, a 1-cocycle with values in the integral units `(∏_{w ∣ v} O_w)^×` is
+trivialised by an integral unit.  By Shapiro's lemma this is `H¹(D_w, O_w^×) = 0`, which holds
+at the unramified places, i.e. at all but finitely many.  It is discharged by
+`NumberField.isUnramifiedAlmostEverywhere`, giving the unconditional
+`NumberField.isZero_H1_finiteIdele` (both in `Iwasawalib/GroupCohomology/UnramifiedIdele.lean`). -/
 theorem isZero_H1_finiteIdele_of (hb : IsUnramifiedAlmostEverywhere K L) :
     IsZero (groupCohomology
       (Rep.ofMulDistribMulAction (L ≃ₐ[K] L) (FiniteAdeleRing (𝓞 L) L)ˣ) 1) :=
@@ -191,9 +199,14 @@ theorem isZero_H1_repIdele_of (hb : IsUnramifiedAlmostEverywhere K L) :
 
 /-! ## The first axiom of a class formation -/
 
-/-- **`H¹(Gal(L/K), C_L) = 0`**, modulo the two remaining inputs of global class field theory:
-the local statement at almost every place, and the injectivity of
-`H²(Gal(L/K), Lˣ) ⟶ H²(Gal(L/K), 𝕀_L)`. -/
+/-- **`H¹(Gal(L/K), C_L) = 0`**, given two inputs of global class field theory: the local
+statement at almost every place, and the injectivity of
+`H²(Gal(L/K), Lˣ) ⟶ H²(Gal(L/K), 𝕀_L)`.
+
+The first input is proved (`NumberField.isUnramifiedAlmostEverywhere`), and
+`NumberField.isZero_H1_repIdeleClass` is this statement with it discharged.  The second is the
+Hasse principle for the Brauer group (`NumberField.BrauerHassePrinciple`), which is not proved
+in this repository. -/
 theorem isZero_H1_repIdeleClass_of' (hb : IsUnramifiedAlmostEverywhere K L)
     (hmono : Mono ((groupCohomology.functor ℤ (L ≃ₐ[K] L) 2).map
       (ideleShortComplex K L).f)) :
@@ -208,8 +221,10 @@ theorem isZero_H1_subgroup_repIdele_of (H : Subgroup (L ≃ₐ[K] L))
       (Rep.ofMulDistribMulAction H (IdeleGroup (𝓞 L) L)) 1) :=
   (isZero_H1_repIdele_of _ _ hb).of_iso (subgroupIdeleIso H 1)
 
-/-- **`H¹(H, C_L) = 0` for a subgroup `H ≤ Gal(L/K)`**, modulo the same two inputs taken over
-the fixed field `L^H`. -/
+/-- **`H¹(H, C_L) = 0` for a subgroup `H ≤ Gal(L/K)`**, given the same two inputs taken over
+the fixed field `L^H`.  As for `NumberField.isZero_H1_repIdeleClass_of'`, the first is proved
+(`NumberField.isUnramifiedAlmostEverywhere`) and only the injectivity on `H²` is still
+unproved. -/
 theorem isZero_H1_subgroup_repIdeleClass_of' (H : Subgroup (L ≃ₐ[K] L))
     (hb : IsUnramifiedAlmostEverywhere (IntermediateField.fixedField H) L)
     (hmono : Mono ((groupCohomology.functor ℤ

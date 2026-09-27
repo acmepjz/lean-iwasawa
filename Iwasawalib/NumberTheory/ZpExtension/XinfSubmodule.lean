@@ -38,7 +38,8 @@ polynomial-density limit in `IwasawaAlgebra.smul_mem_of_isClosed_of_X_smul_mem`.
 
 * `MvZpExtension.xinfSubmoduleOfSubgroup`: the `Λ`-submodule attached to a closed subgroup of
   `X∞` containing `T X∞`.
-* `MvZpExtension.YnSubmodule`: the case `S = Y_n`.
+* `MvZpExtension.YnSubmodule`: the case `S = Y_n`.  Its tail condition `T X∞ ⊆ Yₙ` is false in
+  general for `n ≥ 1`; see its docstring and `MvZpExtension.YnStableSubmodule`.
 
 ## Main results
 
@@ -174,9 +175,17 @@ variable (H : MvZpExtension p ι K Kinf) (γ : H.GG ⧸ H.Xinf)
 
 /-! ### `Yₙ` as a `Λ`-submodule -/
 
-/-- **`Yₙ` as a closed `Λ`-submodule of `Additive X∞`.**  The hypothesis `hTY` is the blueprint's
-prerequisite that `K∞Lₙ / Kₙ` be abelian, in the form `T X∞ ⊆ Yₙ`; it is the same hypothesis
-that `MvZpExtension.xinfQuotientMulEquivOfPlace'` asks for. -/
+/-- **`Yₙ` as a closed `Λ`-submodule of `Additive X∞`**, under the tail condition
+`hTY : T X∞ ⊆ Yₙ`, where `T X∞` is formed with the fixed element `γ` of `Γ = G ⧸ X∞`.
+
+**Warning**: when `γ` is a topological generator of `Γ`, `hTY` is false in general for `n ≥ 1`.
+It says that `γ`, hence all of `Γ`, acts trivially on `Xₙ = X∞ / Yₙ` (equivalently, that
+`K∞Lₙ / K` is abelian); it is *not* the condition that `K∞Lₙ / Kₙ` be abelian, which always
+holds.  At `n = 0` it does hold, since `K∞L₀ / K` is abelian, so in general this definition is
+usable only at `n = 0`.  The `Λ`-submodule with carrier `Yₙ` for every `n`, with no tail
+condition, is `MvZpExtension.YnStableSubmodule`
+(`Iwasawalib/NumberTheory/ZpExtension/YnStability.lean`), which only uses that `Yₙ` is stable
+under conjugation; that is the one the assembly of Iwasawa's theorem uses. -/
 noncomputable def YnSubmodule (n : ℕ)
     (hTY : Subgroup.gammaSubOne H.Xinf H.mul_comm_Xinf' γ ≤ H.YnIn n) :
     letI := H.XinfLambdaModule γ

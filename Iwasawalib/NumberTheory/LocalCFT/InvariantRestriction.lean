@@ -416,9 +416,15 @@ theorem smul_ofMul_unit_of_eq_adicCompletionComap {π : v.adicCompletion K}
 there (`IsDedekindDomain.HeightOneSpectrum.valued_adicCompletionComap_of_ramificationIdx_eq_one`)
 and is fixed by `D_w` (`NumberField.decomposition_smul_adicCompletionComap`), so its class in
 `K_v^× / N(L_w^×)` is defined and is the Artin generator.  Identifying `σ` with the arithmetic
-Frobenius `arithFrobAt` of `w` is *not* done here: it needs `D_w ≅ Gal(k_w / k_v)` at an
-unramified place, of which only the injectivity
-(`NumberField.stabilizerHom_injective`) is available. -/
+Frobenius `arithFrobAt` of `w` is not done in this file.  It is done in
+`Iwasawalib/NumberTheory/LocalCFT/ArtinFrobenius.lean`
+(`NumberField.localArtinAdicCompletionUnits_mk_uniformizer_arithFrob`), which takes for `σ` the
+arithmetic Frobenius: at an unramified place it generates `D_w`
+(`NumberField.mem_zpowers_arithFrobDecomposition`, in
+`Iwasawalib/NumberTheory/LocalCFT/ResidueFrobenius.lean`), by the injectivity of
+`D_w → Gal(k_w / k_v)` (`NumberField.stabilizerHom_injective`).  That file also proves the
+surjectivity (`NumberField.stabilizerHom_surjective`), so that this map is the isomorphism
+`D_w ≅ Gal(k_w / k_v)` (`NumberField.decompositionMulEquivResidueGal`). -/
 theorem localArtinAdicCompletionUnits_mk_uniformizer
     (h : v.asIdeal.ramificationIdx' w.asIdeal = 1)
     (hσ : ∀ d : decompositionGroup K L w, d ∈ Subgroup.zpowers σ)

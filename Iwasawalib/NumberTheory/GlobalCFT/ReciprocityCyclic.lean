@@ -33,9 +33,11 @@ direction in which `ρ` is known to be one-sided:
   `NumberField.card_tateH0_ideleClassGroup_ge`, which this repository proves, finishes —
   `NumberField.reciprocityEquivOfInjective`.
 
-The module docstring of `Iwasawalib/NumberTheory/GlobalCFT/ArtinMap.lean` says that passing
-from the cardinality to the canonical isomorphism "is Tate's theorem, which needs the
-fundamental class and cup products".  For a cyclic extension that is not so: the content below
+In general the canonical isomorphism is Tate's theorem, which needs a fundamental class; this
+repository has it only in abstract form (`Rep.split.reciprocityIso`, applied to a
+`NumberField.IdeleClassFormationData` in `Iwasawalib/NumberTheory/CFT/GlobalReciprocity.lean`),
+see the module docstring of `Iwasawalib/NumberTheory/GlobalCFT/ArtinMap.lean`.  For a cyclic
+extension none of this is needed: the content below
 is the two-line argument that a surjection between finite groups of the same order is
 bijective, applied to the norm quotient.  What genuinely remains missing is the *existence* of
 `ρ`, i.e. the reciprocity law itself, which is the hypothesis of every statement here.

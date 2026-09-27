@@ -116,7 +116,9 @@ noncomputable def ggShiftRestrictHom (n : ℕ) : (H.shift n).GG →* H.GG := by
 
 namespace Internal
 
-private theorem toGamma_action_in_Linf (σ : H.GG) (x : Kinf) :
+/-- For `σ ∈ Gal(L∞/K)` and `x ∈ K∞`, the image of `σ` in `Γ` applied to `x` is, as an element
+of the separable closure of `K∞`, the value of `σ` at `x` viewed in `L∞`. -/
+theorem toGamma_action_in_Linf (σ : H.GG) (x : Kinf) :
     (algebraMap Kinf (SeparableClosure Kinf) (H.toGamma σ x)) =
       ((IntermediateField.restrictScalarsAutEquiv K H.Linf σ)
         (algebraMap Kinf ↥H.Linf x) : SeparableClosure Kinf) := by
@@ -168,7 +170,11 @@ private theorem mem_GGOverKn_iff_fixes_Kn (n : ℕ) (σ : H.GG) :
       rw [IsScalarTower.algebraMap_apply Kinf ↥H.Linf (SeparableClosure Kinf)]
       exact hx'')
 
-private theorem restrictScalarsAutEquiv_ggShiftRestrictHom (n : ℕ)
+/-- The image of `τ ∈ Gal(L∞/K_n)` under `MvZpExtension.ggShiftRestrictHom`, viewed as a
+`K`-automorphism of `L∞`, is the `K_n`-automorphism
+`MvZpExtension.Internal.ggShiftToLinfMulEquiv n τ` of `L∞` with scalars restricted to `K`
+(`MvZpExtension.Internal.linfRestrictKnHom`). -/
+theorem restrictScalarsAutEquiv_ggShiftRestrictHom (n : ℕ)
     (τ : (H.shift n).GG) :
     IntermediateField.restrictScalarsAutEquiv K H.Linf
         (H.ggShiftRestrictHom n τ) =
@@ -244,7 +250,10 @@ private theorem restrictScalarsAutEquiv_coe_Xinf (x : H.Xinf) :
   rfl
 
 set_option maxHeartbeats 1000000 in
-private theorem coe_xinfShiftMulEquiv_eq_ggShiftRestrictHom (n : ℕ)
+/-- The identification `MvZpExtension.xinfShiftMulEquiv` of the group `X∞` of the shifted
+extension with the group `X∞` of `H` is the restriction map
+`MvZpExtension.ggShiftRestrictHom` on underlying elements. -/
+theorem coe_xinfShiftMulEquiv_eq_ggShiftRestrictHom (n : ℕ)
     (x : (H.shift n).Xinf) :
     ((H.xinfShiftMulEquiv n x : H.Xinf) : H.GG) =
       H.ggShiftRestrictHom n (x : (H.shift n).GG) := by

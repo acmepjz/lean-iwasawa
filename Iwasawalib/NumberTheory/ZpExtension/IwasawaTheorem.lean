@@ -22,10 +22,14 @@ with layers `Kₙ`.  Then there are integers `μ ≥ 0`, `λ ≥ 0` and `ν` suc
 
 **The final theorem of this file, `MvZpExtension.multiplicity_classNumber_Kn_eq₁_of_cft`, is
 conditional**: its proof depends on `sorryAx` through the class field theory `sorry`s of
-`Iwasawalib.NumberTheory.NumberField.HilbertClassField.ClassFieldTheory`.  The `sorry` of
+`Iwasawalib.NumberTheory.NumberField.HilbertClassField.ClassFieldTheory`, which it reaches
+only through the cardinality bridge `MvZpExtension.exists_eventualClassNumberCardinalityBridge`
+(see its docstring).  The other three theorems of this file are proved without `sorryAx`.
+
 `MvZpExtension.multiplicity_classNumber_Kn_eq₁` in
-`Iwasawalib/NumberTheory/ZpExtension/ClassGroup.lean` is intentionally left in place.  The
-other three theorems of this file are proved without `sorryAx`.
+`Iwasawalib/NumberTheory/ZpExtension/ClassGroup.lean` has the same statement, and its proof is
+`MvZpExtension.multiplicity_classNumber_Kn_eq₁_of_cft`.  So it depends on `sorryAx` in the same
+way.
 
 The file assembles the theorem from three inputs, each of which comes with its own threshold:
 
@@ -48,8 +52,8 @@ All three are moved to the common threshold `max e₁ e₂`.
   from the generator description at a threshold `e₁` and the cardinality bridge at a threshold
   `e₂`, with no relation assumed between `e₁` and `e₂`.
 * `MvZpExtension.multiplicity_classNumber_Kn_eq₁_of_cft`: **Iwasawa's theorem**, with the
-  statement of `MvZpExtension.multiplicity_classNumber_Kn_eq₁`.  **Conditional on class field
-  theory**, see its docstring.
+  statement of `MvZpExtension.multiplicity_classNumber_Kn_eq₁`, which it proves.  **Conditional
+  on class field theory**, see its docstring.
 -/
 
 open Module PowerSeries NumberField IsDedekindDomain
@@ -173,7 +177,9 @@ This is `MvZpExtension.multiplicity_classNumber_Kn_eq₁_of_eventual_Yn_data` at
 `MvZpExtension.EventualClassNumberCardinalityBridge.of_le`, and the hypothesis `hYdata` is
 `MvZpExtension.exists_eventual_Yn_lambda_data_of_generators`.
 
-Proved without `sorryAx`: the class field theory is in the two hypotheses. -/
+Proved without `sorryAx`.  In `MvZpExtension.multiplicity_classNumber_Kn_eq₁_of_cft`, `hgen` is
+supplied by `MvZpExtension.exists_eventual_Yn_generators`, which does not depend on `sorryAx`,
+and `hbridge` by `MvZpExtension.exists_eventualClassNumberCardinalityBridge`, which does. -/
 theorem multiplicity_classNumber_Kn_eq₁_of_eventual_Yn_generators
     [Unique ι]
     (γ : H.GG ⧸ H.Xinf)
@@ -215,35 +221,36 @@ variable (H : MvZpExtension p ι K Kinf)
 there are natural numbers `μ`, `λ`, an integer `ν` and a bound `N` such that
 `ord_p #Cl(Kₙ) = μ pⁿ + λ n + ν` for all `n > N`.
 
-The statement is that of `MvZpExtension.multiplicity_classNumber_Kn_eq₁`.
+The statement is that of `MvZpExtension.multiplicity_classNumber_Kn_eq₁`
+(`Iwasawalib/NumberTheory/ZpExtension/ClassGroup.lean`), whose proof is this theorem.
 
 **Warning**: this declaration is *not* unconditional.  It has no hypothesis named "cft": the
 suffix records that its proof depends on `sorryAx` through the class field theory `sorry`s of
-`Iwasawalib.NumberTheory.NumberField.HilbertClassField.ClassFieldTheory`, by two routes.
+`Iwasawalib.NumberTheory.NumberField.HilbertClassField.ClassFieldTheory`.  They are reached by
+one route only, the cardinality bridge
+`MvZpExtension.exists_eventualClassNumberCardinalityBridge`
+(`EventualClassNumberBridgeOfCFT.lean`), which uses
 
-* Through `MvZpExtension.exists_eventualClassNumberCardinalityBridge`, which uses
-  `MvZpExtension.finrank_Ln` (derived from
-  `NumberField.IsUnramifiedEverywhere.bijective_artinMap_of_isSepClosed`), the instance
-  `MvZpExtension.finiteDimensional_Ln` and `MvZpExtension.exists_inertiaSubgroup_ne_bot` (both
-  derived from `NumberField.IsUnramifiedEverywhere.surjective_artinMap`).
-* Through `MvZpExtension.exists_eventual_Yn_generators` (YnGenerators.lean), that is
-  `MvZpExtension.RamifiedBasePlaceData.exists_eventual_Yn_generators` (YnGenerators.lean), which
-  needs a ramified place and obtains it from `MvZpExtension.exists_inertiaSubgroup_ne_bot`
-  via `MvZpExtension.RamifiedBasePlaceData.nonempty_orbitIndex`, hence from
-  `NumberField.IsUnramifiedEverywhere.surjective_artinMap`.
+* `MvZpExtension.finrank_Ln` (Ln.lean), which depends on
+  `NumberField.IsUnramifiedEverywhere.bijective_artinMap_of_isSepClosed` and
+  `NumberField.IsUnramifiedEverywhere.surjective_artinMap`;
+* the instances `MvZpExtension.finiteDimensional_Ln` (Ln.lean) and
+  `MvZpExtension.finiteDimensional_Ln'` (Linf.lean), which depend on
+  `NumberField.IsUnramifiedEverywhere.surjective_artinMap`;
+* `MvZpExtension.exists_inertiaSubgroup_ne_bot` (RamifiedFamily.lean, existence of a ramified
+  place), which depends on `NumberField.IsUnramifiedEverywhere.surjective_artinMap`.
 
 `NumberField.IsUnramifiedEverywhere.surjective_artinMap` and
 `NumberField.IsUnramifiedEverywhere.bijective_artinMap_of_isSepClosed` are `sorry`, and
-`NumberField.IsUnramifiedEverywhere.artinMap` is itself defined by `sorry`.
-The local input at the primes not above `p`,
-`MvZpExtension.exists_restrictNormalHom_pow_eq_one_of_liesOver_adicAbv`, and the assembly
-`MvZpExtension.multiplicity_classNumber_Kn_eq₁_of_eventual_Yn_generators` do not depend on
-`sorryAx`.
+`NumberField.IsUnramifiedEverywhere.artinMap` is itself defined by `sorry`.  These three are
+the only `sorry`s this theorem depends on; `NumberField.IsUnramifiedEverywhere.artinMap_spec`
+is not used.
 
-The `sorry` of `MvZpExtension.multiplicity_classNumber_Kn_eq₁` in
-`Iwasawalib/NumberTheory/ZpExtension/ClassGroup.lean` is intentionally left in place: that
-declaration is the statement of the theorem, and it is not replaced by a proof which depends
-on `sorryAx`. -/
+The other inputs do not depend on `sorryAx`: the generator description
+`MvZpExtension.exists_eventual_Yn_generators` (YnGenerators.lean), the local input at the
+primes not above `p`, `MvZpExtension.exists_restrictNormalHom_pow_eq_one_of_liesOver_adicAbv`
+(which discharges the hypothesis `hlocal` of `MvZpExtension.exists_eventual_Yn_generators`),
+and the assembly `MvZpExtension.multiplicity_classNumber_Kn_eq₁_of_eventual_Yn_generators`. -/
 theorem multiplicity_classNumber_Kn_eq₁_of_cft [Unique ι] :
     ∃ (mu lambda : ℕ) (nu : ℤ) (N : ℕ), ∀ n > N,
       multiplicity p (NumberField.classNumber (H.Kn n)) = mu * p ^ n + lambda * n + nu := by

@@ -100,11 +100,10 @@ theorem Subgroup.dense_zpowers_map_continuousMulEquiv {A B : Type*} [Group A] [G
   rw [himg]
   exact e.surjective.denseRange.dense_image e.continuous ha
 
-variable {p : ℕ} [Fact p.Prime] {ι K Kinf : Type*} [Finite ι]
-variable [Field K] [NumberField K] [Field Kinf] [Algebra K Kinf] [IsGalois K Kinf]
-
 namespace MvZpExtension
 
+variable {p : ℕ} [Fact p.Prime] {ι K Kinf : Type*} [Finite ι]
+variable [Field K] [NumberField K] [Field Kinf] [Algebra K Kinf] [IsGalois K Kinf]
 variable (H : MvZpExtension p ι K Kinf)
 
 /-! ### The restriction map on elements of `L∞` -/
@@ -128,11 +127,9 @@ private theorem Internal.coe_ggShiftRestrictHom_apply_eq_ggShiftToLinfMulEquiv (
       ((Internal.ggShiftToLinfMulEquiv (H := H) n σ y' : ↥H.Linf) :
         SeparableClosure Kinf) := by
   obtain rfl : y' = ⟨y.1, y.2⟩ := Subtype.ext hy
-  have h1 : IntermediateField.restrictScalarsAutEquiv K H.Linf (H.ggShiftRestrictHom n σ) =
-      Internal.linfRestrictKnHom (H := H) n (Internal.ggShiftToLinfMulEquiv (H := H) n σ) :=
-    (IntermediateField.restrictScalarsAutEquiv K H.Linf).apply_symm_apply _
   rw [← IntermediateField.coe_restrictScalarsAutEquiv_apply (K := K) (E := H.Linf)
-    (H.ggShiftRestrictHom n σ) y, h1]
+    (H.ggShiftRestrictHom n σ) y,
+    Internal.restrictScalarsAutEquiv_ggShiftRestrictHom (H := H) n σ]
   rfl
 
 /-- For `σ ∈ Gal(L∞/K_n)` (the ambient group of the shifted extension `H.shift n`) and `x` in
@@ -211,33 +208,6 @@ theorem mem_inertiaSubgroup_shift_iff (n : ℕ) (σ : (H.shift n).GG)
 
 /-! ### The projection to `Γ` -/
 
-/-- For `σ ∈ Gal(L∞/K)` and `x ∈ K∞`, the image of `σ` in `Γ` applied to `x` is, as an element
-of the separable closure of `K∞`, the value of `σ` at `x` viewed in `L∞`. -/
-private theorem Internal.algebraMap_toGamma_apply (σ : H.GG) (x : Kinf) :
-    (algebraMap Kinf (SeparableClosure Kinf) (H.toGamma σ x)) =
-      ((IntermediateField.restrictScalarsAutEquiv K H.Linf σ)
-        (algebraMap Kinf ↥H.Linf x) : SeparableClosure Kinf) := by
-  let y : H.KinfIn := H.kinfInEquiv.symm x
-  have hy : H.kinfInEquiv y = x := H.kinfInEquiv.apply_symm_apply x
-  have bridge (z : H.KinfIn) :
-      algebraMap Kinf ↥H.Linf (H.kinfInEquiv z) =
-        IntermediateField.restrictScalarsAlgEquiv K H.Linf
-          (algebraMap H.KinfIn ↥(H.Linf.restrictScalars K) z) :=
-    DFunLike.congr_fun H.algebraMap_comp_kinfInEquiv z
-  rw [← hy]
-  rw [IsScalarTower.algebraMap_apply Kinf ↥H.Linf (SeparableClosure Kinf)]
-  simp only [toGamma, MonoidHom.coe_comp, Function.comp_apply]
-  have hact :
-      H.kinfInEquiv.autCongr.toMonoidHom
-          (AlgEquiv.restrictNormalHom H.KinfIn σ) (H.kinfInEquiv y) =
-        H.kinfInEquiv ((AlgEquiv.restrictNormalHom H.KinfIn σ) y) := by
-    change H.kinfInEquiv.autCongr
-      (AlgEquiv.restrictNormalHom H.KinfIn σ) (H.kinfInEquiv y) = _
-    simp [AlgEquiv.autCongr_apply, AlgEquiv.trans_apply]
-  rw [hact]
-  rw [bridge, bridge]
-  simp [IntermediateField.restrictScalarsAutEquiv, AlgEquiv.autCongr_apply]
-
 /-- For `σ ∈ Gal(L∞/K)`, `x ∈ K∞` and `y ∈ L∞` the same element as `x`: the image of `σ` in
 `Γ` applied to `x` is, as an element of the separable closure of `K∞`, the element `σ y`. -/
 private theorem Internal.algebraMap_toGamma_apply_eq (σ : H.GG) (x : Kinf)
@@ -247,7 +217,7 @@ private theorem Internal.algebraMap_toGamma_apply_eq (σ : H.GG) (x : Kinf)
       ((σ y : ↥(H.Linf.restrictScalars K)) : SeparableClosure Kinf) := by
   obtain rfl : y = ⟨algebraMap Kinf (SeparableClosure Kinf) x,
       (algebraMap Kinf ↥H.Linf x).2⟩ := Subtype.ext hy
-  rw [Internal.algebraMap_toGamma_apply H σ x]
+  rw [Internal.toGamma_action_in_Linf (H := H) σ x]
   rfl
 
 /-- For `σ ∈ Gal(L∞/K_n)`, restricting `σ` to `K∞` and then viewing the result in
@@ -272,11 +242,11 @@ theorem restrictScalarsGalHom_toGamma_shift (n : ℕ) (σ : (H.shift n).GG) :
 
 /-- The identification `MvZpExtension.xinfShiftMulEquiv` of the group `X∞` of the shifted
 extension with the group `X∞` of `H` is the restriction map `Gal(L∞/K_n) → Gal(L∞/K)` on
-underlying elements. -/
+underlying elements.  This restates
+`MvZpExtension.Internal.coe_xinfShiftMulEquiv_eq_ggShiftRestrictHom` with `H` explicit. -/
 theorem coe_xinfShiftMulEquiv_apply (n : ℕ) (x : ↥(H.shift n).Xinf) :
-    ((H.xinfShiftMulEquiv n x : ↥H.Xinf) : H.GG) = H.ggShiftRestrictHom n (x : (H.shift n).GG) := by
-  rw [H.ggShiftMulEquiv_xinf_compat n x]
-  exact H.coe_ggShiftMulEquiv n (x : (H.shift n).GG)
+    ((H.xinfShiftMulEquiv n x : ↥H.Xinf) : H.GG) = H.ggShiftRestrictHom n (x : (H.shift n).GG) :=
+  Internal.coe_xinfShiftMulEquiv_eq_ggShiftRestrictHom (H := H) n x
 
 /-- If two elements of `Gal(L∞/K_n)` have the same class modulo the group `X∞` of the shifted
 extension, then their images in `Gal(L∞/K)` have the same class modulo `X∞`. -/

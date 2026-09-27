@@ -20,16 +20,29 @@ about `Γ ≅ ℤₚ`:
 `e`* — namely `e = max mᵢ` where `Iᵢ = Γ^{p^{mᵢ}}`, using that the nonzero closed subgroups of
 `ℤₚ` are exactly the `p^m ℤₚ`.
 
-That last fact is `EquivMvZp.eq_bot_or_Γpow_of_isClosed`.  The arithmetic input still missing
-for the full blueprint node is:
+That last fact is `EquivMvZp.eq_bot_or_Γpow_of_isClosed`.  The arithmetic input needed for the
+full blueprint node is:
 
 * at least one prime ramifies (needs finiteness of the Hilbert class field);
-* only primes above `p` ramify (blueprint node `p:unr-outside-p`, local class field theory);
+* only primes above `p` ramify (blueprint node `p:unr-outside-p`);
 * the inertia subgroup of a place of `K∞` is a closed subgroup of `Γ`, nonzero exactly when
   the prime ramifies.
 
-None of these is available in mathlib at present, so only the group-theoretic core is
-formalized here.
+None of these is in mathlib, and only the group-theoretic core is formalized in this file.  All
+three are now in the repository, elsewhere:
+
+* the first is `MvZpExtension.exists_inertiaSubgroup_ne_bot`
+  (`Iwasawalib/NumberTheory/ZpExtension/RamifiedFamily.lean`), which is **conditional on class
+  field theory**: it depends on the `sorry`
+  `NumberField.IsUnramifiedEverywhere.surjective_artinMap`;
+* the second is proved unconditionally, by the tame route rather than by local class field
+  theory, in `Iwasawalib/NumberTheory/ZpExtension/TameLocalExponent.lean`:
+  `MvZpExtension.exists_restrictNormalHom_pow_eq_one_of_liesOver_adicAbv` discharges the
+  hypothesis of `MvZpExtension.ramified_place_liesOver_basePrimeAbove_p`, and the result is
+  packaged as `MvZpExtension.exists_ramifiedBasePlaceData_unconditional`;
+* the third is `AbsoluteValue.isClosed_inertiaSubgroup` (closedness) together with
+  `MvZpExtension.inertiaSubgroup_eq_bot_iff_bddAbove_ramificationIdx` (the inertia subgroup is
+  trivial exactly when the ramification indices in the layers are bounded).
 -/
 
 namespace EquivMvZp

@@ -1,3 +1,7 @@
+/-
+Copyright (c) 2026 Iwasawalib contributors. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
 module
 public import Iwasawalib.GroupCohomology.UnramifiedIdele
 public import Iwasawalib.NumberTheory.CFT.FirstInequality
@@ -17,9 +21,37 @@ public import Iwasawalib.NumberTheory.ZpExtension.ShiftInertiaTransport
 public import Iwasawalib.NumberTheory.ZpExtension.YnGenerators
 public import Iwasawalib.NumberTheory.ZpExtension.IwasawaTheorem
 public import Mathlib.NumberTheory.LSeries.Nonvanishing
+public import Iwasawalib.NumberTheory.ZpExtension.CyclotomicIwasawa
+public import Iwasawalib.NumberTheory.ZpExtension.IntermediateUnramifiedEqBase
+public import Iwasawalib.NumberTheory.ZpExtension.RamifiedFamilyEventualLinearDisjoint
+public import Iwasawalib.GroupCohomology.FiniteClassFormation
+public import Iwasawalib.GroupCohomology.SplittingModule
+public import Iwasawalib.NumberTheory.CFT.FirstInequalityTower
+public import Iwasawalib.NumberTheory.CFT.GlobalReciprocity
+public import Iwasawalib.NumberTheory.CFT.GlobalReciprocityLocalCompatibility
+public import Iwasawalib.NumberTheory.GlobalCFT.ArtinMap
+public import Iwasawalib.NumberTheory.GlobalCFT.IdeleFrobenius
+public import Iwasawalib.NumberTheory.GlobalCFT.ReciprocityCyclic
+public import Iwasawalib.NumberTheory.LocalCFT.ArtinFrobenius
+public import Iwasawalib.NumberTheory.LocalCFT.UnitFiltrationExp
+
+/-!
+# Axiom audit
+
+This file declares nothing.  It prints `#print axioms` for the declarations added or changed by
+each round of work, and `#check`s every declaration name written into a docstring in that round,
+so that a rename or removal breaks the build.  It is imported by `Iwasawalib.lean`, so the audit
+runs as part of the library build.  Every axiom printed below is expected to be one of `propext`,
+`Classical.choice`, `Quot.sound` and `sorryAx`; where a comment above a group says whether
+`sorryAx` is acceptable, that is the expectation for the group.  The only `sorry`s of the library
+are the class field theory declarations of
+`Iwasawalib/NumberTheory/NumberField/HilbertClassField/ClassFieldTheory.lean`.
+-/
 @[expose] public section
--- FIRING CONTROL: a known-`sorry` declaration must show `sorryAx`.
--- If this line ever prints an axiom list WITHOUT `sorryAx`, the gate below is dead.
+-- FIRING CONTROL: a declaration known to depend on `sorryAx` must show `sorryAx`.  Iwasawa's
+-- theorem is proved by `multiplicity_classNumber_Kn_eq₁_of_cft`, which reaches the class field
+-- theory `sorry`s of `ClassFieldTheory.lean`.  If this line ever prints an axiom list WITHOUT
+-- `sorryAx` while those `sorry`s are still there, the gate below is dead.
 #print axioms MvZpExtension.multiplicity_classNumber_Kn_eq₁
 
 -- ===== predecessor's declarations (S-unit lattice, S-unit Herbrand, idele class Herbrand) =====
@@ -451,10 +483,11 @@ public import Mathlib.NumberTheory.LSeries.Nonvanishing
 #print axioms MvZpExtension.dense_zpowers_mk_shift_of_mk_eq_pow
 #print axioms MvZpExtension.map_gammaSubOne_xinfShiftMulEquiv
 
--- ===== YnGenerators (first two UNCONDITIONAL: no `sorryAx` is acceptable) =====
+-- ===== YnGenerators (all UNCONDITIONAL since wave 3: no `sorryAx` is acceptable) =====
 #print axioms MvZpExtension.pow_mem_GGOverKn
 #print axioms MvZpExtension.YnIn_eq_topologicalClosure_closure_of_lifts
--- CFT-CONDITIONAL (`sorryAx` expected, via RamifiedBasePlaceData.nonempty_orbitIndex):
+-- Unconditional since wave 3 (the case split on `D.base` replaced the call to
+-- `RamifiedBasePlaceData.nonempty_orbitIndex`):
 #print axioms MvZpExtension.RamifiedBasePlaceData.exists_eventual_Yn_generators
 #print axioms MvZpExtension.exists_eventual_Yn_generators
 
@@ -466,8 +499,186 @@ public import Mathlib.NumberTheory.LSeries.Nonvanishing
 #print axioms MvZpExtension.multiplicity_classNumber_Kn_eq₁_of_eventual_Yn_data
 -- CFT-CONDITIONAL (`sorryAx` expected; Iwasawa's theorem modulo the class field theory `sorry`s):
 #print axioms MvZpExtension.multiplicity_classNumber_Kn_eq₁_of_cft
--- REGRESSION GUARD: the types of `multiplicity_classNumber_Kn_eq₁_of_cft` and of the protected
--- `multiplicity_classNumber_Kn_eq₁` (ClassGroup.lean, still `sorry`) are definitionally equal (same
--- arguments in the same order, same conclusion); the two proofs are then equal by proof irrelevance.
+-- REGRESSION GUARD: the types of `multiplicity_classNumber_Kn_eq₁_of_cft` and of
+-- `multiplicity_classNumber_Kn_eq₁` (ClassGroup.lean, proved since wave 3 by
+-- `exact H.multiplicity_classNumber_Kn_eq₁_of_cft`) are definitionally equal (same arguments in the
+-- same order, same conclusion); the two proofs are then equal by proof irrelevance.
 -- This does not compare binder names or binder kinds; those agree because the source texts are identical.
 example : @MvZpExtension.multiplicity_classNumber_Kn_eq₁_of_cft = @MvZpExtension.multiplicity_classNumber_Kn_eq₁ := rfl
+
+-- ===== wave 3: Iwasawa's theorem closed through `_of_cft`, `Y_n` generators unconditional =====
+-- New (CyclotomicIwasawa.lean).  UNCONDITIONAL: no `sorryAx` is acceptable.
+#print axioms NumberField.exists_isCyclotomicZpExtension
+-- New (CyclotomicIwasawa.lean).  CFT-CONDITIONAL: `sorryAx` expected, via
+-- `multiplicity_classNumber_Kn_eq₁`.
+#print axioms NumberField.exists_cyclotomic_multiplicity_classNumber_eq
+-- Proof changed (ClassGroup.lean: `sorry` replaced by `multiplicity_classNumber_Kn_eq₁_of_cft`).
+-- CFT-CONDITIONAL: `sorryAx` expected.
+#print axioms MvZpExtension.multiplicity_classNumber_Kn_eq₁
+-- New (YnGenerators.lean).  UNCONDITIONAL: no `sorryAx` is acceptable.
+#print axioms MvZpExtension.YnIn_eq_gammaSubOne_of_forall_inertiaSubgroup_eq_bot
+-- Proof changed (YnGenerators.lean), and its only consumer.  UNCONDITIONAL since wave 3.
+#print axioms MvZpExtension.RamifiedBasePlaceData.exists_eventual_Yn_generators
+#print axioms MvZpExtension.exists_eventual_Yn_generators
+-- Private -> public (YnShiftTransport.lean).  UNCONDITIONAL: no `sorryAx` is acceptable.
+#print axioms MvZpExtension.Internal.toGamma_action_in_Linf
+#print axioms MvZpExtension.Internal.restrictScalarsAutEquiv_ggShiftRestrictHom
+#print axioms MvZpExtension.Internal.coe_xinfShiftMulEquiv_eq_ggShiftRestrictHom
+-- Proof changed (ShiftInertiaTransport.lean).  UNCONDITIONAL: no `sorryAx` is acceptable.
+#print axioms MvZpExtension.coe_xinfShiftMulEquiv_apply
+-- Unused instance arguments dropped by `omit` (proofs unchanged).  UNCONDITIONAL.
+#print axioms NumberField.decompositionIntegersRingAut_injective
+#print axioms NumberField.decompositionIntegersRingAut_mem_inertiaAut
+#print axioms MvZpExtension.restrictNormalHom_pow_finrank_eq_one
+#print axioms MvZpExtension.inertiaSubgroup_comp_Γ_eq
+#print axioms MvZpExtension.comp_eq_self_of_Γpow_le
+-- Unchanged, printed because this wave's docstrings make claims about their axioms.
+-- UNCONDITIONAL (no `sorryAx` is acceptable):
+#print axioms MvZpExtension.exists_multiplicity_classNumber_of_card_eq
+#print axioms MvZpExtension.multiplicity_classNumber_Kn_eq₁_of_eventual_Yn_data
+#print axioms MvZpExtension.exists_restrictNormalHom_pow_eq_one_of_liesOver_adicAbv
+#print axioms MvZpExtension.exists_ramifiedBasePlaceData_unconditional
+#print axioms MvZpExtension.RamifiedBasePlaceData.orbitPlace
+#print axioms MvZpExtension.RamifiedBasePlaceData.exists_isEquiv_orbitPlace
+#print axioms MvZpExtension.ramified_place_liesOver_basePrimeAbove_p
+#print axioms MvZpExtension.exists_totally_ramified_of_finite_ramified
+-- CFT-CONDITIONAL (`sorryAx` expected):
+#print axioms MvZpExtension.finrank_Ln
+#print axioms MvZpExtension.finiteDimensional_Ln
+#print axioms MvZpExtension.finiteDimensional_Ln'
+#print axioms MvZpExtension.exists_inertiaSubgroup_ne_bot
+#print axioms MvZpExtension.RamifiedBasePlaceData.nonempty_orbitIndex
+#print axioms MvZpExtension.exists_eventualClassNumberCardinalityBridge
+#print axioms MvZpExtension.multiplicity_classNumber_Kn_eq₁_of_cft
+
+-- ===== wave 3: every declaration named in a new or edited docstring must exist =====
+#check @AbsoluteValue.inertiaSubgroup_eq_bot_of_not_isNontrivial
+#check @AbsoluteValue.inertiaSubgroup_eq_of_equiv
+#check @AbsoluteValue.isClosed_inertiaSubgroup
+#check @AbsoluteValue.rpowOfLeOneOrIsNonarchimedean
+#check @AbsoluteValue.trivial
+#check @CyclotomicPinfField.cyclotomicZpSubfield
+#check @EquivMvZp.eq_bot_or_Γpow_of_isClosed
+#check @IntermediateField.eq_bot_of_isUnramifiedEverywhere_of_inertiaSubgroup_eq_top
+#check @IntermediateField.intermediateField_eq_bot_of_totallyRamified_of_isUnramifiedEverywhere
+#check @IntermediateField.linearDisjoint_of_intermediateField_eq_bot
+#check @IsCyclotomicZpExtension
+#check @IsCyclotomicZpExtension.infinite_dimensional
+#check @LocalCFT.IsExpData.eq_zero_of_expUnit_eq_one
+#check @LocalCFT.IsExpData.exists_expUnit_eq
+#check @LocalCFT.IsExpData.expUnit
+#check @LocalCFT.IsExpData.expUnit_add
+#check @LocalCFT.orderOf_dvd_sub_one
+#check @MvZpExtension
+#check @MvZpExtension.EventualClassNumberCardinalityBridge
+#check @MvZpExtension.EventualClassNumberCardinalityBridge.of_le
+#check @MvZpExtension.HH
+#check @MvZpExtension.HH_shift_eq_commutator_sup_iSup
+#check @MvZpExtension.Internal.coe_xinfShiftMulEquiv_eq_ggShiftRestrictHom
+#check @MvZpExtension.Internal.ggShiftToLinfMulEquiv
+#check @MvZpExtension.Internal.linfRestrictKnHom
+#check @MvZpExtension.RamifiedBasePlaceData
+#check @MvZpExtension.RamifiedBasePlaceData.HH_eq_commutator_sup_iSup
+#check @MvZpExtension.RamifiedBasePlaceData.base
+#check @MvZpExtension.RamifiedBasePlaceData.covers
+#check @MvZpExtension.RamifiedBasePlaceData.exists_common_shift
+#check @MvZpExtension.RamifiedBasePlaceData.exists_eventual_Yn_generators
+#check @MvZpExtension.RamifiedBasePlaceData.exists_isEquiv_orbitPlace
+#check @MvZpExtension.RamifiedBasePlaceData.inertia_Kn_eq_top
+#check @MvZpExtension.RamifiedBasePlaceData.nonempty_orbitIndex
+#check @MvZpExtension.RamifiedBasePlaceData.orbitPlace
+#check @MvZpExtension.RamifiedBasePlaceData.selectedInertia_cover
+#check @MvZpExtension.YnIn_eq_gammaSubOne_of_forall_inertiaSubgroup_eq_bot
+#check @MvZpExtension.YnIn_eq_topologicalClosure_closure_of_lifts
+#check @MvZpExtension.YnStableSubmodule
+#check @MvZpExtension.YnSubmodule
+#check @MvZpExtension.commutator_GG_eq
+#check @MvZpExtension.exists_GG_conjugating_places_of_comp_equiv
+#check @MvZpExtension.exists_eventualClassNumberCardinalityBridge
+#check @MvZpExtension.exists_eventual_Yn_generators
+#check @MvZpExtension.exists_eventually_totallyRamified_and_linearDisjoint
+#check @MvZpExtension.exists_eventually_totallyRamified_of_finiteRamified_and_linearDisjoint
+#check @MvZpExtension.exists_inertiaSubgroup_ne_bot
+#check @MvZpExtension.exists_mem_Xinf_mul_mem_inertiaSubgroup
+#check @MvZpExtension.exists_multiplicity_classNumber_of_card_eq
+#check @MvZpExtension.exists_ramifiedBasePlaceData
+#check @MvZpExtension.exists_ramifiedBasePlaceData_unconditional
+#check @MvZpExtension.exists_restrictNormalHom_pow_eq_one_of_liesOver_adicAbv
+#check @MvZpExtension.exists_shift_totally_ramified
+#check @MvZpExtension.exists_totally_ramified
+#check @MvZpExtension.exists_totally_ramified_of_finite_ramified
+#check @MvZpExtension.exists_Γ_conjugating_of_comp_equiv
+#check @MvZpExtension.finiteDimensional_Ln
+#check @MvZpExtension.finiteDimensional_Ln'
+#check @MvZpExtension.finite_basePrimesAbove_p
+#check @MvZpExtension.finite_ramified_of_bddAbove_outside
+#check @MvZpExtension.finite_ramified_of_exponent_outside
+#check @MvZpExtension.finrank_Kn₁
+#check @MvZpExtension.finrank_Ln
+#check @MvZpExtension.ggShiftRestrictHom
+#check @MvZpExtension.inertiaSubgroup_eq_bot_iff_bddAbove_ramificationIdx
+#check @MvZpExtension.inertiaSubgroup_eq_bot_of_archimedean
+#check @MvZpExtension.inertiaSubgroup_eq_bot_of_exponent
+#check @MvZpExtension.inertiaSubgroup_eq_bot_of_fixes_Kn
+#check @MvZpExtension.inertiaSubgroup_inf_Xinf
+#check @MvZpExtension.isEquiv_of_inertia_eq_top_of_comp_isEquiv
+#check @MvZpExtension.multiplicity_classNumber_Kn_eq₁
+#check @MvZpExtension.multiplicity_classNumber_Kn_eq₁_of_cft
+#check @MvZpExtension.multiplicity_classNumber_Kn_eq₁_of_eventual_Yn_data
+#check @MvZpExtension.multiplicity_classNumber_Kn_eq₁_of_eventual_Yn_generators
+#check @MvZpExtension.multiplicity_classNumber_Kn_eq₁_of_eventual_card_bridge
+#check @MvZpExtension.nu_mul_nu
+#check @MvZpExtension.ramified_place_liesOver_basePrimeAbove_p
+#check @MvZpExtension.reindex_eventual_Yn_lambda_data
+#check @MvZpExtension.shift
+#check @MvZpExtension.xinfQuotientMulEquivOfInertia
+#check @MvZpExtension.xinfQuotientMulEquivOfPlace
+#check @MvZpExtension.xinfQuotientMulEquivOfPlace'
+#check @MvZpExtension.xinfShiftMulEquiv
+#check @NumberField.BrauerHassePrinciple
+#check @NumberField.GlobalReciprocityMapLocalCompatibility
+#check @NumberField.IdeleClassFormationData
+#check @NumberField.IsArtinReciprocal
+#check @NumberField.IsUnramifiedAlmostEverywhere
+#check @NumberField.IsUnramifiedEverywhere.artinMap
+#check @NumberField.IsUnramifiedEverywhere.artinMap_spec
+#check @NumberField.IsUnramifiedEverywhere.bijective_artinMap_of_isSepClosed
+#check @NumberField.IsUnramifiedEverywhere.surjective_artinMap
+#check @NumberField.NormalizedIdeleClassFormationData
+#check @NumberField.brauerHassePrinciple_iff_isZero_H1_repIdeleClass
+#check @NumberField.card_tateH0_ideleClassGroup_ge
+#check @NumberField.card_tateH0_ideleClassGroup_ge_everywhere
+#check @NumberField.card_tateH0_ideleClassGroup_ge_of_unramified
+#check @NumberField.card_tateH0_ideleClassGroup_le_of_chain
+#check @NumberField.decompositionMulEquivResidueGal
+#check @NumberField.exists_cyclotomic_multiplicity_classNumber_eq
+#check @NumberField.exists_isCyclotomicZpExtension
+#check @NumberField.frobIdealHom
+#check @NumberField.frobIdeleHom
+#check @NumberField.globalReciprocityMap
+#check @NumberField.hasCyclotomicZpExtension
+#check @NumberField.herbrand_adicCompletion_units_eq_card
+#check @NumberField.herbrand_ideleClassGroup_eq_card_of_unramified
+#check @NumberField.herbrand_ideleClassGroup_eq_card_of_unramified_everywhere
+#check @NumberField.herbrand_sIdele
+#check @NumberField.isUnramifiedAlmostEverywhere
+#check @NumberField.isZero_H1_finiteIdele
+#check @NumberField.isZero_H1_repIdele
+#check @NumberField.isZero_H1_repIdeleClass
+#check @NumberField.isZero_H1_repIdeleClass_of'
+#check @NumberField.localArtinAdicCompletionUnits_mk_uniformizer_arithFrob
+#check @NumberField.mem_zpowers_arithFrobDecomposition
+#check @NumberField.pow_card_quotient_sub_one_eq_one_of_mem_inertia
+#check @NumberField.quotientNormEquivGalois
+#check @NumberField.reciprocityEquivOfInjectiveOfGe
+#check @NumberField.reciprocityEquivOfSurjective
+#check @NumberField.stabilizerHom_injective
+#check @NumberField.stabilizerHom_surjective
+#check @NumberField.subsingleton_tateH1_ideleClassGroup_iff_card_eq
+#check @NumberField.subsingleton_tateH1_ideleClassGroup_iff_everywhere
+#check @Rep.split.FiniteClassFormation
+#check @Rep.split.reciprocityIso
+#check @Rep.split.tateCohomologyIso
+#check @Subgroup.isClosed_gammaSubOneG
+#check @arithFrobAt
+#check @hasCyclotomicZpExtension_iff_isCyclotomicZpExtension_cyclotomicZpSubfield

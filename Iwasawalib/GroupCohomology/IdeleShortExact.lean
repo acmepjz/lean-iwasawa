@@ -129,10 +129,14 @@ end Hilbert90
 /-- **The criterion for the first axiom of a class formation.**  If `H¹(Gal(L/K), 𝕀_L) = 0` and
 the map `H²(Gal(L/K), Lˣ) ⟶ H²(Gal(L/K), 𝕀_L)` is injective, then `H¹(Gal(L/K), C_L) = 0`.
 
-Both hypotheses are genuine theorems of global class field theory and are *not* proved here:
-the first is the vanishing of `H¹` of the restricted product of the local unit groups, the
-second is the injectivity of the map from the Brauer group of `L/K` into the sum of the local
-Brauer groups. -/
+Both hypotheses are genuine theorems of global class field theory, and neither is proved in
+this file.  The first is the vanishing of `H¹` of the restricted product of the local unit
+groups; it is proved, for a finite Galois extension of number fields, as
+`NumberField.isZero_H1_repIdele` in `Iwasawalib/GroupCohomology/UnramifiedIdele.lean`, where
+`NumberField.isZero_H1_repIdeleClass` is this criterion with `hIdele` discharged.  The second
+is the injectivity of the map from the Brauer group of `L/K` into the sum of the local Brauer
+groups, the Hasse principle `NumberField.BrauerHassePrinciple`; it is *not* proved in this
+repository. -/
 theorem isZero_H1_repIdeleClass_of
     (hIdele : IsZero (groupCohomology (repIdele K L) 1))
     (hmono : Mono ((groupCohomology.functor ℤ (L ≃ₐ[K] L) 2).map (ideleShortComplex K L).f)) :

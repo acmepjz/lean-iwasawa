@@ -1,3 +1,7 @@
+/-
+Copyright (c) 2026 Iwasawalib contributors. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
 module
 
 public import Iwasawalib.NumberTheory.ZpExtension.RamifiedFamily
@@ -5,6 +9,23 @@ public import Iwasawalib.NumberTheory.ZpExtension.Ln
 public import Mathlib.FieldTheory.LinearDisjoint
 
 @[expose] public section
+
+/-!
+# Total ramification and linear disjointness at a common layer
+
+Two thin wrappers that combine the ramified-family lemmas with a linear-disjointness statement
+`(H.Ln n).LinearDisjoint Kinf` for all large `n`, at a common threshold.  Neither proves any
+linear disjointness: both take it as the hypothesis `hld` and return it in the conclusion.
+
+## Main statements
+
+* `MvZpExtension.exists_eventually_totallyRamified_and_linearDisjoint`: from a finite family of
+  ramified places, via `MvZpExtension.exists_shift_totally_ramified`.
+* `MvZpExtension.exists_eventually_totallyRamified_of_finiteRamified_and_linearDisjoint`: from
+  the raw-place finiteness hypothesis `hfin`, via
+  `MvZpExtension.exists_totally_ramified_of_finite_ramified`.  **Warning**: vacuous for a
+  `ℤₚ`-extension of a number field; see its docstring.
+-/
 
 open IntermediateField
 
@@ -15,8 +36,12 @@ namespace MvZpExtension
 
 variable (H : MvZpExtension p ι K Kinf)
 
-/- The ramified-family API supplies the total-ramification half.  The
-   linear-disjointness half remains an explicit arithmetic input. -/
+/-- The ramified-family API supplies the total-ramification half.  The linear-disjointness half
+remains an explicit arithmetic input.
+
+**Warning**: the linear-disjointness part of the conclusion is not proved here: it is the
+hypothesis `hld`, returned unchanged.  Only the total-ramification part, from
+`MvZpExtension.exists_shift_totally_ramified`, has content. -/
 theorem exists_eventually_totallyRamified_and_linearDisjoint
     [Unique ι] {s : Type*} [Finite s]
     (v : s → AbsoluteValue Kinf ℝ)
@@ -34,7 +59,16 @@ theorem exists_eventually_totallyRamified_and_linearDisjoint
   have hn₁ : e₁ ≤ n := le_trans (le_max_right _ _) hn
   exact ⟨he₁ n hn₁, hld n hn₀⟩
 
-/- The same composition using the finiteness-of-the-ramified-set interface. -/
+/-- The same composition using the finiteness-of-the-ramified-set interface.
+
+**Warning**: `hfin` ranges over raw absolute values of `K∞`, and holds only when no place of
+`K∞` ramifies in `K∞ / K`: a ramified `w` gives infinitely many ramified absolute values
+`w ^ c`, `0 < c ≤ 1`, all equivalent to `w` (see the module docstring of
+`Iwasawalib/NumberTheory/ZpExtension/RamifiedFamily.lean`).  For a `ℤₚ`-extension of a number
+field some place ramifies (`MvZpExtension.exists_inertiaSubgroup_ne_bot`, proved here only
+conditionally on class field theory), so this lemma is
+vacuous there.  As in `MvZpExtension.exists_eventually_totallyRamified_and_linearDisjoint`, the
+linear-disjointness part of the conclusion is the hypothesis `hld`, returned unchanged. -/
 theorem exists_eventually_totallyRamified_of_finiteRamified_and_linearDisjoint
     [Unique ι]
     (hfin : {w : AbsoluteValue Kinf ℝ | w.inertiaSubgroup K ≠ ⊥}.Finite)

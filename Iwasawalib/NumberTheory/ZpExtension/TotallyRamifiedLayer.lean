@@ -22,9 +22,11 @@ three arithmetic inputs that were missing when it was written.  Two of them are 
 * *`K∞ / K_e` is totally ramified at the place* is turned into the membership statement
   `Γ^{p^e} ≤ I_v(K∞/K)` by `MvZpExtension.inertiaSubgroup_Kn_eq_top_iff`.
 
-What is still genuinely missing is only the *identification of the ramified set*: that at least
-one prime ramifies (needs finiteness of the Hilbert class field) and that only finitely many do
-(only primes above `p` ramify, blueprint node `p:unr-outside-p`, local class field theory).
+This file does not identify the ramified set.  That only primes above `p` ramify is proved
+unconditionally, by the tame route (`MvZpExtension.exists_ramifiedBasePlaceData_unconditional`,
+`Iwasawalib/NumberTheory/ZpExtension/TameLocalExponent.lean`), with finite family
+`MvZpExtension.RamifiedBasePlaceData.orbitPlace`.  That at least one prime ramifies is
+`MvZpExtension.exists_inertiaSubgroup_ne_bot`, which is conditional on class field theory.
 Accordingly `MvZpExtension.exists_totally_ramified` below takes the finite family of ramified
 places as input.
 

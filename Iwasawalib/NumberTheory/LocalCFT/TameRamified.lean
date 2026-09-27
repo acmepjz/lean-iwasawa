@@ -30,8 +30,15 @@ the graded pieces of the unit filtration are `p`-groups on which `p` no longer a
 invertibly, and the classical argument replaces the filtration by the `p`-adic logarithm
 isomorphism `1 + 𝔪^m ≅ 𝔪^m`.  Mathlib has no nonarchimedean `exp`/`log` for a complete
 discretely valued field of mixed characteristic — only the real, complex and Banach-algebra
-exponentials — so that route is not available here and `h(O_w^×) = 1` remains open in the wild
-case.
+exponentials.  This repository now has its own exponential,
+`LocalCFT.IsExpData.expUnit` in `Iwasawalib/NumberTheory/LocalCFT/UnitFiltrationExp.lean`: for
+`k` larger than the absolute ramification index it sends `x` with `v x ≤ exp (-k)` into
+`U^(k)`, turns sums into products (`LocalCFT.IsExpData.expUnit_add`), has trivial kernel
+(`LocalCFT.IsExpData.eq_zero_of_expUnit_eq_one`) and is onto `U^(k)`
+(`LocalCFT.IsExpData.exists_expUnit_eq`).  It is not yet packaged as a `D_w`-equivariant
+isomorphism `𝔪^k ≅ U^(k)`, and the wild-case reduction of
+`Iwasawalib/NumberTheory/LocalCFT/WildNormIndex.lean` does not use it, so `h(O_w^×) = 1` remains
+open in the wild case.
 
 ## Main statements
 

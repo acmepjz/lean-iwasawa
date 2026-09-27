@@ -34,15 +34,30 @@ hypothesis `hgen`, so both forms are available and agree:
 
 ## What is assumed
 
-Exactly one thing beyond what is proved in this repository, and it is inherited verbatim from
+The arithmetic input taken as a hypothesis is inherited verbatim from
 `NumberField.herbrand_ideleClassGroup_of_herbrand_sIdele`: the hypothesis `hidele`, the value
 `h(𝕀_{L,S}) = ∏_{v ∈ S ∪ S_∞} n_v` of the Herbrand quotient of the `S`-ideles.  That is the
-*local* half of the computation (semilocal decomposition, Shapiro, and `h(L_wˣ) = e(w | v)`).
+*local* half of the computation (semilocal decomposition, Shapiro, and `h(L_wˣ) = #D_w`).
 Dirichlet's `S`-unit theorem in full-lattice form, the Noether-Deuring comparison, the value
 `h(O_{L,S}^×) = (∏_v n_v) / n` and the short exact sequence
 `1 → O_{L,S}^× → 𝕀_{L,S} → C_L → 1` are all proved, in
 `Iwasawalib/NumberTheory/CFT/SUnitLattice.lean`, `Iwasawalib/NumberTheory/CFT/SUnitHerbrand.lean`
 and `Iwasawalib/NumberTheory/CFT/IdeleClassHerbrand.lean`.
+
+`hidele` is discharged in exactly one case: every finite place of `K` is unramified in `L`, and
+every archimedean place of `K` has trivial decomposition group in `Gal(L/K)`.  There
+`NumberField.herbrand_ideleClassGroup_eq_card_of_unramified`
+(`Iwasawalib/NumberTheory/CFT/IdeleClassHerbrandValue.lean`) proves the value of `h(𝕀_{L,S})`
+inside its proof, for its own choice of places above `S`, from `NumberField.herbrand_sIdele` and
+the local value `NumberField.herbrand_adicCompletion_units_eq_card`, and concludes
+`h(C_L) = [L : K]` with no hypothesis left over;
+`NumberField.herbrand_ideleClassGroup_eq_card_of_unramified_everywhere` supplies `S` as well.
+The second inequality in that case, without `hidele`, is
+`NumberField.card_tateH0_ideleClassGroup_ge_of_unramified` and
+`NumberField.card_tateH0_ideleClassGroup_ge_everywhere`
+(`Iwasawalib/NumberTheory/CFT/FirstInequality.lean`).  When some finite place of `K` ramifies in
+`L`, or some archimedean decomposition group is nontrivial, no declaration of this repository
+discharges `hidele`.
 
 ## Main statements
 
@@ -151,8 +166,10 @@ theorem finite_tateH1_ideleClassGroup
 
 This is `NumberField.herbrand_ideleClassGroup_of_herbrand_sIdele`, which gives
 `h(C_L) = [L : K]`, combined with `CyclicTate.herbrand_le_card_tateH0`.  The hypothesis
-`hidele` is the local half of the computation of `h(𝕀_{L,S})` and is the only input not proved
-in this repository; see the module docstring. -/
+`hidele` is the local half of the computation of `h(𝕀_{L,S})`.  It is discharged only when
+every finite place is unramified and every archimedean decomposition group is trivial, where
+`NumberField.card_tateH0_ideleClassGroup_ge_of_unramified` states this inequality without it;
+see the module docstring. -/
 theorem card_tateH0_ideleClassGroup_ge
     (hgen : ∀ g : L ≃ₐ[K] L, ∃ m : ℕ, σ ^ m = g)
     (hsup : IdeleGroup.principalSubgroup (𝓞 L) L
@@ -217,11 +234,19 @@ theorem card_groupCohomology_two_ideleClassGroup_ge
 
 /-- **If `Ĥ¹(Gal(L/K), C_L) = 0` then `#Ĥ⁰(Gal(L/K), C_L) = [L : K]` exactly.**
 
-The vanishing of `H¹(Gal(L/K), C_L)` is the first fundamental inequality; in this repository it
-is available only under the named hypotheses of
-`Iwasawalib/GroupCohomology/IdeleVanishing.lean`, so it is taken here as an instance hypothesis
-rather than proved.  Note that the *inequality*
-`NumberField.card_tateH0_ideleClassGroup_ge` does not need it. -/
+The vanishing of `H¹(Gal(L/K), C_L)` is the first fundamental inequality.  It is not proved in
+this repository, so it is taken here as an instance hypothesis.  Since `H¹(Gal(L/K), 𝕀_L) = 0`
+is unconditional (`NumberField.isZero_H1_repIdele`), in Mathlib's `groupCohomology` it is
+equivalent to the Hasse principle for the Brauer group
+(`NumberField.brauerHassePrinciple_iff_isZero_H1_repIdeleClass`), and, for a cyclic extension in
+which every finite place is unramified and every archimedean decomposition group is trivial, to
+the norm-index bound `#Ĥ⁰(Gal(L/K), C_L) ≤ [L : K]`
+(`NumberField.subsingleton_tateH1_ideleClassGroup_iff_everywhere`).  Note that the *inequality*
+`NumberField.card_tateH0_ideleClassGroup_ge` does not need it.
+
+In that unramified case the hypothesis `hidele` is not needed either:
+`NumberField.subsingleton_tateH1_ideleClassGroup_iff_card_eq` gives the same equality without
+it. -/
 theorem card_tateH0_ideleClassGroup_eq_of_subsingleton
     (hgen : ∀ g : L ≃ₐ[K] L, ∃ m : ℕ, σ ^ m = g)
     (hsup : IdeleGroup.principalSubgroup (𝓞 L) L

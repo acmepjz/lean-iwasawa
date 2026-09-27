@@ -65,6 +65,7 @@ variable (H : MvZpExtension p ι K Kinf)
 
 /-! ### Translating a place by an element of `Γ` -/
 
+omit [Finite ι] [NumberField K] in
 /-- For a place `v` of `K∞` and `τ ∈ Γ = Gal(K∞/K)`, the inertia subgroup in `Γ` of the
 translated place `x ↦ v (τ x)` is equal to the inertia subgroup of `v`.  (In general it is a
 conjugate; `Γ` is abelian.) -/
@@ -78,6 +79,7 @@ theorem inertiaSubgroup_comp_Γ_eq (v : AbsoluteValue Kinf ℝ) (τ : H.Γ) :
     rw [IsMulCommutative.is_comm.comm τ σ, mul_inv_cancel_right]
   rw [h]
 
+omit [NumberField K] in
 /-- If the inertia subgroup in `Γ` of a place `v` of `K∞` contains `Γ^{p^e}`, then every
 `τ ∈ Γ^{p^e}` fixes `v`: the translated place `x ↦ v (τ x)` is equal to `v`, as absolute
 values (not only up to equivalence). -/
@@ -167,8 +169,9 @@ Equivalently, `D.base` is nonempty.
 `MvZpExtension.exists_inertiaSubgroup_ne_bot` (at least one place ramifies in `K∞ / K`), which
 is derived from `NumberField.IsUnramifiedEverywhere.finiteDimensional`, which is derived from
 `NumberField.IsUnramifiedEverywhere.surjective_artinMap`, which is `sorry`.  So this theorem
-depends on `sorryAx`, and so does everything below it that does not take the conclusion as a
-hypothesis. -/
+depends on `sorryAx`.  No declaration of the library uses it:
+`MvZpExtension.RamifiedBasePlaceData.exists_eventual_Yn_generators` splits on whether `D.base` is
+empty instead. -/
 theorem RamifiedBasePlaceData.nonempty_orbitIndex [Unique ι] (D : RamifiedBasePlaceData H)
     (e : ℕ) : Nonempty (D.base × (H.Γ ⧸ (H.Γpow e : Subgroup H.Γ))) := by
   obtain ⟨w, hw⟩ := H.exists_inertiaSubgroup_ne_bot

@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2026 The Iwasawalib contributors. All rights reserved.
+Copyright (c) 2026 Iwasawalib contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 module
@@ -110,6 +110,7 @@ theorem residue_decomposition_smul_of_residue_eq (d : decompositionGroup K L w)
     = d • residue _ (algebraMap (𝓞 L) (LocalCFT.integers (F := w.adicCompletion L)) a)
   rw [h]
 
+omit [NumberField K] [IsGalois K L] in
 /-- **The local action is faithful.**  `D_w → RingAut O_w` is injective: an element of the
 decomposition group fixing `O_w` pointwise fixes `𝓞 L`, hence `L`, pointwise. -/
 theorem decompositionIntegersRingAut_injective :
@@ -136,6 +137,7 @@ theorem decompositionIntegersRingAut_injective :
     = algebraMap (𝓞 L) L a / algebraMap (𝓞 L) L b
   rw [map_div₀, hfix, hfix]
 
+omit [NumberField K] [IsGalois K L] in
 /-- **Global inertia acts trivially on the local residue field.**  An element of `D_w` whose
 underlying automorphism lies in Mathlib's inertia group `w.asIdeal.inertia Gal(L/K)` acts as
 the identity on the residue field of `O_w`, i.e. lies in `LocalCFT.inertiaAut O_w`. -/

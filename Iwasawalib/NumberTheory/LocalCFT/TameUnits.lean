@@ -29,10 +29,14 @@ coprime to `#G`.  The two inputs are:
   Bézout relation `a·#G + b·p = 1` then trivialises every class *explicitly*, with no appeal
   to a `p`-adic logarithm.
 
-The wild case `p ∣ #G` is **not** covered, and is not covered by any route available here: the
-classical proof that `h(𝒪ˣ) = 1` in general goes through the `p`-adic logarithm
-`1 + 𝔪^m ≅ 𝔪^m`, and Mathlib has no nonarchimedean `exp`/`log` for a complete discretely
-valued field of mixed characteristic.
+The wild case `p ∣ #G` is **not** covered.  The classical proof that `h(𝒪ˣ) = 1` in general
+goes through the `p`-adic logarithm `1 + 𝔪^m ≅ 𝔪^m`, and Mathlib has no nonarchimedean
+`exp`/`log` for a complete discretely valued field of mixed characteristic.
+`Iwasawalib/NumberTheory/LocalCFT/UnitFiltrationExp.lean` now constructs an exponential,
+`LocalCFT.IsExpData.expUnit`, which for `k` beyond the absolute ramification index maps
+`{x | v x ≤ exp (-k)}` onto `U k`, turning sums into products and with trivial kernel.  It is
+not yet shown to commute with the action of `G`, and no Herbrand quotient computation uses it,
+so the wild case remains open.
 
 ## Main statements
 

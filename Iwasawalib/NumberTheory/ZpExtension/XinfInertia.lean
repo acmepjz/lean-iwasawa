@@ -29,13 +29,19 @@ This file discharges everything about `X = X∞` and `G = Gal(L∞/K)`:
 * hence `MvZpExtension.exists_dense_zpowers`: in the `ℤₚ`-case (`Unique ι`) the group `Γ` has
   a topological generator, transported from `EquivMvZp.topologicalGenerator`.
 
-What is *not* here is the inertia subgroup `I` itself.  Producing it means knowing that
-`L∞ / K∞` is unramified and `K∞ / K_e` totally ramified at every ramified place, as statements
-about the infinite extension `L∞ / K`; the repository's ramification theory
-(`Iwasawalib.NumberTheory.AbsoluteValue.InertiaSubgroup`) is for absolute values, and the
-missing arithmetic inputs are listed in
-`Iwasawalib.NumberTheory.ZpExtension.TotallyRamified`.  So `I` remains a hypothesis, with the
-two properties it is supposed to have.
+What is *not* here is the inertia subgroup `I` itself: in
+`MvZpExtension.xinfQuotientMulEquivOfInertia` it is a hypothesis, with the two properties it is
+supposed to have.  It is produced downstream, in
+`Iwasawalib/NumberTheory/ZpExtension/XinfStepOne.lean`: there `I = I_w(L∞/K)` is the inertia
+subgroup of a place `w` of `L∞`, the property `I ∩ X∞ = 1` is
+`MvZpExtension.inertiaSubgroup_inf_Xinf` (`L∞ / K∞` is unramified), and `G = X∞ I` is
+`MvZpExtension.exists_mem_Xinf_mul_mem_inertiaSubgroup`, under total ramification of `K∞ / K`
+at the place below `w`.  Step 1 with `I` produced is `MvZpExtension.xinfQuotientMulEquivOfPlace`
+and `MvZpExtension.xinfQuotientMulEquivOfPlace'`.  Total ramification holds over a suitable
+layer `Kₑ` at a given finite family of ramified places by `MvZpExtension.exists_totally_ramified`,
+which uses that inertia subgroups are closed (`AbsoluteValue.isClosed_inertiaSubgroup`); `Kₑ` is
+made the base by `MvZpExtension.shift`, as in
+`Iwasawalib/NumberTheory/ZpExtension/ShiftStepOne.lean`.
 
 ## Main results
 

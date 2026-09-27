@@ -16,26 +16,32 @@ public import Mathlib.NumberTheory.NumberField.ClassNumber
 The `Λ`-module side of Iwasawa's theorem on growth of class groups is complete: blueprint node
 `finite-index-submodule-growth` is
 `IwasawaAlgebra.exists_multiplicity_card_quotient_smul_submodule_of_isTorsion`.
-What is still missing is the arithmetic input, blueprint nodes
-`Xn-isom-qout` (`X_n ≅ X_∞ / ν_{n,e} Y`) and `Xn-isom-An` (`ord_p #Cl(K_n) = ord_p #X_n`).
+The arithmetic input, blueprint nodes `Xn-isom-qout` (`X_n ≅ X_∞ / ν_{n,e} Y`) and `Xn-isom-An`
+(`ord_p #Cl(K_n) = ord_p #X_n`), is now supplied, conditionally on class field theory: the main theorem
+`MvZpExtension.multiplicity_classNumber_Kn_eq₁` is closed through
+`MvZpExtension.multiplicity_classNumber_Kn_eq₁_of_cft`
+(`Iwasawalib/NumberTheory/ZpExtension/IwasawaTheorem.lean`).
 
-`MvZpExtension.finrank_Ln` is the Lean form of `Xn-isom-An`, but as of this file it still
-depends on `sorryAx` (through `NumberField.bijective_artinMap_of_isSepClosed` in
-`Iwasawalib/NumberTheory/NumberField/HilbertClassField/ClassFieldTheory.lean`).  Closing
-`MvZpExtension.multiplicity_classNumber_Kn_eq₁` on top of it would produce a theorem that
-*looks* proved and is not, so it is deliberately **not** closed here.
+That proof is still **conditional on class field theory**.  For instance
+`MvZpExtension.finrank_Ln`, the Lean form of `Xn-isom-An`, depends on `sorryAx` through the
+class field theory `sorry`s `NumberField.IsUnramifiedEverywhere.artinMap`,
+`NumberField.IsUnramifiedEverywhere.surjective_artinMap` and
+`NumberField.IsUnramifiedEverywhere.bijective_artinMap_of_isSepClosed` of
+`Iwasawalib/NumberTheory/NumberField/HilbertClassField/ClassFieldTheory.lean`; see the
+docstring of `MvZpExtension.multiplicity_classNumber_Kn_eq₁_of_cft` for the route.
 
-Instead this file records the assembly as a standalone, unconditionally proved theorem which
-takes the missing arithmetic as an explicit hypothesis: once someone produces, for a
-`ℤₚ`-extension `K∞/K`, a finitely generated torsion `Λ`-module `M` (`= X_∞`) with a
-finite-index `Λ`-submodule `Y` and the cardinality identity
+This file records the last step of the assembly as a standalone, unconditionally proved
+theorem which takes the arithmetic as an explicit hypothesis: for a `ℤₚ`-extension `K∞/K`, a
+finitely generated torsion `Λ`-module `M` (`= X_∞`) with a finite-index `Λ`-submodule `Y` and
+the cardinality identity
 
 `#(M / ν_{n,e} Y) = p ^ ord_p(h_{K_n})` for all `n ≥ e`,
 
-Iwasawa's formula follows by `exists_multiplicity_classNumber_of_card_eq` below.  Combining
-that hypothesis with blueprint node `Xn-isom-qout` (which supplies `X_n ≅ M / ν_{n,e} Y`) and
-`Xn-isom-An` (which supplies `#X_n = p ^ ord_p(h_{K_n})`) gives
-`MvZpExtension.multiplicity_classNumber_Kn_eq₁`.
+Iwasawa's formula follows by `exists_multiplicity_classNumber_of_card_eq` below.  That
+hypothesis is discharged, with `M = X_∞`, in
+`MvZpExtension.multiplicity_classNumber_Kn_eq₁_of_eventual_Yn_data`
+(`Iwasawalib/NumberTheory/ZpExtension/EventualClassNumberBridge.lean`), which lies on the proof
+route of `MvZpExtension.multiplicity_classNumber_Kn_eq₁_of_cft`.
 -/
 
 open Module PowerSeries
@@ -55,8 +61,9 @@ variable (H : MvZpExtension p ι K Kinf)
 cardinalities of the quotients `M / ν_{n,e} Y` of a finitely generated torsion `Λ`-module `M`
 by a finite-index `Λ`-submodule `Y`, then `ord_p(h_{K_n}) = μ p^n + λ n + ν` for large `n`.
 
-This is proved unconditionally; the hypothesis `hcard` is exactly the arithmetic input that is
-not yet formalized (see the module docstring). -/
+This is proved unconditionally; the hypothesis `hcard` is the arithmetic input, discharged in
+`MvZpExtension.multiplicity_classNumber_Kn_eq₁_of_eventual_Yn_data` (see the module
+docstring). -/
 theorem exists_multiplicity_classNumber_of_card_eq
     {M : Type*} [AddCommGroup M] [Module ℤ_[p]⟦X⟧ M] [Module.Finite ℤ_[p]⟦X⟧ M]
     (hM : Module.IsTorsion ℤ_[p]⟦X⟧ M)

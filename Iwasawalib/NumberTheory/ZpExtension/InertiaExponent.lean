@@ -61,7 +61,15 @@ bounded-ramification criterion it replaces.
   `MvZpExtension.bddAbove_ramificationIdx_of_exponent`: hence `hbound`, with `N = 1`.
 * `MvZpExtension.finite_ramified_of_exponent_outside`,
   `MvZpExtension.exists_shift_totally_ramified_of_exponent_outside`: the ramified family from an
-  exponent bound outside a finite set of places.
+  exponent bound outside a finite set of places.  **Warning**: their hypotheses can hold only
+  when no place of `K∞` ramifies, so they are vacuous for a `ℤₚ`-extension of a number field;
+  see their docstrings.
+
+The layerwise local statement at the primes not above `p` is proved in
+`Iwasawalib/NumberTheory/ZpExtension/TameLocalExponent.lean`
+(`MvZpExtension.exists_restrictNormalHom_pow_eq_one_of_liesOver_adicAbv`), and turned into
+`I_w(K∞/K) = ⊥` by `MvZpExtension.inertiaSubgroup_eq_bot_of_fixes_Kn` in the proof of
+`MvZpExtension.ramified_place_liesOver_basePrimeAbove_p`.
 -/
 
 namespace EquivMvZp
@@ -190,7 +198,17 @@ include H in
 /-- **Only finitely many places ramify, from an exponent bound outside a finite set.**  The
 form of `MvZpExtension.finite_ramified_of_bddAbove_outside` that the tame character can feed:
 outside `S` — in practice the places above `p` — it suffices that some nonzero `M` (depending on
-the place: `M = N(v) - 1`) kills the inertia subgroup. -/
+the place: `M = N(v) - 1`) kills the inertia subgroup.
+
+**Warning**: `hexp` makes every absolute value outside `S` unramified
+(`MvZpExtension.inertiaSubgroup_eq_bot_of_exponent`), so it puts every ramified absolute value of
+`K∞` into the finite set `S`.  But the set of ramified absolute values is infinite as soon as it
+is nonempty: a ramified `w` gives the ramified absolute values `w ^ c`, `0 < c ≤ 1`, pairwise
+distinct and all equivalent to `w` (`AbsoluteValue.rpowOfLeOneOrIsNonarchimedean`,
+`AbsoluteValue.inertiaSubgroup_eq_of_equiv`).  So `hS` and `hexp` can hold together only when no
+place of `K∞` ramifies in `K∞ / K`, which never happens for a `ℤₚ`-extension of a number field
+(`MvZpExtension.exists_inertiaSubgroup_ne_bot`, proved here only conditionally on class field
+theory); the lemma is vacuous there. -/
 theorem finite_ramified_of_exponent_outside {S : Set (AbsoluteValue Kinf ℝ)} (hS : S.Finite)
     (hexp : ∀ w ∉ S, ∃ M : ℕ, M ≠ 0 ∧ ∀ σ ∈ w.inertiaSubgroup K, σ ^ M = 1) :
     {w : AbsoluteValue Kinf ℝ | w.inertiaSubgroup K ≠ ⊥}.Finite := by
@@ -207,8 +225,15 @@ Lemma 13.15 — consumes.
 
 This is `MvZpExtension.exists_shift_totally_ramified_of_bddAbove_outside` with its hypothesis
 replaced by the one the tame character actually produces.  Unconditional: not `sorry`-tainted.
-What is still missing is only the local statement `∀ σ ∈ I_w(K∞/K), σ ^ (N(v) - 1) = 1` at the
-places away from `p`; see `Iwasawalib/NumberTheory/LocalCFT/TameCharacter.lean`. -/
+The local statement, in its layerwise form (`σ ^ (N(v) - 1)` restricts to the identity on every
+layer `Kₙ`, for `σ ∈ I_w(K∞/K)` and `w` over a prime `v ∤ p`), is
+`MvZpExtension.exists_restrictNormalHom_pow_eq_one_of_liesOver_adicAbv`.
+
+**Warning**: as for `MvZpExtension.finite_ramified_of_exponent_outside`, the hypotheses `hS` and
+`hexp` can hold together only when no place of `K∞` ramifies in `K∞ / K`, so this lemma is
+vacuous for a `ℤₚ`-extension of a number field.  The local statement is used instead through
+`MvZpExtension.exists_ramifiedBasePlaceData_unconditional`, and the family actually used
+downstream is `MvZpExtension.RamifiedBasePlaceData.orbitPlace`. -/
 theorem exists_shift_totally_ramified_of_exponent_outside [Unique ι]
     {S : Set (AbsoluteValue Kinf ℝ)} (hS : S.Finite)
     (hexp : ∀ w ∉ S, ∃ M : ℕ, M ≠ 0 ∧ ∀ σ ∈ w.inertiaSubgroup K, σ ^ M = 1) :

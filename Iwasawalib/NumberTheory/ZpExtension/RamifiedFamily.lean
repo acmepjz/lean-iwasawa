@@ -14,8 +14,9 @@ public import Iwasawalib.NumberTheory.ZpExtension.ShiftStepOne
 `MvZpExtension.exists_totally_ramified` (Washington, Lemma 13.3) and its shifted form
 `MvZpExtension.exists_shift_totally_ramified` take the ramified places of `K∞ / K` as a
 *parameter*: a finite family `v : s → AbsoluteValue K∞ ℝ` with `I_{v j}(K∞/K) ≠ ⊥`.  This file
-supplies what is needed to produce that family, and separates sharply what is unconditional
-from what is not.
+proves the bounded-ramification criterion and states raw-place interfaces for that family; those
+interfaces are vacuous for a `ℤₚ`-extension of a number field (see the warning below), and the
+family actually used is `MvZpExtension.RamifiedBasePlaceData.orbitPlace`.
 
 ## The unconditional part: ramification in a `ℤₚ`-extension is all-or-unbounded
 
@@ -33,7 +34,10 @@ which is unbounded in `n`.  Hence the criterion
 (`MvZpExtension.inertiaSubgroup_eq_bot_iff_bddAbove_ramificationIdx`).  Nothing in this part
 uses class field theory, and none of it is `sorry`-tainted.
 
-## What this does *not* prove: "only the primes above `p` ramify"
+## What this file does *not* prove: "only the primes above `p` ramify"
+
+This is proved elsewhere, in `Iwasawalib/NumberTheory/ZpExtension/TameLocalExponent.lean`; this
+section explains what the local input is.
 
 It is tempting to argue that at a place `w` of residue characteristic `ℓ ≠ p` the extension is
 *tamely* ramified, that tame inertia is finite cyclic, and that a finite subgroup of the
@@ -48,11 +52,21 @@ quotient of the absolute inertia group of `K_v` is `∏_{q ≠ ℓ} ℤ_q`, whic
 quotient.  It is ruled out by *abelianness*: Frobenius acts on the tame quotient by `x ↦ x^q`,
 so in an abelian extension inertia is killed by `q - 1` and `e(w | v) ∣ N(v) - 1`, a bound
 uniform in the layer.  That bound is the local reciprocity input — classically local class
-field theory, `I_v ≅ 𝒪_v^×` whose pro-`p` part is finite — and neither it nor the tame
-character is available in this repository or in mathlib.
+field theory, `I_v ≅ 𝒪_v^×` whose pro-`p` part is finite.  It is proved in this repository
+without class field theory, by the tame route:
+`NumberField.pow_card_quotient_sub_one_eq_one_of_mem_inertia`
+(`Iwasawalib/NumberTheory/LocalCFT/TameInertiaOrder.lean`) shows that in an abelian extension
+of number fields a tame inertia element is killed by `N(v) - 1`, and
+`MvZpExtension.exists_restrictNormalHom_pow_eq_one_of_liesOver_adicAbv`
+(`Iwasawalib/NumberTheory/ZpExtension/TameLocalExponent.lean`) applies this to the image of
+`I_w(K∞/K)` in every layer `Kₙ / K` at a prime `v ∤ p` (tame there, having `p`-power order),
+with the same `N(v) - 1` for every `n`.
 
-So the criterion above is the exact interface: *supply a bound on the tame ramification indices
-that is uniform in `n`, and "unramified outside `p`" follows with no further `ℤₚ`-theory.*
+So the criterion above is an exact interface: *supply a bound on the tame ramification indices
+that is uniform in `n`, and "unramified outside `p`" follows with no further `ℤₚ`-theory.*  The
+repository in fact uses the exponent form of this interface
+(`Iwasawalib/NumberTheory/ZpExtension/InertiaExponent.lean`): an exponent bound on the images
+of `I_w(K∞/K)` in the layers makes `I_w(K∞/K)` trivial outright.
 
 ## The two arithmetic inputs, and their status
 
@@ -61,9 +75,27 @@ that is uniform in `n`, and "unramified outside `p`" follows with no further `�
   `NumberField.IsUnramifiedEverywhere.finiteDimensional`, which rests on
   `NumberField.IsUnramifiedEverywhere.surjective_artinMap`, which is `sorry`.  There is no
   `sorry`-free route: "unramified everywhere ⇒ finite" *is* the reciprocity statement.
-* *only finitely many places ramify* (classically: only those above `p`, of which there are
-  finitely many): this stays a **hypothesis**, `hfin` below.  It is exactly the missing local
-  input described above.
+* *only the places above `p` ramify*: no longer missing, and not `sorry`-tainted.  It is proved
+  outside this file: `MvZpExtension.exists_ramifiedBasePlaceData_unconditional`
+  (`Iwasawalib/NumberTheory/ZpExtension/TameLocalExponent.lean`) produces a
+  `MvZpExtension.RamifiedBasePlaceData`: a finite set of primes of `K` above `p` such that every
+  ramified place of `K∞` restricts on `K` to an absolute value equivalent to the adic place of
+  one of them.  The corresponding finite family of places of `K∞`, exhaustive up to equivalence
+  (`MvZpExtension.RamifiedBasePlaceData.exists_isEquiv_orbitPlace`), is
+  `MvZpExtension.RamifiedBasePlaceData.orbitPlace`
+  (`Iwasawalib/NumberTheory/ZpExtension/RamifiedPlaceFamily.lean`).
+
+**Warning** on the hypothesis `hfin` of the lemmas below: the set
+`{w : AbsoluteValue K∞ ℝ | w.inertiaSubgroup K ≠ ⊥}` is a set of *absolute values*, not of places
+up to equivalence, and it is infinite as soon as it is nonempty.  If `w` is ramified then `w` is
+nontrivial (`AbsoluteValue.inertiaSubgroup_eq_bot_of_not_isNontrivial`), and the absolute values
+`w ^ c` for `0 < c ≤ 1` (`AbsoluteValue.rpowOfLeOneOrIsNonarchimedean`) are pairwise distinct,
+equivalent to `w`, and hence ramified (`AbsoluteValue.inertiaSubgroup_eq_of_equiv`).  So `hfin`
+holds only when no place of `K∞` ramifies in `K∞ / K`, which never happens for a
+`ℤₚ`-extension of a number field (`MvZpExtension.exists_inertiaSubgroup_ne_bot`, `sorry`-tainted
+here).  The lemmas that assume `hfin`, or whose hypotheses imply it, are unconditional but
+vacuous in that setting; the ramified family is to be taken from
+`MvZpExtension.RamifiedBasePlaceData` instead.
 
 ## Main results
 
@@ -78,8 +110,11 @@ that is uniform in `n`, and "unramified outside `p`" follows with no further `�
   `MvZpExtension.exists_shift_totally_ramified_of_bddAbove_outside` and
   `MvZpExtension.exists_shift_totally_ramified_of_finite_ramified`: the ramified family, in the
   two forms `MvZpExtension.exists_totally_ramified` and
-  `MvZpExtension.exists_shift_totally_ramified` consume; both take only `hfin`, and neither is
-  `sorry`-tainted.
+  `MvZpExtension.exists_shift_totally_ramified` consume; they take only `hfin` (or hypotheses
+  implying it), and none is `sorry`-tainted.  **Warning**: these three lemmas and
+  `MvZpExtension.finite_ramified_of_bddAbove_outside` are vacuous for a `ℤₚ`-extension of a
+  number field, because `hfin` holds only when no place ramifies; see the warning above and
+  their own docstrings.
 * `MvZpExtension.exists_inertiaSubgroup_ne_bot`: at least one place ramifies — **tainted**, see
   its own warning.
 -/
@@ -154,8 +189,10 @@ This is the unconditional `ℤₚ`-side of "only the primes above `p` ramify": a
 `K∞` whose residue characteristic is different from `p`, every layer `Kₙ / K` is *tamely*
 ramified at `w`, and what has to be supplied is a bound on the tame ramification indices
 `e(w | v)` that is uniform in `n` (classically `e(w | v) ∣ N(v) - 1`, which comes from local
-class field theory or, equivalently, from the tame character of an abelian extension).  No
-such bound is available in this repository; see the module docstring. -/
+class field theory or, equivalently, from the tame character of an abelian extension).  That
+local input is proved, in exponent form rather than as a bound on ramification indices, by
+`MvZpExtension.exists_restrictNormalHom_pow_eq_one_of_liesOver_adicAbv`; see the module
+docstring. -/
 theorem inertiaSubgroup_eq_bot_iff_bddAbove_ramificationIdx [Unique ι]
     (w : AbsoluteValue Kinf ℝ) :
     w.inertiaSubgroup K = ⊥ ↔
@@ -213,8 +250,8 @@ everywhere unramified abelian extension of a number field is finite, because the
 `Cl(K) → Gal(K∞/K)` is surjective — and in this repository that route is
 `NumberField.IsUnramifiedEverywhere.finiteDimensional`, which is derived from
 `NumberField.IsUnramifiedEverywhere.surjective_artinMap`, which is `sorry`.  So this theorem
-depends on `sorryAx`, and so does everything below it that does not take the conclusion as a
-hypothesis.  No `sorry`-free route to this statement exists in the repository: the implication
+depends on `sorryAx`, and so does every declaration that uses it without taking its conclusion
+as a hypothesis.  No `sorry`-free route to this statement exists in the repository: the implication
 "unramified everywhere ⇒ finite" *is* the reciprocity input. -/
 theorem exists_inertiaSubgroup_ne_bot [Unique ι] :
     ∃ w : AbsoluteValue Kinf ℝ, w.inertiaSubgroup K ≠ ⊥ := by
@@ -237,11 +274,17 @@ omit [NumberField K] in
 finitely many places of `K∞` ramify in `K∞ / K`, then there is a single layer `Kₑ` beyond which
 `K∞ / Kₙ` is totally ramified at *every* ramified place simultaneously.
 
-The hypothesis `hfin` is the only input: it is the statement that the ramified set is finite,
-which classically follows from "only the primes above `p` ramify" (local class field theory)
-together with the finiteness of the set of places above `p`.  Nothing here is `sorry`-tainted:
-the taint enters only through `MvZpExtension.exists_inertiaSubgroup_ne_bot`, which is what
-makes the family *nonempty*, and which is not used here. -/
+The hypothesis `hfin` is the only input.  Nothing here is `sorry`-tainted: the taint enters
+only through `MvZpExtension.exists_inertiaSubgroup_ne_bot`, which is what makes the family
+*nonempty*, and which is not used here.
+
+**Warning**: `hfin` is not the formal counterpart of "only finitely many places ramify".  It
+ranges over raw absolute values, and a ramified `w` gives infinitely many ramified absolute
+values `w ^ c`, `0 < c ≤ 1`, all equivalent to `w`.  So `hfin` holds only when no place of `K∞`
+ramifies in `K∞ / K`, and then the conclusion is vacuous.  For a `ℤₚ`-extension of a number
+field some place does ramify (`MvZpExtension.exists_inertiaSubgroup_ne_bot`), so this lemma
+never applies there; use `MvZpExtension.exists_ramifiedBasePlaceData_unconditional` and
+`MvZpExtension.RamifiedBasePlaceData.orbitPlace`, which work up to equivalence of places. -/
 theorem exists_totally_ramified_of_finite_ramified [Unique ι]
     (hfin : {w : AbsoluteValue Kinf ℝ | w.inertiaSubgroup K ≠ ⊥}.Finite) :
     ∃ e : ℕ, ∀ n, e ≤ n → ∀ w : AbsoluteValue Kinf ℝ, w.inertiaSubgroup K ≠ ⊥ →
@@ -256,7 +299,12 @@ i.e. total ramification of `K∞ / Kₙ` read as a `ℤₚ`-extension of `Kₙ` 
 which is what `MvZpExtension.xinfQuotientMulEquivOfPlace'` — Step 1 of Washington's Lemma
 13.15 — is applied to.  As in
 `MvZpExtension.exists_totally_ramified_of_finite_ramified`, the only input is finiteness of
-the ramified set, and nothing here is `sorry`-tainted. -/
+the ramified set, and nothing here is `sorry`-tainted.
+
+**Warning**: `hfin` ranges over raw absolute values of `K∞` and holds only when no place of
+`K∞` ramifies in `K∞ / K` (see the module docstring), so this lemma is vacuous for a
+`ℤₚ`-extension of a number field.  The family actually used downstream is
+`MvZpExtension.RamifiedBasePlaceData.orbitPlace`. -/
 theorem exists_shift_totally_ramified_of_finite_ramified [Unique ι]
     (hfin : {w : AbsoluteValue Kinf ℝ | w.inertiaSubgroup K ≠ ⊥}.Finite) :
     ∃ e : ℕ, ∀ n, e ≤ n →
@@ -276,7 +324,15 @@ finitely many places ramify in `K∞ / K`.
 
 This is the whole of the `ℤₚ`-side of "only the primes above `p` ramify": the user of this
 lemma has to supply exactly the classical local statement `e(w | v) ∣ N(v) - 1` for `v ∤ p`,
-uniformly in the layer, and nothing else.  Unconditional. -/
+uniformly in the layer, and nothing else.  Unconditional.
+
+**Warning**: the hypotheses `hS` and `hbound` imply the conclusion, a finiteness statement about
+raw absolute values of `K∞`, and that set is infinite as soon as one place ramifies (see the
+module docstring).  So `hS` and `hbound` can hold together only when no place of `K∞` ramifies
+in `K∞ / K`: by `MvZpExtension.inertiaSubgroup_eq_bot_iff_bddAbove_ramificationIdx`, `hbound`
+puts every ramified absolute value into the finite set `S`.  For a `ℤₚ`-extension of a number
+field the lemma is vacuous; the local statement is used instead through
+`MvZpExtension.exists_ramifiedBasePlaceData_unconditional`. -/
 theorem finite_ramified_of_bddAbove_outside [Unique ι] {S : Set (AbsoluteValue Kinf ℝ)}
     (hS : S.Finite)
     (hbound : ∀ w ∉ S, ∃ N : ℕ, ∀ n : ℕ, w.ramificationIdxOfIsScalarTower K ↥(H.Kn n) ≤ N) :
@@ -289,7 +345,12 @@ theorem finite_ramified_of_bddAbove_outside [Unique ι] {S : Set (AbsoluteValue 
 `MvZpExtension.exists_shift_totally_ramified` consumes: combine
 `MvZpExtension.finite_ramified_of_bddAbove_outside` with
 `MvZpExtension.exists_shift_totally_ramified_of_finite_ramified`.  Unconditional: not
-`sorry`-tainted. -/
+`sorry`-tainted.
+
+**Warning**: as for `MvZpExtension.finite_ramified_of_bddAbove_outside`, the hypotheses `hS` and
+`hbound` can hold together only when no place of `K∞` ramifies in `K∞ / K`, so this lemma is
+vacuous for a `ℤₚ`-extension of a number field.  The family actually used downstream is
+`MvZpExtension.RamifiedBasePlaceData.orbitPlace`. -/
 theorem exists_shift_totally_ramified_of_bddAbove_outside [Unique ι]
     {S : Set (AbsoluteValue Kinf ℝ)} (hS : S.Finite)
     (hbound : ∀ w ∉ S, ∃ N : ℕ, ∀ n : ℕ, w.ramificationIdxOfIsScalarTower K ↥(H.Kn n) ≤ N) :

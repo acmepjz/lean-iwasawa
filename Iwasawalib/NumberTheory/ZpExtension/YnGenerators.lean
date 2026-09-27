@@ -31,15 +31,27 @@ elements `a_i^{(n)}` defined by `σ_i ^ p ^ (n - e) = a_i^{(n)} σ_1 ^ p ^ (n - 
 * `MvZpExtension.YnIn_eq_topologicalClosure_closure_of_lifts`: the generator description of
   `Y_n` at one level `n ≥ e`, in multiplicative closure form, from a family of places and of
   inertia lifts given as hypotheses.  Unconditional.
+* `MvZpExtension.YnIn_eq_gammaSubOne_of_forall_inertiaSubgroup_eq_bot`: if no place of `K∞`
+  ramifies in `K∞ / K`, then `Y_n = (γ ^ p ^ n - 1) X∞` for every `n` and every topological
+  generator `γ` of `G ⧸ X∞`.  Unconditional.
 * `MvZpExtension.RamifiedBasePlaceData.exists_eventual_Yn_generators`: `∃ γ e a`, the
-  generator description of `Y_n` for all `n ≥ e`, from a base-prime package.  **Conditional on
-  class field theory**, see its docstring.
+  generator description of `Y_n` for all `n ≥ e`, from a base-prime package.  Unconditional.
 * `MvZpExtension.exists_eventual_Yn_generators`: the same from the local exponent input
-  `hlocal`.  **Conditional on class field theory**, see its docstring.
+  `hlocal`, which is a hypothesis.  Unconditional.
 
 The conclusion of the last two is the hypothesis `hgen` of
 `MvZpExtension.multiplicity_classNumber_Kn_eq₁_of_eventual_Yn_data`, together with the `γ` and
-the `hγ` that theorem takes; the `example`s at the end of the file check this.
+the `hγ` that theorem takes.
+
+## Class field theory
+
+None of the declarations of this file depends on class field theory.  The proof of
+`MvZpExtension.RamifiedBasePlaceData.exists_eventual_Yn_generators` splits on whether the
+package has a base prime.  If it has one, the family of ramified places is nonempty and
+`MvZpExtension.YnIn_eq_topologicalClosure_closure_of_lifts` applies.  If it has none, no place
+of `K∞` ramifies and `MvZpExtension.YnIn_eq_gammaSubOne_of_forall_inertiaSubgroup_eq_bot`
+gives the description with `a = ∅`.  So the proof does not use the CFT-conditional
+`MvZpExtension.RamifiedBasePlaceData.nonempty_orbitIndex`.
 -/
 
 open Module PowerSeries NumberField IsDedekindDomain
@@ -184,6 +196,60 @@ theorem YnIn_eq_topologicalClosure_closure_of_lifts [Unique ι]
 
 set_option synthInstance.maxHeartbeats 800000 in
 set_option maxHeartbeats 1000000 in
+/-- **`Y_n` when no place ramifies.**  Let `γ` be a topological generator of `G ⧸ X∞` and
+suppose (`hunr`) that every place of `K∞` has trivial inertia subgroup in `Γ = Gal(K∞/K)`.
+Then for every `n`, `Y_n = Gal(L∞/K∞ L_n)`, as a subgroup of `X∞`, is
+`{(γ ^ p ^ n • x) x⁻¹ | x ∈ X∞}`.
+
+Proof: at the shifted extension `H.shift n`, the inertia cover
+`MvZpExtension.HH_shift_eq_commutator_sup_iSup` with the empty family gives that `HH` is the
+commutator subgroup of `Gal(L∞/K_n)`, which is `(γ' - 1) X∞` for a generator `γ'` of
+`Gal(K∞/K_n)` (`MvZpExtension.commutator_GG_eq`) and is closed
+(`Subgroup.isClosed_gammaSubOneG`); then transport along `MvZpExtension.xinfShiftMulEquiv`.
+
+In fact some place ramifies in every `ℤ_p`-extension (`MvZpExtension.exists_inertiaSubgroup_ne_bot`,
+which depends on class field theory), so `hunr` never holds.  This lemma is there so that the
+theorems below do not need that fact. -/
+theorem YnIn_eq_gammaSubOne_of_forall_inertiaSubgroup_eq_bot [Unique ι]
+    (γ : H.GG ⧸ H.Xinf) (hγ : Dense (Subgroup.zpowers γ : Set (H.GG ⧸ H.Xinf)))
+    (hunr : ∀ u : AbsoluteValue Kinf ℝ, u.inertiaSubgroup K = ⊥) (n : ℕ) :
+    H.YnIn n = Subgroup.gammaSubOne H.Xinf H.mul_comm_Xinf' (γ ^ p ^ n) := by
+  -- an element of `Gal(L∞/K_n)` whose class is `γ ^ p ^ n`
+  obtain ⟨σ, hσ⟩ := QuotientGroup.mk_surjective γ
+  have hσ0 : (QuotientGroup.mk σ : H.GG ⧸ H.Xinf) = γ ^ p ^ 0 := by
+    rw [pow_zero, pow_one]
+    exact hσ
+  obtain ⟨g', hg'⟩ : ∃ g' : (H.shift n).GG,
+      H.ggShiftRestrictHom n g' = σ ^ p ^ (n - 0) := by
+    refine ⟨(H.ggShiftMulEquiv n).symm
+      ⟨σ ^ p ^ (n - 0), H.pow_mem_GGOverKn (Nat.zero_le n) γ hσ0⟩, ?_⟩
+    rw [← H.coe_ggShiftMulEquiv n]
+    exact congrArg Subtype.val ((H.ggShiftMulEquiv n).apply_symm_apply _)
+  have hg'mk : (QuotientGroup.mk (H.ggShiftRestrictHom n g') : H.GG ⧸ H.Xinf) = γ ^ p ^ n := by
+    rw [hg', QuotientGroup.mk_pow, hσ, Nat.sub_zero]
+  have hγ' := H.dense_zpowers_mk_shift_of_mk_eq_pow hγ n g' hg'mk
+  -- the inertia cover with the empty family: `HH = commutator = (γ' - 1) X∞`
+  have hcov := H.HH_shift_eq_commutator_sup_iSup (s := Empty) Empty.elim n
+    (fun u hu ↦ absurd (hunr u) hu) Empty.elim (fun j ↦ j.elim)
+  have hcov' : (H.shift n).HH = Subgroup.gammaSubOneG (H.shift n).Xinf
+      (H.shift n).mul_comm_Xinf' (QuotientGroup.mk g') := by
+    rw [hcov, ← (H.shift n).commutator_GG_eq _ hγ']
+    exact le_antisymm (sup_le le_rfl (iSup_le fun j ↦ j.elim)) le_sup_left
+  have hcl : (Subgroup.gammaSubOneG (H.shift n).Xinf (H.shift n).mul_comm_Xinf'
+      (QuotientGroup.mk g')).topologicalClosure =
+      Subgroup.gammaSubOneG (H.shift n).Xinf (H.shift n).mul_comm_Xinf' (QuotientGroup.mk g') :=
+    SetLike.coe_injective (by
+      rw [Subgroup.topologicalClosure_coe, (Subgroup.isClosed_gammaSubOneG _ _ _
+        (H.shift n).isClosed_Xinf).closure_eq])
+  -- `Y_0` of the shifted extension, then transport
+  have hY0 : (H.shift n).YnIn 0 = Subgroup.gammaSubOne (H.shift n).Xinf
+      (H.shift n).mul_comm_Xinf' (QuotientGroup.mk g') := by
+    rw [← H.topologicalClosure_HH_shift_subgroupOf_Xinf_eq_YnIn_zero n, hcov', hcl]
+    exact Subgroup.comap_map_eq_self_of_injective (Subgroup.subtype_injective _) _
+  rw [← H.map_YnIn_xinfShiftMulEquiv n, hY0, H.map_gammaSubOne_xinfShiftMulEquiv n g', hg'mk]
+
+set_option synthInstance.maxHeartbeats 800000 in
+set_option maxHeartbeats 1000000 in
 /-- **The generator description of `Y_n` for all `n ≥ e`, from a base-prime package.**  Given
 `D : RamifiedBasePlaceData H` (finitely many primes of `K` above `p`, one ramified place of
 `K∞` above each, covering every ramified place of `K∞` up to equivalence of restrictions to
@@ -194,17 +260,14 @@ attached to `Y_n` is `ℤ_p · (ν_{n,e} • a) + ω_n X∞`.
 This is exactly `γ`, `hγ`, `e`, `a` and `hgen` of
 `MvZpExtension.multiplicity_classNumber_Kn_eq₁_of_eventual_Yn_data`.
 
-**Warning**: this declaration is *not* unconditional.  Its proof needs at least one place of
-`K∞` which ramifies in `K∞ / K` (the index `j₀` of
-`MvZpExtension.YnIn_eq_topologicalClosure_closure_of_lifts`).  The proof uses exactly one
-CFT-conditional declaration, `MvZpExtension.RamifiedBasePlaceData.nonempty_orbitIndex`, which
-rests on `MvZpExtension.exists_inertiaSubgroup_ne_bot` and through it on
-`NumberField.IsUnramifiedEverywhere.surjective_artinMap` (`sorry`).  So this theorem depends
-on `sorryAx`.
-
-The dependence on class field theory is avoidable in principle: if no place ramifies, the
-inertia cover gives `HH = commutator` and `hgen` holds with `a = ∅`.  That case is not
-formalized here. -/
+This theorem does not depend on class field theory.  The proof splits on whether `D.base`
+is empty.  If it is not, a base prime `q₀` gives the index `j₀ = (q₀, 1)` of
+`MvZpExtension.YnIn_eq_topologicalClosure_closure_of_lifts`, applied to the family
+`MvZpExtension.RamifiedBasePlaceData.orbitPlace`.  If it is, then by `D.covers` no place of
+`K∞` ramifies in `K∞ / K`, and
+`MvZpExtension.YnIn_eq_gammaSubOne_of_forall_inertiaSubgroup_eq_bot` gives the description with
+`e = 0` and `a = ∅`.  The CFT-conditional
+`MvZpExtension.RamifiedBasePlaceData.nonempty_orbitIndex` is not used. -/
 theorem RamifiedBasePlaceData.exists_eventual_Yn_generators [Unique ι]
     (D : RamifiedBasePlaceData H) :
     ∃ γ : H.GG ⧸ H.Xinf, Dense (Subgroup.zpowers γ : Set (H.GG ⧸ H.Xinf)) ∧
@@ -223,8 +286,29 @@ theorem RamifiedBasePlaceData.exists_eventual_Yn_generators [Unique ι]
               (⊤ : Submodule ℤ_[p]⟦X⟧ (Additive ↥H.Xinf))).restrictScalars ℤ_[p]) := by
   classical
   obtain ⟨γ, hγ⟩ := H.exists_dense_zpowers
+  rcases isEmpty_or_nonempty D.base with hD | hD
+  · -- no place of `K∞` ramifies: `Y_n = (γ ^ p ^ n - 1) X∞`, and `e = 0`, `a = ∅`
+    have hunr : ∀ u : AbsoluteValue Kinf ℝ, u.inertiaSubgroup K = ⊥ := by
+      intro u
+      by_contra hu
+      obtain ⟨q, -⟩ := D.covers u hu
+      exact isEmptyElim q
+    refine ⟨γ, hγ, 0, ∅, fun n _ ↦ ?_⟩
+    letI := H.XinfZpModule
+    letI := H.XinfLambdaModule γ
+    haveI := H.isScalarTower_Xinf γ
+    haveI := H.continuousSMul_XinfZpModule
+    refine H.hgen_of_closure γ 0 ∅ ?_
+    have hc := Subgroup.isClosed_gammaSubOne H.Xinf H.mul_comm_Xinf' (γ ^ p ^ n) H.isClosed_Xinf
+    rw [Finset.coe_empty, Set.smul_set_empty, Set.empty_union, H.coe_omega_smul_top_Xinf γ n,
+      AddSubgroup.closure_eq, H.YnIn_eq_gammaSubOne_of_forall_inertiaSubgroup_eq_bot γ hγ hunr n]
+    apply SetLike.coe_injective
+    rw [AddSubgroup.topologicalClosure_coe]
+    exact hc.closure_eq.symm
+  -- some base prime: the family of ramified places has the index `j₀ = (q₀, 1)`
+  obtain ⟨q₀⟩ := hD
   obtain ⟨e, he⟩ := D.exists_common_shift
-  obtain ⟨j₀⟩ := RamifiedBasePlaceData.nonempty_orbitIndex H D e
+  let j₀ : D.base × (H.Γ ⧸ (H.Γpow e : Subgroup H.Γ)) := (q₀, 1)
   have hv := RamifiedBasePlaceData.Γpow_le_inertiaSubgroup_orbitPlace H D he
   have hcover := RamifiedBasePlaceData.exists_isEquiv_orbitPlace H D he
   haveI : Finite (D.base × (H.Γ ⧸ (H.Γpow e : Subgroup H.Γ))) :=
@@ -318,17 +402,9 @@ it (see also its corollary `MvZpExtension.exists_ramifiedBasePlaceData_unconditi
 The conclusion is exactly `γ`, `hγ`, `e`, `a` and `hgen` of
 `MvZpExtension.multiplicity_classNumber_Kn_eq₁_of_eventual_Yn_data`.
 
-**Warning**: this declaration is *not* unconditional.  It is
-`MvZpExtension.RamifiedBasePlaceData.exists_eventual_Yn_generators` applied to a package
-produced by `MvZpExtension.exists_ramifiedBasePlaceData`.  The proof uses exactly one
-CFT-conditional declaration, `MvZpExtension.RamifiedBasePlaceData.nonempty_orbitIndex`, which
-rests on `MvZpExtension.exists_inertiaSubgroup_ne_bot` and through it on
-`NumberField.IsUnramifiedEverywhere.surjective_artinMap` (`sorry`).  So this theorem depends
-on `sorryAx`.
-
-The dependence on class field theory is avoidable in principle: if no place ramifies, the
-inertia cover gives `HH = commutator` and `hgen` holds with `a = ∅`.  That case is not
-formalized here. -/
+It is `MvZpExtension.RamifiedBasePlaceData.exists_eventual_Yn_generators` applied to a package
+produced by `MvZpExtension.exists_ramifiedBasePlaceData`.  Neither depends on class field
+theory, so neither does this theorem. -/
 theorem exists_eventual_Yn_generators [Unique ι]
     (hlocal : ∀ (q : HeightOneSpectrum (𝓞 K)),
       (p : 𝓞 K) ∉ q.asIdeal →
@@ -353,76 +429,5 @@ theorem exists_eventual_Yn_generators [Unique ι]
               (⊤ : Submodule ℤ_[p]⟦X⟧ (Additive ↥H.Xinf))).restrictScalars ℤ_[p]) := by
   obtain ⟨D⟩ := H.exists_ramifiedBasePlaceData hlocal
   exact RamifiedBasePlaceData.exists_eventual_Yn_generators H D
-
-/-! ### Compatibility with the consumer
-
-The two `example`s below contain no `sorry` of their own.  They check that the output of
-`exists_eventual_Yn_generators` (resp. of the `RamifiedBasePlaceData` version) is accepted, with
-no reindexing, as the arguments `γ hγ e a hgen` of
-`MvZpExtension.multiplicity_classNumber_Kn_eq₁_of_eventual_Yn_data`, and that `hlocal` is
-accepted by `MvZpExtension.exists_ramifiedBasePlaceData`.  The hypotheses `hYdata`, `hbridge`
-are the remaining two hypotheses of the consumer, quantified over the `γ` and `e` produced;
-they are there only so that the application typechecks and carry no claim. -/
-
--- The two `example`s below are compile-time checks that the output of the theorems above has
--- the shape the consumer expects.  Their hypotheses `hYdata` and `hbridge` are universally
--- quantified placeholders; the examples are not results.
-
-set_option synthInstance.maxHeartbeats 800000 in
-example [Unique ι]
-    (hlocal : ∀ (q : HeightOneSpectrum (𝓞 K)),
-      (p : 𝓞 K) ∉ q.asIdeal →
-      ∀ (v : AbsoluteValue Kinf ℝ),
-        [v.LiesOver (HeightOneSpectrum.adicAbv K q)] →
-        ∃ M : ℕ, M ≠ 0 ∧
-          ∀ n σ, σ ∈ v.inertiaSubgroup K →
-            AlgEquiv.restrictNormalHom (H.Kn n) (σ ^ M) = 1)
-    (hYdata : ∀ (γ : H.GG ⧸ H.Xinf) (e : ℕ),
-      letI := H.XinfZpModule
-      letI := H.XinfLambdaModule γ
-      haveI := H.isScalarTower_Xinf γ
-      ∃ Y : Submodule ℤ_[p]⟦X⟧ (Additive ↑H.Xinf),
-        Y.restrictScalars ℤ_[p] =
-            H.xinfZpSubmoduleOfSubgroup (H.YnIn e) (H.isClosed_YnIn e) ∧
-          ∀ n : ℕ, e ≤ n →
-            (((((Polynomial.nu ℤ_[p] p n e : Polynomial ℤ_[p]) : ℤ_[p]⟦X⟧) • Y).restrictScalars
-                ℤ_[p])) =
-              H.xinfZpSubmoduleOfSubgroup (H.YnIn n) (H.isClosed_YnIn n))
-    (hbridge : ∀ e : ℕ, EventualClassNumberCardinalityBridge H e) :
-    ∃ (mu lambda : ℕ) (nu : ℤ) (N : ℕ), ∀ n > N,
-      (multiplicity p (NumberField.classNumber (H.Kn n)) : ℤ) =
-        (mu : ℤ) * (p : ℤ) ^ n + (lambda : ℤ) * n + nu := by
-  obtain ⟨γ, hγ, e, a, hgen⟩ := H.exists_eventual_Yn_generators hlocal
-  exact H.multiplicity_classNumber_Kn_eq₁_of_eventual_Yn_data γ hγ e a hgen (hYdata γ e)
-    (hbridge e)
-
-set_option synthInstance.maxHeartbeats 800000 in
-example [Unique ι]
-    (hlocal : ∀ (q : HeightOneSpectrum (𝓞 K)),
-      (p : 𝓞 K) ∉ q.asIdeal →
-      ∀ (v : AbsoluteValue Kinf ℝ),
-        [v.LiesOver (HeightOneSpectrum.adicAbv K q)] →
-        ∃ M : ℕ, M ≠ 0 ∧
-          ∀ n σ, σ ∈ v.inertiaSubgroup K →
-            AlgEquiv.restrictNormalHom (H.Kn n) (σ ^ M) = 1)
-    (hYdata : ∀ (γ : H.GG ⧸ H.Xinf) (e : ℕ),
-      letI := H.XinfZpModule
-      letI := H.XinfLambdaModule γ
-      haveI := H.isScalarTower_Xinf γ
-      ∃ Y : Submodule ℤ_[p]⟦X⟧ (Additive ↑H.Xinf),
-        Y.restrictScalars ℤ_[p] =
-            H.xinfZpSubmoduleOfSubgroup (H.YnIn e) (H.isClosed_YnIn e) ∧
-          ∀ n : ℕ, e ≤ n →
-            (((((Polynomial.nu ℤ_[p] p n e : Polynomial ℤ_[p]) : ℤ_[p]⟦X⟧) • Y).restrictScalars
-                ℤ_[p])) =
-              H.xinfZpSubmoduleOfSubgroup (H.YnIn n) (H.isClosed_YnIn n))
-    (hbridge : ∀ e : ℕ, EventualClassNumberCardinalityBridge H e) :
-    ∃ (mu lambda : ℕ) (nu : ℤ) (N : ℕ), ∀ n > N,
-      (multiplicity p (NumberField.classNumber (H.Kn n)) : ℤ) =
-        (mu : ℤ) * (p : ℤ) ^ n + (lambda : ℤ) * n + nu := by
-  obtain ⟨D⟩ := H.exists_ramifiedBasePlaceData hlocal
-  obtain ⟨γ, hγ, e, a, hgen⟩ := RamifiedBasePlaceData.exists_eventual_Yn_generators H D
-  exact H.multiplicity_classNumber_Kn_eq₁_of_eventual_Yn_data γ hγ e a hgen (hYdata γ e)
-    (hbridge e)
 
 end MvZpExtension

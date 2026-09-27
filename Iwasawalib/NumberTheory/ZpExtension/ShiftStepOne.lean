@@ -29,10 +29,19 @@ This file supplies the two hypotheses of `MvZpExtension.xinfQuotientMulEquivOfPl
   `MvZpExtension.exists_dense_zpowers_shift`;
 * `hram` is `MvZpExtension.exists_shift_totally_ramified`.
 
-What is *not* supplied, and is not supplied anywhere in the repository, is the identification
-of the family `v`: that at least one prime of `K` ramifies in `K∞` and that only the primes
-above `p` do.  Both are class field theory.  Accordingly the ramified family stays a parameter,
-exactly as in `MvZpExtension.exists_totally_ramified`.
+What is *not* supplied here is the family `v` itself: in this file the ramified family stays a
+parameter, exactly as in `MvZpExtension.exists_totally_ramified`.  It is supplied elsewhere.
+That only the primes above `p` ramify is proved unconditionally
+(`MvZpExtension.exists_ramifiedBasePlaceData_unconditional`, in
+`Iwasawalib/NumberTheory/ZpExtension/TameLocalExponent.lean`), and the resulting finite family
+of places of `K∞`, which at a suitable level `e` contains every ramified place up to
+equivalence (`MvZpExtension.RamifiedBasePlaceData.exists_isEquiv_orbitPlace`), is
+`MvZpExtension.RamifiedBasePlaceData.orbitPlace`
+(`Iwasawalib/NumberTheory/ZpExtension/RamifiedPlaceFamily.lean`).  That at least one prime of
+`K` ramifies in `K∞` is only available conditionally on class field theory:
+`MvZpExtension.exists_inertiaSubgroup_ne_bot` depends on the `sorry`
+`NumberField.IsUnramifiedEverywhere.surjective_artinMap`, and it is what makes the family
+nonempty (`MvZpExtension.RamifiedBasePlaceData.nonempty_orbitIndex`).
 
 ## Main results
 

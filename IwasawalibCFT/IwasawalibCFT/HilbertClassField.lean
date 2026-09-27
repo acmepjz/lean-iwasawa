@@ -12,9 +12,10 @@ import Iwasawalib.NumberTheory.NumberField.HilbertClassField.UniverseTransport
 /-!
 # The Hilbert class field hypotheses, discharged by external class field theory
 
-This file is part of the leaf library `IwasawalibCFT`. Unlike `Iwasawalib`, it is **not** a Lean
-module file, because it imports the external `sorry`-free class field theory library
-`ClassFieldTheory` (<https://github.com/n-yamaguchi-0729/ClassFieldTheory>, commit
+This file is part of the nested Lake package `IwasawalibCFT` (directory `IwasawalibCFT/` of the
+repository). Unlike `Iwasawalib`, it is **not** a Lean module file, because it imports the
+external `sorry`-free class field theory library `ClassFieldTheory`
+(<https://github.com/n-yamaguchi-0729/ClassFieldTheory>, commit
 `2e6280f9d2579705a0cc6c76ec68c2b60f9c601a`), which is not module based. It proves the two
 hypotheses `NumberField.HilbertClassFieldUpperBound` and `NumberField.HilbertClassFieldExistence`
 of `Iwasawalib/NumberTheory/NumberField/HilbertClassField/Hypothesis.lean`.
@@ -43,10 +44,6 @@ statements used are exactly the ones quoted in this docstring.
 The external library works with fields in `Type`, so the hypotheses are first proved in universe
 `0` and then transported to all universes with
 `Iwasawalib/NumberTheory/NumberField/HilbertClassField/UniverseTransport.lean`.
-
-Nothing in the import closure of this file contains
-`Iwasawalib/NumberTheory/NumberField/HilbertClassField/ClassFieldTheory.lean` (the file with the
-class field theory `sorry`s).
 
 ## Main statements
 

@@ -38,10 +38,11 @@ of places of `K∞`, which at a suitable level `e` contains every ramified place
 equivalence (`MvZpExtension.RamifiedBasePlaceData.exists_isEquiv_orbitPlace`), is
 `MvZpExtension.RamifiedBasePlaceData.orbitPlace`
 (`Iwasawalib/NumberTheory/ZpExtension/RamifiedPlaceFamily.lean`).  That at least one prime of
-`K` ramifies in `K∞` is only available conditionally on class field theory:
-`MvZpExtension.exists_inertiaSubgroup_ne_bot` depends on the `sorry`
-`NumberField.IsUnramifiedEverywhere.surjective_artinMap`, and it is what makes the family
-nonempty (`MvZpExtension.RamifiedBasePlaceData.nonempty_orbitIndex`).
+`K` ramifies in `K∞`, which makes the family nonempty, is class field theory:
+`MvZpExtension.exists_inertiaSubgroup_ne_bot_of_hcf` proves it from the upper-bound half
+`NumberField.HilbertClassFieldUpperBound` of the Hilbert class field theorem.  It is not needed
+downstream: `MvZpExtension.RamifiedBasePlaceData.exists_eventual_Yn_generators` splits on
+whether the family is empty.
 
 ## Main results
 

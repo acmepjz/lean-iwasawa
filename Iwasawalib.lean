@@ -222,14 +222,12 @@ public import Iwasawalib.NumberTheory.Padics.Units
 public import Iwasawalib.NumberTheory.ZpExtension.BaseChangeLinearDisjoint
 public import Iwasawalib.NumberTheory.ZpExtension.BasePrimeRamification
 public import Iwasawalib.NumberTheory.ZpExtension.Basic
-public import Iwasawalib.NumberTheory.ZpExtension.ClassGroup
 public import Iwasawalib.NumberTheory.ZpExtension.ClassNumberGrowth
 public import Iwasawalib.NumberTheory.ZpExtension.CommutatorEq
 public import Iwasawalib.NumberTheory.ZpExtension.Compositum
 public import Iwasawalib.NumberTheory.ZpExtension.ConjugateAction
 public import Iwasawalib.NumberTheory.ZpExtension.CyclotomicIwasawa
 public import Iwasawalib.NumberTheory.ZpExtension.EventualClassNumberBridge
-public import Iwasawalib.NumberTheory.ZpExtension.EventualClassNumberBridgeOfCFT
 public import Iwasawalib.NumberTheory.ZpExtension.FiniteLayerCardinality
 public import Iwasawalib.NumberTheory.ZpExtension.FiniteRamifiedPlaces
 public import Iwasawalib.NumberTheory.ZpExtension.FiniteSubalgebraLinearDisjoint

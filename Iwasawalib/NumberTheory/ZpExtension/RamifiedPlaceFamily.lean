@@ -38,8 +38,6 @@ of `K∞` with nontrivial inertia in `K∞ / K`.
   family has inertia subgroup containing `Γ^{p^e}`.
 * `MvZpExtension.RamifiedBasePlaceData.exists_isEquiv_orbitPlace`: every place of `K∞` with
   nontrivial inertia is equivalent to a member of the family.
-* `MvZpExtension.RamifiedBasePlaceData.nonempty_orbitIndex`: the index type is nonempty
-  (conditional, see below).
 * `MvZpExtension.inertiaSubgroup_Kn_placeBelow_shiftPlaceEquiv_symm_eq_top`: for `n ≥ e`, a
   place of `L∞` above a member of the family, viewed as a place of the shifted extension, lies
   over a place of `K∞` which is totally ramified in `K∞ / K_n`.
@@ -48,10 +46,12 @@ of `K∞` with nontrivial inertia in `K∞ / K`.
 
 ## Conditionality
 
-`MvZpExtension.RamifiedBasePlaceData.nonempty_orbitIndex` is **not** unconditional: it uses
-`MvZpExtension.exists_inertiaSubgroup_ne_bot`, which depends on the `sorry`
-`NumberField.IsUnramifiedEverywhere.surjective_artinMap`.  Every other declaration of this file
-is unconditional.
+Every declaration of this file is unconditional.  Nothing here claims that the family is
+nonempty: that at least one place ramifies in a `ℤₚ`-extension of a number field is class field
+theory (`MvZpExtension.exists_inertiaSubgroup_ne_bot_of_hcf` proves it from the upper-bound half
+of the Hilbert class field theorem), and
+`MvZpExtension.RamifiedBasePlaceData.exists_eventual_Yn_generators` splits on whether `D.base` is
+empty instead.
 -/
 
 open PowerSeries NumberField IsDedekindDomain
@@ -160,23 +160,6 @@ theorem RamifiedBasePlaceData.exists_isEquiv_orbitPlace [Unique ι]
     exact h2
   rw [key]
   exact hτ.symm
-
-/-- **The family of ramified places is nonempty**: in the `ℤₚ`-case, for every package `D` of
-ramified base primes and every `e`, the index type `D.base × (Γ ⧸ Γ^{p^e})` has an element.
-Equivalently, `D.base` is nonempty.
-
-**Warning**: this declaration is *not* unconditional.  Its only route in this repository is
-`MvZpExtension.exists_inertiaSubgroup_ne_bot` (at least one place ramifies in `K∞ / K`), which
-is derived from `NumberField.IsUnramifiedEverywhere.finiteDimensional`, which is derived from
-`NumberField.IsUnramifiedEverywhere.surjective_artinMap`, which is `sorry`.  So this theorem
-depends on `sorryAx`.  No declaration of the library uses it:
-`MvZpExtension.RamifiedBasePlaceData.exists_eventual_Yn_generators` splits on whether `D.base` is
-empty instead. -/
-theorem RamifiedBasePlaceData.nonempty_orbitIndex [Unique ι] (D : RamifiedBasePlaceData H)
-    (e : ℕ) : Nonempty (D.base × (H.Γ ⧸ (H.Γpow e : Subgroup H.Γ))) := by
-  obtain ⟨w, hw⟩ := H.exists_inertiaSubgroup_ne_bot
-  obtain ⟨q, -⟩ := D.covers w hw
-  exact ⟨(q, QuotientGroup.mk 1)⟩
 
 /-! ### The cover at the shifted extension -/
 

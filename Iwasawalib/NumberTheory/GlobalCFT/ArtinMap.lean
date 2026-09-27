@@ -34,15 +34,19 @@ The descent to `ClassGroup (𝓞 F)` is exactly **Artin reciprocity**, isolated 
 Granted it:
 
 * `NumberField.artinMapOfReciprocal F K h : ClassGroup (𝓞 F) →* Gal(K/F)`;
-* `NumberField.artinMapOfReciprocal_mk0_eq_arithFrobAt` is verbatim the conclusion of
-  `NumberField.IsUnramifiedEverywhere.artinMap_spec`;
+* `NumberField.artinMapOfReciprocal_mk0_eq_arithFrobAt`: it sends the class of a prime `p` of
+  `𝓞 F` to the arithmetic Frobenius `arithFrobAt (𝓞 F) Gal(K/F) P.asIdeal` at any prime `P` of
+  `𝓞 K` above `p`;
 * `NumberField.surjective_artinMapOfReciprocal` reduces the surjectivity of the Artin map to the
   surjectivity of `frobIdealHom`, i.e. to the statement that the Frobenius elements generate
   `Gal(K/F)`.
 
-So `NumberField.IsUnramifiedEverywhere.artinMap` may be defined as `artinMapOfReciprocal F K h`
-as soon as `h` is available, and `artinMap_spec` and `surjective_artinMap` follow from the two
-theorems above.
+So an Artin map characterised by Frobenius elements exists as soon as `h` is available, and it
+is surjective as soon as the Frobenius elements generate `Gal(K/F)`.  (Until 2026-09 such an
+Artin map, and these two properties, were stated with `sorry` in
+`Iwasawalib/NumberTheory/NumberField/HilbertClassField/ClassFieldTheory.lean`.  They have been
+removed; Iwasawa's theorem takes its class field theory input from the hypotheses
+`NumberField.HilbertClassFieldUpperBound` and `NumberField.HilbertClassFieldExistence` instead.)
 
 ## Why neither input is available here
 
@@ -88,9 +92,9 @@ What is still missing is the arithmetic input those statements consume.
   constructed.  Moreover `Iwasawalib/NumberTheory/CFT/GlobalReciprocity.lean` and
   `Iwasawalib/NumberTheory/CFT/GlobalReciprocityLocalCompatibility.lean` are stated for
   `F L : Type`, whereas this file works at `Type*`.
-* The existence theorem of class field theory, which
-  `NumberField.IsUnramifiedEverywhere.bijective_artinMap_of_isSepClosed` needs in addition, is
-  not proved.
+* The existence theorem of class field theory, which the bijectivity of the Artin map
+  `Cl(F) → Gal(H/F)` for the maximal unramified abelian extension `H` of `F` needs in addition,
+  is not proved.
 
 So `IsArtinReciprocal`, and the surjectivity of `frobIdealHom` below, remain unproved inputs.
 
@@ -198,8 +202,7 @@ theorem artinMapOfReciprocal_mk0 (h : IsArtinReciprocal F K) (p : HeightOneSpect
   rw [artinMapOfReciprocal, MonoidHom.comp_apply, MulEquiv.coe_toMonoidHom, ClassGroup.equiv_mk0,
     QuotientGroup.mk'_apply, QuotientGroup.lift_mk, frobIdealHom_mk0]
 
-/-- **The Artin map satisfies the specification of
-`NumberField.IsUnramifiedEverywhere.artinMap_spec`** : it sends the class of `p` to the
+/-- **The Artin map sends the class of a prime `p` to the Frobenius at `p`**: its value is the
 arithmetic Frobenius at any prime `P` of `𝓞 K` above `p`. -/
 theorem artinMapOfReciprocal_mk0_eq_arithFrobAt [NumberField K] (h : IsArtinReciprocal F K)
     (p : HeightOneSpectrum (𝓞 F)) (P : HeightOneSpectrum (𝓞 K))

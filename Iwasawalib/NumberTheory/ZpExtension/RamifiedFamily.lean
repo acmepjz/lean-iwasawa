@@ -32,7 +32,7 @@ which is unbounded in `n`.  Hence the criterion
 `I_w(K∞/K) = ⊥  ↔  the ramification indices e(w | Kₙ/K) are bounded`
 
 (`MvZpExtension.inertiaSubgroup_eq_bot_iff_bddAbove_ramificationIdx`).  Nothing in this part
-uses class field theory, and none of it is `sorry`-tainted.
+uses class field theory.
 
 ## What this file does *not* prove: "only the primes above `p` ramify"
 
@@ -70,13 +70,13 @@ of `I_w(K∞/K)` in the layers makes `I_w(K∞/K)` trivial outright.
 
 ## The two arithmetic inputs, and their status
 
-* *at least one place ramifies*: `MvZpExtension.exists_inertiaSubgroup_ne_bot` is proved here,
-  but is **`sorry`-tainted**: the only route in the repository is
-  `NumberField.IsUnramifiedEverywhere.finiteDimensional`, which rests on
-  `NumberField.IsUnramifiedEverywhere.surjective_artinMap`, which is `sorry`.  There is no
-  `sorry`-free route: "unramified everywhere ⇒ finite" *is* the reciprocity statement.
-* *only the places above `p` ramify*: no longer missing, and not `sorry`-tainted.  It is proved
-  outside this file: `MvZpExtension.exists_ramifiedBasePlaceData_unconditional`
+* *at least one place ramifies*: this is class field theory — an everywhere unramified abelian
+  extension of a number field is finite — and is not proved here.  It is proved from the
+  upper-bound half of the Hilbert class field theorem as
+  `MvZpExtension.exists_inertiaSubgroup_ne_bot_of_hcf`
+  (`Iwasawalib/NumberTheory/ZpExtension/IwasawaTheoremOfHCF.lean`).
+* *only the places above `p` ramify*: no longer missing, and proved without class field
+  theory, outside this file: `MvZpExtension.exists_ramifiedBasePlaceData_unconditional`
   (`Iwasawalib/NumberTheory/ZpExtension/TameLocalExponent.lean`) produces a
   `MvZpExtension.RamifiedBasePlaceData`: a finite set of primes of `K` above `p` such that every
   ramified place of `K∞` restricts on `K` to an absolute value equivalent to the adic place of
@@ -92,10 +92,10 @@ nontrivial (`AbsoluteValue.inertiaSubgroup_eq_bot_of_not_isNontrivial`), and the
 `w ^ c` for `0 < c ≤ 1` (`AbsoluteValue.rpowOfLeOneOrIsNonarchimedean`) are pairwise distinct,
 equivalent to `w`, and hence ramified (`AbsoluteValue.inertiaSubgroup_eq_of_equiv`).  So `hfin`
 holds only when no place of `K∞` ramifies in `K∞ / K`, which never happens for a
-`ℤₚ`-extension of a number field (`MvZpExtension.exists_inertiaSubgroup_ne_bot`, `sorry`-tainted
-here).  The lemmas that assume `hfin`, or whose hypotheses imply it, are unconditional but
-vacuous in that setting; the ramified family is to be taken from
-`MvZpExtension.RamifiedBasePlaceData` instead.
+`ℤₚ`-extension of a number field (`MvZpExtension.exists_inertiaSubgroup_ne_bot_of_hcf`, which
+assumes the upper-bound half of the Hilbert class field theorem).  The lemmas that assume
+`hfin`, or whose hypotheses imply it, are unconditional but vacuous in that setting; the ramified
+family is to be taken from `MvZpExtension.RamifiedBasePlaceData` instead.
 
 ## Main results
 
@@ -111,12 +111,10 @@ vacuous in that setting; the ramified family is to be taken from
   `MvZpExtension.exists_shift_totally_ramified_of_finite_ramified`: the ramified family, in the
   two forms `MvZpExtension.exists_totally_ramified` and
   `MvZpExtension.exists_shift_totally_ramified` consume; they take only `hfin` (or hypotheses
-  implying it), and none is `sorry`-tainted.  **Warning**: these three lemmas and
+  implying it).  **Warning**: these three lemmas and
   `MvZpExtension.finite_ramified_of_bddAbove_outside` are vacuous for a `ℤₚ`-extension of a
   number field, because `hfin` holds only when no place ramifies; see the warning above and
   their own docstrings.
-* `MvZpExtension.exists_inertiaSubgroup_ne_bot`: at least one place ramifies — **tainted**, see
-  its own warning.
 -/
 open IntermediateField
 
@@ -242,48 +240,19 @@ section Family
 
 variable [NumberField K]
 
-include H in
-/-- **At least one place of `K` ramifies in `K∞`.**
-
-**Warning**: this declaration is *not* unconditional.  Its proof is the classical one — an
-everywhere unramified abelian extension of a number field is finite, because the Artin map
-`Cl(K) → Gal(K∞/K)` is surjective — and in this repository that route is
-`NumberField.IsUnramifiedEverywhere.finiteDimensional`, which is derived from
-`NumberField.IsUnramifiedEverywhere.surjective_artinMap`, which is `sorry`.  So this theorem
-depends on `sorryAx`, and so does every declaration that uses it without taking its conclusion
-as a hypothesis.  No `sorry`-free route to this statement exists in the repository: the implication
-"unramified everywhere ⇒ finite" *is* the reciprocity input. -/
-theorem exists_inertiaSubgroup_ne_bot [Unique ι] :
-    ∃ w : AbsoluteValue Kinf ℝ, w.inertiaSubgroup K ≠ ⊥ := by
-  by_contra hcon
-  have hc : ∀ w : AbsoluteValue Kinf ℝ, w.inertiaSubgroup K = ⊥ := fun w ↦ by
-    by_contra h
-    exact hcon ⟨w, h⟩
-  haveI := H.isGalois (⊤ : IntermediateField K Kinf)
-  haveI := H.isAbelianGalois (⊤ : IntermediateField K Kinf)
-  haveI : NumberField.IsUnramifiedEverywhere K ↥(⊤ : IntermediateField K Kinf) :=
-    AbsoluteValue.isUnramifiedEverywhere_of_inertiaSubgroup_le_fixingSubgroup K ⊤
-      fun w ↦ by rw [hc w]; exact bot_le
-  haveI : FiniteDimensional K ↥(⊤ : IntermediateField K Kinf) :=
-    NumberField.IsUnramifiedEverywhere.finiteDimensional K _
-  exact H.infinite_dimensional
-    ((IntermediateField.topEquiv (F := K) (E := Kinf)).toLinearEquiv.finiteDimensional)
-
 omit [NumberField K] in
 /-- **The ramified family, as `MvZpExtension.exists_totally_ramified` consumes it.**  If only
 finitely many places of `K∞` ramify in `K∞ / K`, then there is a single layer `Kₑ` beyond which
 `K∞ / Kₙ` is totally ramified at *every* ramified place simultaneously.
 
-The hypothesis `hfin` is the only input.  Nothing here is `sorry`-tainted: the taint enters
-only through `MvZpExtension.exists_inertiaSubgroup_ne_bot`, which is what makes the family
-*nonempty*, and which is not used here.
+The hypothesis `hfin` is the only input.
 
 **Warning**: `hfin` is not the formal counterpart of "only finitely many places ramify".  It
 ranges over raw absolute values, and a ramified `w` gives infinitely many ramified absolute
 values `w ^ c`, `0 < c ≤ 1`, all equivalent to `w`.  So `hfin` holds only when no place of `K∞`
 ramifies in `K∞ / K`, and then the conclusion is vacuous.  For a `ℤₚ`-extension of a number
-field some place does ramify (`MvZpExtension.exists_inertiaSubgroup_ne_bot`), so this lemma
-never applies there; use `MvZpExtension.exists_ramifiedBasePlaceData_unconditional` and
+field some place does ramify (`MvZpExtension.exists_inertiaSubgroup_ne_bot_of_hcf`), so this
+lemma never applies there; use `MvZpExtension.exists_ramifiedBasePlaceData_unconditional` and
 `MvZpExtension.RamifiedBasePlaceData.orbitPlace`, which work up to equivalence of places. -/
 theorem exists_totally_ramified_of_finite_ramified [Unique ι]
     (hfin : {w : AbsoluteValue Kinf ℝ | w.inertiaSubgroup K ≠ ⊥}.Finite) :
@@ -299,7 +268,7 @@ i.e. total ramification of `K∞ / Kₙ` read as a `ℤₚ`-extension of `Kₙ` 
 which is what `MvZpExtension.xinfQuotientMulEquivOfPlace'` — Step 1 of Washington's Lemma
 13.15 — is applied to.  As in
 `MvZpExtension.exists_totally_ramified_of_finite_ramified`, the only input is finiteness of
-the ramified set, and nothing here is `sorry`-tainted.
+the ramified set.
 
 **Warning**: `hfin` ranges over raw absolute values of `K∞` and holds only when no place of
 `K∞` ramifies in `K∞ / K` (see the module docstring), so this lemma is vacuous for a
@@ -344,8 +313,7 @@ theorem finite_ramified_of_bddAbove_outside [Unique ι] {S : Set (AbsoluteValue 
 /-- **The ramified family from the local input alone**, in the form
 `MvZpExtension.exists_shift_totally_ramified` consumes: combine
 `MvZpExtension.finite_ramified_of_bddAbove_outside` with
-`MvZpExtension.exists_shift_totally_ramified_of_finite_ramified`.  Unconditional: not
-`sorry`-tainted.
+`MvZpExtension.exists_shift_totally_ramified_of_finite_ramified`.  Unconditional.
 
 **Warning**: as for `MvZpExtension.finite_ramified_of_bddAbove_outside`, the hypotheses `hS` and
 `hbound` can hold together only when no place of `K∞` ramifies in `K∞ / K`, so this lemma is

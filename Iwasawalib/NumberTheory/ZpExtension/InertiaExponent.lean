@@ -45,7 +45,7 @@ of `σ` in `Gal(Kₙ/K)` is killed by `M`, i.e. that `σ ^ M` fixes `Kₙ` point
 form implies the global one; `MvZpExtension.inertiaSubgroup_eq_bot_of_layer_exponent` and
 `MvZpExtension.inertiaSubgroup_eq_bot_of_fixes_Kn` are the two shapes of that.
 
-Everything here is unconditional: no class field theory, no `sorry`, no taint.  Note in
+Everything here is unconditional: no class field theory is used.  Note in
 particular that `[Unique ι]` is *not* needed — the argument works for `ℤₚᵈ`, unlike the
 bounded-ramification criterion it replaces.
 
@@ -207,8 +207,8 @@ is nonempty: a ramified `w` gives the ramified absolute values `w ^ c`, `0 < c �
 distinct and all equivalent to `w` (`AbsoluteValue.rpowOfLeOneOrIsNonarchimedean`,
 `AbsoluteValue.inertiaSubgroup_eq_of_equiv`).  So `hS` and `hexp` can hold together only when no
 place of `K∞` ramifies in `K∞ / K`, which never happens for a `ℤₚ`-extension of a number field
-(`MvZpExtension.exists_inertiaSubgroup_ne_bot`, proved here only conditionally on class field
-theory); the lemma is vacuous there. -/
+(`MvZpExtension.exists_inertiaSubgroup_ne_bot_of_hcf`, from the upper-bound half of the Hilbert
+class field theorem); the lemma is vacuous there. -/
 theorem finite_ramified_of_exponent_outside {S : Set (AbsoluteValue Kinf ℝ)} (hS : S.Finite)
     (hexp : ∀ w ∉ S, ∃ M : ℕ, M ≠ 0 ∧ ∀ σ ∈ w.inertiaSubgroup K, σ ^ M = 1) :
     {w : AbsoluteValue Kinf ℝ | w.inertiaSubgroup K ≠ ⊥}.Finite := by
@@ -224,7 +224,7 @@ the form `MvZpExtension.exists_shift_totally_ramified` — and hence Step 1 of W
 Lemma 13.15 — consumes.
 
 This is `MvZpExtension.exists_shift_totally_ramified_of_bddAbove_outside` with its hypothesis
-replaced by the one the tame character actually produces.  Unconditional: not `sorry`-tainted.
+replaced by the one the tame character actually produces.  Unconditional.
 The local statement, in its layerwise form (`σ ^ (N(v) - 1)` restricts to the identity on every
 layer `Kₙ`, for `σ ∈ I_w(K∞/K)` and `w` over a prime `v ∤ p`), is
 `MvZpExtension.exists_restrictNormalHom_pow_eq_one_of_liesOver_adicAbv`.

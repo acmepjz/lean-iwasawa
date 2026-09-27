@@ -192,8 +192,9 @@ theorem exists_restrictNormalHom_pow_eq_one_of_liesOver_adicAbv :
 
 The index `base` of the package produced here may be empty, as the docstring of
 `MvZpExtension.RamifiedBasePlaceData` allows: this theorem does not say that any prime ramifies.
-Nonemptiness is `MvZpExtension.RamifiedBasePlaceData.nonempty_orbitIndex`, which is
-`sorry`-tainted through `MvZpExtension.exists_inertiaSubgroup_ne_bot`. -/
+That some place ramifies is class field theory
+(`MvZpExtension.exists_inertiaSubgroup_ne_bot_of_hcf`); by
+`MvZpExtension.RamifiedBasePlaceData.covers` it makes `base` nonempty. -/
 theorem exists_ramifiedBasePlaceData_unconditional [Unique ι] :
     Nonempty (RamifiedBasePlaceData H) :=
   H.exists_ramifiedBasePlaceData H.exists_restrictNormalHom_pow_eq_one_of_liesOver_adicAbv

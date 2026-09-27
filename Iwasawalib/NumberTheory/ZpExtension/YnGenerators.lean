@@ -50,8 +50,8 @@ None of the declarations of this file depends on class field theory.  The proof 
 package has a base prime.  If it has one, the family of ramified places is nonempty and
 `MvZpExtension.YnIn_eq_topologicalClosure_closure_of_lifts` applies.  If it has none, no place
 of `K∞` ramifies and `MvZpExtension.YnIn_eq_gammaSubOne_of_forall_inertiaSubgroup_eq_bot`
-gives the description with `a = ∅`.  So the proof does not use the CFT-conditional
-`MvZpExtension.RamifiedBasePlaceData.nonempty_orbitIndex`.
+gives the description with `a = ∅`.  So the proof does not need a ramified place, whose
+existence is class field theory (`MvZpExtension.exists_inertiaSubgroup_ne_bot_of_hcf`).
 -/
 
 open Module PowerSeries NumberField IsDedekindDomain
@@ -207,8 +207,9 @@ commutator subgroup of `Gal(L∞/K_n)`, which is `(γ' - 1) X∞` for a generato
 `Gal(K∞/K_n)` (`MvZpExtension.commutator_GG_eq`) and is closed
 (`Subgroup.isClosed_gammaSubOneG`); then transport along `MvZpExtension.xinfShiftMulEquiv`.
 
-In fact some place ramifies in every `ℤ_p`-extension (`MvZpExtension.exists_inertiaSubgroup_ne_bot`,
-which depends on class field theory), so `hunr` never holds.  This lemma is there so that the
+In fact some place ramifies in every `ℤ_p`-extension of a number field
+(`MvZpExtension.exists_inertiaSubgroup_ne_bot_of_hcf`, which assumes the upper-bound half of the
+Hilbert class field theorem), so `hunr` never holds.  This lemma is there so that the
 theorems below do not need that fact. -/
 theorem YnIn_eq_gammaSubOne_of_forall_inertiaSubgroup_eq_bot [Unique ι]
     (γ : H.GG ⧸ H.Xinf) (hγ : Dense (Subgroup.zpowers γ : Set (H.GG ⧸ H.Xinf)))
@@ -266,8 +267,8 @@ is empty.  If it is not, a base prime `q₀` gives the index `j₀ = (q₀, 1)` 
 `MvZpExtension.RamifiedBasePlaceData.orbitPlace`.  If it is, then by `D.covers` no place of
 `K∞` ramifies in `K∞ / K`, and
 `MvZpExtension.YnIn_eq_gammaSubOne_of_forall_inertiaSubgroup_eq_bot` gives the description with
-`e = 0` and `a = ∅`.  The CFT-conditional
-`MvZpExtension.RamifiedBasePlaceData.nonempty_orbitIndex` is not used. -/
+`e = 0` and `a = ∅`.  So no ramified place is assumed to exist, and
+`MvZpExtension.exists_inertiaSubgroup_ne_bot_of_hcf` is not needed. -/
 theorem RamifiedBasePlaceData.exists_eventual_Yn_generators [Unique ι]
     (D : RamifiedBasePlaceData H) :
     ∃ γ : H.GG ⧸ H.Xinf, Dense (Subgroup.zpowers γ : Set (H.GG ⧸ H.Xinf)) ∧

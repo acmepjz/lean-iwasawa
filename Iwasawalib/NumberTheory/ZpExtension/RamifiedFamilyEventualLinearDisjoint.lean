@@ -65,10 +65,10 @@ theorem exists_eventually_totallyRamified_and_linearDisjoint
 `K∞` ramifies in `K∞ / K`: a ramified `w` gives infinitely many ramified absolute values
 `w ^ c`, `0 < c ≤ 1`, all equivalent to `w` (see the module docstring of
 `Iwasawalib/NumberTheory/ZpExtension/RamifiedFamily.lean`).  For a `ℤₚ`-extension of a number
-field some place ramifies (`MvZpExtension.exists_inertiaSubgroup_ne_bot`, proved here only
-conditionally on class field theory), so this lemma is
-vacuous there.  As in `MvZpExtension.exists_eventually_totallyRamified_and_linearDisjoint`, the
-linear-disjointness part of the conclusion is the hypothesis `hld`, returned unchanged. -/
+field some place ramifies (`MvZpExtension.exists_inertiaSubgroup_ne_bot_of_hcf`, from the
+upper-bound half of the Hilbert class field theorem), so this lemma is vacuous there.  As in
+`MvZpExtension.exists_eventually_totallyRamified_and_linearDisjoint`, the linear-disjointness
+part of the conclusion is the hypothesis `hld`, returned unchanged. -/
 theorem exists_eventually_totallyRamified_of_finiteRamified_and_linearDisjoint
     [Unique ι]
     (hfin : {w : AbsoluteValue Kinf ℝ | w.inertiaSubgroup K ≠ ⊥}.Finite)

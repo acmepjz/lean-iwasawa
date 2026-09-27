@@ -17,18 +17,16 @@ The `Λ`-module side of Iwasawa's theorem on growth of class groups is complete:
 `finite-index-submodule-growth` is
 `IwasawaAlgebra.exists_multiplicity_card_quotient_smul_submodule_of_isTorsion`.
 The arithmetic input, blueprint nodes `Xn-isom-qout` (`X_n ≅ X_∞ / ν_{n,e} Y`) and `Xn-isom-An`
-(`ord_p #Cl(K_n) = ord_p #X_n`), is now supplied, conditionally on class field theory: the main theorem
-`MvZpExtension.multiplicity_classNumber_Kn_eq₁` is closed through
-`MvZpExtension.multiplicity_classNumber_Kn_eq₁_of_cft`
-(`Iwasawalib/NumberTheory/ZpExtension/IwasawaTheorem.lean`).
-
-That proof is still **conditional on class field theory**.  For instance
-`MvZpExtension.finrank_Ln`, the Lean form of `Xn-isom-An`, depends on `sorryAx` through the
-class field theory `sorry`s `NumberField.IsUnramifiedEverywhere.artinMap`,
-`NumberField.IsUnramifiedEverywhere.surjective_artinMap` and
-`NumberField.IsUnramifiedEverywhere.bijective_artinMap_of_isSepClosed` of
-`Iwasawalib/NumberTheory/NumberField/HilbertClassField/ClassFieldTheory.lean`; see the
-docstring of `MvZpExtension.multiplicity_classNumber_Kn_eq₁_of_cft` for the route.
+(`ord_p #Cl(K_n) = ord_p #X_n`), is supplied in
+`MvZpExtension.multiplicity_classNumber_Kn_eq₁_of_hcf`
+(`Iwasawalib/NumberTheory/ZpExtension/IwasawaTheoremOfHCF.lean`), which is Iwasawa's theorem
+with the class field theory input isolated in the two hypotheses
+`NumberField.HilbertClassFieldUpperBound` and `NumberField.HilbertClassFieldExistence`
+(`Iwasawalib/NumberTheory/NumberField/HilbertClassField/Hypothesis.lean`).  For instance the
+Lean form of `Xn-isom-An` is `MvZpExtension.finrank_Ln_of_hcf`.  The two hypotheses are
+discharged from the external class field theory library `ClassFieldTheory` in the separate
+package `IwasawalibCFT`, whose `MvZpExtension.multiplicity_classNumber_Kn_eq₁` is Iwasawa's
+theorem with no hypotheses and no `sorry`.
 
 This file records the last step of the assembly as a standalone, unconditionally proved
 theorem which takes the arithmetic as an explicit hypothesis: for a `ℤₚ`-extension `K∞/K`, a
@@ -41,7 +39,7 @@ Iwasawa's formula follows by `exists_multiplicity_classNumber_of_card_eq` below.
 hypothesis is discharged, with `M = X_∞`, in
 `MvZpExtension.multiplicity_classNumber_Kn_eq₁_of_eventual_Yn_data`
 (`Iwasawalib/NumberTheory/ZpExtension/EventualClassNumberBridge.lean`), which lies on the proof
-route of `MvZpExtension.multiplicity_classNumber_Kn_eq₁_of_cft`.
+route of `MvZpExtension.multiplicity_classNumber_Kn_eq₁_of_hcf`.
 -/
 
 open Module PowerSeries

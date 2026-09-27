@@ -31,10 +31,10 @@ full blueprint node is:
 None of these is in mathlib, and only the group-theoretic core is formalized in this file.  All
 three are now in the repository, elsewhere:
 
-* the first is `MvZpExtension.exists_inertiaSubgroup_ne_bot`
-  (`Iwasawalib/NumberTheory/ZpExtension/RamifiedFamily.lean`), which is **conditional on class
-  field theory**: it depends on the `sorry`
-  `NumberField.IsUnramifiedEverywhere.surjective_artinMap`;
+* the first is `MvZpExtension.exists_inertiaSubgroup_ne_bot_of_hcf`
+  (`Iwasawalib/NumberTheory/ZpExtension/IwasawaTheoremOfHCF.lean`), which is **class field
+  theory**: it assumes the upper-bound half `NumberField.HilbertClassFieldUpperBound` of the
+  Hilbert class field theorem;
 * the second is proved unconditionally, by the tame route rather than by local class field
   theory, in `Iwasawalib/NumberTheory/ZpExtension/TameLocalExponent.lean`:
   `MvZpExtension.exists_restrictNormalHom_pow_eq_one_of_liesOver_adicAbv` discharges the

@@ -9,12 +9,10 @@ public import Iwasawalib.NumberTheory.CFT.IdeleClassHerbrand
 public import Iwasawalib.NumberTheory.CFT.SecondInequality
 public import Iwasawalib.NumberTheory.CFT.SIdeleHerbrand
 public import Iwasawalib.NumberTheory.CFT.BrauerHassePrinciple
-public import Iwasawalib.NumberTheory.ZpExtension.ClassGroup
 public import Iwasawalib.NumberTheory.Analytic.ClassGroupLSeries
 public import Iwasawalib.NumberTheory.CFT.IdeleClassFixedPoints
 public import Iwasawalib.NumberTheory.LocalCFT.TameInertiaOrder
 public import Iwasawalib.NumberTheory.ZpExtension.TameLocalExponent
-public import Iwasawalib.NumberTheory.ZpExtension.EventualClassNumberBridgeOfCFT
 public import Iwasawalib.NumberTheory.ZpExtension.RamifiedPlaceFamily
 public import Iwasawalib.NumberTheory.ZpExtension.YnGeneratorsCore
 public import Iwasawalib.NumberTheory.ZpExtension.ShiftInertiaTransport
@@ -45,18 +43,19 @@ public import Iwasawalib.NumberTheory.ZpExtension.IwasawaTheoremOfHCF
 This file declares nothing.  It prints `#print axioms` for the declarations added or changed by
 each round of work, and `#check`s every declaration name written into a docstring in that round,
 so that a rename or removal breaks the build.  It is imported by `Iwasawalib.lean`, so the audit
-runs as part of the library build.  Every axiom printed below is expected to be one of `propext`,
-`Classical.choice`, `Quot.sound` and `sorryAx`; where a comment above a group says whether
-`sorryAx` is acceptable, that is the expectation for the group.  The only `sorry`s of the library
-are the class field theory declarations of
-`Iwasawalib/NumberTheory/NumberField/HilbertClassField/ClassFieldTheory.lean`.
+runs as part of the library build.  The library contains no `sorry`: every axiom printed below
+is expected to be one of `propext`, `Classical.choice` and `Quot.sound`.  The class field theory
+input of Iwasawa's theorem is isolated in
+`Iwasawalib/NumberTheory/NumberField/HilbertClassField/Hypothesis.lean`, as the two explicit
+hypotheses of `MvZpExtension.multiplicity_classNumber_Kn_eq₁_of_hcf`; the axioms of that theorem
+are checked by `#guard_msgs` at the top of the file.
 -/
 @[expose] public section
--- FIRING CONTROL: a declaration known to depend on `sorryAx` must show `sorryAx`.  Iwasawa's
--- theorem is proved by `multiplicity_classNumber_Kn_eq₁_of_cft`, which reaches the class field
--- theory `sorry`s of `ClassFieldTheory.lean`.  If this line ever prints an axiom list WITHOUT
--- `sorryAx` while those `sorry`s are still there, the gate below is dead.
-#print axioms MvZpExtension.multiplicity_classNumber_Kn_eq₁
+-- Iwasawa's theorem, assuming the two Hilbert class field hypotheses: no `sorryAx`.
+/--
+info: 'MvZpExtension.multiplicity_classNumber_Kn_eq₁_of_hcf' depends on axioms: [propext, Classical.choice, Quot.sound]
+-/
+#guard_msgs in #print axioms MvZpExtension.multiplicity_classNumber_Kn_eq₁_of_hcf
 
 -- ===== predecessor's declarations (S-unit lattice, S-unit Herbrand, idele class Herbrand) =====
 #print axioms NumberField.finrank_sUnitLattice
@@ -448,11 +447,7 @@ are the class field theory declarations of
 #print axioms MvZpExtension.exists_restrictNormalHom_pow_eq_one_of_liesOver_adicAbv
 #print axioms MvZpExtension.exists_ramifiedBasePlaceData_unconditional
 
--- ===== EventualClassNumberBridgeOfCFT (CFT-CONDITIONAL: `sorryAx` expected, via finrank_Ln / finiteDimensional_Ln / exists_inertiaSubgroup_ne_bot) =====
-#print axioms MvZpExtension.card_gal_Ln'_eq_classNumber_pow_of_linearDisjoint
-#print axioms MvZpExtension.exists_eventualClassNumberCardinalityBridge
-
--- ===== RamifiedPlaceFamily (UNCONDITIONAL except nonempty_orbitIndex: no `sorryAx` is acceptable on the first eight) =====
+-- ===== RamifiedPlaceFamily (UNCONDITIONAL: no `sorryAx` is acceptable) =====
 #print axioms MvZpExtension.inertiaSubgroup_comp_Γ_eq
 #print axioms MvZpExtension.comp_eq_self_of_Γpow_le
 #print axioms MvZpExtension.RamifiedBasePlaceData.orbitPlace
@@ -461,8 +456,6 @@ are the class field theory declarations of
 #print axioms MvZpExtension.RamifiedBasePlaceData.exists_isEquiv_orbitPlace
 #print axioms MvZpExtension.inertiaSubgroup_Kn_placeBelow_shiftPlaceEquiv_symm_eq_top
 #print axioms MvZpExtension.HH_shift_eq_commutator_sup_iSup
--- CFT-CONDITIONAL (`sorryAx` expected, via exists_inertiaSubgroup_ne_bot):
-#print axioms MvZpExtension.RamifiedBasePlaceData.nonempty_orbitIndex
 
 -- ===== YnGeneratorsCore (UNCONDITIONAL: no `sorryAx` is acceptable) =====
 #print axioms Subgroup.eq_topologicalClosure_zpowers_of_dense_mk
@@ -490,35 +483,20 @@ are the class field theory declarations of
 -- ===== YnGenerators (all UNCONDITIONAL since wave 3: no `sorryAx` is acceptable) =====
 #print axioms MvZpExtension.pow_mem_GGOverKn
 #print axioms MvZpExtension.YnIn_eq_topologicalClosure_closure_of_lifts
--- Unconditional since wave 3 (the case split on `D.base` replaced the call to
--- `RamifiedBasePlaceData.nonempty_orbitIndex`):
+-- Unconditional since wave 3 (by a case split on whether `D.base` is empty):
 #print axioms MvZpExtension.RamifiedBasePlaceData.exists_eventual_Yn_generators
 #print axioms MvZpExtension.exists_eventual_Yn_generators
 
--- ===== IwasawaTheorem (first three UNCONDITIONAL: no `sorryAx` is acceptable) =====
+-- ===== IwasawaTheorem (UNCONDITIONAL: no `sorryAx` is acceptable) =====
 #print axioms MvZpExtension.reindex_eventual_Yn_generators
 #print axioms MvZpExtension.exists_eventual_Yn_lambda_data_of_generators
 #print axioms MvZpExtension.multiplicity_classNumber_Kn_eq₁_of_eventual_Yn_generators
 -- The endpoint used by the assembly (UNCONDITIONAL):
 #print axioms MvZpExtension.multiplicity_classNumber_Kn_eq₁_of_eventual_Yn_data
--- CFT-CONDITIONAL (`sorryAx` expected; Iwasawa's theorem modulo the class field theory `sorry`s):
-#print axioms MvZpExtension.multiplicity_classNumber_Kn_eq₁_of_cft
--- REGRESSION GUARD: the types of `multiplicity_classNumber_Kn_eq₁_of_cft` and of
--- `multiplicity_classNumber_Kn_eq₁` (ClassGroup.lean, proved since wave 3 by
--- `exact H.multiplicity_classNumber_Kn_eq₁_of_cft`) are definitionally equal (same arguments in the
--- same order, same conclusion); the two proofs are then equal by proof irrelevance.
--- This does not compare binder names or binder kinds; those agree because the source texts are identical.
-example : @MvZpExtension.multiplicity_classNumber_Kn_eq₁_of_cft = @MvZpExtension.multiplicity_classNumber_Kn_eq₁ := rfl
 
--- ===== wave 3: Iwasawa's theorem closed through `_of_cft`, `Y_n` generators unconditional =====
+-- ===== wave 3: `Y_n` generators unconditional =====
 -- New (CyclotomicIwasawa.lean).  UNCONDITIONAL: no `sorryAx` is acceptable.
 #print axioms NumberField.exists_isCyclotomicZpExtension
--- New (CyclotomicIwasawa.lean).  CFT-CONDITIONAL: `sorryAx` expected, via
--- `multiplicity_classNumber_Kn_eq₁`.
-#print axioms NumberField.exists_cyclotomic_multiplicity_classNumber_eq
--- Proof changed (ClassGroup.lean: `sorry` replaced by `multiplicity_classNumber_Kn_eq₁_of_cft`).
--- CFT-CONDITIONAL: `sorryAx` expected.
-#print axioms MvZpExtension.multiplicity_classNumber_Kn_eq₁
 -- New (YnGenerators.lean).  UNCONDITIONAL: no `sorryAx` is acceptable.
 #print axioms MvZpExtension.YnIn_eq_gammaSubOne_of_forall_inertiaSubgroup_eq_bot
 -- Proof changed (YnGenerators.lean), and its only consumer.  UNCONDITIONAL since wave 3.
@@ -546,14 +524,6 @@ example : @MvZpExtension.multiplicity_classNumber_Kn_eq₁_of_cft = @MvZpExtensi
 #print axioms MvZpExtension.RamifiedBasePlaceData.exists_isEquiv_orbitPlace
 #print axioms MvZpExtension.ramified_place_liesOver_basePrimeAbove_p
 #print axioms MvZpExtension.exists_totally_ramified_of_finite_ramified
--- CFT-CONDITIONAL (`sorryAx` expected):
-#print axioms MvZpExtension.finrank_Ln
-#print axioms MvZpExtension.finiteDimensional_Ln
-#print axioms MvZpExtension.finiteDimensional_Ln'
-#print axioms MvZpExtension.exists_inertiaSubgroup_ne_bot
-#print axioms MvZpExtension.RamifiedBasePlaceData.nonempty_orbitIndex
-#print axioms MvZpExtension.exists_eventualClassNumberCardinalityBridge
-#print axioms MvZpExtension.multiplicity_classNumber_Kn_eq₁_of_cft
 
 -- ===== wave 3: every declaration named in a new or edited docstring must exist =====
 #check @AbsoluteValue.inertiaSubgroup_eq_bot_of_not_isNontrivial
@@ -589,7 +559,6 @@ example : @MvZpExtension.multiplicity_classNumber_Kn_eq₁_of_cft = @MvZpExtensi
 #check @MvZpExtension.RamifiedBasePlaceData.exists_eventual_Yn_generators
 #check @MvZpExtension.RamifiedBasePlaceData.exists_isEquiv_orbitPlace
 #check @MvZpExtension.RamifiedBasePlaceData.inertia_Kn_eq_top
-#check @MvZpExtension.RamifiedBasePlaceData.nonempty_orbitIndex
 #check @MvZpExtension.RamifiedBasePlaceData.orbitPlace
 #check @MvZpExtension.RamifiedBasePlaceData.selectedInertia_cover
 #check @MvZpExtension.YnIn_eq_gammaSubOne_of_forall_inertiaSubgroup_eq_bot
@@ -598,11 +567,9 @@ example : @MvZpExtension.multiplicity_classNumber_Kn_eq₁_of_cft = @MvZpExtensi
 #check @MvZpExtension.YnSubmodule
 #check @MvZpExtension.commutator_GG_eq
 #check @MvZpExtension.exists_GG_conjugating_places_of_comp_equiv
-#check @MvZpExtension.exists_eventualClassNumberCardinalityBridge
 #check @MvZpExtension.exists_eventual_Yn_generators
 #check @MvZpExtension.exists_eventually_totallyRamified_and_linearDisjoint
 #check @MvZpExtension.exists_eventually_totallyRamified_of_finiteRamified_and_linearDisjoint
-#check @MvZpExtension.exists_inertiaSubgroup_ne_bot
 #check @MvZpExtension.exists_mem_Xinf_mul_mem_inertiaSubgroup
 #check @MvZpExtension.exists_multiplicity_classNumber_of_card_eq
 #check @MvZpExtension.exists_ramifiedBasePlaceData
@@ -612,13 +579,10 @@ example : @MvZpExtension.multiplicity_classNumber_Kn_eq₁_of_cft = @MvZpExtensi
 #check @MvZpExtension.exists_totally_ramified
 #check @MvZpExtension.exists_totally_ramified_of_finite_ramified
 #check @MvZpExtension.exists_Γ_conjugating_of_comp_equiv
-#check @MvZpExtension.finiteDimensional_Ln
-#check @MvZpExtension.finiteDimensional_Ln'
 #check @MvZpExtension.finite_basePrimesAbove_p
 #check @MvZpExtension.finite_ramified_of_bddAbove_outside
 #check @MvZpExtension.finite_ramified_of_exponent_outside
 #check @MvZpExtension.finrank_Kn₁
-#check @MvZpExtension.finrank_Ln
 #check @MvZpExtension.ggShiftRestrictHom
 #check @MvZpExtension.inertiaSubgroup_eq_bot_iff_bddAbove_ramificationIdx
 #check @MvZpExtension.inertiaSubgroup_eq_bot_of_archimedean
@@ -626,8 +590,6 @@ example : @MvZpExtension.multiplicity_classNumber_Kn_eq₁_of_cft = @MvZpExtensi
 #check @MvZpExtension.inertiaSubgroup_eq_bot_of_fixes_Kn
 #check @MvZpExtension.inertiaSubgroup_inf_Xinf
 #check @MvZpExtension.isEquiv_of_inertia_eq_top_of_comp_isEquiv
-#check @MvZpExtension.multiplicity_classNumber_Kn_eq₁
-#check @MvZpExtension.multiplicity_classNumber_Kn_eq₁_of_cft
 #check @MvZpExtension.multiplicity_classNumber_Kn_eq₁_of_eventual_Yn_data
 #check @MvZpExtension.multiplicity_classNumber_Kn_eq₁_of_eventual_Yn_generators
 #check @MvZpExtension.multiplicity_classNumber_Kn_eq₁_of_eventual_card_bridge
@@ -644,10 +606,6 @@ example : @MvZpExtension.multiplicity_classNumber_Kn_eq₁_of_cft = @MvZpExtensi
 #check @NumberField.IdeleClassFormationData
 #check @NumberField.IsArtinReciprocal
 #check @NumberField.IsUnramifiedAlmostEverywhere
-#check @NumberField.IsUnramifiedEverywhere.artinMap
-#check @NumberField.IsUnramifiedEverywhere.artinMap_spec
-#check @NumberField.IsUnramifiedEverywhere.bijective_artinMap_of_isSepClosed
-#check @NumberField.IsUnramifiedEverywhere.surjective_artinMap
 #check @NumberField.NormalizedIdeleClassFormationData
 #check @NumberField.brauerHassePrinciple_iff_isZero_H1_repIdeleClass
 #check @NumberField.card_tateH0_ideleClassGroup_ge
@@ -655,7 +613,6 @@ example : @MvZpExtension.multiplicity_classNumber_Kn_eq₁_of_cft = @MvZpExtensi
 #check @NumberField.card_tateH0_ideleClassGroup_ge_of_unramified
 #check @NumberField.card_tateH0_ideleClassGroup_le_of_chain
 #check @NumberField.decompositionMulEquivResidueGal
-#check @NumberField.exists_cyclotomic_multiplicity_classNumber_eq
 #check @NumberField.exists_isCyclotomicZpExtension
 #check @NumberField.frobIdealHom
 #check @NumberField.frobIdeleHom
@@ -687,7 +644,7 @@ example : @MvZpExtension.multiplicity_classNumber_Kn_eq₁_of_cft = @MvZpExtensi
 #check @arithFrobAt
 #check @hasCyclotomicZpExtension_iff_isCyclotomicZpExtension_cyclotomicZpSubfield
 
--- ===== CFT integration (branch cft-unconditional): sorry-free route to Iwasawa's theorem =====
+-- ===== Hilbert class field hypotheses: sorry-free route to Iwasawa's theorem =====
 -- Every declaration below must print exactly [propext, Classical.choice, Quot.sound].
 #print axioms NumberField.isUnramifiedAt_of_isUnramifiedEverywhere
 #print axioms NumberField.isUnramifiedAtInfinitePlaces_of_isUnramifiedEverywhere

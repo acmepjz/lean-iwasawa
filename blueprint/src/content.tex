@@ -68,8 +68,7 @@ studied the growth of class groups of $K_n$ in a $\BZ_p$-extension.
 \uses{Zp-ext-def,Xn-isom-qout,coinvariant-growth-2,Xn-isom-An,
 finite-index-submodule-growth,hilbert-p-class-field,exists-totally-ramified,
 iwasawa-mod-invariants,Zp-ext-Ln,Zp-ext-An}
-\lean{MvZpExtension.multiplicity_classNumber_Kn_eq₁,
-MvZpExtension.multiplicity_classNumber_Kn_eq₁_of_cft}
+\lean{MvZpExtension.multiplicity_classNumber_Kn_eq₁_of_hcf}
 \leanok
 Let $K$ be a number field, $p$ be a prime,
 $K_\infty/K$ be a $\BZ_p$-extension.
@@ -136,20 +135,26 @@ e_2$, because $L_n$ and $K_\infty$ are linearly disjoint over $K_n$ as soon as
 $K_\infty/K_n$ is totally ramified at some place. It then applies Lemma
 \ref{finite-index-submodule-growth} (in the form for a module already known to be torsion) for
 $n\geq\max(e_1,e_2)$. Class field theory
-enters only through the Artin map of Theorem \ref{artin-map}, used for
+enters only through the Hilbert class field (Theorems \ref{artin-map-surjective}
+and \ref{hilbert-class-field}), used for
 $[L_n:K_n]=p^{\ord_p(h_{K_n})}$ and the finiteness of $L_n/K_n$, and through the
 existence of a ramified place (Lemma \ref{exists-totally-ramified}).
 These class field theory inputs are isolated in Lean as two statements, the
 upper bound $[E:F]\leq h_F$ for finite abelian everywhere unramified $E/F$ and
 the existence of the Hilbert class field of degree $h_F$
 (\texttt{NumberField.HilbertClassFieldUpperBound},
-\texttt{NumberField.HilbertClassFieldExistence}), from which the theorem is
-proved without any \texttt{sorry}
-(\texttt{MvZpExtension.multiplicity\_classNumber\_Kn\_eq\textsubscript{1}\_of\_hcf}).
-The separate leaf library \texttt{IwasawalibCFT} proves both statements from the
-external \texttt{sorry}-free class field theory library
-\texttt{n-yamaguchi-0729/ClassFieldTheory} and obtains the theorem with no
-\texttt{sorry} at all.
+\texttt{NumberField.HilbertClassFieldExistence}), and the {\Lean} declaration
+of this theorem,
+\texttt{MvZpExtension.multiplicity\_classNumber\_Kn\_eq\textsubscript{1}\_of\_hcf},
+proves it from these two statements taken as hypotheses.
+The library \texttt{Iwasawalib} contains no \texttt{sorry}.
+The unconditional theorem
+\texttt{MvZpExtension.multiplicity\_classNumber\_Kn\_eq\textsubscript{1}} is in the
+separate nested package \texttt{IwasawalibCFT} (directory \texttt{IwasawalibCFT/},
+built with \texttt{cd IwasawalibCFT \&\& lake build}), which proves both
+statements from the external \texttt{sorry}-free class field theory library
+\texttt{n-yamaguchi-0729/ClassFieldTheory}; it depends only on the axioms
+\texttt{propext}, \texttt{Classical.choice} and \texttt{Quot.sound}.
 \end{remark}
 
 The first goal of our project is formalize the proof of the above
@@ -2806,11 +2811,23 @@ for all sufficiently large $n$, with $\nu:=\nu_0+\ord_p\#(X/Y)$.
 \section{Global class field theory}
 
 The results of this section are the class field theory input used in the
-previous sections --- concretely, in Proposition \ref{Xn-isom-An} and hence in
-Theorem \ref{clgp-growth}; they are also exactly what the {\Lean} declarations
-\texttt{NumberField.IsUnramifiedEverywhere.artinMap},
-\texttt{surjective\_artinMap}, \texttt{artinMap\_spec} and
-\texttt{bijective\_artinMap\_of\_isSepClosed} assert.
+previous sections --- concretely, in Proposition \ref{Xn-isom-An}, Lemma
+\ref{exists-totally-ramified} and hence in Theorem \ref{clgp-growth}.
+They are not formalized in \texttt{Iwasawalib}.
+The {\Lean} proof uses only two consequences of them, stated as propositions in
+\texttt{Iwasawalib/NumberTheory/NumberField/HilbertClassField/Hypothesis.lean}:
+\texttt{NumberField.HilbertClassFieldUpperBound}, the bound $[E:F]\leq h_F$ for a
+finite abelian everywhere unramified extension $E/F$ (Theorem
+\ref{artin-map-surjective}), and \texttt{NumberField.HilbertClassFieldExistence},
+the existence of the Hilbert class field, of degree $h_F$ (Theorem
+\ref{hilbert-class-field}).
+\texttt{Iwasawalib} takes them as hypotheses (see
+\texttt{MvZpExtension.multiplicity\_classNumber\_Kn\_eq\textsubscript{1}\_of\_hcf}),
+and the nested package \texttt{IwasawalibCFT} proves them from the external
+library \texttt{n-yamaguchi-0729/ClassFieldTheory}.
+(Until September 2026, \texttt{Iwasawalib} contained statements of Theorems
+\ref{artin-map}--\ref{hilbert-class-field} with \texttt{sorry} proofs; they
+have been removed.)
 We follow \cite{Neu99}, Chapter VI, and \cite{Mil20}; see also \cite{CF67}.
 
 \emph{Honesty warning.}
@@ -3282,14 +3299,15 @@ See \cite{Neu99}, Ch.~VI, \S6.
 \subsection{The Artin map of an unramified abelian extension}
 
 We now specialize to unramified extensions and obtain the four statements
-formalized in {\Lean}.
+about the Artin map; Theorems \ref{artin-map-surjective} and
+\ref{hilbert-class-field} give the two propositions used by the {\Lean} proof
+(see the beginning of this section).
 Let $F$ be a number field.
 
 \begin{thm}
 \label{artin-map}
 \uses{idele-class-group-and-class-group,global-reciprocity-map,
 reciprocity-local-compatibility}
-\lean{NumberField.IsUnramifiedEverywhere.artinMap}
 Let $K/F$ be an abelian Galois extension (not assumed finite) which is
 unramified at every place of $F$.
 Then there is a unique group homomorphism
@@ -3335,7 +3353,6 @@ Uniqueness is clear, since the classes $[\fp]$ generate $\Cl(\CO_F)$.
 \begin{thm}
 \label{artin-map-spec}
 \uses{artin-map}
-\lean{NumberField.IsUnramifiedEverywhere.artinMap_spec}
 In the situation of Theorem \ref{artin-map}, let $\fp$ be a prime of $\CO_F$ and
 $\fP$ a prime of $\CO_K$ above $\fp$. Then
 $$\mathrm{Art}_{K/F}([\fp])=\Frob_\fP,$$
@@ -3360,7 +3377,6 @@ $\Frob_\fP=\Frob_\fp=\mathrm{Art}_{K/F}([\fp])$.
 \label{artin-map-surjective}
 \uses{artin-map,global-reciprocity-map,reciprocity-local-compatibility,
 idele-class-group-and-class-group}
-\lean{NumberField.IsUnramifiedEverywhere.surjective_artinMap}
 In the situation of Theorem \ref{artin-map}, the map
 $\mathrm{Art}_{K/F}:\Cl(\CO_F)\to\Gal(K/F)$ is surjective.
 Consequently $\#\Gal(K/F)\leq\#\Cl(\CO_F)$; in particular $K/F$ is a finite
@@ -3396,7 +3412,8 @@ $\Gal(K/F)$ is a quotient group of the finite abelian group $\Cl(\CO_F)$.
 \uses{artin-map,artin-map-surjective,existence-theorem,
 idele-class-group-and-class-group,global-reciprocity-map,
 reciprocity-local-compatibility}
-\lean{NumberField.IsUnramifiedEverywhere.bijective_artinMap_of_isSepClosed}
+\lean{NumberField.HilbertClassFieldExistence,
+NumberField.finrank_maximalUnramifiedAbelianExtension_eq_classNumber_of_hcf}
 Let $\Omega$ be a separably closed field containing $F$ (e.g.~a separable
 closure) and let $H\subset\Omega$ be the maximal abelian extension of $F$ inside
 $\Omega$ which is unramified at every place of $F$ (the \emph{Hilbert class
@@ -3625,8 +3642,9 @@ unramified abelian extension of exponent $p$, then
 $\Gal(L_n'/K_n)\cong A_n/A_n^p$, so for instance if $A_n\cong\BZ/p^2\BZ$ we get
 $\ord_p\#\Gal(L_n'/K_n)=1$ while $\ord_p\#\Cl(K_n)=\ord_p\#A_n=2$.
 The {\Lean} definition \texttt{MvZpExtension.Ln} is the maximal unramified
-abelian $p$-extension (see \texttt{MvZpExtension.finrank\_Ln}, which asserts
-$[L_n:K_n]=p^{\ord_p(h_{K_n})}$), i.e.~the one adopted here.
+abelian $p$-extension (see \texttt{MvZpExtension.finrank\_Ln\_of\_hcf}, which
+asserts $[L_n:K_n]=p^{\ord_p(h_{K_n})}$ from the two Hilbert class field
+hypotheses), i.e.~the one adopted here.
 \end{remark}
 
 \begin{definition}
@@ -3640,7 +3658,7 @@ viewed as a quotient of $\Cl(K_n)$.
 \begin{prop}
 \label{Xn-isom-An}
 \uses{Zp-ext-Ln,Zp-ext-An,hilbert-p-class-field,artin-map}
-\lean{MvZpExtension.finrank_Ln}
+\lean{MvZpExtension.finrank_Ln_of_hcf}
 \leanok
 There is a canonical isomorphism $X_n\cong A_n$.
 \end{prop}
@@ -3894,7 +3912,7 @@ or it is totally ramified in $K_n/K$ for all $n$.
 \begin{lem}[\cite{Was97}, Lemma 13.3]
 \label{exists-totally-ramified}
 \uses{p:unr-outside-p,Zp-ext-totally-ramified,Zp-ext-def}
-\lean{MvZpExtension.exists_inertiaSubgroup_ne_bot,
+\lean{MvZpExtension.exists_inertiaSubgroup_ne_bot_of_hcf,
 MvZpExtension.exists_totally_ramified,
 MvZpExtension.RamifiedBasePlaceData.exists_common_shift,
 MvZpExtension.RamifiedBasePlaceData.exists_isEquiv_orbitPlace}
@@ -3992,7 +4010,9 @@ Xn-isom-An}
 \lean{MvZpExtension.xinfQuotientMulEquivOfPlace',
 MvZpExtension.LinfFixedHH_eq_L0In,
 MvZpExtension.YnIn_eq_topologicalClosure_closure_of_lifts,
-MvZpExtension.moduleFinite_and_isTorsion_Xinf_Yn_of_generators}
+MvZpExtension.moduleFinite_and_isTorsion_Xinf,
+MvZpExtension.hY_of_generators,
+MvZpExtension.hstep2_of_generators}
 Suppose $K_\infty/K$ is totally ramified
 (Definition \ref{Zp-ext-totally-ramified}).
 Then there exists a $\Lambda$-submodule $Y$ of $X_\infty$ of finite index,
@@ -4138,8 +4158,7 @@ conjugate-action,weierstrass-division,Zp-ext-L-inf}
 \lean{MvZpExtension.exists_eventual_Yn_generators,
 MvZpExtension.exists_eventual_Yn_lambda_data_of_generators,
 MvZpExtension.xinfInQuotientYnMulEquiv,
-MvZpExtension.finite_quotient_YnIn,
-MvZpExtension.moduleFinite_and_isTorsion_Xinf_Yn_of_generators}
+MvZpExtension.moduleFinite_and_isTorsion_Xinf}
 There exists a $\Lambda$-submodule $Y$ of $X_\infty$ of finite index,
 such that for all $n\geq e$,
 $$

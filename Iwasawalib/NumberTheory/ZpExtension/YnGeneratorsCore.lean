@@ -28,9 +28,9 @@ This file contains the abstract form of that assertion and the pieces of the `Xâ
 bookkeeping which do not mention the shifted extension `H.shift n`.
 
 **Every declaration in this file is proved without `sorryAx`** (axioms: `propext`,
-`Classical.choice`, `Quot.sound`): no class field theory is used or needed (in particular
-nothing here goes through `MvZpExtension.exists_inertiaSubgroup_ne_bot` or
-`MvZpExtension.finite_quotient_YnIn`).
+`Classical.choice`, `Quot.sound`): no class field theory is used or needed.  In particular
+nothing here needs a ramified place (`MvZpExtension.exists_inertiaSubgroup_ne_bot_of_hcf`) or
+the finiteness of `Xâˆž / Y_n`.
 
 ## Main statements
 

@@ -51,20 +51,6 @@ instance isAbelianGalois_Ln' (n : ℕ) : IsAbelianGalois Kinf (H.Ln' n) :=
 instance isSExtension_Ln' (n : ℕ) : IsSExtension Kinf (H.Ln' n) {p} :=
   IntermediateField.isSExtension_singleton_adjoin (F := H.Kn n) (H.Ln n)
 
-/-- Warning: like `MvZpExtension.finrank_Ln`, this depends on the class field theory
-`sorry`s in `Iwasawalib.NumberTheory.NumberField.HilbertClassField.ClassFieldTheory`
-(through `MvZpExtension.finiteDimensional_Ln`). -/
-instance finiteDimensional_Ln' (n : ℕ) : FiniteDimensional Kinf (H.Ln' n) :=
-  IntermediateField.finiteDimensional_adjoin_of_isGalois (F := H.Kn n) (H.Ln n)
-
-/-- Warning: like `MvZpExtension.finrank_Ln`, this depends on the class field theory
-`sorry`s in `Iwasawalib.NumberTheory.NumberField.HilbertClassField.ClassFieldTheory`. -/
-theorem exists_finrank_Ln'_eq_pow (n : ℕ) : ∃ k, Module.finrank Kinf (H.Ln' n) = p ^ k := by
-  obtain ⟨k, hk⟩ := H.exists_finrank_Ln_eq_pow n
-  obtain ⟨j, -, hj⟩ := (Nat.dvd_prime_pow Fact.out).1
-    (hk ▸ IntermediateField.finrank_adjoin_dvd (F' := Kinf) (H.Ln n))
-  exact ⟨j, hj⟩
-
 instance isUnramifiedEverywhere_Ln' (n : ℕ) :
     NumberField.IsUnramifiedEverywhere Kinf (H.Ln' n) :=
   NumberField.isUnramifiedEverywhere_adjoin (F := H.Kn n) (H.Ln n)

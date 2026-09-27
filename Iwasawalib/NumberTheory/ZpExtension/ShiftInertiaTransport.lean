@@ -45,8 +45,7 @@ to the subgroup `(γ - 1) X∞`.
 
 ## Conditionality
 
-Every declaration of this file is unconditional: none of them uses class field theory or any
-declaration depending on `sorry`.
+Every declaration of this file is unconditional: none of them uses class field theory.
 -/
 
 open IntermediateField Module NumberField

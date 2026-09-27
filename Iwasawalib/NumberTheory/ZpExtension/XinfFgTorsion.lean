@@ -214,8 +214,9 @@ with `Y ⊆ ℤ_p·a + ω_e X∞`, and suppose `X∞ / ν_{n,e} Y` is finite for
 (`MvZpExtension.xinfZpSubmoduleOfSubgroup`), and that is all Step 3 needs.  In the blueprint
 `e` is a layer above which `K∞ / K_e` is totally ramified, `Y` is `Gal(L∞/L_e K∞) = Y_e`, `a`
 is `a₂, …, a_s` (one element for each ramified prime beyond the first), `ν_{n,e} Y_e = Y_n` is
-Step 2, and `X∞ / Y_n ≅ X_n = Gal(K∞ L_n / K∞)` is finite by class field theory
-(`MvZpExtension.finite_quotient_YnIn`). -/
+Step 2, and `X∞ / Y_n ≅ X_n = Gal(K∞ L_n / K∞)` is finite by class field theory (in
+`MvZpExtension.multiplicity_classNumber_Kn_eq₁_of_eventual_Yn_data` this finiteness is derived
+from the cardinality bridge `MvZpExtension.EventualClassNumberCardinalityBridge`). -/
 theorem moduleFinite_and_isTorsion_Xinf (e : ℕ)
     (Y : Subgroup ↥H.Xinf) (hYcl : IsClosed (Y : Set ↥H.Xinf))
     (a : Finset (Additive ↥H.Xinf))
@@ -246,92 +247,5 @@ theorem moduleFinite_and_isTorsion_Xinf (e : ℕ)
   exact IwasawaAlgebra.moduleFinite_and_isTorsion_of_le_span
     (H.xinfZpSubmoduleOfSubgroup Y hYcl) a e
     (H.finite_quotient_xinfZpSubmoduleOfSubgroup Y hYcl hMY) hY hfin
-
-/-! ### `Y_n`, and the class-field-theoretic input `X_n` is finite -/
-
-/-- **`X∞ / Y_n ≅ X_n = Gal(K∞L_n/K∞)` is finite.**
-
-**Warning**: like `MvZpExtension.finrank_Ln`, this depends on the class field theory `sorry`s
-in `Iwasawalib.NumberTheory.NumberField.HilbertClassField.ClassFieldTheory`, through
-`MvZpExtension.finiteDimensional_Ln'`.  It is the only class-field-theoretic input of
-`MvZpExtension.moduleFinite_and_isTorsion_Xinf_Yn`; the theorem
-`MvZpExtension.moduleFinite_and_isTorsion_Xinf` itself is free of it. -/
-theorem finite_quotient_YnIn (n : ℕ) : Finite (↥H.Xinf ⧸ H.YnIn n) :=
-  Finite.of_equiv _ (H.xinfInQuotientYnMulEquiv n).toEquiv.symm
-
-/-- **`Finite (Additive X∞ ⧸ Y_n)`**: the quotient of `Additive X∞` by the closed
-`ℤ_p`-submodule `Y_n` is finite.
-
-**Warning**: not unconditional (depends on `sorryAx`, like `MvZpExtension.finite_quotient_YnIn`). -/
-theorem finite_quotient_YnZpSubmodule (n : ℕ) :
-    letI := H.XinfZpModule
-    Finite ((Additive ↥H.Xinf) ⧸ H.xinfZpSubmoduleOfSubgroup (H.YnIn n) (H.isClosed_YnIn n)) :=
-  H.finite_quotient_xinfZpSubmoduleOfSubgroup (H.YnIn n) (H.isClosed_YnIn n)
-    (H.finite_quotient_YnIn n)
-
-/-- **`Finite (Additive X∞ ⧸ Y_n)` for the `Λ`-submodule `Y_n`.**
-
-**Warning**: not unconditional (depends on `sorryAx`, like `MvZpExtension.finite_quotient_YnIn`). -/
-theorem finite_quotient_YnSubmodule (n : ℕ)
-    (hTY : Subgroup.gammaSubOne H.Xinf H.mul_comm_Xinf' γ ≤ H.YnIn n) :
-    letI := H.XinfLambdaModule γ
-    Finite ((Additive ↥H.Xinf) ⧸ H.YnSubmodule γ n hTY) :=
-  H.finite_quotient_xinfSubmoduleOfSubgroup γ (H.YnIn n) (H.isClosed_YnIn n) hTY
-    (H.finite_quotient_YnIn n)
-
-set_option synthInstance.maxHeartbeats 800000 in
-/-- **Blueprint node `Xn-isom-qout-of-totally-ramified`, Step 3, with `Y = Y_e`.**
-
-**Warning**: not unconditional (depends on `sorryAx`, like `MvZpExtension.finite_quotient_YnIn`).
-
-Exactly two hypotheses remain:
-
-* `hY`: `Y_e ⊆ ℤ_p·a + ω_e X∞` — the blueprint's description of `Y_e` as topologically
-  generated over `ℤ_p` by `ω_e X∞` and the `s - 1` elements `a₂, …, a_s`, in the only form
-  Step 3 uses;
-* `hstep2`: `ν_{n,e} Y_e = Y_n`, which is Step 2 of the node.  It is discharged from the same
-  generator description, by `MvZpExtension.hstep2_of_generators`.
-
-  Two claims this docstring previously made about `hstep2` were wrong, and are corrected here.
-  Its core is **not** `MvZpExtension.nu_smul_topologicalClosure_sup_span_Xinf` /
-  `IwasawaAlgebra.nu_smul_sup_span`: those are `Λ`-span statements, whereas `hstep2` is a
-  `ℤ_p`-span statement about `Submodule.map (IwasawaAlgebra.lsmulZp ν)`; the usable partner is
-  `IwasawaAlgebra.map_lsmulZp_span_sup`.  And the remark that modulo `ν_{n,e} ω_e X∞` the
-  elements `ν_{n,e} a_i` are `γ`-fixed is **not needed** for `hstep2` as stated -- that remark
-  is the blueprint's device for matching a closed `Λ`-submodule with a closed subgroup, and at
-  the `ℤ_p` level its role is taken by
-  `IwasawaAlgebra.topologicalClosure_closure_union_eq_span_sup`.
-
-The finiteness of `X∞ / Y_n`, which in the blueprint is `X_n ≅ A_n` finite, is discharged here
-by `MvZpExtension.finite_quotient_YnIn`; it is class field theory, and it is the reason this
-theorem — unlike `MvZpExtension.moduleFinite_and_isTorsion_Xinf` — depends on the `sorry`s of
-`Iwasawalib.NumberTheory.NumberField.HilbertClassField.ClassFieldTheory`. -/
-theorem moduleFinite_and_isTorsion_Xinf_Yn (e : ℕ) (a : Finset (Additive ↥H.Xinf))
-    (hY : letI := H.XinfZpModule
-      letI := H.XinfLambdaModule γ
-      haveI := H.isScalarTower_Xinf γ
-      H.xinfZpSubmoduleOfSubgroup (H.YnIn e) (H.isClosed_YnIn e) ≤
-        Submodule.span ℤ_[p] (a : Set (Additive ↥H.Xinf)) ⊔
-          ((Ideal.span {((Polynomial.oneAddXPowSubOne ℤ_[p] (p ^ e) : Polynomial ℤ_[p]) :
-              ℤ_[p]⟦X⟧)} • (⊤ : Submodule ℤ_[p]⟦X⟧ (Additive ↥H.Xinf))).restrictScalars ℤ_[p]))
-    (hstep2 : letI := H.XinfZpModule
-      letI := H.XinfLambdaModule γ
-      haveI := H.isScalarTower_Xinf γ
-      ∀ n : ℕ, e ≤ n → Submodule.map
-          (IwasawaAlgebra.lsmulZp (Additive ↥H.Xinf)
-            ((Polynomial.nu ℤ_[p] p n e : Polynomial ℤ_[p]) : ℤ_[p]⟦X⟧))
-          (H.xinfZpSubmoduleOfSubgroup (H.YnIn e) (H.isClosed_YnIn e))
-        = H.xinfZpSubmoduleOfSubgroup (H.YnIn n) (H.isClosed_YnIn n)) :
-    letI := H.XinfZpModule
-    letI := H.XinfLambdaModule γ
-    Module.Finite ℤ_[p]⟦X⟧ (Additive ↥H.Xinf) ∧
-      Module.IsTorsion ℤ_[p]⟦X⟧ (Additive ↥H.Xinf) := by
-  letI := H.XinfZpModule
-  letI := H.XinfLambdaModule γ
-  haveI := H.isScalarTower_Xinf γ
-  refine H.moduleFinite_and_isTorsion_Xinf γ e (H.YnIn e) (H.isClosed_YnIn e) a
-    (H.finite_quotient_YnIn e) hY fun n hn ↦ ?_
-  rw [hstep2 n hn]
-  exact H.finite_quotient_YnZpSubmodule n
 
 end MvZpExtension

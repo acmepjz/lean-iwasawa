@@ -13,12 +13,14 @@ public import Mathlib.Algebra.Algebra.Subalgebra.Directed
 /-!
 # The Frobenius of a possibly infinite unramified abelian extension
 
-`NumberField.IsUnramifiedEverywhere.artinMap` in
-`Iwasawalib/NumberTheory/NumberField/HilbertClassField/ClassFieldTheory.lean` is stated for an
-unramified abelian extension `K / F` which is **not known to be finite** — the
-`FiniteDimensional F K` instance in that file is *derived from* the surjectivity of the Artin
-map, so nothing may assume it beforehand.  Mathlib's `arithFrobAt` needs a finite Galois group,
-so it cannot be used directly.  This file removes the finiteness hypothesis.
+An Artin map `Cl(F) → Gal(K/F)` for an unramified abelian extension `K / F` of a number field
+has to be defined for `K / F` **not known to be finite**, because finiteness is itself a
+consequence of class field theory: it follows from the surjectivity of the Artin map
+(`NumberField.finiteDimensional_of_surjective_artinMapOfReciprocal_candidate`) or from the upper
+bound of the Hilbert class field theorem
+(`NumberField.finiteDimensional_of_hilbertClassFieldUpperBound`).  So nothing may assume it
+beforehand.  Mathlib's `arithFrobAt` needs a finite Galois group, so it cannot be used directly.
+This file removes the finiteness hypothesis.
 
 ## The construction
 
@@ -35,9 +37,8 @@ because it is bijective on each `E` (`NumberField.bijective_globalFrobAlgHom`).
 * `NumberField.frobAt : Gal(K/F)` — the Frobenius at `p`, for `K / F` unramified abelian of
   arbitrary degree.
 * `NumberField.restrictNormalHom_frobAt` — it restricts to `globalFrobAt F E p` on every finite
-  intermediate field `E`.  This is the sense in which it is *the* Frobenius, and it is the
-  route suggested by the docstring of `artinMap`: the value at `x : K` is computed inside a
-  finite subextension containing `x`.
+  intermediate field `E`.  This is the sense in which it is *the* Frobenius: the value at
+  `x : K` is computed inside a finite subextension containing `x`.
 * `NumberField.frobAt_eq_globalFrobAt` — when `K` happens to be a number field, `frobAt` is the
   Frobenius of the finite theory, hence `arithFrobAt (𝓞 F) Gal(K/F) P.asIdeal` for any `P`
   above `p`.  Without this the infinite construction would be a different object.

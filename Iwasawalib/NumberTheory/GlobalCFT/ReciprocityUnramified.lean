@@ -96,8 +96,9 @@ theorem reciprocityEquivOfArtinReciprocal_apply
 
 /-- **The Frobenius normalisation of the reciprocity isomorphism.**  The class of the idele
 which is `x` at `p` and `1` at every other place goes to `Frob_p ^ ord_p(x)`; in particular a
-uniformiser at `p` goes to `Frob_p`.  This is the compatibility that
-`NumberField.IsUnramifiedEverywhere.artinMap_spec` asks for. -/
+uniformiser at `p` goes to `Frob_p`.  This is the compatibility with Frobenius elements that
+characterises the Artin map (compare `NumberField.artinMapOfReciprocal_mk0_eq_arithFrobAt` for
+the Artin map on the ideal class group). -/
 theorem reciprocityEquivOfArtinReciprocal_singleIdele
     (hsurj : Function.Surjective (frobIdeleHom K L))
     (hcard : Nat.card (TateH0 (L ≃ₐ[K] L) (Additive (IdeleClassGroup (𝓞 L) L)) σ)

@@ -12,10 +12,10 @@ public import Mathlib.FieldTheory.Galois.Abelian
 /-!
 # The Frobenius of an abelian extension depends only on the prime below
 
-`NumberField.IsUnramifiedEverywhere.artinMap_spec` in
-`Iwasawalib/NumberTheory/NumberField/HilbertClassField/ClassFieldTheory.lean` asserts that the
-Artin map sends the class of a prime `p` of `𝓞 F` to `arithFrobAt (𝓞 F) Gal(K/F) P.asIdeal` for
-*any* prime `P` of `𝓞 K` above `p`.  Both the Artin map and that theorem are still `sorry`.
+The Artin map of an unramified abelian extension `K / F` of number fields is specified by
+sending the class of a prime `p` of `𝓞 F` to `arithFrobAt (𝓞 F) Gal(K/F) P.asIdeal` for *any*
+prime `P` of `𝓞 K` above `p` (for the Artin map built from Artin reciprocity this is
+`NumberField.artinMapOfReciprocal_mk0_eq_arithFrobAt`).
 This file proves the part of that specification which does not mention the Artin map, and which
 any construction of it will have to consume:
 
@@ -39,7 +39,7 @@ holds in general — which is why the first statement needs `IsAbelianGalois K L
 
 ## Scope
 
-What is *not* here is the remaining, deep, half of `artinMap_spec`: that `p ↦ Frob_p`
+What is *not* here is the remaining, deep, half of that specification: that `p ↦ Frob_p`
 factors through the ideal class group.  That is Artin reciprocity, and it is not available from
 the local computations in `Iwasawalib/NumberTheory/LocalCFT/`.
 -/
@@ -75,13 +75,12 @@ theorem exists_heightOneSpectrum_under_eq (p : HeightOneSpectrum (𝓞 K)) :
   exact ⟨⟨Q, hQ1, Ideal.ne_bot_of_liesOver_of_ne_bot p.ne_bot Q⟩, (Ideal.over_def Q p.asIdeal).symm⟩
 
 variable (K L) in
-/-- **The right-hand side of `NumberField.IsUnramifiedEverywhere.artinMap_spec` is a function of
-the prime of the base field alone.**  For an abelian extension there is a map
+/-- **The Frobenius that the Artin map prescribes at the class of a prime is a function of the
+prime of the base field alone.**  For an abelian extension there is a map
 `p ↦ Frob_p` on the primes of `𝓞 K` whose value at `p` is the arithmetic Frobenius at *every*
-prime `P` of `𝓞 L` above `p`.  Any map `ClassGroup (𝓞 K) →* Gal(L/K)` satisfying
-`artinMap_spec` must therefore send the class of `p` to `globalFrob K L p`; this is the part of
-that specification which does not mention the (still unconstructed)
-`NumberField.IsUnramifiedEverywhere.artinMap`. -/
+prime `P` of `𝓞 L` above `p`.  Any map `ClassGroup (𝓞 K) →* Gal(L/K)` sending the class of `p`
+to the arithmetic Frobenius at the primes above `p` must therefore send it to `Frob_p`; this is
+the part of that specification which does not mention the Artin map. -/
 theorem exists_globalFrob [IsAbelianGalois K L] :
     ∃ f : HeightOneSpectrum (𝓞 K) → Gal(L/K), ∀ (p : HeightOneSpectrum (𝓞 K))
       (P : HeightOneSpectrum (𝓞 L)), P.asIdeal.under (𝓞 K) = p.asIdeal →
@@ -98,7 +97,7 @@ elaborator diverges: the `isDefEq` check inside
 `coe_localArtinAdicCompletionUnits_mk_uniformizer_eq_arithFrobAt` exceeds 200000 heartbeats,
 because the local Artin machinery stacks universe-polymorphic completions.  The three results
 above, which are what a construction of the Artin map has to consume, are stated at `Type*`
-and are unaffected -- `NumberField.IsUnramifiedEverywhere.artinMap` quantifies over `Type*`,
+and are unaffected -- the Artin map `NumberField.artinMapOfReciprocal` quantifies over `Type*`,
 so a `Type`-only statement would not apply to it at all.
 -/
 
@@ -110,9 +109,9 @@ attribute [local instance] decompositionIntegersMulSemiringAction
 /-- **The local Artin map at an unramified place `w` of an abelian extension, applied to a
 uniformiser of `K_v`, computes the arithmetic Frobenius at every prime `P` above `v`** — in
 particular the value does not depend on which place above `v` the local computation is made at.
-This is the local computation of the element that
-`NumberField.IsUnramifiedEverywhere.artinMap_spec` prescribes at the class of `v`, stated
-without reference to `NumberField.IsUnramifiedEverywhere.artinMap`. -/
+This is the local computation of the element that the Artin map prescribes at the class of `v`
+(compare `NumberField.artinMapOfReciprocal_mk0_eq_arithFrobAt`), stated without reference to
+any Artin map on the ideal class group. -/
 theorem coe_localArtinAdicCompletionUnits_mk_uniformizer_eq_arithFrobAt
     [IsAbelianGalois K L]
     (v : HeightOneSpectrum (𝓞 K)) (w : HeightOneSpectrum (𝓞 L))

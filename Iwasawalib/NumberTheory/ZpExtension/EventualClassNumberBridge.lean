@@ -23,12 +23,15 @@ inputs, all taken as hypotheses of
 * the cardinality bridge `MvZpExtension.EventualClassNumberCardinalityBridge`:
   `#Gal(K∞Lₙ/K∞) = p ^ ord_p #Cl(Kₙ)` for `n ≥ e`.
 
-In the proof of `MvZpExtension.multiplicity_classNumber_Kn_eq₁_of_cft`
-(`Iwasawalib/NumberTheory/ZpExtension/IwasawaTheorem.lean`), `hgen` is supplied by
-`MvZpExtension.exists_eventual_Yn_generators` and `hYdata` by
-`MvZpExtension.exists_eventual_Yn_lambda_data_of_generators`, neither of which depends on
-`sorryAx`.  The bridge is supplied by `MvZpExtension.exists_eventualClassNumberCardinalityBridge`,
-which is conditional on class field theory.
+In the proof of `MvZpExtension.multiplicity_classNumber_Kn_eq₁_of_hcf`
+(`Iwasawalib/NumberTheory/ZpExtension/IwasawaTheoremOfHCF.lean`, through
+`MvZpExtension.multiplicity_classNumber_Kn_eq₁_of_eventual_Yn_generators`), `hgen` is supplied
+by `MvZpExtension.exists_eventual_Yn_generators` and `hYdata` by
+`MvZpExtension.exists_eventual_Yn_lambda_data_of_generators`, neither of which uses class field
+theory.  The bridge is supplied by
+`MvZpExtension.exists_eventualClassNumberCardinalityBridge_of_hcf`, which assumes the two
+Hilbert class field hypotheses `NumberField.HilbertClassFieldUpperBound` and
+`NumberField.HilbertClassFieldExistence`.
 
 ## Main statements
 

@@ -4,18 +4,20 @@ https://acmepjz.github.io/lean-iwasawa
 
 ## Status of the main theorem
 
-Iwasawa's theorem on the growth of class groups in a `ℤₚ`-extension is
-`MvZpExtension.multiplicity_classNumber_Kn_eq₁` (`Iwasawalib/NumberTheory/ZpExtension/ClassGroup.lean`).
+Iwasawa's theorem on the growth of class groups in a `ℤₚ`-extension is proved without any `sorry`.
 
-* In the library `Iwasawalib` it is proved modulo the class field theory `sorry`s of
-  `Iwasawalib/NumberTheory/NumberField/HilbertClassField/ClassFieldTheory.lean`.
-  The class field theory needed is isolated in two statements
-  (`NumberField.HilbertClassFieldUpperBound`, `NumberField.HilbertClassFieldExistence`), from
-  which `MvZpExtension.multiplicity_classNumber_Kn_eq₁_of_hcf` proves the theorem without `sorry`.
-* The leaf library `IwasawalibCFT` (not a default target) proves those two statements with the
-  `sorry`-free class field theory library
+* The library `Iwasawalib` contains no `sorry`. The class field theory needed is isolated in two
+  statements, `NumberField.HilbertClassFieldUpperBound` and `NumberField.HilbertClassFieldExistence`
+  (`Iwasawalib/NumberTheory/NumberField/HilbertClassField/Hypothesis.lean`), from which
+  `MvZpExtension.multiplicity_classNumber_Kn_eq₁_of_hcf`
+  (`Iwasawalib/NumberTheory/ZpExtension/IwasawaTheoremOfHCF.lean`) proves the theorem.
+* The nested package `IwasawalibCFT` (directory `IwasawalibCFT/`, not built by the root package
+  or its CI) proves those two statements with the `sorry`-free class field theory library
   [n-yamaguchi-0729/ClassFieldTheory](https://github.com/n-yamaguchi-0729/ClassFieldTheory)
-  (pinned at commit `2e6280f9`) and states
-  `MvZpExtension.multiplicity_classNumber_Kn_eq₁_unconditional`, with exactly the same statement
-  and axioms `propext`, `Classical.choice`, `Quot.sound` only. Build it with
-  `lake build IwasawalibCFT` (the external library adds roughly half an hour of compilation).
+  (pinned at commit `2e6280f9`) and states the unconditional theorem
+  `MvZpExtension.multiplicity_classNumber_Kn_eq₁` (`IwasawalibCFT/IwasawalibCFT/Iwasawa.lean`),
+  whose axioms are `propext`, `Classical.choice`, `Quot.sound` only. Build it with
+  `cd IwasawalibCFT && lake build` (this also compiles the external library).
+
+Until September 2026 `Iwasawalib` also contained a version of the theorem proved from class field
+theory `sorry`s; it has been removed.

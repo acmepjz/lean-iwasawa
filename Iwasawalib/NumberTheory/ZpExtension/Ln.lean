@@ -43,35 +43,6 @@ instance isUnramifiedEverywhere_Ln (n : ℕ) :
     (SeparableClosure Kinf) (H.Ln n)).1 hle
   exact h
 
-/-- **Warning**: not unconditional; depends on `sorryAx` through
-`NumberField.IsUnramifiedEverywhere.surjective_artinMap` (via
-`NumberField.IsUnramifiedEverywhere.finiteDimensional`). -/
-instance finiteDimensional_Ln (n : ℕ) : FiniteDimensional (H.Kn n) (H.Ln n) :=
-  (IntermediateField.liftAlgEquiv <| IntermediateField.maximalGaloisSExtension (H.Kn n)
-    (NumberField.maximalUnramifiedAbelianExtension (H.Kn n) (SeparableClosure Kinf))
-      {p}).toLinearEquiv.finiteDimensional
-
-/-- **Warning**: not unconditional; depends on `sorryAx` through
-`NumberField.IsUnramifiedEverywhere.surjective_artinMap` (via
-`NumberField.IsUnramifiedEverywhere.finiteDimensional`). -/
-instance numberField_Ln (n : ℕ) : NumberField (H.Ln n) where
-  to_finiteDimensional := .trans ℚ (H.Kn n) (H.Ln n)
-
-/-- **`[L_n : K_n] = p ^ ord_p(h_{K_n})`** (blueprint node `Xn-isom-An`).
-
-**Warning**: not unconditional; depends on `sorryAx` through
-`NumberField.IsUnramifiedEverywhere.bijective_artinMap_of_isSepClosed` and
-`NumberField.IsUnramifiedEverywhere.surjective_artinMap` (and
-`NumberField.IsUnramifiedEverywhere.artinMap`, defined by `sorry`). -/
-theorem finrank_Ln (n : ℕ) : Module.finrank (H.Kn n) (H.Ln n) =
-    p ^ multiplicity p (NumberField.classNumber (H.Kn n)) := by
-  rw [Ln, ← (IntermediateField.liftAlgEquiv <| IntermediateField.maximalGaloisSExtension (H.Kn n)
-    (NumberField.maximalUnramifiedAbelianExtension (H.Kn n) (SeparableClosure Kinf))
-      {p}).toLinearEquiv.finrank_eq,
-    IntermediateField.finrank_maximalGaloisSExtension_singleton_bot,
-    NumberField.IsUnramifiedEverywhere.finrank_eq_classNumber_of_isSepClosed,
-    Nat.multiplicity_eq_factorization Fact.out (NumberField.classNumber_ne_zero _)]
-
 /-- TODO: go mathlib -/
 theorem _root_.IsSepClosure.ofSeparable
     (K J L : Type*) [Field K] [Field J] [Field L] [Algebra K J] [Algebra J L] [IsSepClosure J L]

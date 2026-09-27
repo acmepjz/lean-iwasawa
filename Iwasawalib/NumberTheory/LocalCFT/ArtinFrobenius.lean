@@ -26,14 +26,16 @@ generator, the local Artin map sends the class of a uniformiser of `K_v` to it:
 `NumberField.localArtinAdicCompletionUnits_mk_uniformizer_arithFrob`, and in the coerced form
 `NumberField.coe_localArtinAdicCompletionUnits_mk_uniformizer_arithFrob` the value is literally
 the term `arithFrobAt (𝓞 K) Gal(L/K) w.asIdeal` appearing on the right-hand side of
-`NumberField.IsUnramifiedEverywhere.artinMap_spec`.
+`NumberField.artinMapOfReciprocal_mk0_eq_arithFrobAt`, the characterisation of the global Artin
+map by Frobenius elements.
 
 ## Scope
 
-This is the *local* half of `NumberField.IsUnramifiedEverywhere.artinMap_spec`.  That theorem
-also needs the global Artin map `NumberField.IsUnramifiedEverywhere.artinMap`, which is still a
-`sorry`, and the comparison of its value on the ideal class of `p` with the local Artin map at a
-place above `p`; neither is done here, and nothing below mentions `artinMap`.
+This is the *local* half of that characterisation.  The global half also needs a global Artin
+map on the ideal class group (in `Iwasawalib` only `NumberField.artinMapOfReciprocal`, which
+assumes Artin reciprocity) and the comparison of its value on the ideal class of `p` with the
+local Artin map at a place above `p`; neither is done here, and nothing below mentions a global
+Artin map.
 
 ## Main statements
 
@@ -88,8 +90,8 @@ theorem exists_uniformizer_unit :
   exact ⟨π, Units.mk0 _ h0, hπ, rfl⟩
 
 /-- **The local Artin map at an unramified finite place sends the class of a uniformiser of `K_v`
-to `arithFrobAt`**, in the shape that
-`NumberField.IsUnramifiedEverywhere.artinMap_spec` consumes: the underlying automorphism of
+to `arithFrobAt`**, in the shape of the right-hand side of
+`NumberField.artinMapOfReciprocal_mk0_eq_arithFrobAt`: the underlying automorphism of
 `L / K` is literally `arithFrobAt (𝓞 K) Gal(L/K) w.asIdeal`. -/
 theorem coe_localArtinAdicCompletionUnits_mk_uniformizer_arithFrob
     (h : v.asIdeal.ramificationIdx' w.asIdeal = 1)

@@ -237,8 +237,8 @@ theorem isNontrivial_iff_of_liesOver
 
 /-- If a field `K` has an infinite place, then it must be of characteristic zero.
 
-Named with a prime because the sorry-free class field theory library used by the leaf
-library `IwasawalibCFT` declares a lemma `AbsoluteValue.charZero_of_not_isNonarchimedean` with
+Named with a prime because the sorry-free class field theory library used by the nested
+package `IwasawalibCFT` declares a lemma `AbsoluteValue.charZero_of_not_isNonarchimedean` with
 the same statement; two declarations of one name cannot be imported together. -/
 theorem charZero_of_not_isNonarchimedean'
     {K : Type*} [Field K] (v : AbsoluteValue K ℝ) (h : ¬IsNonarchimedean v) : CharZero K := by

@@ -145,8 +145,8 @@ theorem surjective_frobIdealHom_of_surjective_frobIdeleHom_candidate
     ← range_frobIdeleHom, MonoidHom.range_eq_top]
   exact h
 
-/-- A surjective conditional Artin map gives finite dimensionality without using the target
-finite-dimensionality instance. -/
+/-- A surjective conditional Artin map shows that `K / F` is finite, although `K` is not assumed
+to be finite over `F`. -/
 theorem finiteDimensional_of_surjective_artinMapOfReciprocal_candidate
     (F K : Type*) [Field F] [NumberField F] [Field K] [Algebra F K]
     [IsAbelianGalois F K] [IsUnramifiedEverywhere F K]

@@ -13,7 +13,7 @@ public import Iwasawalib.RingTheory.IwasawaAlgebra.FgTorsionSpan
 # `ν_{n,e} · (ℤ_p·a + ω_e M) = ℤ_p·(ν_{n,e}·a) + ω_n M`
 
 This is Step 2 of blueprint node `Xn-isom-qout-of-totally-ramified` at the `ℤ_p`-level, which
-is the level at which `MvZpExtension.moduleFinite_and_isTorsion_Xinf_Yn` consumes it:
+is the level at which `MvZpExtension.hstep2_of_generators` consumes it:
 `IwasawaAlgebra.nu_smul_sup_span` (in
 `Iwasawalib.RingTheory.IwasawaAlgebra.NuSubmodule`) is the same identity for `Λ`-submodules and
 `Λ`-spans, but the submodule `Y_n = Gal(L∞/K∞L_n)` enters Step 3 only as a `ℤ_p`-submodule,

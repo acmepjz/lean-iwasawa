@@ -25,8 +25,9 @@ three arithmetic inputs that were missing when it was written.  Two of them are 
 This file does not identify the ramified set.  That only primes above `p` ramify is proved
 unconditionally, by the tame route (`MvZpExtension.exists_ramifiedBasePlaceData_unconditional`,
 `Iwasawalib/NumberTheory/ZpExtension/TameLocalExponent.lean`), with finite family
-`MvZpExtension.RamifiedBasePlaceData.orbitPlace`.  That at least one prime ramifies is
-`MvZpExtension.exists_inertiaSubgroup_ne_bot`, which is conditional on class field theory.
+`MvZpExtension.RamifiedBasePlaceData.orbitPlace`.  That at least one prime ramifies is class
+field theory: it is `MvZpExtension.exists_inertiaSubgroup_ne_bot_of_hcf`, which assumes the
+upper-bound half `NumberField.HilbertClassFieldUpperBound` of the Hilbert class field theorem.
 Accordingly `MvZpExtension.exists_totally_ramified` below takes the finite family of ramified
 places as input.
 

@@ -15,11 +15,15 @@ public import Iwasawalib.NumberTheory.NumberField.HilbertClassField.Basic
 This file states the two classical Hilbert class field theorems needed downstream as explicit,
 universe-polymorphic propositions, and derives their standard consequences for the maximal
 unramified abelian extension. Nothing here is proved about class field theory itself: the
-hypotheses are meant to be discharged by an external class field theory library.
+hypotheses are meant to be discharged by an external class field theory library. The nested
+package `IwasawalibCFT` (directory `IwasawalibCFT/`, not part of the library `Iwasawalib`) does
+so with the library `n-yamaguchi-0729/ClassFieldTheory`.
 
-This file deliberately does not import
-`Iwasawalib.NumberTheory.NumberField.HilbertClassField.ClassFieldTheory`, so none of the
-instances declared there are in scope.
+These two hypotheses are the whole class field theory input of Iwasawa's theorem
+`MvZpExtension.multiplicity_classNumber_Kn_eq₁_of_hcf`. Until 2026-09 `Iwasawalib` also stated
+parts of class field theory with `sorry` in
+`Iwasawalib.NumberTheory.NumberField.HilbertClassField.ClassFieldTheory`; that material has been
+removed.
 
 ## Main definitions
 

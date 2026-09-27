@@ -22,15 +22,3 @@ rev = "6f1ef4e5dd604a435bddba4747b13970cd65d2a1"
 
 [[lean_lib]]
 name = "Iwasawalib"
-
-# Sorry-free global class field theory (n-yamaguchi-0729/ClassFieldTheory, Apache-2.0),
-# pinned to the Lean v4.33.0 / Mathlib 6f1ef4e5 snapshot.  It is used ONLY by the non-module
-# leaf library `IwasawalibCFT`; `Iwasawalib` itself does not import it.
-[[require]]
-name = "ClassFieldTheory"
-git = "https://github.com/n-yamaguchi-0729/ClassFieldTheory.git"
-rev = "2e6280f9d2579705a0cc6c76ec68c2b60f9c601a"
-
-# Non-module leaf library (not a default target): uses the external ClassFieldTheory library.
-[[lean_lib]]
-name = "IwasawalibCFT"

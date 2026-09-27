@@ -39,13 +39,6 @@ instance isSepClosure_Kn (n : ℕ) : IsSepClosure (H.Kn n) (SeparableClosure Kin
 instance isSExtension_Ln (n : ℕ) : IsSExtension (H.Kn n) (H.Ln n) {p} :=
   .of_algEquiv {p} (IntermediateField.liftAlgEquiv _)
 
-/-- Warning: like `MvZpExtension.finrank_Ln`, this depends on the class field theory `sorry`s in
-`Iwasawalib.NumberTheory.NumberField.HilbertClassField.ClassFieldTheory`, because the
-finiteness of `Lₙ / Kₙ` does. `MvZpExtension.isSExtension_Ln` is the `sorry`-free form that
-`MvZpExtension.Ln_mono` actually uses. -/
-theorem exists_finrank_Ln_eq_pow (n : ℕ) : ∃ k, Module.finrank (H.Kn n) (H.Ln n) = p ^ k :=
-  (isSExtension_singleton_iff_of_finiteDimensional (H.Kn n) (H.Ln n) p).1 inferInstance
-
 /-- The compositum `Kₙ Lₘ` is contained in `Lₙ` for `m ≤ n`: it is an unramified abelian
 extension of `Kₙ` of `p`-power degree. This is the blueprint node `Ln-mono`. -/
 theorem adjoin_Ln_le {m n : ℕ} (h : m ≤ n) :

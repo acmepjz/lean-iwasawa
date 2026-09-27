@@ -206,7 +206,7 @@ theorem CommGroup.card_primeToComponent [CommGroup G] [Finite G] (m : ℕ) :
   refine (Nat.dvd_primeToComponent_iff m h1).2
     ⟨Subgroup.card_subgroup_dvd_card _, card_primeToComponent_coprime G m⟩ |>.antisymm ?_
   rw [Nat.primeToComponent, Nat.eq_div_of_mul_eq_left h2
-    (card_primeToComponent_mul_card_primaryComponent G m isTorsion_of_finite)]
+    (card_primeToComponent_mul_card_primaryComponent G m isMulTorsion_of_finite)]
   exact Nat.div_dvd_div_left (Nat.primaryComponent_dvd_self ..) <|
     (Nat.dvd_primaryComponent_iff h1 hm).2
       ⟨Subgroup.card_subgroup_dvd_card _, primeFactors_card_primaryComponent_subset G hm⟩
@@ -218,5 +218,5 @@ theorem CommGroup.card_primaryComponent [CommGroup G] [Finite G] (m : ℕ) :
   have h2 : Nat.card (primeToComponent G m) ≠ 0 :=
     Nat.card_ne_zero.2 ⟨inferInstance, inferInstance⟩
   rw [Nat.eq_div_of_mul_eq_right h2
-    (card_primeToComponent_mul_card_primaryComponent G m isTorsion_of_finite),
+    (card_primeToComponent_mul_card_primaryComponent G m isMulTorsion_of_finite),
     card_primeToComponent, Nat.primaryComponent_eq_div _ h1]

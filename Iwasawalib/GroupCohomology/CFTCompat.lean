@@ -202,7 +202,7 @@ variable {M N : Type*} [Monoid M] [Monoid N]
 variable (M N) in
 @[to_additive]
 lemma subsingleton_monoidHom_of_isTorsion_isMulTorsionFree
-    (hM : Monoid.IsTorsion M) [IsMulTorsionFree N] : Subsingleton (M →* N) where
+    (hM : IsMulTorsion M) [IsMulTorsionFree N] : Subsingleton (M →* N) where
   allEq f g := by
     ext m
     obtain ⟨n, hn, hrm⟩ := isOfFinOrder_iff_pow_eq_one.1 <| hM m

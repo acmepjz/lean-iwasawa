@@ -125,7 +125,7 @@ in fact equal to `| | ^ c` for some `0 < c ≤ 1`. -/
 theorem exists_ringHom_complex_of_not_isNonarchimedean
     {K : Type*} [Field K] (v : AbsoluteValue K ℝ) (h : ¬IsNonarchimedean v) :
     ∃ φ : K →+* ℂ, NumberField.place φ ≈ v := by
-  have := v.charZero_of_not_isNonarchimedean h
+  have := v.charZero_of_not_isNonarchimedean' h
   have := v.isNormalized_normalization_of_isNontrivial <| by
     apply isNontrivial_of_not_isNonarchimedean
     rwa [isNonarchimedean_iff_of_liesOver (v.comp (algebraMap ℚ K).injective) v]

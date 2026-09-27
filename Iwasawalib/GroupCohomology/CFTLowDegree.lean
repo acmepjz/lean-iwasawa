@@ -84,7 +84,7 @@ lemma H1_isZero_of_trivial (M : Rep R G) [IsAddTorsionFree M]
     [M.IsTrivial] [Finite G] : IsZero (H1 M) := by
   refine .of_iso ?_ (groupCohomology.H1IsoOfIsTrivial M)
   simp [subsingleton_addMonoidHom_of_isTorsion_isAddTorsionFree,
-    is_add_torsion_of_finite]
+    isAddTorsion_of_finite]
 
 namespace cocycles₂
 

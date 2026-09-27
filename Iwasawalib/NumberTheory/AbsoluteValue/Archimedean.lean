@@ -28,7 +28,7 @@ Main results:
   and `v (x + 1) > 1`.
 - `AbsoluteValue.isNonarchimedean_iff_exists_forall_apply_natCast_le`:
   an absolute value `v` is non-archimedean if and only if `v(ℕ)` is bounded.
-- `AbsoluteValue.charZero_of_not_isNonarchimedean`:
+- `AbsoluteValue.charZero_of_not_isNonarchimedean'`:
   if a field has an infinite place, then it must be of characteristic zero.
 
 -/
@@ -235,8 +235,12 @@ theorem isNontrivial_iff_of_liesOver
     map_zero, hn.add_eq_max_of_ne h3.ne, max_eq_right h3.le] at h1
   simp [hx] at h1
 
-/-- If a field `K` has an infinite place, then it must be of characteristic zero. -/
-theorem charZero_of_not_isNonarchimedean
+/-- If a field `K` has an infinite place, then it must be of characteristic zero.
+
+Named with a prime because the sorry-free class field theory library used by the leaf
+library `IwasawalibCFT` declares a lemma `AbsoluteValue.charZero_of_not_isNonarchimedean` with
+the same statement; two declarations of one name cannot be imported together. -/
+theorem charZero_of_not_isNonarchimedean'
     {K : Type*} [Field K] (v : AbsoluteValue K ℝ) (h : ¬IsNonarchimedean v) : CharZero K := by
   rcases CharP.exists' K with hc | ⟨p, hp, hc⟩
   · exact hc

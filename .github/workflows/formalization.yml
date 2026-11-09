@@ -1,0 +1,50 @@
+name: Formalization metadata and comparison
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  metadata:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install check-jsonschema
+      - run: >-
+          check-jsonschema
+          --schemafile https://raw.githubusercontent.com/mathlib-initiative/formalization.yaml/main/schema/v0.4.schema.json
+          formalization.yaml
+
+  comparator:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@v4
+      - uses: leanprover/lean-action@v1
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.x'
+      - name: Install compatible verifier
+        shell: bash
+        run: |
+          git clone https://github.com/leanprover/comparator.git "$RUNNER_TEMP/iwasawa-comparator"
+          cd "$RUNNER_TEMP/iwasawa-comparator"
+          git checkout 3927ad383f208ae977c340a91c48ac9b497d2097
+          lake build comparator lean4export
+          go install github.com/zouuup/landrun@main
+          echo "$RUNNER_TEMP/iwasawa-comparator/.lake/build/bin" >> "$GITHUB_PATH"
+          echo "$RUNNER_TEMP/iwasawa-comparator/.lake/packages/lean4export/.lake/build/bin" >> "$GITHUB_PATH"
+          go env GOPATH | sed 's|$|/bin|' >> "$GITHUB_PATH"
+      - name: Build trusted shared dependencies and comparison modules
+        working-directory: IwasawalibCFT
+        run: lake build Challenge Solution
+      - name: Compare both unconditional theorems
+        run: scripts/check-comparator.sh

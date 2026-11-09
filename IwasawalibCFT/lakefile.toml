@@ -26,3 +26,10 @@ rev = "2e6280f9d2579705a0cc6c76ec68c2b60f9c601a"
 
 [[lean_lib]]
 name = "IwasawalibCFT"
+
+# Comparator modules are separate because they declare the same theorem names.
+[[lean_lib]]
+name = "Challenge"
+
+[[lean_lib]]
+name = "Solution"

@@ -1,0 +1,128 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/mathlib-initiative/formalization.yaml/main/schema/v0.4.schema.json
+version: "v0.4"
+project:
+  name: "Formalization of Iwasawa Theory in Lean"
+  description: >-
+    Iwasawa's class-number growth theorem for Z_p-extensions of number fields,
+    together with the existence of cyclotomic Z_p-extensions and their growth
+    formula. The root library proves the formula from two explicit Hilbert
+    class field propositions; the nested IwasawalibCFT package proves those
+    propositions using an external class field theory formalization and
+    obtains the unconditional results.
+  authors:
+    - "Jz Pan (acmepjz / acme_pjz)"
+    - "caosip"
+    - "njw"
+    - "pelicanhere"
+    - "Nick Adfor"
+    - "Pietro Monticone"
+    - "Shouxin Zhang"
+  license: "Apache-2.0"
+sources:
+  - title: "Introduction to cyclotomic fields"
+    authors: ["Lawrence C. Washington"]
+    id: "Graduate Texts in Mathematics 83, second edition, Springer, 1997"
+    type: "book"
+    location: "Chapter 13, Theorem 13.13"
+    relationship: "formalizes"
+    note: "The principal reference in the blueprint and main theorem docstring."
+  - title: "On Gamma-extensions of algebraic number fields"
+    authors: ["Kenkichi Iwasawa"]
+    id: "Bulletin of the American Mathematical Society 65 (1959), 183–226"
+    type: "article"
+    location: "Theorem 11"
+    relationship: "formalizes"
+    note: "Historical source cited by the blueprint for the growth theorem."
+related_formalizations:
+  - id: "https://github.com/acmepjz/lean-iwasawa"
+    relationship: "builds-on"
+    note: "The original Iwasawa development and blueprint credited to Jz Pan and contributors."
+  - id: "https://github.com/n-yamaguchi-0729/ClassFieldTheory/tree/2e6280f9d2579705a0cc6c76ec68c2b60f9c601a"
+    relationship: "builds-on"
+    note: >-
+      Naganori Yamaguchi's class field theory library supplies the Hilbert
+      class field results used by the nested package. Its proof development
+      and authorship are separate from the integration work in this repository.
+  - id: "https://github.com/leanprover-community/mathlib4"
+    relationship: "builds-on"
+    note: "Reuses Mathlib's algebra, number theory, topology, and proof infrastructure."
+classification:
+  arxiv: ["math.NT"]
+  msc2020: ["11R23", "11R37"]
+status:
+  scope: >-
+    The two unconditional endpoints are in the nested IwasawalibCFT package.
+    The two deliberate holes in its separate Comparator Challenge are
+    specifications, not unresolved library proofs.
+  main_results:
+    - declaration: "MvZpExtension.multiplicity_classNumber_Kn_eq₁"
+      file: "IwasawalibCFT/IwasawalibCFT/Iwasawa.lean"
+      sorry_count: 0
+      axioms: ["propext", "Classical.choice", "Quot.sound"]
+      comparator_config: "IwasawalibCFT/comparator.json"
+    - declaration: "NumberField.exists_cyclotomic_multiplicity_classNumber_eq"
+      file: "IwasawalibCFT/IwasawalibCFT/Iwasawa.lean"
+      sorry_count: 0
+      axioms: ["propext", "Classical.choice", "Quot.sound"]
+      comparator_config: "IwasawalibCFT/comparator.json"
+automation:
+  methods:
+    - method: "other"
+      tool_setup: "Earlier contributor development, as credited in Git and source headers."
+      prompting_notes: "The earlier contributors' complete automation history was not reconstructed."
+    - method: "agent"
+      models: ["claude-fable-5-1", "claude-opus-5-5"]
+      framework: "Claude Code with MechMath Agent Team (MMAT) FL-Prover"
+      tool_setup: >-
+        Human-directed completion on 2026-09-26 and 2026-09-27, with delegated
+        formalization, proof, integration and review tasks; Lean builds,
+        declaration checks, axiom audits and blueprint checks.
+      prompting_notes: >-
+        Complete the existing EonMath/lean-iwasawa development, preserve the
+        main theorem statement, audit sorry and custom-axiom dependencies,
+        integrate the external CFT library, then remove obsolete sorry-based
+        declarations and publish the cleaned development.
+      cost:
+        wall_time: "Not measured; recorded work spans 2026-09-26–2026-09-27."
+        spend_usd: "Unknown; launch budget limits are not actual expenditure."
+    - method: "agent"
+      framework: "Codex"
+      tool_setup: "Provenance reconstruction and Comparator interface preparation in November 2026."
+      prompting_notes: "Recover relevant Claude Code history, follow the official metadata specification, and configure comparison of the existing results."
+  notes: >-
+    Model strings are literal identifiers in the recovered session records,
+    not inferred product names. The recovery covers the September completion
+    phase and does not establish the tool use of every earlier contributor.
+    See docs/formalization-history.md for session identifiers and milestones.
+fidelity:
+  divergences: >-
+    The class-number formula uses multiplicity p of the class number and
+    natural mu, lambda with integer nu, for all n above a threshold. The
+    general extension structure is specialized by Unique on the index type.
+    The cyclotomic result additionally supplies an extension as a witness.
+    The unconditional results discharge both Hilbert class field propositions
+    by formal proofs. Comparator preserves their existing statements; it
+    does not itself certify correspondence to the informal literature.
+review:
+  status: "agent-reviewed"
+  notes: >-
+    Historical Claude Code records report statement-preservation review,
+    builds and axiom audits. The nested package was rebuilt successfully
+    during metadata preparation; its existing axiom guards allow only the
+    three standard axioms listed above. Independent human mathematical peer
+    review is not asserted. Full Comparator execution is pending availability
+    of compatible comparator, lean4export and landrun executables.
+alignment:
+  statements:
+    - source: "Washington, Theorem 13.13; Iwasawa, Theorem 11"
+      lean: "MvZpExtension.multiplicity_classNumber_Kn_eq₁"
+      module: "IwasawalibCFT.Iwasawa"
+      status: "proved"
+    - source: "Cyclotomic Z_p-extension specialization of the growth theorem"
+      lean: "NumberField.exists_cyclotomic_multiplicity_classNumber_eq"
+      module: "IwasawalibCFT.Iwasawa"
+      status: "proved"
+acknowledgements: >-
+  Credits follow the blueprint, source headers and Git author identities;
+  they do not assign every historical change to a particular person or model.
+  This development uses Lean, Mathlib and Naganori Yamaguchi's ClassFieldTheory.

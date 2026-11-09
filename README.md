@@ -21,3 +21,17 @@ Iwasawa's theorem on the growth of class groups in a `ℤₚ`-extension is prove
 
 Until September 2026 `Iwasawalib` also contained a version of the theorem proved from class field
 theory `sorry`s; it has been removed.
+
+## Provenance and verification
+
+[`formalization.yaml`](formalization.yaml) records sources, authorship, automation,
+review scope and the two final results using the official v0.4 format.
+[Recovered development history](docs/formalization-history.md) summarizes the
+September 2026 Claude Code work and the external CFT integration.
+
+The nested package has a [Comparator configuration](IwasawalibCFT/comparator.json)
+and [setup instructions](IwasawalibCFT/COMPARATOR.md). Its two deliberate Challenge
+holes are specifications and do not belong to the library proofs. The
+**Formalization metadata and comparison** workflow validates metadata on push/PR;
+manual dispatch also runs Comparator on both unconditional results, including
+compilation of the external CFT dependency.

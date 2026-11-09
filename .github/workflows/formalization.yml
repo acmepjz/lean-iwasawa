@@ -39,7 +39,7 @@ jobs:
           cd "$RUNNER_TEMP/iwasawa-comparator"
           git checkout 3927ad383f208ae977c340a91c48ac9b497d2097
           lake build comparator lean4export
-          go install github.com/zouuup/landrun@main
+          go install github.com/zouuup/landrun/cmd/landrun@v0.1.18-0.20261016135722-ec104f6edc1e
           echo "$RUNNER_TEMP/iwasawa-comparator/.lake/build/bin" >> "$GITHUB_PATH"
           echo "$RUNNER_TEMP/iwasawa-comparator/.lake/packages/lean4export/.lake/build/bin" >> "$GITHUB_PATH"
           go env GOPATH | sed 's|$|/bin|' >> "$GITHUB_PATH"

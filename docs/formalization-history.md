@@ -38,7 +38,11 @@ Comparator challenge/solution interface for both unconditional endpoints.
 The CFT package was rebuilt successfully during this preparation (5241 jobs).
 `lake build Challenge Solution` also passed (5243 jobs), with only the two
 expected Challenge sorry warnings in the new interface. The metadata passed
-validation against the official v0.4 JSON Schema. Comparator
-execution remains pending: this environment has no comparator, lean4export or
-landrun executables, and terminal network access cannot resolve GitHub.
-See [comparison instructions](../IwasawalibCFT/COMPARATOR.md).
+validation against the official v0.4 JSON Schema. The initial attempt to run
+Comparator and push was blocked by unavailable tools and terminal network access.
+After network access was restored on November 9, the compatible tools were built
+and both endpoints passed full Comparator validation, including Lean kernel
+replay, in 11 minutes 56 seconds (exit 0). Landrun's installation command was
+corrected to use `cmd/landrun` and its tested version was pinned in the setup
+instructions and CI. See the [verification record](comparator-verification.md)
+and [comparison instructions](../IwasawalibCFT/COMPARATOR.md).

@@ -23,7 +23,7 @@ git clone https://github.com/leanprover/comparator.git /tmp/iwasawa-comparator
 cd /tmp/iwasawa-comparator
 git checkout 3927ad383f208ae977c340a91c48ac9b497d2097
 lake build comparator lean4export
-go install github.com/zouuup/landrun@main
+go install github.com/zouuup/landrun/cmd/landrun@v0.1.18-0.20261016135722-ec104f6edc1e
 export PATH="/tmp/iwasawa-comparator/.lake/build/bin:/tmp/iwasawa-comparator/.lake/packages/lean4export/.lake/build/bin:$(go env GOPATH)/bin:$PATH"
 ```
 
@@ -45,3 +45,7 @@ pushes and pull requests. A first CFT build can take hours.
 The challenge imports, Lake configuration and pinned dependencies are part of
 the trusted specification. Review them along with the theorem statements;
 comparison does not prove that these statements faithfully express the book.
+
+Both endpoints passed this full check on 2026-11-09; see the
+[verification record](../docs/comparator-verification.md) for exact revisions
+and output. The Landrun version above is the tested revision from upstream main.

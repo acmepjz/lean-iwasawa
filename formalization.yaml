@@ -110,8 +110,11 @@ review:
     builds and axiom audits. The nested package was rebuilt successfully
     during metadata preparation; its existing axiom guards allow only the
     three standard axioms listed above. Independent human mathematical peer
-    review is not asserted. Full Comparator execution is pending availability
-    of compatible comparator, lean4export and landrun executables.
+    review is not asserted. On 2026-11-09, both endpoints passed full
+    Comparator statement comparison, the standard-axiom allowlist check,
+    and Lean kernel replay under real Landrun with the systemd AF_UNIX
+    restriction (exit 0). Nanoda was not enabled. See
+    docs/comparator-verification.md for tool revisions and the result.
 alignment:
   statements:
     - source: "Washington, Theorem 13.13; Iwasawa, Theorem 11"

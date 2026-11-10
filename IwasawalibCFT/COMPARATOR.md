@@ -56,3 +56,7 @@ comparison does not prove that these statements faithfully express the book.
 The former pair of endpoints passed on 2026-11-09; see the
 [verification record](../docs/comparator-verification.md) for exact revisions
 and output. The Landrun version above is the tested revision from upstream main.
+
+The Mathlib-only replacement passed full Comparator on 2026-11-10, including
+statement comparison, the standard-axiom allowlist and Lean kernel replay. See
+[the current verification record](../docs/comparator-mathlib-verification.md).

@@ -49,3 +49,29 @@ replay, in 11 minutes 56 seconds (exit 0). Landrun's installation command was
 corrected to use `cmd/landrun` and its tested version was pinned in the setup
 instructions and CI. See the [verification record](comparator-verification.md)
 and [comparison instructions](../IwasawalibCFT/COMPARATOR.md).
+
+## Mathlib-only challenge, November 10
+
+Following contributor feedback, the challenge was replaced by the exact
+`NumberField.multiplicity_classNumber_eq_of_finrank_eq_pow` statement from
+upstream `ClassGroup.lean` at `aef1a74ec13d5a5684367e9c43668fae276c7cd9`.
+Its sole import is `Mathlib.NumberTheory.NumberField.ClassNumber`. The earlier
+structure-based theorem and cyclotomic corollary remain in the library but
+are no longer Comparator targets.
+
+The proof constructs the union of the cyclic Galois tower and restricts the
+layers to it. Compactness supplies an automorphism generating every finite
+quotient. These compatible quotients identify the union's Galois group with
+the additive p-adic integers. The prescribed degrees identify the original
+layers with the canonical Z_p-extension layers, and field isomorphisms preserve
+their class numbers. The unconditional Iwasawa theorem then gives the formula.
+The bridge is proved in `IwasawalibCFT.CyclicTower` and `IwasawalibCFT.Tower`;
+the final statement is in `IwasawalibCFT.MathlibIwasawa`.
+
+The first Comparator attempt detected different automatically generated
+universe parameter names. Moving the final statement to its own module
+preserved the requested signature and made the elaborated name, universe
+list, and type literally identical to the challenge. The fresh full Comparator
+run passed on November 10 (exit 0, 11 minutes 32 seconds), including Lean kernel
+replay. The November 9 result above covers only the earlier pair of targets.
+See [the current verification record](comparator-mathlib-verification.md).

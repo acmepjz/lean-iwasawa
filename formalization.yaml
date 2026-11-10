@@ -150,12 +150,15 @@ review:
     during metadata preparation; its existing axiom guards allow only the
     three standard axioms listed above. Independent human mathematical peer
     review is not asserted. The new Mathlib-only theorem compiles and its
-    axiom guard passes; full Comparator validation of this replacement is
-    pending. On 2026-11-09, the two former Comparator endpoints passed full
+    axiom guard passes. On 2026-11-10, full Comparator validation of this
+    Mathlib-only replacement passed statement comparison, the standard-axiom
+    allowlist and Lean kernel replay (exit 0, 11 minutes 32 seconds).
+    On 2026-11-09, the two former Comparator endpoints passed full
     Comparator statement comparison, the standard-axiom allowlist check,
     and Lean kernel replay under real Landrun with the systemd AF_UNIX
     restriction (exit 0). Nanoda was not enabled. See
-    docs/comparator-verification.md for tool revisions and the result.
+    docs/comparator-mathlib-verification.md for the current result and
+    docs/comparator-verification.md for the historical pair of targets.
 alignment:
   statements:
     - source: "Washington, Theorem 13.13; increasing cyclic Galois tower formulation"

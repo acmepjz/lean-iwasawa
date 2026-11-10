@@ -1,0 +1,22 @@
+import IwasawalibCFT.Tower
+
+variable {p : ℕ} [Fact p.Prime] {K : Type*} [Field K] [NumberField K]
+
+/-- **Iwasawa's theorem** on growth of class groups of `ℤₚ`-extension of number fields. This is an
+alternative statement which depends only on the concepts in Mathlib. Note: the assumption
+`∀ n, NumberField (Kn n)` can be derived from other assumptions, but we keep it here to avoid
+`haveI` in the statement of the conclusion. -/
+theorem NumberField.multiplicity_classNumber_eq_of_finrank_eq_pow {L : Type*} [Field L]
+    [Algebra K L] (Kn : ℕ → IntermediateField K L) [∀ n, NumberField (Kn n)]
+    [∀ n, IsGalois K (Kn n)] [∀ n, IsCyclic Gal(Kn n/K)]
+    (hle : ∀ n, Kn n ≤ Kn (n + 1)) (hfinrank : ∀ n, Module.finrank K (Kn n) = p ^ n) :
+    ∃ (mu lambda : ℕ) (nu : ℤ) (N : ℕ), ∀ n > N,
+      multiplicity p (NumberField.classNumber (Kn n)) = mu * p ^ n + lambda * n + nu := by
+  let := NumberField.isGalois_towerUnion Kn
+  obtain ⟨H⟩ := NumberField.nonempty_towerUnion_zpExtension Kn hle hfinrank
+  exact NumberField.multiplicity_classNumber_eq_of_union_zpExtension Kn H hfinrank
+
+/--
+info: 'NumberField.multiplicity_classNumber_eq_of_finrank_eq_pow' depends on axioms: [propext, Classical.choice, Quot.sound]
+-/
+#guard_msgs in #print axioms NumberField.multiplicity_classNumber_eq_of_finrank_eq_pow

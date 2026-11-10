@@ -140,23 +140,4 @@ theorem multiplicity_classNumber_eq_of_union_zpExtension
       ((e.trans (IntermediateField.equivOfEq he)).toRingEquiv)
   simpa only [hclass] using H.multiplicity_classNumber_Kn_eq₁
 
-/-- **Iwasawa's theorem** on growth of class groups of `ℤₚ`-extension of number fields. This is an
-alternative statement which depends only on the concepts in Mathlib. Note: the assumption
-`∀ n, NumberField (Kn n)` can be derived from other assumptions, but we keep it here to avoid
-`haveI` in the statement of the conclusion. -/
-theorem multiplicity_classNumber_eq_of_finrank_eq_pow {L : Type*} [Field L]
-    [Algebra K L] (Kn : ℕ → IntermediateField K L) [∀ n, NumberField (Kn n)]
-    [∀ n, IsGalois K (Kn n)] [∀ n, IsCyclic Gal(Kn n/K)]
-    (hle : ∀ n, Kn n ≤ Kn (n + 1)) (hfinrank : ∀ n, Module.finrank K (Kn n) = p ^ n) :
-    ∃ (mu lambda : ℕ) (nu : ℤ) (N : ℕ), ∀ n > N,
-      multiplicity p (NumberField.classNumber (Kn n)) = mu * p ^ n + lambda * n + nu := by
-  let := isGalois_towerUnion Kn
-  obtain ⟨H⟩ := nonempty_towerUnion_zpExtension Kn hle hfinrank
-  exact multiplicity_classNumber_eq_of_union_zpExtension Kn H hfinrank
-
 end NumberField
-
-/--
-info: 'NumberField.multiplicity_classNumber_eq_of_finrank_eq_pow' depends on axioms: [propext, Classical.choice, Quot.sound]
--/
-#guard_msgs in #print axioms NumberField.multiplicity_classNumber_eq_of_finrank_eq_pow

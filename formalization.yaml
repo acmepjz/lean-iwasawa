@@ -58,7 +58,7 @@ status:
     The structure-based theorem and cyclotomic corollary remain library results.
   main_results:
     - declaration: "NumberField.multiplicity_classNumber_eq_of_finrank_eq_pow"
-      file: "IwasawalibCFT/IwasawalibCFT/Tower.lean"
+      file: "IwasawalibCFT/IwasawalibCFT/MathlibIwasawa.lean"
       sorry_count: 0
       axioms: ["propext", "Classical.choice", "Quot.sound"]
       comparator_config: "IwasawalibCFT/comparator.json"
@@ -160,7 +160,7 @@ alignment:
   statements:
     - source: "Washington, Theorem 13.13; increasing cyclic Galois tower formulation"
       lean: "NumberField.multiplicity_classNumber_eq_of_finrank_eq_pow"
-      module: "IwasawalibCFT.Tower"
+      module: "IwasawalibCFT.MathlibIwasawa"
       status: "proved"
     - source: "Washington, Theorem 13.13; Iwasawa, Theorem 11"
       lean: "MvZpExtension.multiplicity_classNumber_Kn_eq₁"

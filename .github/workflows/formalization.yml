@@ -46,5 +46,5 @@ jobs:
       - name: Build trusted shared dependencies and comparison modules
         working-directory: IwasawalibCFT
         run: lake build Challenge Solution
-      - name: Compare both unconditional theorems
+      - name: Compare the Mathlib-only Iwasawa theorem
         run: scripts/check-comparator.sh

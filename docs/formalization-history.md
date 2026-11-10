@@ -28,8 +28,11 @@ The recovered final report says both packages built, blueprint declaration
 checks passed, and the main results used only `propext`, `Classical.choice`,
 and `Quot.sound`. The source contains executable axiom guards for those results.
 These historical reports are distinguished from fresh verification below.
-Earlier work is credited through source headers, the blueprint and Git authors;
-its complete human/automation history is unknown. Actual cost was not recovered.
+Earlier work is credited through source headers, the blueprint and Git authors.
+Contributor clarification on 2026-11-10 identifies it as predominantly human-written,
+with copilot assistance in `cf5cb00` and Aristotle proofs with human refactoring
+in `3850e82`, `12d2514` and `31e2978`. The Aristotle commit messages corroborate
+these attributions. Specific models and actual costs were not supplied.
 
 ## November 2026 metadata and comparison preparation
 

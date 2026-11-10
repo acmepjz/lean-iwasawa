@@ -25,13 +25,14 @@ theory `sorry`s; it has been removed.
 ## Provenance and verification
 
 [`formalization.yaml`](formalization.yaml) records sources, authorship, automation,
-review scope and the two final results using the official v0.4 format.
+review scope and the main results using the official v0.4 format.
 [Recovered development history](docs/formalization-history.md) summarizes the
 September 2026 Claude Code work and the external CFT integration.
 
 The nested package has a [Comparator configuration](IwasawalibCFT/comparator.json)
-and [setup instructions](IwasawalibCFT/COMPARATOR.md). Its two deliberate Challenge
-holes are specifications and do not belong to the library proofs. The
+and [setup instructions](IwasawalibCFT/COMPARATOR.md). Its Mathlib-only Challenge states the growth formula for an increasing cyclic
+Galois tower of degrees p^n, with one deliberate specification hole. The proof
+constructs the union as a Z_p-extension and recovers its layers. The
 **Formalization metadata and comparison** workflow validates metadata on push/PR;
-manual dispatch also runs Comparator on both unconditional results, including
+manual dispatch also runs Comparator on this Mathlib-only theorem, including
 compilation of the external CFT dependency.

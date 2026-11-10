@@ -2,8 +2,7 @@
   "challenge_module": "Challenge",
   "solution_module": "Solution",
   "theorem_names": [
-    "MvZpExtension.multiplicity_classNumber_Kn_eq₁",
-    "NumberField.exists_cyclotomic_multiplicity_classNumber_eq"
+    "NumberField.multiplicity_classNumber_eq_of_finrank_eq_pow"
   ],
   "definition_names": [],
   "enable_nanoda": false,

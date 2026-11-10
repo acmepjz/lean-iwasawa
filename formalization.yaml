@@ -51,25 +51,52 @@ classification:
   msc2020: ["11R23", "11R37"]
 status:
   scope: >-
-    The two unconditional endpoints are in the nested IwasawalibCFT package.
-    The two deliberate holes in its separate Comparator Challenge are
-    specifications, not unresolved library proofs.
+    The nested IwasawalibCFT package proves the growth theorem for increasing
+    cyclic Galois towers with layer degrees p^n using only Mathlib concepts
+    in its statement. Comparator checks this single endpoint. Its one
+    deliberate Challenge hole is a specification, not an unresolved proof.
+    The structure-based theorem and cyclotomic corollary remain library results.
   main_results:
+    - declaration: "NumberField.multiplicity_classNumber_eq_of_finrank_eq_pow"
+      file: "IwasawalibCFT/IwasawalibCFT/Tower.lean"
+      sorry_count: 0
+      axioms: ["propext", "Classical.choice", "Quot.sound"]
+      comparator_config: "IwasawalibCFT/comparator.json"
     - declaration: "MvZpExtension.multiplicity_classNumber_Kn_eq₁"
       file: "IwasawalibCFT/IwasawalibCFT/Iwasawa.lean"
       sorry_count: 0
       axioms: ["propext", "Classical.choice", "Quot.sound"]
-      comparator_config: "IwasawalibCFT/comparator.json"
     - declaration: "NumberField.exists_cyclotomic_multiplicity_classNumber_eq"
       file: "IwasawalibCFT/IwasawalibCFT/Iwasawa.lean"
       sorry_count: 0
       axioms: ["propext", "Classical.choice", "Quot.sound"]
-      comparator_config: "IwasawalibCFT/comparator.json"
 automation:
   methods:
-    - method: "other"
-      tool_setup: "Earlier contributor development, as credited in Git and source headers."
-      prompting_notes: "The earlier contributors' complete automation history was not reconstructed."
+    - method: "manual"
+      tool_setup: >-
+        Earlier contributor development was predominantly human-written,
+        according to contributor clarification on 2026-11-10. The identified
+        AI-assisted exceptions are recorded separately below.
+    - method: "copilot"
+      tool_setup: "Human proof development with AI copilot assistance."
+      prompting_notes: >-
+        Contributor attribution for commit
+        https://github.com/acmepjz/lean-iwasawa/commit/cf5cb00dd51836350945f313fc2f69d2561c244f
+        (LinearMap.isPseudoIsomorphism_iff_bijective_map).
+        The specific copilot model was not supplied.
+    - method: "agent"
+      framework: "Aristotle (Harmonic)"
+      tool_setup: >-
+        AI-generated proofs with human refactoring and extraction of reusable
+        infrastructure. Attribution is corroborated by the commit messages.
+      prompting_notes: >-
+        https://github.com/acmepjz/lean-iwasawa/commit/3850e82c74d0bbb19f26d4534c59df25302ea1ab
+        supplies results on maximal abelian extensions, unramified towers,
+        decomposition and inertia subgroups, with infrastructure extracted by humans.
+        https://github.com/acmepjz/lean-iwasawa/commit/12d2514e585a774e234399675055e3e38b33516e
+        supplies the Gelfand–Tornheim proof with significant human refactoring.
+        https://github.com/acmepjz/lean-iwasawa/commit/31e29784206ffdfafc326f2fcaf50303f5be4351
+        combines human decomposition-subgroup refactoring with an elementary AI-proved result.
     - method: "agent"
       models: ["claude-fable-5-1", "claude-opus-5-5"]
       framework: "Claude Code with MechMath Agent Team (MMAT) FL-Prover"
@@ -87,12 +114,20 @@ automation:
         spend_usd: "Unknown; launch budget limits are not actual expenditure."
     - method: "agent"
       framework: "Codex"
-      tool_setup: "Provenance reconstruction and Comparator interface preparation in November 2026."
-      prompting_notes: "Recover relevant Claude Code history, follow the official metadata specification, and configure comparison of the existing results."
+      tool_setup: >-
+        Provenance reconstruction, Comparator interface preparation, and proof
+        of the Mathlib-only cyclic-tower formulation in November 2026.
+      prompting_notes: >-
+        Recover the Claude Code history and follow the official metadata
+        specification. Following contributor feedback, replace the challenge
+        with the exact upstream Mathlib-only statement, construct the union's
+        Z_p-extension structure, and recover the original layers without
+        adding hypotheses or axioms.
   notes: >-
     Model strings are literal identifiers in the recovered session records,
-    not inferred product names. The recovery covers the September completion
-    phase and does not establish the tool use of every earlier contributor.
+    not inferred product names. The session recovery covers the September completion
+    phase; earlier development is described using contributor clarification
+    and the identified AI-assisted commit messages.
     See docs/formalization-history.md for session identifiers and milestones.
 fidelity:
   divergences: >-
@@ -101,8 +136,12 @@ fidelity:
     general extension structure is specialized by Unique on the index type.
     The cyclotomic result additionally supplies an extension as a witness.
     The unconditional results discharge both Hilbert class field propositions
-    by formal proofs. Comparator preserves their existing statements; it
-    does not itself certify correspondence to the informal literature.
+    by formal proofs. The Mathlib-only challenge preserves the upstream
+    NumberField.multiplicity_classNumber_eq_of_finrank_eq_pow statement at
+    acmepjz/lean-iwasawa revision aef1a74ec13d5a5684367e9c43668fae276c7cd9,
+    including its explicit NumberField instances on the layers. The proof
+    constructs the union rather than assuming the ambient field is algebraic
+    or Galois. Comparator does not itself certify correspondence to literature.
 review:
   status: "agent-reviewed"
   notes: >-
@@ -110,13 +149,19 @@ review:
     builds and axiom audits. The nested package was rebuilt successfully
     during metadata preparation; its existing axiom guards allow only the
     three standard axioms listed above. Independent human mathematical peer
-    review is not asserted. On 2026-11-09, both endpoints passed full
+    review is not asserted. The new Mathlib-only theorem compiles and its
+    axiom guard passes; full Comparator validation of this replacement is
+    pending. On 2026-11-09, the two former Comparator endpoints passed full
     Comparator statement comparison, the standard-axiom allowlist check,
     and Lean kernel replay under real Landrun with the systemd AF_UNIX
     restriction (exit 0). Nanoda was not enabled. See
     docs/comparator-verification.md for tool revisions and the result.
 alignment:
   statements:
+    - source: "Washington, Theorem 13.13; increasing cyclic Galois tower formulation"
+      lean: "NumberField.multiplicity_classNumber_eq_of_finrank_eq_pow"
+      module: "IwasawalibCFT.Tower"
+      status: "proved"
     - source: "Washington, Theorem 13.13; Iwasawa, Theorem 11"
       lean: "MvZpExtension.multiplicity_classNumber_Kn_eq₁"
       module: "IwasawalibCFT.Iwasawa"

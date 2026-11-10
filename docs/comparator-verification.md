@@ -1,6 +1,6 @@
 # Comparator verification, 2026-11-09
 
-Both declarations in `IwasawalibCFT/comparator.json` passed:
+Both declarations selected by `IwasawalibCFT/comparator.json` at that revision passed:
 
 - `MvZpExtension.multiplicity_classNumber_Kn_eq₁`
 - `NumberField.exists_cyclotomic_multiplicity_classNumber_eq`

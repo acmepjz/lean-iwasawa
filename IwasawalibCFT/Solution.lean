@@ -1,2 +1,2 @@
-/- The existing proofs, with their original declaration names and statements. -/
-import IwasawalibCFT.Iwasawa
+/- The Mathlib-only tower statement, proved using the unconditional Iwasawa theorem. -/
+import IwasawalibCFT.Tower

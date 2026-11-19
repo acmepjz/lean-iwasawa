@@ -26,8 +26,10 @@ The source audit passes for all 332 repository Lean files (largest: 1,472 lines)
 and all 5,315 resolved non-core files in Solution's transitive import closure.
 Run `python3 scripts/audit-lean-sources.py` to reproduce it.
 
-Before submission, require successful root and nested builds, the source audit,
-and `lake comparator` under Lean 4.35. Historical Lean 4.33 checks are recorded
+The root and nested builds, source audit, and standard `lake comparator` under
+Lean 4.35 passed on 2026-11-19. The bundled NanoDa also checked the same
+export successfully. See `lean435-verification.md`, including the recorded
+pretty-printer diagnostic. Historical Lean 4.33 checks are recorded
 separately and do not certify the migration. Palomar performs its own protected
 verification with NanoDa, regardless of the submitted `enable_nanoda` field.
 A default local Lake comparison must not be described as a NanoDa check.

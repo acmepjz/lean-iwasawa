@@ -75,3 +75,23 @@ list, and type literally identical to the challenge. The fresh full Comparator
 run passed on November 10 (exit 0, 11 minutes 32 seconds), including Lean kernel
 replay. The November 9 result above covers only the earlier pair of targets.
 See [the current verification record](comparator-mathlib-verification.md).
+
+## Lean 4.35 migration and Palomar preparation, November 18–19
+
+The project moved to Lean 4.35.0, Mathlib
+`56a005855ea17e0b0958f73ec801ae140b0a1679`, and CFT revision
+`b9a2dddbf076eb96b768c333fd828d339ab3d9eb` (now the `Nyll` package).
+Local compatibility changes preserve theorem statements; duplicate idele
+and absolute-value declarations now supplied by Mathlib were removed.
+The field-equality Galois transport was implemented through the canonical
+algebra equivalence to avoid kernel timeouts. All repository Lean files
+now use modules. Upstream sources were left unchanged.
+
+Standard `lake comparator` replaces the cloned verifier; its Bubblewrap
+adapter exposes the contained parent dependency and build caches. Root and
+nested builds, source audits, metadata validation, Lean replay and an additional
+NanoDa check passed. See `lean435-verification.md` for the exact source revision,
+checksums and NanoDa's non-typechecking pretty-printer diagnostic.
+The human responsible maintainers supplied by the user are Jinzhao Pan,
+Yichuan Cao, and Jiawei Nie. Palomar submission materials were prepared, but
+no submission or registration was made.

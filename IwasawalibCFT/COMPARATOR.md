@@ -36,3 +36,6 @@ Palomar acceptance or NanoDa verification.
 
 The November 9 and 10 verification records in `docs/` concern the previous
 Lean 4.33 snapshots. They do not certify this Lean 4.35 migration.
+
+The Lean 4.35 migration passed standard Lake Comparator on 2026-11-19;
+see [the verification record](../docs/lean435-verification.md).

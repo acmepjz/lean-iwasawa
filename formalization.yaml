@@ -154,9 +154,14 @@ review:
     builds and axiom audits. The nested package was rebuilt successfully
     during metadata preparation; its existing axiom guards allow only the
     three standard axioms listed above. Independent human mathematical peer
-    review is not asserted. The Lean 4.35 migration is being validated;
-    the historical results below certify their recorded Lean 4.33 snapshots,
-    not the current migration. On 2026-11-10, full Comparator validation of the
+    review is not asserted. On 2026-11-19, the Lean 4.35 root and nested
+    builds passed, as did standard lake comparator with Bubblewrap sandboxing,
+    statement/dependency comparison, the axiom allowlist, and Lean kernel replay.
+    The source audit passed for every repository file and Solution import.
+    The bundled NanoDa also checked the same export: 123997 declarations,
+    no typechecker errors, exit 0; its pretty-printer diagnostic is recorded
+    in docs/lean435-verification.md. These are local checks, not a Palomar verdict. The older results below certify their
+    recorded Lean 4.33 snapshots. On 2026-11-10, full Comparator validation of the
     Mathlib-only replacement passed statement comparison, the standard-axiom
     allowlist and Lean kernel replay (exit 0, 11 minutes 32 seconds).
     On 2026-11-09, the two former Comparator endpoints passed full

@@ -84,7 +84,7 @@ section
 
 @[simp] lemma norm_hom_res [Group G] [Group H] [Fintype G] [Fintype H]
     (M : Rep.{w} R G) (e : H ≃* G) :
-    (res e.toMonoidHom M).norm.hom.toLinearMap = M.norm.hom.toLinearMap := by
+    (res e.toMonoidHom M).norm.asHom.hom.toLinearMap = M.norm.asHom.hom.toLinearMap := by
   ext
   simp [res_obj_V, norm, Representation.norm, res_obj_ρ, ← e.toEquiv.sum_comp]
 

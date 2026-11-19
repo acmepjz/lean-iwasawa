@@ -14,7 +14,7 @@ Iwasawa's theorem on the growth of class groups in a `ℤₚ`-extension is prove
 * The nested package `IwasawalibCFT` (directory `IwasawalibCFT/`, not built by the root package
   or its CI) proves those two statements with the `sorry`-free class field theory library
   [n-yamaguchi-0729/ClassFieldTheory](https://github.com/n-yamaguchi-0729/ClassFieldTheory)
-  (pinned at commit `2e6280f9`) and states the unconditional theorem
+  (pinned at commit `b9a2dddb`) and states the unconditional theorem
   `MvZpExtension.multiplicity_classNumber_Kn_eq₁` (`IwasawalibCFT/IwasawalibCFT/Iwasawa.lean`),
   whose axioms are `propext`, `Classical.choice`, `Quot.sound` only. Build it with
   `cd IwasawalibCFT && lake build` (this also compiles the external library).
@@ -36,3 +36,6 @@ constructs the union as a Z_p-extension and recovers its layers. The
 **Formalization metadata and comparison** workflow validates metadata on push/PR;
 manual dispatch also runs Comparator on this Mathlib-only theorem, including
 compilation of the external CFT dependency.
+
+The Lean 4.35 migration and Palomar submission paths are documented in
+[the submission preparation notes](docs/palomar-submission.md).

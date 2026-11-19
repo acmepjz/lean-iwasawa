@@ -115,7 +115,7 @@ lemma map₂_apply (f : G →₀ A) (x : G) :
     Representation.map₂ (R := R) f x = f x - f ((gen G)⁻¹ * x) := by
   simp only [map₂, LinearMap.sub_apply, LinearMap.id_coe, id_eq, lmapDomain_apply, coe_sub,
     Pi.sub_apply, sub_right_inj]
-  convert Finsupp.mapDomain_apply ?_ _ ((gen G)⁻¹ * x)
+  convert Finsupp.mapDomain_apply_of_injective ?_ _ ((gen G)⁻¹ * x)
   · simp
   · intro x y h
     simpa using h
@@ -305,7 +305,10 @@ set_option backward.isDefEq.respectTransparency false in
   X₃ := ind₁'.obj M
   f := coind₁'_ι.app M
   g := map₁.app M ≫ (ind₁'_iso_coind₁'.app M).inv
-  zero := by ext; simp [map₁, ind₁'_iso_coind₁', Representation.map₁, funext_iff]
+  zero := by
+    ext
+    simp [map₁, ind₁'_iso_coind₁', Representation.map₁, funext_iff, ← Pi.zero_def]
+    exact (Representation.ind₁'_lequiv_coind₁' (R := R) (G := G) (V := M)).symm.toLinearMap.map_zero
 
 set_option backward.isDefEq.respectTransparency false in
 /-- The second short complex in the periodicity sequence. -/
@@ -344,8 +347,11 @@ lemma exact_periodSeq₁ : (periodSeq₁ M).Exact := by
     Representation.Equiv.mk_apply, EmbeddingLike.map_eq_zero_iff,
     Representation.IntertwiningMap.mem_range]
   intro w hw
+  have hw' : Representation.map₁ (R := R) w = 0 := by
+    apply (Representation.ind₁'_lequiv_coind₁' (R := R) (G := G) (V := M)).symm.injective
+    simpa using hw
   change w ∈ LinearMap.range Representation.coind₁'_ι
-  simp [← Representation.map₁_ker, hw]
+  simp [← Representation.map₁_ker, hw']
 
 set_option backward.defeqAttrib.useBackward true in
 set_option backward.isDefEq.respectTransparency false in

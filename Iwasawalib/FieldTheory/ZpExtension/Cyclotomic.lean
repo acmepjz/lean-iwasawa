@@ -333,8 +333,7 @@ theorem fieldRange_eq_cyclotomicZpSubfield (f : Kinf →ₐ[K] CyclotomicPinfFie
       CyclotomicPinfField.cyclotomicZpSubfield_eq_fixedField] using
         congr(IntermediateField.fixedField $(this))
   have hfin : Finite f.fieldRange.fixingSubgroup := by
-    have hc : IsClosed ((f.fieldRange.fixingSubgroup.map <| MonoidHomClass.toMonoidHom <|
-        continuousCyclotomicCharacter p K (CyclotomicPinfField p K)) : Set ℤ_[p]ˣ) :=
+    have hc : IsClosed ((f.fieldRange.fixingSubgroup.map <| (continuousCyclotomicCharacter p K (CyclotomicPinfField p K)).toMonoidHom) : Set ℤ_[p]ˣ) :=
       (InfiniteGalois.fixingSubgroup_isClosed f.fieldRange).isCompact.image
         (continuousCyclotomicCharacter p K (CyclotomicPinfField p K)).continuous |>.isClosed
     rcases PadicInt.finite_or_finiteIndex_of_subgroup_units_of_isClosed p _ hc with ⟨h, -⟩ | ⟨-, h⟩

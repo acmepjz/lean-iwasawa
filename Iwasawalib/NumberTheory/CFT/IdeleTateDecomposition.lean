@@ -315,6 +315,7 @@ def tateH1SIdeleEquiv (hS : S.Finite) :
       ((tateH1InfiniteIdeleEquivPi (K := K) (L := L) (σ := σ)).prodCongr
           (tateH1FiniteSIdeleEquiv hS)))
 
+set_option synthInstance.maxHeartbeats 80000 in
 /-- **The semilocal decomposition of `Ĥ⁰(Gal(L/K), 𝕀_{L,S})` when `L / K` is unramified outside
 `S`.**  The hypothesis is the vanishing of the Tate cohomology of the semilocal integral units
 at each place outside `S`, which
@@ -338,6 +339,7 @@ def tateH0SIdeleEquivOfUnramified (hS : S.Finite)
   (tateH0SIdeleEquiv hS).trans
     ((AddEquiv.refl _).prodCongr (AddEquiv.prodSubsingletonRight _ _))
 
+set_option synthInstance.maxHeartbeats 80000 in
 /-- **The semilocal decomposition of `Ĥ¹(Gal(L/K), 𝕀_{L,S})` when `L / K` is unramified outside
 `S`.** -/
 def tateH1SIdeleEquivOfUnramified (hS : S.Finite)

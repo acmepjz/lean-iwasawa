@@ -225,9 +225,9 @@ def localAut (σ : L ≃ₐ[K] L) (hσ : ∀ y : L, w ((σ : L ≃+* L) y) = w y
     commutes' := by
       have hcont₁ : Continuous fun c : v.Completion ↦
           Completion.congr (σ : L ≃+* L) w w hσ (algebraMap v.Completion w.Completion c) :=
-        (Completion.continuous_congr _ w w hσ).comp NumberField.LiesOver.continuous_completionMap
+        (Completion.continuous_congr _ w w hσ).comp (NumberField.LiesOver.continuous_completionMap _ _)
       have hcont₂ : Continuous (algebraMap v.Completion w.Completion) :=
-        NumberField.LiesOver.continuous_completionMap
+        (NumberField.LiesOver.continuous_completionMap _ _)
       have := Continuous.ext_on (denseRange_algebraMap_completion v) hcont₁ hcont₂ ?_
       · exact fun c ↦ congrFun this c
       · rintro _ ⟨k, rfl⟩
@@ -357,7 +357,7 @@ theorem completionMap_eq_algebraMap (v : InfinitePlace K) (w : InfinitePlace L)
   have hcont₁ : Continuous (Completion.map (algebraMap K L) v w hf) :=
     Completion.continuous_map _ v w hf
   have hcont₂ : Continuous (algebraMap v.Completion w.Completion) :=
-    NumberField.LiesOver.continuous_completionMap
+    (NumberField.LiesOver.continuous_completionMap _ _)
   have := Continuous.ext_on (denseRange_algebraMap_completion v) hcont₁ hcont₂ ?_
   · exact congrFun this c
   · rintro _ ⟨k, rfl⟩
@@ -373,9 +373,9 @@ theorem congr_algebraMap_completion (v : InfinitePlace K) (w₀ w : InfinitePlac
       = algebraMap v.Completion w.Completion c := by
   have hcont₁ : Continuous fun c : v.Completion ↦
       Completion.congr (σ : L ≃+* L) w₀ w h (algebraMap v.Completion w₀.Completion c) :=
-    (Completion.continuous_congr _ w₀ w h).comp NumberField.LiesOver.continuous_completionMap
+    (Completion.continuous_congr _ w₀ w h).comp (NumberField.LiesOver.continuous_completionMap _ _)
   have hcont₂ : Continuous (algebraMap v.Completion w.Completion) :=
-    NumberField.LiesOver.continuous_completionMap
+    (NumberField.LiesOver.continuous_completionMap _ _)
   have := Continuous.ext_on (denseRange_algebraMap_completion v) hcont₁ hcont₂ ?_
   · exact congrFun this c
   · rintro _ ⟨k, rfl⟩

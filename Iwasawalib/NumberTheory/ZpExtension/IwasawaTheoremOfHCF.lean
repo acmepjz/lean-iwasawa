@@ -89,7 +89,7 @@ theorem finrank_Ln_of_hcf (hU : HilbertClassFieldUpperBound.{u, u})
       {p}).toLinearEquiv.finrank_eq,
     IntermediateField.finrank_maximalGaloisSExtension_singleton_bot,
     finrank_maximalUnramifiedAbelianExtension_eq_classNumber_of_hcf hU hE,
-    Nat.multiplicity_eq_factorization Fact.out (NumberField.classNumber_ne_zero _)]
+    Nat.multiplicity_eq_factorization Fact.out]
 
 /-- Assuming the upper-bound half of the Hilbert class field theorem, `K∞ Lₙ / K∞` is finite. -/
 theorem finiteDimensional_Ln'_of_hcf (hU : HilbertClassFieldUpperBound.{u, u}) (n : ℕ) :

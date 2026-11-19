@@ -80,7 +80,7 @@ theorem pow_injective (e : ℕ) : Function.Injective fun σ : G ↦ σ ^ p ^ e :
   intro a b hab
   apply H.continuousMulEquiv.injective
   apply Multiplicative.toAdd.injective
-  refine IsAddTorsionFree.nsmul_right_injective (M := ι → ℤ_[p]) (pow_ne_zero e
+  refine (show AddCommute _ _ from add_comm _ _).eq_of_nsmul_eq_nsmul (pow_ne_zero e
     (Fact.out : p.Prime).ne_zero) ?_
   have := congrArg (fun x ↦ Multiplicative.toAdd (H.continuousMulEquiv x)) hab
   simpa [map_pow] using this
@@ -218,9 +218,9 @@ theorem coe_ringHomOfMemImp (h : ∀ x : L, x ∈ E → x ∈ F) (x : ↥E) :
 
 Stated for abstract intermediate fields: at concrete ones the transport forces the kernel to
 unfold their definitions. -/
-def galContinuousMulEquivCongr {E E' : IntermediateField A L} (h : E = E') :
+noncomputable def galContinuousMulEquivCongr {E E' : IntermediateField A L} (h : E = E') :
     Gal(↥E/A) ≃ₜ* Gal(↥E'/A) :=
-  h ▸ ContinuousMulEquiv.refl Gal(↥E/A)
+  (IntermediateField.equivOfEq h).continuousAutCongr
 
 /-- `IntermediateField.ringHomOfMemImp` is compatible with the structure maps into any further
 extension `Ω / L`. -/

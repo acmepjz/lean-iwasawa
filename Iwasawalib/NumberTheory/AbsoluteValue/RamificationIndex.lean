@@ -297,7 +297,8 @@ theorem ramificationIdx_spec
   obtain ⟨w', _⟩ := w.exists_liesOver (AlgebraicClosure K)
   have : v'.comp (algebraMap K _).injective = w'.comp (algebraMap K _).injective := by
     have := LiesOver.trans w' w v
-    rw [LiesOver.comp_eq v' v, LiesOver.comp_eq w' v]
+    change v'.under K = w'.under K
+    rw [LiesOver.under_eq v' v, LiesOver.under_eq w' v]
   rw [ramificationIdxOfIsScalarTower_eq_of_comp_eq _ _ this]
   have := IsScalarTower.of_algHom (i.restrictScalars F)
   exact (ramificationIdxOfIsScalarTower_eq_of_liesOver ..).symm

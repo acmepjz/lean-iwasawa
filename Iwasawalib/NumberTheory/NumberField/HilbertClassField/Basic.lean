@@ -109,7 +109,7 @@ theorem isUnramifiedOutside_of_isUnramifiedOutside_preimage [Algebra.IsAlgebraic
   rintro v h1 h2 w h3
   have hwv : (w.comp (algebraMap L K).injective).comp (algebraMap L' L).injective = v := by
     ext x
-    simpa [← IsScalarTower.algebraMap_apply] using congr($(h3.comp_eq) x)
+    simpa [AbsoluteValue.under, ← IsScalarTower.algebraMap_apply] using congr($(h3.under_eq) x)
   refine H (w.comp (algebraMap L K).injective) ?_ (fun u hu ↦ ?_) w inferInstance
   · rw [← hwv] at h1
     exact AbsoluteValue.isNontrivial_of_isNontrivial_comp _ h1
@@ -131,7 +131,7 @@ theorem isUnramifiedOutside_preimage_iff [Algebra.IsAlgebraic F K]
   refine H (v.comp (algebraMap L' L).injective) ?_ (fun u hu h' ↦ ?_) w (.trans w v _)
   · rwa [AbsoluteValue.isNontrivial_iff_of_liesOver _ v]
   · obtain ⟨v', h3, h4⟩ := AbsoluteValue.exists_equiv_and_liesOver_of_comp_equiv _ _ h'
-    exact h2 v' (h4.comp_eq ▸ hu) h3.symm
+    exact h2 v' ((show v'.comp (algebraMap L' L).injective = u from h4.under_eq) ▸ hu) h3.symm
 
 /-- A typeclass asserting that an algebraic extension `K / F` is unramified everywhere. -/
 abbrev IsUnramifiedEverywhere [Algebra.IsAlgebraic F K] : Prop := IsUnramifiedOutside F K K ∅
@@ -270,7 +270,7 @@ instance isUnramifiedOutside_maximalExtensionUnramifiedOutside (L : Type*) [Fiel
     rw [AbsoluteValue.liesOver_iff]
     ext t
     have := congr($(AbsoluteValue.LiesOver.comp_eq u v) t)
-    simpa [AbsoluteValue.comp_apply] using this
+    simpa [AbsoluteValue.comp_apply, AbsoluteValue.under] using this
   exact IsUnramifiedOutside.isUnramifiedIn F (i : IntermediateField F K) F T v hv hv' _ this
 
 instance isUnramifiedOutside_maximalExtensionUnramifiedOutside' (L : Type*) [Field L] [Algebra L F]
@@ -350,7 +350,7 @@ theorem isGalois_maximalExtensionUnramifiedOutside_of_isGalois
   change Normal F (restrictScalars F H)
   rw [normal_iff_forall_map_le']
   intro σ
-  let σH := ((restrictScalars F H).map (AlgHomClass.toAlgHom σ)).toSubfield.toIntermediateField
+  let σH := ((restrictScalars F H).map σ.toAlgHom).toSubfield.toIntermediateField
       fun (x : K) ↦ by
     simp only [toSubfield_map, AlgHomClass.toRingHom_toAlgHom, restrictScalars_toSubfield,
       Subfield.mem_map, mem_toSubfield, RingHom.coe_coe]
@@ -358,7 +358,7 @@ theorem isGalois_maximalExtensionUnramifiedOutside_of_isGalois
     simp
   suffices σH ≤ H from fun x hx ↦ this hx
   let f := (σ.restrictNormal K).toRingEquiv
-  let g : H ≃+* σH := ((restrictScalars F H).equivMap (AlgHomClass.toAlgHom σ)).toRingEquiv
+  let g : H ≃+* σH := ((restrictScalars F H).equivMap σ.toAlgHom).toRingEquiv
   have hcomp : (algebraMap K σH).comp f = RingHom.comp g (algebraMap K H) := by
     ext x
     simp only [AlgEquiv.toRingEquiv_toRingHom, RingHom.coe_comp,

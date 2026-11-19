@@ -2,10 +2,14 @@
 Copyright (c) 2026 Iwasawalib contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import Iwasawalib.NumberTheory.Padics.HasBasis
-import Iwasawalib.Topology.Algebra.Group.Basic
-import Mathlib.GroupTheory.SpecificGroups.Cyclic
-import Mathlib.Topology.Algebra.ContinuousMonoidHom
+module
+
+public import Iwasawalib.NumberTheory.Padics.HasBasis
+public import Iwasawalib.Topology.Algebra.Group.Basic
+public import Mathlib.GroupTheory.SpecificGroups.Cyclic
+public import Mathlib.Topology.Algebra.ContinuousMonoidHom
+
+@[expose] public section
 
 open Topology
 

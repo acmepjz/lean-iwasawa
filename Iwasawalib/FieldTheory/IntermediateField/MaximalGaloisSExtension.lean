@@ -538,7 +538,7 @@ theorem isGalois_maximalGaloisSExtension_of_isGalois
   change Normal F (restrictScalars F H)
   rw [normal_iff_forall_map_le']
   intro σ
-  let σH := ((restrictScalars F H).map (AlgHomClass.toAlgHom σ)).toSubfield.toIntermediateField
+  let σH := ((restrictScalars F H).map σ.toAlgHom).toSubfield.toIntermediateField
       fun (x : K) ↦ by
     simp only [toSubfield_map, AlgHomClass.toRingHom_toAlgHom, restrictScalars_toSubfield,
       Subfield.mem_map, mem_toSubfield, RingHom.coe_coe]
@@ -546,7 +546,7 @@ theorem isGalois_maximalGaloisSExtension_of_isGalois
     simp
   suffices σH ≤ H from fun x hx ↦ this hx
   let f := (σ.restrictNormal K).toRingEquiv
-  let g : H ≃+* σH := ((restrictScalars F H).equivMap (AlgHomClass.toAlgHom σ)).toRingEquiv
+  let g : H ≃+* σH := ((restrictScalars F H).equivMap σ.toAlgHom).toRingEquiv
   have hcomp : (algebraMap K σH).comp f = RingHom.comp g (algebraMap K H) := by
     ext x
     simp only [AlgEquiv.toRingEquiv_toRingHom, RingHom.coe_comp,

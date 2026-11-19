@@ -124,10 +124,9 @@ theorem strictAnti_Γpow' [Nonempty ι] : StrictAnti H.Γpow' := by
   wlog h'' : n < n' generalizing n n'
   · exact this n' n h.symm h'.symm (h'.lt_or_gt.resolve_left h'')
   simp_rw [Γpow'] at h
-  replace h := congr(AddSubgroup.toSubgroup.symm <|
-    ($h).map (MonoidHomClass.toMonoidHom H.continuousMulEquiv))
-  repeat rw [Subgroup.map_comap_eq_self_of_surjective H.continuousMulEquiv.surjective] at h
-  simp only [OrderIso.symm_apply_apply, Submodule.toAddSubgroup_inj] at h
+  replace h := Subgroup.comap_injective H.continuousMulEquiv.surjective h
+  replace h := AddSubgroup.toSubgroup.injective h
+  replace h := Submodule.toAddSubgroup_injective h
   obtain ⟨i⟩ := ‹Nonempty ι›
   suffices True = False by simp_rw [← this]
   classical

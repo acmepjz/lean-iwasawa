@@ -44,7 +44,7 @@ theorem fixingSubgroup_LinfFixedHH_subgroupOf_Xinf_eq_YnIn_zero :
     change H.xinfHom σ x = x
     apply Subtype.ext
     exact IntermediateField.adjoin_induction Kinf
-      (p := fun y hy ↦
+      (motive := fun y hy ↦
         (((H.xinfHom σ) ⟨y, H.Ln'_le_Linf 0 hy⟩ : ↑H.Linf) :
           SeparableClosure Kinf) = y)
       (fun y hy ↦ by

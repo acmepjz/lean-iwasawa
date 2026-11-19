@@ -4,6 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 module
 
+public import Mathlib.RingTheory.ClassGroup.ExtendedHom
+
 public import Mathlib.Algebra.Algebra.Shrink
 public import Mathlib.Algebra.Field.Shrink
 public import Mathlib.FieldTheory.IsAlgClosed.AlgebraicClosure

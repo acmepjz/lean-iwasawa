@@ -5,6 +5,9 @@ Authors: Jz Pan
 -/
 module
 
+public import Mathlib.Topology.Algebra.Group.Units
+public import Mathlib.Topology.Algebra.Group.ClosedSubgroup
+
 public import Mathlib.Analysis.Normed.Ring.Units
 public import Mathlib.NumberTheory.Basic
 public import Iwasawalib.NumberTheory.Padics.ForMathlib

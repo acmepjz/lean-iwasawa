@@ -206,8 +206,9 @@ lemma subsingleton_monoidHom_of_isTorsion_isMulTorsionFree
   allEq f g := by
     ext m
     obtain ⟨n, hn, hrm⟩ := isOfFinOrder_iff_pow_eq_one.1 <| hM m
-    refine pow_left_injective hn.ne' ?_
-    simp_all [← map_pow]
+    have hf : f m = 1 := (pow_eq_one_iff_left hn.ne').mp (by rw [← map_pow, hrm, map_one])
+    have hg : g m = 1 := (pow_eq_one_iff_left hn.ne').mp (by rw [← map_pow, hrm, map_one])
+    exact hf.trans hg.symm
 
 namespace Finsupp
 
@@ -276,7 +277,7 @@ variable {G : Type*} [Group G] [Fintype G]
 variable (G) in
 @[simp] lemma norm_trivial_int_eq_card : (trivial ℤ G ℤ).norm = Nat.card G := by
   ext
-  simp [Representation.norm]
+  simp [Representation.norm, Representation.isTrivial_apply]
 
 end Representation
 
@@ -311,7 +312,7 @@ lemma _root_.Representation.norm_ofIsTrivial (R M G : Type*) [Group G] [Semiring
     [AddCommGroup M] [Module R M] [Fintype G] (ρ : Representation R G M)
     [ρ.IsTrivial] : ρ.norm = Nat.card G := by
   ext
-  simp [Representation.norm]
+  simp [Representation.norm, Representation.isTrivial_apply]
 
 theorem _root_.range_eq_span {R : Type*} [CommSemiring R] (n : ℕ) :
     LinearMap.range (n : R →ₗ[R] R) = Ideal.span {(n : R)} := by

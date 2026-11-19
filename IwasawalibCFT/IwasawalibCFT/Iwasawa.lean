@@ -2,20 +2,23 @@
 Copyright (c) 2026 Iwasawalib contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import IwasawalibCFT.HilbertClassField
-import Iwasawalib.NumberTheory.ZpExtension.CyclotomicIwasawa
-import Iwasawalib.NumberTheory.ZpExtension.IwasawaTheoremOfHCF
+module
+
+public import IwasawalibCFT.HilbertClassField
+public import Iwasawalib.NumberTheory.ZpExtension.CyclotomicIwasawa
+public import Iwasawalib.NumberTheory.ZpExtension.IwasawaTheoremOfHCF
+
+@[expose] public section
 
 /-!
 # Iwasawa's theorem, unconditionally
 
-This file is part of the nested Lake package `IwasawalibCFT` (directory `IwasawalibCFT/` of the
-repository). It is **not** a Lean module file: through `IwasawalibCFT.HilbertClassField` it
-depends on the external `sorry`-free class field theory library `ClassFieldTheory`
-(<https://github.com/n-yamaguchi-0729/ClassFieldTheory>, commit
-`2e6280f9d2579705a0cc6c76ec68c2b60f9c601a`), which is not module based and therefore cannot be
-imported by the module library `Iwasawalib`. The package is kept separate from the root package
-`Iwasawalib`, so that the root package, and its CI, do not depend on the external library.
+This module belongs to the nested Lake package `IwasawalibCFT`. Through
+`IwasawalibCFT.HilbertClassField` it uses the external class field theory package
+`Nyll` (<https://github.com/n-yamaguchi-0729/ClassFieldTheory>, revision
+`b9a2dddbf076eb96b768c333fd828d339ab3d9eb`). The separate package keeps the root
+library build independent of this external proof dependency. Both now use
+Lean's module system.
 
 ## Architecture
 

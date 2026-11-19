@@ -243,6 +243,7 @@ variable {p : ℕ} [Fact p.Prime] {ι K Kinf : Type*} [Finite ι]
 variable [Field K] [NumberField K] [Field Kinf] [Algebra K Kinf] [IsGalois K Kinf]
 variable (H : MvZpExtension p ι K Kinf)
 
+set_option maxHeartbeats 800000 in
 /-- **A lift of `γ ^ p ^ e` in an inertia subgroup.**  Let `w` be a place of `L∞` and suppose
 that the inertia subgroup in `Γ = Gal(K∞/K)` of the place of `K∞` below `w` contains
 `Γ ^ (p ^ e)`.  Then for every `γ : G ⧸ X∞` there is an element `σ` of the inertia subgroup

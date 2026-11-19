@@ -203,7 +203,9 @@ theorem exists_integral_trivialisation (v : HeightOneSpectrum (𝓞 K))
     haveI : (w : HeightOneSpectrum (𝓞 L)).asIdeal.LiesOver v.asIdeal :=
       ⟨(mem_placesOver.1 w.2).symm⟩
     rw [hucoe, valued_diagLocalProduct,
-      ← valuation_liesOver L v (w : HeightOneSpectrum (𝓞 L)) (x : K), hv _ w.2, pow_one, hxval]
+      ← valuation_liesOver L v (w : HeightOneSpectrum (𝓞 L)) (x : K),
+      ← Ideal.ramificationIdx'_eq_ramificationIdx v.asIdeal
+        (w : HeightOneSpectrum (𝓞 L)).asIdeal v.ne_bot, hv _ w.2, pow_one, hxval]
   have husmul : ∀ g : L ≃ₐ[K] L, g • u = u := fun g ↦
     Units.ext (smul_diagLocalProduct g (x : K))
   refine ⟨b * u, mem_localProductIntegerUnits_of_valued_eq_one fun w ↦ ?_, fun g ↦ ?_⟩

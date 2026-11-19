@@ -5,6 +5,8 @@ Authors: Jz Pan
 -/
 module
 
+public import Mathlib.Analysis.SpecialFunctions.Pow.Continuity
+
 public import Iwasawalib.NumberTheory.AbsoluteValue.Archimedean
 
 @[expose] public section
@@ -56,7 +58,7 @@ theorem isNormalized_iff_of_liesOver
     v.IsNormalized ↔ w.IsNormalized := by
   have : v.comp (algebraMap ℚ K).injective = w.comp (algebraMap ℚ L).injective := by
     ext
-    simp [← LiesOver.comp_eq w v]
+    simp [← LiesOver.under_eq w v, AbsoluteValue.under, ← IsScalarTower.algebraMap_apply ℚ K L]
   simp_rw [isNormalized_iff]
   congr!
 

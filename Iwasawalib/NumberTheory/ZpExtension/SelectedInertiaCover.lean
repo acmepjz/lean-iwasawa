@@ -28,7 +28,8 @@ theorem exists_Linf_place_placeBelow_eq (v : AbsoluteValue Kinf ℝ) :
   have h := congrArg
     (fun u : AbsoluteValue ↥H.KinfIn ℝ ↦ u (H.kinfInEquiv.symm x))
     (H.comp_placeBelow w)
-  rw [hw.comp_eq] at h
+  rw [show w.comp (algebraMap ↥H.KinfIn ↥(H.Linf.restrictScalars K)).injective = v'
+    from hw.under_eq] at h
   change v (H.kinfInEquiv (H.kinfInEquiv.symm x)) =
     H.placeBelow w (H.kinfInEquiv (H.kinfInEquiv.symm x)) at h
   simpa only [H.kinfInEquiv.apply_symm_apply] using h.symm

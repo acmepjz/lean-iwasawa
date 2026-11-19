@@ -969,13 +969,13 @@ theorem map_decompositionSubgroup_eq_of_liesOver
   · rw [← hτ2]
     rw [mem_decompositionSubgroup_iff_forall_apply_eq] at hτ ⊢
     intro x
-    simpa [AlgEquiv.restrictNormalHom] using hτ (algebraMap K L x)
+    simpa [AlgEquiv.restrictNormalHom, AbsoluteValue.under] using hτ (algebraMap K L x)
   · obtain ⟨τ, rfl⟩ := AlgEquiv.restrictNormalHom_surjective L σ
     have h : (w.comp (f := τ) τ.injective).comp (algebraMap K L).injective =
         w.comp (algebraMap K L).injective := by
       ext x
       rw [mem_decompositionSubgroup_iff_forall_apply_eq] at hσ
-      simpa [AlgEquiv.restrictNormalHom] using hσ x
+      simpa [AlgEquiv.restrictNormalHom, AbsoluteValue.under] using hσ x
     have := Normal.tower_top_of_normal F K L
     obtain ⟨τ', hτ'⟩ := exists_algEquiv_comp_eq_of_comp_eq h
     use τ * IntermediateField.restrictRestrictAlgEquivMapHom F L K L τ'

@@ -4,6 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 module
 
+public import Mathlib.Topology.Algebra.Group.Subgroup
+
 public import Iwasawalib.NumberTheory.ZpExtension.ConjugateAction
 public import Mathlib.GroupTheory.Commutator.Basic
 public import Mathlib.Tactic.Group

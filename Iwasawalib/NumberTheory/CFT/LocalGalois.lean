@@ -1,5 +1,8 @@
 module
 
+public import Mathlib.NumberTheory.NumberField.Completion.FinitePlace
+public import Mathlib.NumberTheory.RamificationInertia.Inertia
+
 public import Iwasawalib.NumberTheory.CFT.AdicCompletionDecomposition
 public import Mathlib.Analysis.Normed.Unbundled.SpectralNorm
 public import Mathlib.NumberTheory.NumberField.Completion.FinitePlace
@@ -227,7 +230,7 @@ end Normal
 
 section Spectral
 
-open WithZeroMulInt NumberField.RingOfIntegers.HeightOneSpectrum
+open WithZeroMulInt NumberField.HeightOneSpectrum
 
 variable {K : Type*} [Field K] [NumberField K] {L : Type*} [Field L] [NumberField L]
   [Algebra K L]

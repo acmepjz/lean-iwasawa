@@ -184,6 +184,8 @@ is that the base change map on valuations raises to the (nonzero) ramification i
 theorem valuation_algebraMap_eq_one_iff (w : HeightOneSpectrum (𝓞 L)) (x : K) :
     w.valuation L (algebraMap K L x) = 1 ↔ (w.under (𝓞 K)).valuation K x = 1 := by
   rw [← valuation_liesOver L (w.under (𝓞 K)) w x,
+    ← Ideal.ramificationIdx'_eq_ramificationIdx (w.under (𝓞 K)).asIdeal w.asIdeal
+      (w.under (𝓞 K)).ne_bot,
     pow_eq_one_iff_left (Ideal.IsDedekindDomain.ramificationIdx'_ne_zero_of_liesOver w.asIdeal
       (w.under (𝓞 K)).ne_bot)]
 

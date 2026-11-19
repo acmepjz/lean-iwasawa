@@ -3,12 +3,15 @@ version: "v0.4"
 project:
   name: "Formalization of Iwasawa Theory in Lean"
   description: >-
-    Iwasawa's class-number growth theorem for Z_p-extensions of number fields,
-    together with the existence of cyclotomic Z_p-extensions and their growth
-    formula. The root library proves the formula from two explicit Hilbert
-    class field propositions; the nested IwasawalibCFT package proves those
-    propositions using an external class field theory formalization and
-    obtains the unconditional results.
+    A formal proof of Iwasawa's classical class-number growth theorem.
+    For an increasing tower of finite cyclic Galois extensions K_n/K of a
+    number field with degrees p^n, the p-adic multiplicity of the class number
+    of K_n equals mu*p^n + lambda*n + nu for all sufficiently large n, with
+    natural mu and lambda and integer nu. The compared statement uses only
+    Mathlib concepts. Its proof constructs the union as a Z_p-extension and
+    discharges the Hilbert class field inputs using the external Nyll class
+    field theory library. The library also contains the cyclotomic specialization.
+    This formalizes a known theorem and makes no claim of a new mathematical result.
   authors:
     - "Jz Pan (acmepjz / acme_pjz)"
     - "caosip"
@@ -17,6 +20,7 @@ project:
     - "Nick Adfor"
     - "Pietro Monticone"
     - "Shouxin Zhang"
+  responsible_maintainers: ["Jinzhao Pan", "Yichuan Cao", "Jiawei Nie"]
   license: "Apache-2.0"
 sources:
   - title: "Introduction to cyclotomic fields"
@@ -29,7 +33,7 @@ sources:
   - title: "On Gamma-extensions of algebraic number fields"
     authors: ["Kenkichi Iwasawa"]
     id: "Bulletin of the American Mathematical Society 65 (1959), 183–226"
-    type: "article"
+    type: "paper"
     location: "Theorem 11"
     relationship: "formalizes"
     note: "Historical source cited by the blueprint for the growth theorem."
@@ -37,7 +41,7 @@ related_formalizations:
   - id: "https://github.com/acmepjz/lean-iwasawa"
     relationship: "builds-on"
     note: "The original Iwasawa development and blueprint credited to Jz Pan and contributors."
-  - id: "https://github.com/n-yamaguchi-0729/ClassFieldTheory/tree/2e6280f9d2579705a0cc6c76ec68c2b60f9c601a"
+  - id: "https://github.com/n-yamaguchi-0729/ClassFieldTheory/tree/b9a2dddbf076eb96b768c333fd828d339ab3d9eb"
     relationship: "builds-on"
     note: >-
       Naganori Yamaguchi's class field theory library supplies the Hilbert
@@ -115,7 +119,8 @@ automation:
     - method: "agent"
       framework: "Codex"
       tool_setup: >-
-        Provenance reconstruction, Comparator interface preparation, and proof
+        Lean 4.35 migration and Palomar preparation, in addition to
+        provenance reconstruction, Comparator interface preparation, and proof
         of the Mathlib-only cyclic-tower formulation in November 2026.
       prompting_notes: >-
         Recover the Claude Code history and follow the official metadata
@@ -149,8 +154,9 @@ review:
     builds and axiom audits. The nested package was rebuilt successfully
     during metadata preparation; its existing axiom guards allow only the
     three standard axioms listed above. Independent human mathematical peer
-    review is not asserted. The new Mathlib-only theorem compiles and its
-    axiom guard passes. On 2026-11-10, full Comparator validation of this
+    review is not asserted. The Lean 4.35 migration is being validated;
+    the historical results below certify their recorded Lean 4.33 snapshots,
+    not the current migration. On 2026-11-10, full Comparator validation of the
     Mathlib-only replacement passed statement comparison, the standard-axiom
     allowlist and Lean kernel replay (exit 0, 11 minutes 32 seconds).
     On 2026-11-09, the two former Comparator endpoints passed full

@@ -2,9 +2,13 @@
 Copyright (c) 2026 Iwasawalib contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import IwasawalibCFT.Iwasawa
-import IwasawalibCFT.CyclicTower
-import Iwasawalib.FieldTheory.Galois.InverseLimit
+module
+
+public import IwasawalibCFT.Iwasawa
+public import IwasawalibCFT.CyclicTower
+public import Iwasawalib.FieldTheory.Galois.InverseLimit
+
+@[expose] public section
 
 /-! # Transport of Iwasawa's formula to a tower in an arbitrary ambient field -/
 

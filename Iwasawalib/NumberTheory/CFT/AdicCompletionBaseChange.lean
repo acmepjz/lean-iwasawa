@@ -129,6 +129,7 @@ theorem valued_adicCompletionComap (x : v.adicCompletion K) :
     show (Valued.v (adicCompletionComap K L v w ((k : K) : v.adicCompletion K)) : ℤᵐ⁰)
         = (Valued.v ((k : K) : v.adicCompletion K) : ℤᵐ⁰) ^ _
     rw [adicCompletionComap_coe, adicCompletion.valued_coe, adicCompletion.valued_coe,
+      Ideal.ramificationIdx'_eq_ramificationIdx v.asIdeal w.asIdeal v.ne_bot,
       valuation_liesOver L v w k]
 
 /-- The base change map carries the ring of integers of `K_v` into that of `L_w`. -/

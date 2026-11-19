@@ -232,7 +232,7 @@ theorem exists_multiplicity_card_quotSMulTop_omega
   obtain ⟨-, ν, N, hN⟩ := exists_factorization_card_quotSMulTop_omega n₀ hfin
   refine ⟨muMod p M, lambdaMod p M, ν, max n₀ N, fun n hn ↦ ?_⟩
   haveI := hfin n (le_of_lt (lt_of_le_of_lt (le_max_left _ _) hn))
-  rw [Nat.multiplicity_eq_factorization hp.out (Nat.card_ne_zero.2 ⟨⟨0⟩, inferInstance⟩)]
+  rw [Nat.multiplicity_eq_factorization hp.out]
   exact hN n (le_of_lt (lt_of_le_of_lt (le_max_right _ _) hn))
 
 /-- `coinvariant-growth-2` in the `multiplicity` form used downstream. -/
@@ -248,7 +248,7 @@ theorem exists_multiplicity_card_quotSMulTop_nu
   obtain ⟨-, ν, N, hN⟩ := exists_factorization_card_quotSMulTop_nu e n₀ he hfin
   refine ⟨muMod p M, lambdaMod p M, ν, max n₀ N, fun n hn ↦ ?_⟩
   haveI := hfin n (le_of_lt (lt_of_le_of_lt (le_max_left _ _) hn))
-  rw [Nat.multiplicity_eq_factorization hp.out (Nat.card_ne_zero.2 ⟨⟨0⟩, inferInstance⟩)]
+  rw [Nat.multiplicity_eq_factorization hp.out]
   exact hN n (le_of_lt (lt_of_le_of_lt (le_max_right _ _) hn))
 
 end Multiplicity

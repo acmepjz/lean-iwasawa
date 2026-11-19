@@ -29,22 +29,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: leanprover/lean-action@v1
-      - uses: actions/setup-go@v5
-        with:
-          go-version: '1.25.x'
-      - name: Install compatible verifier
-        shell: bash
-        run: |
-          git clone https://github.com/leanprover/comparator.git "$RUNNER_TEMP/iwasawa-comparator"
-          cd "$RUNNER_TEMP/iwasawa-comparator"
-          git checkout 3927ad383f208ae977c340a91c48ac9b497d2097
-          lake build comparator lean4export
-          go install github.com/zouuup/landrun/cmd/landrun@v0.1.18-0.20261016135722-ec104f6edc1e
-          echo "$RUNNER_TEMP/iwasawa-comparator/.lake/build/bin" >> "$GITHUB_PATH"
-          echo "$RUNNER_TEMP/iwasawa-comparator/.lake/packages/lean4export/.lake/build/bin" >> "$GITHUB_PATH"
-          go env GOPATH | sed 's|$|/bin|' >> "$GITHUB_PATH"
+      - name: Install comparator sandbox
+        run: sudo apt-get update && sudo apt-get install -y bubblewrap
       - name: Build trusted shared dependencies and comparison modules
         working-directory: IwasawalibCFT
         run: lake build Challenge Solution
+      - name: Audit module headers and source lengths
+        run: python3 scripts/audit-lean-sources.py
       - name: Compare the Mathlib-only Iwasawa theorem
         run: scripts/check-comparator.sh

@@ -63,7 +63,7 @@ theorem rep_sub_apply (σ : G) (x : M) :
     (Rep.applyAsHom (rep G M) σ - 𝟙 _).hom.toLinearMap x = σ • x - x := by
   simp [Rep.sub_hom, Rep.applyAsHom]
 
-theorem rep_norm_apply (x : M) : (rep G M).norm.hom.toLinearMap x = normHom G M x := by
+theorem rep_norm_apply (x : M) : (rep G M).norm.asHom.hom.toLinearMap x = normHom G M x := by
   show (∑ g : G, (rep G M).ρ g) x = normHom G M x
   rw [LinearMap.sum_apply, normHom_apply]
   rfl
@@ -87,12 +87,12 @@ def kerSubEquivKer :
   map_add' _ _ := rfl
 
 /-- The kernel of the norm endomorphism of the representation is `kerNorm`. -/
-def kerNormEquivKer : kerNorm G M ≃+ LinearMap.ker (rep G M).norm.hom.toLinearMap where
+def kerNormEquivKer : kerNorm G M ≃+ LinearMap.ker (rep G M).norm.asHom.hom.toLinearMap where
   toFun x := ⟨x.1, by
-    show (rep G M).norm.hom.toLinearMap x.1 = 0
+    show (rep G M).norm.asHom.hom.toLinearMap x.1 = 0
     rw [rep_norm_apply, mem_kerNorm.1 x.2]⟩
   invFun x := ⟨x.1, mem_kerNorm.2 (by
-    have h : (rep G M).norm.hom.toLinearMap x.1 = 0 := x.2
+    have h : (rep G M).norm.asHom.hom.toLinearMap x.1 = 0 := x.2
     rwa [rep_norm_apply] at h)⟩
   left_inv _ := rfl
   right_inv _ := rfl

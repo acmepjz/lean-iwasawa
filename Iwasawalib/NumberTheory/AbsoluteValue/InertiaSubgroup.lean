@@ -256,7 +256,7 @@ theorem map_inertiaSubgroup_eq_of_liesOver
     (v : AbsoluteValue K ℝ) (w : AbsoluteValue L ℝ) [w.LiesOver v] :
     (w.inertiaSubgroup F).map (AlgEquiv.restrictNormalHom K) =
       v.inertiaSubgroup F := by
-  rw [← LiesOver.comp_eq w v]
+  rw [← LiesOver.under_eq w v, AbsoluteValue.under]
   by_cases hw : IsNonarchimedean w
   · have hv := (w.isNonarchimedean_comp_iff (algebraMap K L)).2 hw
     ext σ

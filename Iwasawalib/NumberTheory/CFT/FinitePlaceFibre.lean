@@ -159,7 +159,7 @@ space `Gal(L/K) ⧸ D_w`. -/
 def equivQuotientStabilizer [IsGalois K L] (w : FinitePlaceFibre L v) :
     FinitePlaceFibre L v ≃ (L ≃ₐ[K] L) ⧸ MulAction.stabilizer (L ≃ₐ[K] L) w :=
   ((Equiv.Set.univ (FinitePlaceFibre L v)).symm.trans
-    (Equiv.setCongr (MulAction.orbit_eq_univ (L ≃ₐ[K] L) w).symm)).trans
+    (Set.equivOfEq (MulAction.orbit_eq_univ (L ≃ₐ[K] L) w).symm)).trans
       (MulAction.orbitEquivQuotientStabilizer (L ≃ₐ[K] L) w)
 
 @[simp]

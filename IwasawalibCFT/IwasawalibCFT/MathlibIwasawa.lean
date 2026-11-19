@@ -1,4 +1,8 @@
-import IwasawalibCFT.Tower
+module
+
+public import IwasawalibCFT.Tower
+
+@[expose] public section
 
 variable {p : ℕ} [Fact p.Prime] {K : Type*} [Field K] [NumberField K]
 

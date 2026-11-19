@@ -68,8 +68,6 @@ theorem adicAbv_eq_zpow (v : HeightOneSpectrum (𝓞 L)) {x : L} (hx : x ≠ 0) 
   push_cast
   congr 1
   rw [IsDedekindDomain.HeightOneSpectrum.ord, neg_neg]
-  conv_rhs => rw [← WithZero.coe_unzero h0]
-  rfl
 
 variable {T : Set (HeightOneSpectrum (𝓞 L))}
 

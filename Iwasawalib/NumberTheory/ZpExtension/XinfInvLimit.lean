@@ -157,6 +157,7 @@ theorem continuous_xinfHom : Continuous H.xinfHom := by
 
 /-- **`X∞ = Gal(L∞/K∞)` as topological groups.** -/
 noncomputable def xinfContinuousMulEquiv : ↥H.Xinf ≃ₜ* Gal(↥H.Linf/Kinf) :=
+  haveI : T2Space Gal(↥H.Linf/Kinf) := krullTopology_t2
   letI e : ↥H.Xinf ≃ Gal(↥H.Linf/Kinf) :=
     Equiv.ofBijective _ ⟨H.xinfHom_injective, H.xinfHom_surjective⟩
   letI h : ↥H.Xinf ≃ₜ Gal(↥H.Linf/Kinf) :=

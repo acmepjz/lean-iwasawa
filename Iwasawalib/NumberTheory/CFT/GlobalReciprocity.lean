@@ -236,7 +236,8 @@ def quotientNormEquivGalois (D : IdeleClassFormationData F L) :
   exact
     (IdeleClassGroup.quotientNormEquivTateCohomologyZero F L).trans
       ((Rep.split.reciprocityIso (repIdeleClass F L) D.fundamentalClass).toLinearEquiv.toAddEquiv
-        |>.trans (MulEquiv.toAdditive (Abelianization.equivOfComm (H := Gal(L/F))).symm))
+        |>.trans (show Additive (Abelianization Gal(L/F)) ≃+ Additive Gal(L/F) from
+          MulEquiv.toAdditive (Abelianization.equivOfComm (H := Gal(L/F))).symm))
 
 /-- The canonical abstract global reciprocity homomorphism attached to the chosen idele-class
 fundamental class.  The definition factors through `C_F / N C_L`, then uses

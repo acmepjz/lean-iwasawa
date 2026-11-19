@@ -115,7 +115,8 @@ instance isGalois_K_restrictScalars_Ln (n : ℕ) : IsGalois K ((H.Ln n).restrict
 
 instance normal_K_Linf : Normal K (H.Linf.restrictScalars K) := by
   rw [H.restrictScalars_Linf]
-  exact IntermediateField.normal_iSup K _ fun n ↦ (H.Ln n).restrictScalars K
+  exact IntermediateField.normal_iSup K _ (fun n ↦ (H.Ln n).restrictScalars K)
+    (h := fun n ↦ (H.isGalois_K_Ln n).to_normal)
 
 instance isSepClosure_K_sepClosure : IsSepClosure K (SeparableClosure Kinf) :=
   IsSepClosure.ofSeparable K Kinf (SeparableClosure Kinf)
@@ -129,6 +130,11 @@ instance isGalois_K_Linf : IsGalois K (H.Linf.restrictScalars K) :=
 
 /-- `G = Gal(L∞/K)`. -/
 abbrev GG := Gal(↥(H.Linf.restrictScalars K)/K)
+
+instance t2Space_GG : T2Space H.GG := by
+  have : Algebra.IsIntegral K ↥(H.Linf.restrictScalars K) :=
+    ⟨(H.isGalois_K_Linf).to_normal.isIntegral⟩
+  exact krullTopology_t2
 
 /-- `K∞`, viewed as an intermediate field of `L∞ / K`. -/
 noncomputable def KinfIn : IntermediateField K ↥(H.Linf.restrictScalars K) :=

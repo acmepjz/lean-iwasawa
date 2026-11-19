@@ -24,20 +24,13 @@ and the same for `MvZpExtension.YnIn` inside `X∞`.  This is the transport that
 (`MvZpExtension.xinfQuotientMulEquivOfPlace'`) at the shifted extension `H.shift n`, where
 `K∞ / Kₙ` is totally ramified, and read the answer back over `K`.
 
-## The kernel trap in this file
+## Transport implementation
 
-`(H.shift e).Linf = H.Linf` is an equality of *intermediate fields*, so the induced map on
-Galois groups is `IntermediateField.galContinuousMulEquivCongr`, a transport along `▸`.  At
-these concrete fields **any definitional unfolding of that transport applied to an element
-diverges**, in the elaborator and in the kernel alike: `MvZpExtension.galLinfShiftContinuousMulEquiv e σ = galContinuousMulEquivCongr (H.Linf_shift e) σ`
-is not provable by `rfl` within 10⁶ heartbeats, even though the same equation *between the two
-equivalences* (`MvZpExtension.galLinfShiftContinuousMulEquiv_eq`) is `rfl` and cheap.  So every
-statement below is first proved in terms of `galContinuousMulEquivCongr` and then moved by
-rewriting with the equation between the maps; no element-level `rfl` and no `rw`-closing `rfl`
-is ever attempted through the transport.  For the same reason the `X∞`-level transport is taken
-along a freshly defined `MvZpExtension.xinfShiftMulEquiv` rather than by unfolding
-`MvZpExtension.xinfShiftContinuousMulEquiv` at an element; the two agree
-(`MvZpExtension.xinfShiftMulEquiv_eq`), by an equation between maps.
+The equality of intermediate fields is transported through their canonical algebra
+isomorphism. In Lean 4.35, using equality elimination directly for the Galois-group
+isomorphism caused kernel timeouts on these concrete fields; conjugation by
+`IntermediateField.equivOfEq` avoids that reduction. The named map equalities below
+keep downstream proofs independent of this implementation choice.
 
 ## Main results
 

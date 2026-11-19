@@ -4,6 +4,10 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 module
 
+public import Mathlib.FieldTheory.Galois.IsGaloisGroup
+
+public import Mathlib.RingTheory.Invariant.Basic
+
 public import Iwasawalib.NumberTheory.CFT.HeightOneSpectrumCongr
 
 @[expose] public section
@@ -514,7 +518,7 @@ above `v`.  This is the combinatorial input to Shapiro's lemma. -/
 def placesOverEquivQuotientDecompositionGroup [IsGalois K L] {v : HeightOneSpectrum (𝓞 K)}
     {w : HeightOneSpectrum (𝓞 L)} (hw : w ∈ placesOver K L v) :
     placesOver K L v ≃ (L ≃ₐ[K] L) ⧸ decompositionGroup K L w :=
-  (Equiv.setCongr (orbit_eq_placesOver hw)).symm.trans
+  (Set.equivOfEq (orbit_eq_placesOver hw)).symm.trans
     (MulAction.orbitEquivQuotientStabilizer _ w)
 
 omit [NumberField K] in

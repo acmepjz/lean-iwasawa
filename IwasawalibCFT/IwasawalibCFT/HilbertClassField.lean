@@ -2,23 +2,26 @@
 Copyright (c) 2026 Iwasawalib contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import ClassFieldTheory.GlobalClassFieldTheory.GlobalClassFields.SmallHilbertClassFieldMaximalSubextension
-import ClassFieldTheory.GlobalClassFieldTheory.GlobalClassFields.HilbertClassFieldUnramifiedMaximality
-import ClassFieldTheory.GlobalClassFieldTheory.GlobalClassFields.SmallHilbertClassFieldOverOriginalBase
-import Iwasawalib.NumberTheory.NumberField.HilbertClassField.DedekindBridge
-import Iwasawalib.NumberTheory.NumberField.HilbertClassField.Hypothesis
-import Iwasawalib.NumberTheory.NumberField.HilbertClassField.UniverseTransport
+module
+
+public import Nyll.ClassFieldTheory.GlobalClassFieldTheory.GlobalClassFields.SmallHilbertClassFieldMaximalSubextension
+public import Nyll.ClassFieldTheory.GlobalClassFieldTheory.GlobalClassFields.HilbertClassFieldUnramifiedMaximality
+public import Nyll.ClassFieldTheory.GlobalClassFieldTheory.GlobalClassFields.SmallHilbertClassFieldOverOriginalBase
+public import Iwasawalib.NumberTheory.NumberField.HilbertClassField.DedekindBridge
+public import Iwasawalib.NumberTheory.NumberField.HilbertClassField.Hypothesis
+public import Iwasawalib.NumberTheory.NumberField.HilbertClassField.UniverseTransport
+
+@[expose] public section
 
 /-!
 # The Hilbert class field hypotheses, discharged by external class field theory
 
-This file is part of the nested Lake package `IwasawalibCFT` (directory `IwasawalibCFT/` of the
-repository). Unlike `Iwasawalib`, it is **not** a Lean module file, because it imports the
-external `sorry`-free class field theory library `ClassFieldTheory`
-(<https://github.com/n-yamaguchi-0729/ClassFieldTheory>, commit
-`2e6280f9d2579705a0cc6c76ec68c2b60f9c601a`), which is not module based. It proves the two
-hypotheses `NumberField.HilbertClassFieldUpperBound` and `NumberField.HilbertClassFieldExistence`
-of `Iwasawalib/NumberTheory/NumberField/HilbertClassField/Hypothesis.lean`.
+This module belongs to the nested Lake package `IwasawalibCFT`. It imports the
+external class field theory package `Nyll` from
+<https://github.com/n-yamaguchi-0729/ClassFieldTheory>, pinned at
+`b9a2dddbf076eb96b768c333fd828d339ab3d9eb` for Lean 4.35.0.
+It proves `NumberField.HilbertClassFieldUpperBound` and
+`NumberField.HilbertClassFieldExistence` using the upstream module-based proof chain.
 
 The external library constructs, for a number field `K : Type`, the small Hilbert class field
 `GlobalClassFieldTheory.GlobalClassFields.smallHilbertClassField K`: a finite abelian extension of

@@ -56,7 +56,7 @@ variable {K L : Type*} [Field K] [Field L] [Algebra K L]
 
 @[simp]
 theorem apply_algebraMap_of_liesOver (x : K) : w (algebraMap K L x) = v x := by
-  simpa using congr($(LiesOver.comp_eq w v) x)
+  simpa [AbsoluteValue.under] using congr($(LiesOver.under_eq w v) x)
 
 /-- If `w` lies over `v`, then the inclusion `K → L` restricts to a ring homomorphism
 `O_v → O_w`. -/

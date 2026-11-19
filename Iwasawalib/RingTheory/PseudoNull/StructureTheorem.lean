@@ -5,6 +5,12 @@ Authors: Jz Pan, Yiming Fu, Shouxin Zhang
 -/
 module
 
+public import Mathlib.RingTheory.LocalProperties.IntegrallyClosed
+public import Mathlib.RingTheory.DiscreteValuationRing.TFAE
+public import Mathlib.GroupTheory.MonoidLocalization.UniqueFactorization
+
+public import Mathlib.RingTheory.DiscreteValuationRing.Basic
+
 public import Mathlib.Algebra.Module.PID
 public import Mathlib.Algebra.Module.FinitePresentation
 public import Mathlib.RingTheory.LocalProperties.Semilocal
@@ -124,7 +130,7 @@ private theorem IsIntegrallyClosed.isDiscreteValuationRing_of_height_eq_one
   have hnf : ¬ IsField (Localization p.asIdeal.primeCompl) := fun h ↦
     hmaxne (IsLocalRing.isField_iff_maximalIdeal_eq.1 h)
   suffices h : ∃! P : Ideal (Localization p.asIdeal.primeCompl), P ≠ ⊥ ∧ P.IsPrime by
-    have htfae := (IsDiscreteValuationRing.TFAE (Localization p.asIdeal.primeCompl) hnf).out 3 0
+    have htfae := (IsDiscreteValuationRing.TFAE (Localization p.asIdeal.primeCompl) hnf).out 4 1
     exact htfae.1 ⟨hic, h⟩
   refine ⟨IsLocalRing.maximalIdeal (Localization p.asIdeal.primeCompl),
     ⟨hmaxne, inferInstance⟩, ?_⟩

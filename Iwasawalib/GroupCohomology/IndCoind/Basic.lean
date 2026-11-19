@@ -199,8 +199,8 @@ set_option backward.defeqAttrib.useBackward true in
 lemma ind₁'_apply₂ (f : G →₀ V) (g x : G) : ρ.ind₁' g f x = ρ g (f (x * g)) := by
   dsimp only [ind₁'_apply, LinearMap.coe_comp, Function.comp_apply, mapRange.linearMap_apply,
     lmapDomain_apply]
-  have : x = x * g * g⁻¹ := eq_mul_inv_of_mul_eq rfl
-  rw [this, mapDomain_apply (mul_left_injective g⁻¹)]
+  conv_lhs => rw [show x = (x * g) * g⁻¹ by simp]
+  rw [mapDomain_apply_of_injective (mul_left_injective g⁻¹)]
   simp
 
 abbrev ind₁'_map (f : V →ₗ[R] W) : (G →₀ V) →ₗ[R] (G →₀ W) := mapRange.linearMap f
@@ -534,7 +534,7 @@ abbrev coind₁AsPi : Rep R G := .of <| Representation.coind₁AsPi R G A
 
 /-- `ind₁AsFinsupp` is isomorphic to `ind₁` pointwise. -/
 def ind₁AsFinsuppIso (A : ModuleCat.{u} R) : ind₁AsFinsupp G A ≅ (ind₁ G).obj A :=
-  mkIso (.mk (.refl R (G →₀ A)) <| fun g ↦ by simp [Representation.ind₁AsFinsupp]) ≪≫
+  mkIso (.mk (.refl R (G →₀ A)) <| fun g ↦ by ext; simp [Representation.ind₁AsFinsupp, Representation.isTrivial_apply]) ≪≫
   ind₁'_obj_iso_ind₁ (.trivial _ _ _)
 
 /-- `coind₁AsPi` is isomorphic to `coind₁` pointwise. -/

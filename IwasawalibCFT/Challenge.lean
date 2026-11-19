@@ -1,4 +1,8 @@
-import Mathlib.NumberTheory.NumberField.ClassNumber
+module
+
+public import Mathlib.NumberTheory.NumberField.ClassNumber
+
+@[expose] public section
 
 variable {p : ℕ} [Fact p.Prime] {K : Type*} [Field K] [NumberField K]
 

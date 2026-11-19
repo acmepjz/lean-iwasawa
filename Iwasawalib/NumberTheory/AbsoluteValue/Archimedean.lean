@@ -9,6 +9,7 @@ public import Mathlib.Algebra.Order.Ring.IsNonarchimedean
 public import Mathlib.Analysis.MeanInequalitiesPow
 public import Mathlib.RingTheory.Valuation.Basic
 public import Mathlib.NumberTheory.Ostrowski
+public import Mathlib.Analysis.SpecialFunctions.Pow.Asymptotics
 
 @[expose] public section
 
@@ -34,12 +35,6 @@ Main results:
 -/
 
 namespace AbsoluteValue
-
-/-- TODO: go mathlib -/
-@[simp]
-theorem comp_apply {R S T : Type*} [Semiring T] [Semiring R] [Semiring S] [PartialOrder S]
-    (v : AbsoluteValue R S) {f : T →+* R} (hf : Function.Injective f) (x) :
-    v.comp hf x = v (f x) := rfl
 
 /-- TODO: go mathlib -/
 @[simp]
@@ -126,7 +121,7 @@ theorem isNontrivial_of_not_isNonarchimedean
 theorem isNonarchimedean_iff_exists_forall_apply_natCast_le
     {K : Type*} [Field K] (v : AbsoluteValue K ℝ) :
     IsNonarchimedean v ↔ ∃ C : ℝ, ∀ n : ℕ, v n ≤ C := by
-  refine ⟨fun h ↦ ⟨1, fun n ↦ h.apply_natCast_le_one⟩, fun ⟨C, h⟩ ↦ ?_⟩
+  refine ⟨fun h ↦ ⟨1, fun n ↦ h.apply_natCast_le_one (by simp) (by simp)⟩, fun ⟨C, h⟩ ↦ ?_⟩
   by_contra H
   rw [not_isNonarchimedean_iff_exists_apply_le_one_and_apply_add_one_gt_one] at H
   obtain ⟨x, h1, h2⟩ := H
@@ -158,7 +153,7 @@ theorem isNonarchimedean_iff_exists_forall_apply_natCast_le
 theorem isNonarchimedean_iff_forall_apply_natCast_le_one
     {K : Type*} [Field K] (v : AbsoluteValue K ℝ) :
     IsNonarchimedean v ↔ ∀ n : ℕ, v n ≤ 1 :=
-  ⟨fun h _ ↦ h.apply_natCast_le_one, fun h ↦
+  ⟨fun h _ ↦ h.apply_natCast_le_one (by simp) (by simp), fun h ↦
     v.isNonarchimedean_iff_exists_forall_apply_natCast_le.2 ⟨1, h⟩⟩
 
 theorem isNonarchimedean_comp_iff
@@ -171,7 +166,7 @@ theorem isNonarchimedean_iff_of_liesOver
     {K L : Type*} [Field K] [Field L] [Algebra K L]
     (v : AbsoluteValue K ℝ) (w : AbsoluteValue L ℝ) [w.LiesOver v] :
     IsNonarchimedean v ↔ IsNonarchimedean w := by
-  rw [← LiesOver.comp_eq w v, isNonarchimedean_comp_iff]
+  rw [← LiesOver.under_eq w v, AbsoluteValue.under, isNonarchimedean_comp_iff]
 
 theorem isNonarchimedean_iff_of_equiv
     {K : Type*} [Field K] {v w : AbsoluteValue K ℝ} (h0 : v ≈ w) :
@@ -232,7 +227,7 @@ theorem isNontrivial_iff_of_liesOver
       refine (mul_le_of_le_one_left (w.nonneg _) (h _)).trans_lt ?_
       simpa [pow_lt_pow_iff_right₀ hgt] using hi
   rw [Polynomial.aeval_eq_sum_range, Finset.sum_range_succ, h2.coeff_natDegree, one_smul,
-    map_zero, hn.add_eq_max_of_ne h3.ne, max_eq_right h3.le] at h1
+    map_zero, hn.add_eq_max_of_ne (fun x ↦ w.map_neg x) h3.ne, max_eq_right h3.le] at h1
   simp [hx] at h1
 
 /-- If a field `K` has an infinite place, then it must be of characteristic zero.
@@ -351,7 +346,7 @@ theorem adic_eq_of_liesOver
     v.adic = w.adic := by
   have : v.comp (algebraMap ℚ K).injective = w.comp (algebraMap ℚ L).injective := by
     ext
-    simp [← LiesOver.comp_eq w v]
+    simp [← LiesOver.under_eq w v, AbsoluteValue.under, ← IsScalarTower.algebraMap_apply ℚ K L]
   simp only [adic]; congr!
 
 theorem adic_eq_of_equiv

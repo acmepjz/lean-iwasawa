@@ -1,6 +1,6 @@
 # Nested Lake package: Iwasawa's theorem without `sorry`, via the external class field theory
 # library `ClassFieldTheory` (n-yamaguchi-0729/ClassFieldTheory, Apache-2.0), pinned to the
-# Lean v4.33.0 / Mathlib 6f1ef4e5 snapshot.  It is a separate package so that the root package
+# Lean v4.35.0 / Mathlib 56a00585 snapshot.  It is a separate package so that the root package
 # `Iwasawalib` (and its CI) does not depend on the external library.  Build with
 # `cd IwasawalibCFT && lake build`; it shares the root package's `.lake/packages`.
 name = "IwasawalibCFT"
@@ -20,9 +20,9 @@ name = "Iwasawalib"
 path = ".."
 
 [[require]]
-name = "ClassFieldTheory"
+name = "Nyll"
 git = "https://github.com/n-yamaguchi-0729/ClassFieldTheory.git"
-rev = "2e6280f9d2579705a0cc6c76ec68c2b60f9c601a"
+rev = "b9a2dddbf076eb96b768c333fd828d339ab3d9eb"
 
 [[lean_lib]]
 name = "IwasawalibCFT"

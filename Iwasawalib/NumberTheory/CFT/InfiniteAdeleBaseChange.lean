@@ -381,7 +381,7 @@ space `Gal(L/K) ⧸ D_w`.  This is the index set of the induced module `Ind_{D_w
 def equivQuotientStabilizer [IsGalois K L] (w : Fibre L v) :
     Fibre L v ≃ (L ≃ₐ[K] L) ⧸ MulAction.stabilizer (L ≃ₐ[K] L) w :=
   ((Equiv.Set.univ (Fibre L v)).symm.trans
-    (Equiv.setCongr (MulAction.orbit_eq_univ (L ≃ₐ[K] L) w).symm)).trans
+    (Set.equivOfEq (MulAction.orbit_eq_univ (L ≃ₐ[K] L) w).symm)).trans
       (MulAction.orbitEquivQuotientStabilizer (L ≃ₐ[K] L) w)
 
 @[simp]

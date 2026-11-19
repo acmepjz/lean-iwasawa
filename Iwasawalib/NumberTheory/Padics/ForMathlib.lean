@@ -5,6 +5,8 @@ Authors: Jz Pan
 -/
 module
 
+public import Mathlib.RingTheory.ZMod
+
 public import Mathlib.Algebra.Algebra.ZMod
 public import Mathlib.Algebra.CharZero.Infinite
 public import Mathlib.LinearAlgebra.Basis.VectorSpace

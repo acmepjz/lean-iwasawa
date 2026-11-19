@@ -337,7 +337,7 @@ theorem card_mul_card_stabilizer (x₀ : Ω) :
     Nat.card Ω * Nat.card (stabilizer G x₀) = Nat.card G := by
   have h1 : Nat.card Ω = Nat.card (G ⧸ stabilizer G x₀) :=
     Nat.card_congr ((Equiv.Set.univ Ω).symm.trans
-      ((Equiv.setCongr (MulAction.orbit_eq_univ G x₀).symm).trans
+      ((Set.equivOfEq (MulAction.orbit_eq_univ G x₀).symm).trans
         (MulAction.orbitEquivQuotientStabilizer G x₀)))
   rw [h1]
   exact (Subgroup.card_eq_card_quotient_mul_card_subgroup _).symm

@@ -174,6 +174,7 @@ theorem inertiaSubgroup_Kn_placeBelow_shiftPlaceEquiv_symm_eq_top [Unique ι] {e
   rw [placeBelow_shiftPlaceEquiv, Equiv.apply_symm_apply]
   exact (H.inertiaSubgroup_Kn_eq_top_iff n _).2 (H.Γpow_le_of_le hen hw)
 
+set_option maxHeartbeats 800000 in
 /-- **The inertia cover over `K_n`.**  Let `v` be a family of places of `K∞` such that every
 place of `K∞` with nontrivial inertia in `K∞ / K` is equivalent to some `v j`, and let
 `selected j` be a place of `L∞` above `v j`.  Then, for every `n`, the subgroup `HH` of

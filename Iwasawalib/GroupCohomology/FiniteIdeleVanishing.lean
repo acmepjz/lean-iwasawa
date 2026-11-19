@@ -76,7 +76,7 @@ theorem nonempty_placesOver (v : HeightOneSpectrum (𝓞 K)) : (placesOver K L v
     (S := 𝓞 L) v.asIdeal hker
   have hQ0 : Q ≠ ⊥ := by
     rintro rfl
-    rw [Ideal.comap_bot_of_injective _ (algebraMap_ringOfIntegers_injective (K := K) (L := L))]
+    rw [Ideal.under, Ideal.comap_bot_of_injective _ (algebraMap_ringOfIntegers_injective (K := K) (L := L))]
       at hQ
     exact v.ne_bot hQ.symm
   exact ⟨⟨Q, hQp, hQ0⟩, hQ⟩

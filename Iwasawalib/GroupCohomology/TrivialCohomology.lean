@@ -186,7 +186,7 @@ noncomputable def _root_.TrivialTateCohomology.zeroIso_ofTrivial
       ModuleCat.of R (M ⧸ LinearMap.range (Nat.card G : M →ₗ[R] M)) :=
   TateCohomology.zeroIso M|>.trans <| LinearEquiv.toModuleIso <|
     Submodule.Quotient.equiv _ _
-      (LinearEquiv.ofEq _ _ (by ext; simp) ≪≫ₗ Submodule.topEquiv) <| by
+      (LinearEquiv.ofEq _ _ (by ext; simp [Representation.isTrivial_apply]) ≪≫ₗ Submodule.topEquiv) <| by
     rw [Representation.norm_ofIsTrivial]
     ext m
     simp [Submodule.submoduleOf]

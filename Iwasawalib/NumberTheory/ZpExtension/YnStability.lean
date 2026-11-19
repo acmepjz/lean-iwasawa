@@ -30,7 +30,7 @@ private theorem restrictScalars_Ln'_eq_sup (n : ℕ) :
   apply le_antisymm
   · intro x hx
     exact IntermediateField.adjoin_induction Kinf
-      (p := fun y _ ↦ y ∈
+      (motive := fun y _ ↦ y ∈
         (IsScalarTower.toAlgHom K Kinf (SeparableClosure Kinf)).fieldRange ⊔
           (H.Ln n).restrictScalars K)
       (fun y hy ↦ (show (H.Ln n).restrictScalars K ≤ _ from le_sup_right) hy)

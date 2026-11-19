@@ -253,7 +253,7 @@ theorem exists_algEquiv_residue_of_isGalois {L : Type*} [Field L] [Algebra N L]
       rintro ⟨g, -⟩
       exact congrArg Subtype.val (hb g)
     have hg : IntermediateField.fixedField (⊤ : Subgroup (N ≃ₐ[E] N)) = ⊥ :=
-      ((IsGalois.tfae (F := E) (E := N)).out 0 1).mp ‹IsGalois E N›
+      ((IsGalois.tfae (F := E) (E := N)).out 1 2).mp ‹IsGalois E N›
     rw [hg, IntermediateField.mem_bot] at hfix
     obtain ⟨c, hc⟩ := hfix
     have hcA : c ∈ A := by

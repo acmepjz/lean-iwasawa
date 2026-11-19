@@ -95,6 +95,7 @@ lemma infl_comp_rest_zero (n : ℕ) (M : Rep R G) :
       rw [show g k = 1 by simp [g], map_one, Module.End.one_apply]
       change v.val = M.ρ k.1 v.val
       exact (v.property k).symm⟩
+  simp only [infl, NatTrans.hcomp_app] at *
   change map φ (res_quotientToInvariantsFunctor'_ι surj M) (n + 1) ≫
     map K.subtype (𝟙 _) (n + 1) = 0
   rw [← map_comp]
@@ -117,6 +118,7 @@ lemma infl_one_mono (M : Rep R G) : Mono ((infl surj 1).app M) := by
   intro z hz
   induction z using H1_induction_on with
   | @h x =>
+      simp only [infl, NatTrans.hcomp_app] at hz
       change map φ (res_quotientToInvariantsFunctor'_ι surj M) 1 (H1π _ x) = 0 at hz
       rw [H1π_comp_map_apply] at hz
       rcases (H1π_eq_zero_iff _).1 hz with ⟨y, hy⟩
@@ -230,6 +232,7 @@ theorem inflation_restriction_exact (n : ℕ) {M : Rep R G}
           e.symm (𝟙 (M ↑ surj)) 1
         refine ⟨τ z, ?_⟩
         have hfac : τ ≫ (infl surj 1).app M = (H1InfRes M φ.ker).f := by
+          simp only [infl, NatTrans.hcomp_app]
           change τ ≫ map φ (res_quotientToInvariantsFunctor'_ι surj M) 1 =
             map (QuotientGroup.mk' φ.ker)
               (Rep.ofHom (M.ρ.quotientToInvariants_lift φ.ker)) 1

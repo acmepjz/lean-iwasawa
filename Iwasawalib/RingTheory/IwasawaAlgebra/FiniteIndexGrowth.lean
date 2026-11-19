@@ -170,7 +170,7 @@ theorem exists_multiplicity_card_quotient_smul_submodule
     exists_factorization_card_quotient_smul_submodule Y e n₀ he hfin
   refine ⟨muMod p M, lambdaMod p M, ν, max n₀ N, fun n hn ↦ ?_⟩
   haveI := hfin n (le_of_lt (lt_of_le_of_lt (le_max_left _ _) hn))
-  rw [Nat.multiplicity_eq_factorization hp.out (Nat.card_ne_zero.2 ⟨⟨0⟩, inferInstance⟩)]
+  rw [Nat.multiplicity_eq_factorization hp.out]
   exact hN n (le_of_lt (lt_of_le_of_lt (le_max_right _ _) hn))
 
 
@@ -241,7 +241,7 @@ theorem exists_multiplicity_card_quotient_smul_submodule_of_isTorsion
     exists_factorization_card_quotient_smul_submodule_of_isTorsion hM Y e n₀ he hfin
   refine ⟨muMod p M, lambdaMod p M, ν, max n₀ N, fun n hn ↦ ?_⟩
   haveI := hfin n (le_of_lt (lt_of_le_of_lt (le_max_left _ _) hn))
-  rw [Nat.multiplicity_eq_factorization hp.out (Nat.card_ne_zero.2 ⟨⟨0⟩, inferInstance⟩)]
+  rw [Nat.multiplicity_eq_factorization hp.out]
   exact hN n (le_of_lt (lt_of_le_of_lt (le_max_right _ _) hn))
 
 end IwasawaAlgebra

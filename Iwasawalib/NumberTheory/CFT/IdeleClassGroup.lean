@@ -4,6 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 module
 
+public import Mathlib.Topology.Algebra.Group.Units
+
 public import Mathlib.NumberTheory.NumberField.AdeleRing
 public import Mathlib.Topology.Algebra.Group.Quotient
 
@@ -38,8 +40,6 @@ variable (R K : Type*) [CommRing R] [IsDedekindDomain R] [Field K]
 
 /-! ## The idele group -/
 
-/-- The idele group `𝕀_K` of `K`, defined as the unit group of the adele ring. -/
-abbrev IdeleGroup : Type _ := (AdeleRing R K)ˣ
 
 namespace IdeleGroup
 
@@ -48,8 +48,7 @@ instance : CommGroup (IdeleGroup R K) := inferInstance
 instance : IsTopologicalGroup (IdeleGroup R K) := inferInstance
 
 /-- The embedding of the principal ideles `Kˣ → 𝕀_K`, `x ↦ (x)ᵥ`. -/
-def principalEmbedding : Kˣ →* IdeleGroup R K :=
-  Units.map (algebraMap K (AdeleRing R K)).toMonoidHom
+abbrev principalEmbedding : Kˣ →* IdeleGroup R K := unitEmbedding R K
 
 @[simp]
 theorem coe_principalEmbedding (x : Kˣ) :
@@ -70,9 +69,6 @@ theorem principalEmbedding_injective [NumberField K] :
     simpa using congrArg (fun u : IdeleGroup R K ↦ (u : AdeleRing R K)) h
   exact Units.ext (AdeleRing.algebraMap_injective R K this)
 
-/-- The subgroup of principal ideles `(x)ᵥ` where `x ∈ Kˣ`. This is the multiplicative
-analogue of `NumberField.AdeleRing.principalSubgroup`. -/
-def principalSubgroup : Subgroup (IdeleGroup R K) := (principalEmbedding R K).range
 
 theorem mem_principalSubgroup {u : IdeleGroup R K} :
     u ∈ principalSubgroup R K ↔ ∃ x : Kˣ, principalEmbedding R K x = u := Iff.rfl
@@ -87,8 +83,6 @@ end IdeleGroup
 
 /-! ## The idele class group -/
 
-/-- The idele class group `C_K = 𝕀_K ⧸ Kˣ` of `K`. -/
-abbrev IdeleClassGroup : Type _ := IdeleGroup R K ⧸ IdeleGroup.principalSubgroup R K
 
 namespace IdeleClassGroup
 

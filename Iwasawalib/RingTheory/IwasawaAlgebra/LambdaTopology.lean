@@ -4,6 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 module
 
+public import Mathlib.Analysis.SpecificLimits.Basic
+
 public import Iwasawalib.RingTheory.IwasawaAlgebra.PowerSeriesAdic
 public import Mathlib.RingTheory.PowerSeries.PiTopology
 public import Mathlib.RingTheory.PowerSeries.Inverse
@@ -194,14 +196,13 @@ theorem hasBasis_nhds_zero_idealAX :
     intro g hg
     simp only [hC, mem_iInter, mem_inter_iff, SetLike.mem_coe, mem_compl_iff] at hg
     exact (hg 0).2 (eq_zero_of_mem_idealAX_pow_forall (fun K ↦ (hg K).1) ▸ hU0)
-  obtain ⟨u, hu⟩ := isCompact_univ.elim_finite_subfamily_closed C hCclosed hCempty
+  obtain ⟨u, hu⟩ := isCompact_univ.elim_finite_subfamily_closed C hCclosed (Set.disjoint_iff_inter_eq_empty.mpr hCempty)
   refine ⟨u.sup id, trivial, fun g hg ↦ hUs ?_⟩
   by_contra hgU
   have : g ∈ (univ : Set ℤ_[p]⟦X⟧) ∩ ⋂ K ∈ u, C K := by
     refine ⟨mem_univ g, mem_biInter fun K hK ↦ ⟨?_, hgU⟩⟩
     exact Ideal.pow_le_pow_right (Finset.le_sup (f := id) hK) hg
-  rw [hu] at this
-  exact this.elim
+  exact Set.disjoint_left.mp hu this.1 this.2
 
 /-- **The topology on `Λ = ℤ_p⟦X⟧` is the `(p, X)`-adic topology.** -/
 theorem isAdic_idealAX : IsAdic (PowerSeries.idealAX (p : ℤ_[p])) := by

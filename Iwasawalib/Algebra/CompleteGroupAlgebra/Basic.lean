@@ -5,6 +5,8 @@ Authors: Jz Pan
 -/
 module
 
+public import Mathlib.Topology.Separation.Connected
+
 public import Iwasawalib.Algebra.InverseLimit.Basic
 public import Mathlib.Algebra.MonoidAlgebra.Basic
 public import Mathlib.LinearAlgebra.Finsupp.Pi

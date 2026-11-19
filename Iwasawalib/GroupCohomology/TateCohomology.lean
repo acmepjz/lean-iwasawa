@@ -98,7 +98,7 @@ variable (M : Rep R G)
 namespace zeroIso
 
 @[simps] def sc : ShortComplex (ModuleCat R) :=
-  .mk M.norm.toModuleCatHom (d₀₁ M) (norm_comp_d_eq_zero M)
+  .mk M.norm.asHom.toModuleCatHom (d₀₁ M) (norm_comp_d_eq_zero M)
 
 set_option backward.isDefEq.respectTransparency false in
 @[simps!] def isoShortComplexH0 : (tateComplex M).sc 0 ≅ sc M :=
@@ -124,14 +124,14 @@ def zeroIso (M : Rep R G) : tateCohomology M 0 ≅
     · rintro ⟨_, ⟨y, rfl⟩, hy⟩
       exact ⟨y, congr(Subtype.val $hy)⟩
     · rintro ⟨y, rfl⟩
-      exact ⟨⟨M.norm.hom y, norm_comp_d_eq_zero_apply _ y⟩, ⟨_, rfl⟩, rfl⟩
+      exact ⟨⟨M.norm.asHom.hom y, norm_comp_d_eq_zero_apply _ y⟩, ⟨_, rfl⟩, rfl⟩
 
 namespace negOneIso
 
 variable (M : Rep R G)
 
 @[simps] def sc : ShortComplex (ModuleCat R) :=
-  .mk (d₁₀ M) M.norm.toModuleCatHom (comp_eq_zero M)
+  .mk (d₁₀ M) M.norm.asHom.toModuleCatHom (comp_eq_zero M)
 
 set_option backward.isDefEq.respectTransparency false in
 @[simps!] def isoShortComplexHneg1 : (tateComplex M).sc (-1) ≅ sc M :=
@@ -176,8 +176,8 @@ def zeroIsoOfIsTrivial :
         Submodule.topEquiv_apply, LinearEquiv.coe_ofEq_apply] at hm2 hm3
       rw [hm3.symm]
       obtain ⟨k, hk⟩ := hm2
-      exact ⟨k, by simpa [Representation.norm] using hk⟩
-    · simp [← hk, Submodule.submoduleOf, Representation.norm])
+      exact ⟨k, by simpa [Representation.norm, Representation.isTrivial_apply] using hk⟩
+    · simp [← hk, Submodule.submoduleOf, Representation.norm, Representation.isTrivial_apply])
 
 def negOneIsoOfIsTrivial :
     tateCohomology M (-1) ≅ ModuleCat.of R
@@ -186,8 +186,8 @@ def negOneIsoOfIsTrivial :
     (LinearEquiv.toModuleIso (Submodule.quotEquivOfEqBot _ (by
       ext m
       simp [Submodule.submoduleOf, ← Module.End.one_eq_id,
-        Representation.Coinvariants.ker]) ≪≫ₗ
-      LinearEquiv.ofEq _ _ (by ext m; simp [Representation.norm])))
+        Representation.Coinvariants.ker, Representation.isTrivial_apply]) ≪≫ₗ
+      LinearEquiv.ofEq _ _ (by ext m; simp [Representation.norm, Representation.isTrivial_apply])))
 
 variable {G : Type} [Group G] [Fintype G]
 
